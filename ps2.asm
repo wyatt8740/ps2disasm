@@ -22356,14 +22356,14 @@ Battle_RunRoutines:
 	move.b	(battle_main_routine_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#$C, d0
-	jmp	GameMode_Battle_EventIndex(pc,d0.w)
+	jmp	BattleModeRoutines(pc,d0.w)
 ; ------------------------------------------------------------
-GameMode_Battle_EventIndex:
-	bra.w	Battle_EventIndex_Standby
-	bra.w	Battle_EventIndex_Fighting
-	bra.w	Battle_EventIndex_RunOption
+BattleModeRoutines:
+	bra.w	BattleMode_Standby
+	bra.w	BattleMode_Fighting
+	bra.w	BattleMode_Run
 ; ------------------------------------------------------------
-Battle_EventIndex_Standby:
+BattleMode_Standby:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	loc_EB32-4(pc,d1.w)
@@ -22790,13 +22790,13 @@ loc_EFC4:
 	subq.w	#4, (event_routine).w
 	rts
 ; -----------------------------------------
-Battle_EventIndex_Fighting:
+BattleMode_Fighting:
 	lsl.w	#2, d1
 	andi.w	#$3C, d1
-	jmp	BattleEvent_Fighting_Routines-4(pc,d1.w)
+	jmp	BattleFightingRoutines-4(pc,d1.w)
 
 ; -----------------------------------------
-BattleEvent_Fighting_Routines:
+BattleFightingRoutines:
 	bra.w	loc_F004
 	bra.w	loc_F0C0
 	bra.w	loc_F188
@@ -23200,18 +23200,18 @@ GenerateRandStatIncrease:
 	rts
 ; ----------------------------------
 
-Battle_EventIndex_RunOption:
+BattleMode_Run:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
-	jmp	RunOption_EventIndex-4(pc,d1.w)
+	jmp	BattleRunRoutines-4(pc,d1.w)
 ; --------------------------------------------
-RunOption_EventIndex:
-	bra.w	Run_EventIndex_TryRun
-	bra.w	Run_EventIndex_RunSuccessful
-	bra.w	Run_EventIndex_RunFailed
-	bra.w	Run_EventIndex_RunEnemiesAttack
+BattleRunRoutines:
+	bra.w	BattleRun_Check
+	bra.w	BattleRun_Successful
+	bra.w	BattleRun_Failed
+	bra.w	BattleRun_EnemyAttack
 ; --------------------------------------------
-Run_EventIndex_TryRun:
+BattleRun_Check:
 	move.w	#WinID_BattleMessage, (window_index).w
 	move.w	#$1202, (script_id).w
 	bsr.w	DetectLeadingCharacter	; get character who's in the lead to display name in the message
@@ -23225,17 +23225,17 @@ Run_EventIndex_TryRun:
 	addq.w	#1, (event_routine).w
 	rts
 
-Run_EventIndex_RunSuccessful:
+BattleRun_Successful:
 	move.b	#GameModeID_Map, (game_mode_index).w	; exit battle screen
 	bra.w	RestoreCharDataAfterBattle
 
-Run_EventIndex_RunFailed:
+BattleRun_Failed:
 	move.w	#WinID_BattleMessage, (window_index).w
 	move.w	#$1203, (script_id).w
 	addq.w	#1, (event_routine).w
 	rts
 
-Run_EventIndex_RunEnemiesAttack:
+BattleRun_EnemyAttack:
 	moveq	#1, d0
 	move.w	d0, $FFFFCC0A.w
 	move.b	d0, (battle_main_routine_index).w
