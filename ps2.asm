@@ -651,7 +651,7 @@ loc_796:
 	move.w	(enemy_data_buffer+$10).w, d7
 	addq.w	#1, d7
 	move.w	d7, (enemy_data_buffer+2).w
-	lea	(char_battle_command_index+4).w, a1
+	lea	(char_battle_commands+4).w, a1
 	moveq	#7, d0
 -
 	tst.w	(a1)
@@ -3182,30 +3182,30 @@ BattleCharacterRoutines:
 ; ---------------------------------------------------------------
 BattleCharacter_Init:
 	move.b	#$12, render_flags(a0)
-	move.w	x_pos(a0), $C(a0)
-	move.w	y_pos(a0), $10(a0)
-	move.w	#$FFE8, $1C(a0)
-	move.w	fighter_id(a0), $16(a0)
-	move.w	#0, $1A(a0)
-	move.w	#3, $28(a0)
-	move.w	#1, routine(a0)
+	move.w	x_pos(a0), saved_x_pos(a0)
+	move.w	y_pos(a0), saved_y_pos(a0)
+	move.w	#$FFE8, attack_x_offset(a0)
+	move.w	fighter_id(a0), battle_anim(a0)
+	move.w	#0, battle_anim_frame(a0)
+	move.w	#3, anim_timer_start(a0)
+	move.w	#1, routine(a0)	; => BattleCharacter_Wait
 	lea	(character_stats+curr_hp).w, a3
 	move.w	fighter_id(a0), d0			; get character index
 	lsl.w	#6, d0
 	adda.w	d0, a3
 	tst.w	(a3)
-	bne.s	loc_1B2C		; branch if character is not dead
+	bne.s	+		; branch if character is not dead
 	move.w	#3, routine(a0)			; => BattleCharacter_Dead
-loc_1B2C:
++
 	rts
 ; ---------------------------------------------------------------
 BattleCharacter_Wait:
 	tst.w	(fight_active_flag).w
 	bne.s	loc_1B4E
-	move.w	$C(a0), x_pos(a0)
-	move.w	$10(a0), y_pos(a0)
+	move.w	saved_x_pos(a0), x_pos(a0)
+	move.w	saved_y_pos(a0), y_pos(a0)
 	move.b	#$10, render_flags(a0)		; display sprites
-	move.w	#0, $24(a0)		; get first sprite mappings
+	move.w	#0, mapping_frame(a0)		; get first sprite mappings
 	rts
 
 loc_1B4E:
@@ -3267,7 +3267,7 @@ loc_1C1A:
 	rts
 
 loc_1C1C:
-	move.w	$C(a0), x_pos(a0)
+	move.w	saved_x_pos(a0), x_pos(a0)
 	btst	#0, 3(a0)
 	beq.s	loc_1C1A
 	lea	(character_stats).w, a3
@@ -3278,7 +3278,7 @@ loc_1C1C:
 	move.w	(a3), d0
 	tst.b	d0
 	beq.w	loc_1D2E
-	lea	(char_battle_command_index).w, a5
+	lea	(char_battle_commands).w, a5
 	move.w	fighter_id(a0), d1
 	lsl.w	#4, d1
 	adda.w	d1, a5
@@ -3348,7 +3348,7 @@ loc_1CF2:
 	rts
 
 loc_1D18:
-	subq.b	#1, 1(a3)
+	subq.b	#1, paralyze_timer(a3)
 	bne.s	loc_1D2A
 	move.w	#WinID_BattleMessage, (window_index).w
 	move.w	#$1222, (script_id).w		; "'Character' is no longer paralyzed!"
@@ -3359,7 +3359,7 @@ loc_1D2E:
 	btst	#$E, d0
 	bne.s	loc_1D2A
 loc_1D34:
-	lea	(char_battle_command_index).w, a5
+	lea	(char_battle_commands).w, a5
 	move.w	fighter_id(a0), d0		; get index for character
 	lsl.w	#4, d0			; get character we just selected
 	adda.w	d0, a5
@@ -3377,16 +3377,16 @@ Battle_CommandUsedIndex:
 ; ---------------------------------------------------------------
 CommandUsed_Attack:
 	lea	(character_stats).w, a3
-	move.w	$36(a0), d0
+	move.w	fighter_id(a0), d0
 	lsl.w	#6, d0
 	adda.w	d0, a3
-	_bclr	#0, 0(a3)
+	_bclr	#0, 0(a3)	; clear defense flag
 	moveq	#0, d3
-	move.b	$21(a3), d3		; get right hand weapon
+	move.b	right_hand(a3), d3		; get right hand weapon
 	addq.w	#1, (a5)
 	andi.w	#1, (a5)+
 	bne.s	loc_1D9E
-	move.b	$22(a3), d3		; get left hand weapon
+	move.b	left_hand(a3), d3		; get left hand weapon
 	move.w	d3, d0
 	lsl.w	#4, d0
 
@@ -3409,12 +3409,12 @@ loc_1D9E:
 	adda.w	d0, a6
 	moveq	#0, d6
 	move.b	(a6)+, d6
-	bne.w	loc_1E54
-	move.w	$36(a0), $16(a0)
+	bne.w	BattleAttack_FixedDamage
+	move.w	fighter_id(a0), battle_anim(a0)
 	moveq	#0, d0
 	move.b	(a6)+, d0
 	beq.s	loc_1DDE
-	move.w	#9, $16(a0)
+	move.w	#9, battle_anim(a0)
 	subq.w	#1, d0
 	beq.s	loc_1E06
 loc_1DDE:
@@ -3460,7 +3460,7 @@ loc_1E4C:
 
 	bra.w	loc_1F30
 
-loc_1E54:
+BattleAttack_FixedDamage:
 	move.w	#8, $16(a0)
 	moveq	#0, d4
 	move.b	(a6)+, d4
@@ -5940,7 +5940,7 @@ MapChar_ChkMoveRight:
 	move.w	#1, x_moving_flag(a0)
 	bra.s	loc_38FC
 loc_38F4:
-	move.w	facing_dir(a0), frame_index(a0)
+	move.w	facing_dir(a0), mapping_frame(a0)
 	rts
 
 loc_38FC:
@@ -5955,18 +5955,18 @@ loc_390E:
 	andi.w	#$FF, ($FFFFF740).w
 	move.w	x_pos(a0), (a2)+
 	move.w	y_pos(a0), (a2)
-	subq.w	#1, frame_duration(a0)
+	subq.w	#1, anim_frame_timer(a0)
 	bpl.w	loc_3956
-	move.w	#7, frame_duration(a0)
-	move.w	anim_index(a0), d0
-	addq.w	#1, anim_index(a0)
-	andi.w	#3, anim_index(a0)
+	move.w	#7, anim_frame_timer(a0)
+	move.w	anim_frame(a0), d0
+	addq.w	#1, anim_frame(a0)
+	andi.w	#3, anim_frame(a0)
 
 	lea	(Map_SpriteMappingsArray).l, a1
 	adda.w	d0, a1
 	move.b	(a1), d0
 	add.w	facing_dir(a0), d0
-	move.w	d0, frame_index(a0)
+	move.w	d0, mapping_frame(a0)
 loc_3956:
 	move.w	#0, ($FFFFF726).w
 	move.w	#0, ($FFFFF724).w
@@ -6004,7 +6004,7 @@ loc_39CA:
 	rts
 
 loc_39D0:
-	move.w	facing_dir(a0), frame_index(a0)
+	move.w	facing_dir(a0), mapping_frame(a0)
 	move.w	#0, x_moving_flag(a0)
 	move.w	#0, y_moving_flag(a0)
 	rts
@@ -22771,7 +22771,7 @@ loc_EF98:
 	move.w	(character_index_2).w, d2
 ; -----------------------------------------
 CommandAction_Defense:
-	lea	(char_battle_command_index).w, a0
+	lea	(char_battle_commands).w, a0
 	move.w	(character_index).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
@@ -22827,7 +22827,7 @@ loc_F004:
 	adda.w	d1, a2
 	tst.w	2(a2)			; check character's HP
 	beq.s	+				; don't bother if character's dead
-	lea	(char_battle_command_index).w, a5
+	lea	(char_battle_commands).w, a5
 	move.w	d2, d1
 	lsl.w	#4, d1		; get correct character in RAM
 	adda.w	d1, a5
@@ -23274,7 +23274,7 @@ loc_F4EC:
 
 loc_F4F8:
 	move.b	(a1), d0
-	lea	(char_battle_command_index).w, a1
+	lea	(char_battle_commands).w, a1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 	move.w	(a1), d0
@@ -23335,7 +23335,7 @@ loc_F570:
 	adda.w	d1, a1
 	moveq	#0, d0
 	move.b	(a1), d0
-	lea	(char_battle_command_index).w, a1
+	lea	(char_battle_commands).w, a1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 loc_F584:
@@ -25327,7 +25327,7 @@ loc_10946:
 	addi.w	#WinID_BattleEmptySpots-WinID_BattleCharStats, (window_index).w
 	rts
 loc_1095A:
-	lea	(char_battle_command_index).w, a1
+	lea	(char_battle_commands).w, a1
 	move.w	d1, d0
 	lsl.w	#4, d0
 	adda.w	d0, a1
