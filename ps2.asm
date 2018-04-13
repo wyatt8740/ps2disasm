@@ -3832,8 +3832,8 @@ TechAction_Shinb:
 	bset	#4, 3(a2)
 	tst.w	(enemy_data_buffer+$18).w
 	beq.s	loc_22EA
-	bsr.w	loc_27AA		; this branches to the wrong location; there's data at that location that doesn't make sense for Shinb, that's why it never works;
-							; branch to this location instead: loc_27C8 --  now Shinb will make you run away with 100% chance
+; The following subroutine requires the enemy_stats address to be loaded in a1, but it's missing in this section.
+	bsr.w	loc_27AA
 	bmi.s	loc_22EA
 	move.w	#$1202, (battle_script_id).w
 	move.b	#2, (battle_main_routine_index).w
