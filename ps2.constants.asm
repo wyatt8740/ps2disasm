@@ -1147,7 +1147,12 @@ ramaddr function x,-(-x)&$FFFFFFFF
 
 ram_start =  ramaddr($FFFF0000)
 
+chunk_table = ramaddr($FFFF6800)
+
 window_art_buffer =  ramaddr($FFFF8000)	; used to store art tiles for windows; mainly for dynamic windows
+
+map_layout_bg =  ramaddr($FFFF9000)	; map layout for plane B
+map_layout_fg =  ramaddr($FFFFA800)	; map layout for plane A
 
 character_stats =  ramaddr($FFFFC000)
 
@@ -1265,6 +1270,9 @@ rng_seed =  ramaddr($FFFFF636)
 
 paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
 
+chunk_table_addr =  ramaddr($FFFFF714)
+map_collision_data_addr =  ramaddr($FFFFF72E)
+collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
 screen_changed_flag =  ramaddr($FFFFF734)
 
 demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo

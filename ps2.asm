@@ -605,7 +605,7 @@ loc_796:
 	addi.w	#$4000, d1
 	move.w	d1, (vdp_control_port).l
 	move.w	#1, (vdp_control_port).l
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	addi.w	#$80, d5
 	dbf	d6, -
 
@@ -677,7 +677,7 @@ loc_8D4:
 
 	movea.l	(a1)+, a0
 	movem.l	d7-a6, -(sp)
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	movem.l	(sp)+, d7-a6
 	movea.l	a1, a2
 	move.w	d6, d0			; loop for every enemy
@@ -5784,7 +5784,7 @@ MapCharacter_Init:
 	bne.s	loc_372C
 	moveq	#0, d4
 	moveq	#0, d5
-	lea	($FFFF9000).w, a1
+	lea	(map_layout_bg).w, a1
 	bsr.w	loc_6DE8
 	cmpi.w	#$11, d3
 	bcs.s	loc_372C
@@ -7414,7 +7414,7 @@ loc_4946:
 	tst.w	(jet_scooter_flag).w
 	beq.s	loc_4968
 	lea	(loc_29E16).l, a1
-	move.l	a1, ($FFFFF72E).w
+	move.l	a1, (map_collision_data_addr).w
 	move.w	#1, $22(a0)
 	move.w	#0, $2C(a0)
 	move.b	#$D8, (sound_queue).w
@@ -9201,32 +9201,37 @@ GamePausedLoop:
 	rts
 
 
-DrawArtTiles:
+; -----------------------------------------------------------------
+; Copies a plane map to a plane table
+; Inputs:
+; a1 = map address
+; d0 = VDP command to write to the plane table
+; d1 = number of cells in a row - 1
+; d2 = number of cell rows - 1
+; -----------------------------------------------------------------
+PlaneMapToVRAM:
 	lea	(vdp_control_port).l, a2
 	lea	(vdp_data_port).l, a3
-
-	move.l	#$800000, d7	; offset
+	move.l	#$800000, d7	; row increment value
 -
 	move.l	d0, (a2)	; write to control port to draw art
-
 	move.w	d1, d4
 -
 	move.w	(a1)+, (a3)
-	dbf	d4, -
-
-	add.l	d7, d0
-	dbf	d2, --
-
+	dbf	d4, -	; copy one row
+	add.l	d7, d0	; move onto next row
+	dbf	d2, --	; and copy it
 	rts
+; -----------------------------------------------------------------
 
 
-DecompressArt:
+DecompressData:
 	lea	($FFFFF7A0).w, a3
 	moveq	#0, d0
 	moveq	#0, d2
 	move.b	(a0)+, d2
 	beq.w	loc_5ED6
-	bmi.w	DecompressArtEnd
+	bmi.w	DecompressDataEnd
 	subq.w	#1, d2
 -
 	lea	($FFFFF7A0).w, a2
@@ -9272,19 +9277,19 @@ loc_5EE6:
 	rept 8
 	move.l	(a6)+, (a5)
 	endm
-	bra.s	DecompressArt
+	bra.s	DecompressData
 
-DecompressArtEnd:
+DecompressDataEnd:
 	rts
 
 
-DecompressArt2:
+DecompressData2:
 	lea	($FFFFF7A0).w, a3
 	moveq	#0, d0
 	moveq	#0, d2
 	move.b	(a0)+, d2
 	beq.w	loc_5F4C
-	bmi.w	DecompressArt2End
+	bmi.w	DecompressData2End
 	subq.w	#1, d2
 
 -
@@ -9330,9 +9335,9 @@ loc_5F5C:
 	rept 8
 	move.l	(a6)+, (a4)+
 	endm
-	bra.s	DecompressArt2
+	bra.s	DecompressData2
 
-DecompressArt2End:
+DecompressData2End:
 	rts
 
 loc_5F74:
@@ -10729,7 +10734,7 @@ Obj_Move:
 	rts
 
 loc_6DA4:
-	movea.w	($FFFFF732).w, a1
+	movea.w	(collision_map_layout_addr).w, a1
 	bsr.s	loc_6DE8
 	btst	d1, (a1)
 	bne.s	loc_6DB2
@@ -10752,7 +10757,7 @@ loc_6DCC:
 	rts
 
 JetScooter_ChkCanMove:
-	movea.w	($FFFFF732).w, a1
+	movea.w	(collision_map_layout_addr).w, a1
 	bsr.s	loc_6DE8
 	btst	d1, (a1)
 	bne.s	loc_6DDE
@@ -10800,7 +10805,7 @@ loc_6E14:
 	adda.w	d4, a1
 	moveq	#0, d3
 	move.b	(a1), d3
-	movea.l	($FFFFF72E).w, a1
+	movea.l	(map_collision_data_addr).w, a1
 	adda.w	d3, a1
 	move.w	d1, d4
 	move.w	d2, d5
@@ -10818,7 +10823,7 @@ loc_6E4E:
 	lsr.w	#4, d5
 	move.w	d5, d3
 	add.w	d1, d3
-	movea.l	$FFFFF736.w, a1
+	movea.l	($FFFFF736).w, a1
 loc_6E60:
 	cmpi.b	#$FF, (a1)
 	beq.s	loc_6E7E
@@ -10912,10 +10917,10 @@ loc_6F4E:
 loc_6F56:
 	moveq	#0, d4
 	moveq	#0, d5
-	movea.w	$FFFFF732.w, a1
+	movea.w	(collision_map_layout_addr).w, a1
 	cmpi.w	#2, ($FFFFF710).w
 	bne.s	loc_6F6A
-	lea	($FFFF9000).w, a1
+	lea	(map_layout_bg).w, a1
 loc_6F6A:
 	bsr.w	loc_6DE8
 	addq.w	#4, d1
@@ -11223,12 +11228,12 @@ GameMode_Sega:
 
 	move.l	#$40000000, (vdp_control_port).l	; write to VRAM
 	lea	(SegaLogoArt).l, a0		; load SEGA logo art
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	lea	(SegaLogoTileInd).l, a1
 	move.l	#$461C0003, d0	; VRAM with x and y offset
 	moveq	#$B, d1			; 12 cells wide
 	moveq	#3, d2			; 4 cells tall
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 
 	moveq	#pal_id_sega, d0
 	bsr.w	PaletteLoad1
@@ -11280,24 +11285,24 @@ GameMode_Title:
 	move	#$2500, sr	; enable V Interrupt
 	move.l	#$40200000, (vdp_control_port).l
 	lea	(TitleScrBGArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$60000001, (vdp_control_port).l
 	lea	(TitleScrCopyrightArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$60000002, (vdp_control_port).l
 	lea	(FontsIconsArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 
 	lea	(TitleScrBGTileInd).l, a1
 	move.l	#$60000003, d0
 	moveq	#$27, d1		; 40 cells wide
 	moveq	#$1B, d2		; 28 cells tall
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(TitleScrPlaneATileInd).l, a1
 	move.l	#$40000003, d0
 	moveq	#$27, d1
 	moveq	#$1B, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 
 	moveq	#pal_id_title, d0
 	bsr.w	PaletteLoad1
@@ -11320,7 +11325,7 @@ GameMode_Title:
 
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(TitleScrWomenArt).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	move.w	(vdp_reg1_values).w, d0	; VDP reg #1 values
 	ori.b	#$40, d0				; enable display
 	move.w	d0, (vdp_control_port).l
@@ -11361,7 +11366,7 @@ GameMode_Title:
 
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(TitScrPhantasyStarLogoArt).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	lea	(vdp_control_port).l, a2
 	lea	(vdp_data_port).l, a3
 
@@ -11427,7 +11432,7 @@ GameMode_Ending:
 	move	#$2500, sr
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(FontsIconsArt).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	bsr.w	DrawArtTiles2
 
 	lea	(vdp_control_port).l, a6
@@ -11442,18 +11447,18 @@ GameMode_Ending:
 
 	move.l	#$40200000, (vdp_control_port).l
 	lea	(loc_AF82A).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$50000002, (vdp_control_port).l
 	lea	(loc_B6E30).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$60000002, (vdp_control_port).l
 	lea	(loc_B6C2C).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	lea	(loc_B7572).l, a1
 	move.l	#$60000003, d0
 	moveq	#$27, d1
 	moveq	#$1B, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(object_ram).w, a6
 	moveq	#0, d7
 	move.w	#$3FE, d6
@@ -11677,7 +11682,7 @@ loc_7914:
 	move.b	(a0)+, d1
 	moveq	#0, d2
 	move.b	(a0)+, d2
-	bra.w	DrawArtTiles
+	bra.w	PlaneMapToVRAM
 
 loc_7932:
 	move.w	d1, $FFFFCD16.w
@@ -11992,7 +11997,7 @@ loc_7C4A:
 	move.w	#0, (fight_active_flag).w
 	lea	(loc_2B1F0).l, a0
 	lea	($FF3000).l, a4
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	tst.w	(map_index).w
 	bne.s	loc_7CA0	; branch if value is not Motavia level
 	tst.w	(jet_scooter_flag).w
@@ -12122,11 +12127,11 @@ loc_7E02:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	move.l	#$40200000, (vdp_control_port).l
 	move	#$2500, sr
 	lea	(loc_AED00).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	moveq	#$35, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, ($FFFFE400).w
@@ -12145,16 +12150,16 @@ loc_7E6A:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(loc_AF7FA).l, a1
 	move.l	#$44A20003, d0
 	moveq	#5, d1
 	moveq	#3, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	move.l	#$40200000, (vdp_control_port).l
 	move	#$2500, sr
 	lea	(loc_AED00).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	moveq	#$36, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, ($FFFFE400).w
@@ -12497,14 +12502,14 @@ loc_829E:
 	beq.s	loc_8364				; branch if we are in the Esper Mansion
 
 	lea	(RolfPortraitArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	moveq	#pal_id_rolf_port, d0
 	bsr.w	PaletteLoad1
 	bra.w	loc_8396
 
 loc_8304:
 	lea	(LibrGraphPortArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	moveq	#pal_id_graph_port, d0
 	bsr.w	PaletteLoad1
 	bra.w	loc_8396
@@ -12537,12 +12542,12 @@ loc_834C:
 loc_8364:
 	lea	(LutzPortraitArt).l, a0
 	move.l	#$40200000, (vdp_control_port).l
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	lea	(LutzPortraitTileInd).l, a1
 	move.l	#$410A0003, d0
 	moveq	#$1D, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	addq.w	#1, (event_routine).w
 	moveq	#$3B, d0
 	bsr.w	PaletteLoad1
@@ -12593,7 +12598,7 @@ LoadPortraits:
 	adda.w	d0, a1
 	movea.l	(a1), a0
 	move.l	#$40000002, (vdp_control_port).l
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	moveq	#0, d0
 	move.b	(a1), d0
 	move.w	d0, d1
@@ -12698,15 +12703,15 @@ loc_850C:
 	move.w	d0, (map_x_pos).w
 	move.l	#$60000002, (vdp_control_port).l
 	lea	(FontsIconsArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$70200003, (vdp_control_port).l
 	lea	(loc_7567A).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	lea	(loc_75BD8).l, a1
 	move.l	#$66000003, d0
 	moveq	#$27, d1
 	moveq	#$F, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	moveq	#$2F, d0
 	bsr.w	PaletteLoad1
 	cmpi.w	#$103, (enemy_data_buffer).w
@@ -12716,7 +12721,7 @@ loc_850C:
 	move.l	#$60000003, d0
 	moveq	#$27, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 loc_8594:
 	lea	(ram_start&$FFFFFF).l, a6
 	moveq	#0, d7
@@ -12889,7 +12894,7 @@ GameOverScreen:
 	move	#$2500, sr
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(FontsIconsArt).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	bsr.w	DrawArtTiles2
 	lea	(vdp_control_port).l, a6
 	move.w	#$9300, (a6)
@@ -12902,13 +12907,13 @@ GameOverScreen:
 	move.w	$FFFFF644.w, (a6)
 	move.l	#$40200000, (vdp_control_port).l
 	lea	(TitleScrBGArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move	#$2700, sr
 	lea	(loc_6C5DA).l, a1
 	move.l	#$60000003, d0
 	moveq	#$27, d1
 	moveq	#$1B, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	move	#$2500, sr
 	moveq	#pal_id_title, d0
 	bsr.w	PaletteLoad1
@@ -12988,7 +12993,7 @@ GameMode_Intro:
 
 	move.l	#$60000002, (vdp_control_port).l
 	lea	(FontsIconsArt).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	tst.w	(building_index).w
 	bne.s	loc_8950		; branch to skip initialization (this happens when we return to the Intro Screen for various reasons, like soft reset, game over, etc.)
 	bsr.w	loc_89EE
@@ -13613,7 +13618,7 @@ loc_8E00:
 	bmi.s	loc_8E18
 	lea	$FFFFF728.w, a6
 	lea	$FFFFF718.w, a5
-	lea	$FFFFA800.w, a4
+	lea	(map_layout_fg).w, a4
 	move.w	#$4000, d2
 	bsr.s	loc_8E30
 loc_8E18:
@@ -13621,7 +13626,7 @@ loc_8E18:
 	bne.s	loc_8E58
 	lea	$FFFFF72A.w, a6
 	lea	$FFFFF71C.w, a5
-	lea	($FFFF9000).w, a4
+	lea	(map_layout_bg).w, a4
 	move.w	#$6000, d2
 loc_8E30:
 	bclr	#0, (a6)
@@ -13685,7 +13690,7 @@ loc_8EBC:
 	moveq	#0, d0
 	move.b	(a0), d0
 	lsl.w	#5, d0
-	movea.l	$FFFFF714.w, a1
+	movea.l	(chunk_table_addr).w, a1
 	adda.w	d0, a1
 	move.w	d1, d0
 	bsr.w	loc_8F2E
@@ -13707,7 +13712,7 @@ loc_8EFE:
 	moveq	#0, d0
 	move.b	(a0), d0
 	lsl.w	#5, d0
-	movea.l	$FFFFF714.w, a1
+	movea.l	(chunk_table_addr).w, a1
 	adda.w	d0, a1
 	move.w	d1, d0
 	bsr.w	loc_8F2E
@@ -13813,7 +13818,7 @@ loc_8FEA:
 
 loc_9002:
 	lea	$FFFFF718.w, a5
-	lea	$FFFFA800.w, a4
+	lea	(map_layout_fg).w, a4
 	move.w	#$4000, d2
 	bsr.s	loc_902A
 	lea	$FFFFF71C.w, a5
@@ -13821,7 +13826,7 @@ loc_9002:
 	beq.s	loc_9022
 	lea	(loc_9060).l, a5
 loc_9022:
-	lea	($FFFF9000).w, a4
+	lea	(map_layout_bg).w, a4
 	move.w	#$6000, d2
 loc_902A:
 	moveq	#0, d4
@@ -13867,10 +13872,10 @@ Map_LoadData:
 	movea.l	(a4)+, a0
 	move.l	#$40000000, (vdp_control_port).l
 	bsr.w	NemDec
-	move.l	#$FF6800, $FFFFF714.w
+	move.l	#chunk_table&$FFFFFF, (chunk_table_addr).w
 	movea.l	(a4)+, a0
-	lea	($FF6800).l, a4
-	bsr.w	DecompressArt2
+	lea	(chunk_table&$FFFFFF).l, a4
+	bsr.w	DecompressData2
 	move.b	(a1)+, d0
 	move.b	d0, d1
 	lsl.w	#4, d0
@@ -13883,14 +13888,14 @@ Map_LoadData:
 	move.b	(a1), d0
 	move.w	d0, (enemy_data_buffer+6).w
 	movea.l	(a1)+, a0
-	lea	($FFFF9000).w, a4
-	bsr.w	DecompressArt2
+	lea	(map_layout_bg).w, a4
+	bsr.w	DecompressData2
 	moveq	#0, d0
 	move.b	(a1), d0
 	move.w	d0, (enemy_data_buffer+8).w
 	movea.l	(a1)+, a0
-	lea	$FFFFA800.w, a4
-	bsr.w	DecompressArt2
+	lea	(map_layout_fg).w, a4
+	bsr.w	DecompressData2
 	move.b	(a1), d0
 	move.b	d0, d1
 	andi.w	#$F, d0
@@ -13903,16 +13908,16 @@ loc_9104:
 	bset	#$E, d0
 loc_910E:
 	move.w	d0, $FFFFF712.w
-	move.w	#$A800, d0
+	move.w	#map_layout_fg, d0
 	andi.b	#$70, d1
 	beq.s	loc_9120
-	move.w	#$9000, d0
+	move.w	#map_layout_bg, d0
 loc_9120:
-	move.w	d0, $FFFFF732.w
-	move.l	(a1)+, $FFFFF72E.w
+	move.w	d0, (collision_map_layout_addr).w
+	move.l	(a1)+, (map_collision_data_addr).w
 	moveq	#0, d1
 	move.b	(a1), d1
-	move.l	(a1)+, $FFFFF736.w
+	move.l	(a1)+, ($FFFFF736).w
 	moveq	#0, d2
 	move.b	(a1)+, d2
 	move.b	(a1), d0
@@ -13942,7 +13947,7 @@ loc_915E:
 	move.w	d1, d0
 	swap	d0
 	move.l	d0, (vdp_control_port).l
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	dbf	d6, loc_915E
 
 	move.w	(map_x_pos).w, d0
@@ -14005,19 +14010,19 @@ loc_9222:
 	move.w	#$ECA, $FFFFFBAE.w
 	move.l	#$70200000, (vdp_control_port).l
 	lea	(loc_412F8).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 loc_923C:
 	cmpi.w	#MapID_NoahGroundF, (map_index).w
 	bcs.s	loc_9258
 	move.l	#$5E200000, (vdp_control_port).l
 	lea	(loc_39E9C).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 loc_9258:
 	move.w	(map_index).w, d0
 	bne.s	loc_92CC
 	tst.b	$FFFFC735.w
 	beq.s	loc_92CA
-	lea	($FFFF9000).w, a1
+	lea	(map_layout_bg).w, a1
 	move.w	#$17FF, d1
 	move.w	#$89, d0
 loc_9270:
@@ -14032,7 +14037,7 @@ loc_9278:
 	move.b	d0, $FFFF9C2C.w
 	move.b	d0, $FFFF9EC8.w
 	move.b	d0, $FFFF9C17.w
-	lea	($FFFF9000).w, a1
+	lea	(map_layout_bg).w, a1
 	tst.b	$FFFFC72F.w
 	beq.s	loc_92A0
 	lea	(loc_17C94).l, a2
@@ -18732,15 +18737,15 @@ loc_C58A:
 	bsr.w	ClearSpriteAndScroll
 	move.l	#$40200000, (vdp_control_port).l
 	lea	(loc_71362).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move.l	#$40000002, (vdp_control_port).l
 	lea	(loc_71702).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	lea	(loc_716BA).l, a1
 	move.l	#$63AC0003, d0
 	moveq	#5, d1
 	moveq	#5, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	move.w	#ObjID_Spaceship, ($FFFFEC00).w
 	moveq	#$39, d0
 	cmpi.w	#MapID_DezolisSkure, (map_index).w
@@ -19363,10 +19368,10 @@ loc_CC8E:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(loc_6D7BA).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
 	bsr.w	loc_6BBE
@@ -19387,10 +19392,10 @@ loc_CCE6:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(loc_6F040).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	move.l	#$40200000, d0
 	move.w	#$95, d7
 	bsr.w	loc_6BBE
@@ -19433,13 +19438,13 @@ loc_CD8A:
 	move.l	#$418C0003, d0
 	moveq	#$C, d1
 	moveq	#$B, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	moveq	#0, d0
 	bsr.s	loc_CDDE
 
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(TylerSpaceshipArt).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	move.l	#$40200000, d0
 	move.w	#$B3, d7
 	bsr.w	loc_6BBE
@@ -19457,7 +19462,7 @@ loc_CDDE:
 	move.l	#$41A60003, d0
 	moveq	#$E, d1
 	moveq	#$B, d2
-	bra.w	DrawArtTiles
+	bra.w	PlaneMapToVRAM
 
 loc_CDF8:
 	move.w	#$1907, (script_id).w
@@ -20174,10 +20179,10 @@ loc_D534:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	lea	(ram_start&$FFFFFF).l, a4
 	lea	(loc_6D7BA).l, a0
-	bsr.w	DecompressArt2
+	bsr.w	DecompressData2
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
 	bsr.w	loc_6BBE
@@ -20203,10 +20208,10 @@ loc_D59C:
 	move.l	#$410C0003, d0
 	moveq	#$1B, d1
 	moveq	#$D, d2
-	bsr.w	DrawArtTiles
+	bsr.w	PlaneMapToVRAM
 	move.l	#$40200000, (vdp_control_port).l
 	lea	(loc_6FF22).l, a0
-	bsr.w	DecompressArt
+	bsr.w	DecompressData
 	move	#$2500, sr
 	moveq	#$30, d0
 	bsr.w	PaletteLoad1
@@ -20591,7 +20596,7 @@ loc_D9DA:
 	add.w	d5, (characters_ram+x_pos).w
 
 	lea	(loc_29B64).l, a1
-	move.l	a1, $FFFFF72E.w
+	move.l	a1, (map_collision_data_addr).w
 	bsr.w	loc_6DA4
 	bne.s	loc_DA10
 	move.w	#$171D, (script_id).w		; "Ok. Let's get off and walk from here."
@@ -20600,7 +20605,7 @@ loc_D9DA:
 
 loc_DA10:
 	lea	(loc_29E16).l, a1
-	move.l	a1, ($FFFFF72E).w
+	move.l	a1, (map_collision_data_addr).w
 	move.w	#$171E, (script_id).w		; "We can't get off here!"
 	addq.w	#1, ($FFFFDE72).w
 	rts
