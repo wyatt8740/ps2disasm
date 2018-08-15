@@ -62,8 +62,8 @@ routine = $22	; word
 ; Properties and constants applicable to map objects
 x_moving_flag = $14	; word
 y_moving_flag = $18	; word
-y_screen_pos = $1E	; word ; y position relative to the screen
-x_screen_pos = $20 ; word ; x position relative to the screen
+sprite_y_pos = $1E	; word ; Y position for sprites
+sprite_x_pos = $20 ; word ; X position for sprites
 mapping_frame = $24	; word
 anim_frame_timer = $26	; word
 step_duration = $28	; word ; determines how many frames characters can move at a single press of a button
@@ -1117,177 +1117,195 @@ ButtonStart_Mask =  1<<ButtonStart	; $80
 
 
 ; VDP
-vdp_data_port =  $C00000
-vdp_control_port =  $C00004
-vdp_counter =  $C00008
+VDP_data_port =  $C00000
+VDP_control_port =  $C00004
+VDP_counter =  $C00008
 
-psg_input =  $C00011
+PSG_input =  $C00011
 
 ; Z80
-z80_ram =  $A00000	; start of Z80 RAM
-z80_ram_end =  $A02000	; end of non-reserved Z80 RAM
-z80_bus_request =  $A11100
-z80_reset =  $A11200
+Z80_RAM =  $A00000	; start of Z80 RAM
+Z80_RAM_end =  $A02000	; end of non-reserved Z80 RAM
+Z80_bus_request =  $A11100
+Z80_reset =  $A11200
 
-security_addr =  $A14000
+Security_addr =  $A14000
 
 ; I/O area
-hw_version =  $A10001
-hw_port_1_data =  $A10003
-hw_port_2_data =  $A10005
-hw_expansion_data =  $A10007
-hw_port_1_control =  $A10009
-hw_port_2_control =  $A1000B
-hw_expansion_control =  $A1000D
+HW_version =  $A10001
+HW_port_1_data =  $A10003
+HW_port_2_data =  $A10005
+HW_expansion_data =  $A10007
+HW_port_1_control =  $A10009
+HW_port_2_control =  $A1000B
+HW_expansion_control =  $A1000D
 
 ; RAM
 ; Make sure RAM address constants work in both 16-bit and 32-bit addressing modes
 ramaddr function x,-(-x)&$FFFFFFFF
 
 
-ram_start =  ramaddr($FFFF0000)
+RAM_start =  ramaddr($FFFF0000)
 
-chunk_table = ramaddr($FFFF6800)
+Chunk_table = ramaddr($FFFF6800)
 
-window_art_buffer =  ramaddr($FFFF8000)	; used to store art tiles for windows; mainly for dynamic windows
+Window_art_buffer =  ramaddr($FFFF8000)	; used to store art tiles for windows; mainly for dynamic windows
 
-map_layout_bg =  ramaddr($FFFF9000)	; map layout for plane B
-map_layout_fg =  ramaddr($FFFFA800)	; map layout for plane A
+Map_layout_BG =  ramaddr($FFFF9000)	; map layout for plane B
+Map_layout_FG =  ramaddr($FFFFA800)	; map layout for plane A
 
-character_stats =  ramaddr($FFFFC000)
+Character_stats =  ramaddr($FFFFC000)
 
-enemy_stats =  ramaddr($FFFFC200)
+Enemy_stats =  ramaddr($FFFFC200)
 
-party_members_num =  ramaddr($FFFFC600)		; current number of party members
-party_members_joined =  ramaddr($FFFFC604)		; number of party members that joined (incremented when going home to recruit new character)
-party_member_join_next =  ramaddr($FFFFC606)	; incremented when you reach a new town, so when you go to Rolf's house, it will use this variable to determine the event
-party_member_id =  ramaddr($FFFFC608)		; ID's for the current party members; so if Rolf is leading, the first ID value is 0; if Nei is leading, then the first value is 1, etc...
+Party_members_num =  ramaddr($FFFFC600)		; current number of party members
+Party_members_joined =  ramaddr($FFFFC604)		; number of party members that joined (incremented when going home to recruit new character)
+Party_member_join_next =  ramaddr($FFFFC606)	; incremented when you reach a new town, so when you go to Rolf's house, it will use this variable to determine the event
+Party_member_ID =  ramaddr($FFFFC608)		; ID's for the current party members; so if Rolf is leading, the first ID value is 0; if Nei is leading, then the first value is 1, etc...
 
-current_money =  ramaddr($FFFFC620)			; amount of money that you own at the moment
+Current_money =  ramaddr($FFFFC620)			; amount of money that you own at the moment
 
-chosen_letter_position =  ramaddr($FFFFC63A)	; position of the cursor when you choose letters for characters' names
+Chosen_letter_position =  ramaddr($FFFFC63A)	; position of the cursor when you choose letters for characters' names
 
-map_index =  ramaddr($FFFFC640)			; index of the map you are in
-map_y_pos =  ramaddr($FFFFC642)
-map_x_pos =  ramaddr($FFFFC644)
+Map_index =  ramaddr($FFFFC640)			; index of the map you are in
+Map_Y_pos =  ramaddr($FFFFC642)
+Map_X_pos =  ramaddr($FFFFC644)
 
-jet_scooter_flag =  ramaddr($FFFFC652)		; flag: 0 = not on jet scooter; 1 = on jet scooter
+Jet_Scooter_flag =  ramaddr($FFFFC652)		; flag: 0 = not on jet scooter; 1 = on jet scooter
 
-planet_index =  ramaddr($FFFFC658)			; 0 = Motavia; 1 = Dezolis
+Planet_index =  ramaddr($FFFFC658)			; 0 = Motavia; 1 = Dezolis
 
-character_names =  ramaddr($FFFFC660)
+Character_names =  ramaddr($FFFFC660)
 
-event_flags =  ramaddr($FFFFC710)
-treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for treasure chests are
+Event_flags =  ramaddr($FFFFC710)
+Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for treasure chests are
 
-battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle
+Battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle
 
-enemy_data_buffer =  ramaddr($FFFFCB00)
+Enemy_formation =  ramaddr($FFFFCB00)
+Encounter_step_flag =  ramaddr($FFFFCB0A)	; set to 1 if we're moving; 0 if not; used to determine if we can enter a random battle
+Enemy_num_1 =  ramaddr($FFFFCB10)
+Enemy_1 =  ramaddr($FFFFCB12)
+Enemy_num_2 =  ramaddr($FFFFCB14)
+Enemy_2 =  ramaddr($FFFFCB16)
+Escape_rate =  ramaddr($FFFFCB18)
 
-battle_main_routine_index =  ramaddr($FFFFCC00)
-fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
-fight_interrupted_flag =  ramaddr($FFFFCC04)	; flag: determines if you want to interrupt the fight and select other commands; 0 = continue fight; 1 = interrupt fight
-battle_script_id =	ramaddr($FFFFCC0C)
-battle_command_used =  ramaddr($FFFFCC0E)
-char_battle_commands =  ramaddr($FFFFCC10)	; word ; 16 bytes per character;
+Battle_main_routine_index =  ramaddr($FFFFCC00)
+Fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
+Fight_interrupted_flag =  ramaddr($FFFFCC04)	; flag: determines if you want to interrupt the fight and select other commands; 0 = continue fight; 1 = interrupt fight
+Battle_script_ID =	ramaddr($FFFFCC0C)
+Battle_command_used =  ramaddr($FFFFCC0E)
+Char_battle_commands =  ramaddr($FFFFCC10)	; word ; 16 bytes per character;
 												; bytes 1-2 = Command index; 0 = attack; 1 = technique; 2 = item; 3 = defense
 												; bytes 3-4 = ID of technique or item if those commands are used
 												; bytes 5-6 = ID of target
 
-battle_turn_index = ramaddr($FFFFCC90)	; word
-battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of fighter; bytes 3-4 = agility
+Battle_turn_index = ramaddr($FFFFCC90)	; word
+Battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of fighter; bytes 3-4 = agility
 
-script_id =  ramaddr($FFFFCD00)
-window_active_flag =  ramaddr($FFFFCD10)
-text_buffer_pointer =	ramaddr($FFFFCD12)
-text_buffer =  ramaddr($FFFFCD40)
+Script_ID =  ramaddr($FFFFCD00)
+Window_active_flag =  ramaddr($FFFFCD10)
+Text_buffer_pointer =	ramaddr($FFFFCD12)
+Text_buffer =  ramaddr($FFFFCD40)
 
-sound_ram =  ramaddr($FFFFD000)
+Sound_RAM =  ramaddr($FFFFD000)
 
-coord_flag_e0 = $FFD000
-tempo_timeout =  $FFD001
-init_tempo_value =  $FFD002
-play_sound_id =  $FFD003
-sound_queue =  ramaddr($FFFFD004)
-current_sfx_priority =  $FFD008
-track_timer =  ramaddr($FFFFD009)
-special_fm3_notes =  $FFD00A
-paused_mode =  ramaddr($FFFFD012)
-communication_byte = $FFD014
-fade_out_remain = $FFD016
-fade_timeout = $FFD017
-music_or_sfx = $FFD01B
-music_tracks = $FFD030
-sfx_tracks = $FFD150
-special_sfx_tracks = $FFD1E0
+Coord_flag_e0 = $FFD000
+Tempo_timeout =  $FFD001
+Init_tempo_value =  $FFD002
+Play_sound_ID =  $FFD003
+Sound_queue =  ramaddr($FFFFD004)
+Current_sfx_priority =  $FFD008
+Track_timer =  ramaddr($FFFFD009)
+Special_fm3_notes =  $FFD00A
+Paused_mode =  ramaddr($FFFFD012)
+Communication_byte = $FFD014
+Fade_out_remain = $FFD016
+Fade_timeout = $FFD017
+Music_or_SFX = $FFD01B
+Music_tracks = $FFD030
+SFX_tracks = $FFD150
+Special_SFX_tracks = $FFD1E0
 
-current_active_objects_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
+Current_active_objects_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
 
-window_index =  ramaddr($FFFFDE10)		; type of window to open
+Window_index =  ramaddr($FFFFDE10)		; type of window to open
 
-window_index_saved =  ramaddr($FFFFDE54)
-window_routine =  ramaddr($FFFFDE56)
+Window_index_saved =  ramaddr($FFFFDE54)
+Window_routine =  ramaddr($FFFFDE56)
 
 
-event_routine =  ramaddr($FFFFDE58)			; index for offset tables
-event_routine_2 =  ramaddr($FFFFDE5A)		; index for offset tables in child tables
-event_routine_3 =  ramaddr($FFFFDE5C)
+Event_routine =  ramaddr($FFFFDE58)			; index for offset tables
+Event_routine_2 =  ramaddr($FFFFDE5A)		; index for offset tables in child tables
+Event_routine_3 =  ramaddr($FFFFDE5C)
 
-character_index =  ramaddr($FFFFDE60)		; id for the characters; 0 = Rolf; 1 = Nei; 2 = Rudo; 3 = Amy; 4 = Hugh; 5 = Anna; 6 = Kain; 7 = Shir
-character_index_2 =  ramaddr($FFFFDE62)		; same as above. Seems to be used when character gets something from another character (e.g. healing technique)
-enemy_index =  ramaddr($FFFFDE64)		; id for the enemies
-technique_index =  ramaddr($FFFFDE66)		; id for the techniques
-tech_tp_consumption =  ramaddr($FFFFDE67)	; holds the value of the TP consumption for techniques
-item_index =  ramaddr($FFFFDE68)
-meseta_value =  ramaddr($FFFFDE6A)			; price for items, services, etc...
-exp_points_buffer =  ramaddr($FFFFDE6A)		; used to hold the value for exp points, such as when you defeat all enemies and you want to display text containing the value
+Character_index =  ramaddr($FFFFDE60)		; id for the characters; 0 = Rolf; 1 = Nei; 2 = Rudo; 3 = Amy; 4 = Hugh; 5 = Anna; 6 = Kain; 7 = Shir
+Character_index_2 =  ramaddr($FFFFDE62)		; same as above. Seems to be used when character gets something from another character (e.g. healing technique)
+Enemy_index =  ramaddr($FFFFDE64)		; id for the enemies
+Technique_index =  ramaddr($FFFFDE66)		; id for the techniques
+Tech_TP_consumption =  ramaddr($FFFFDE67)	; holds the value of the TP consumption for techniques
+Item_index =  ramaddr($FFFFDE68)
+Meseta_value =  ramaddr($FFFFDE6A)			; price for items, services, etc...
+EXP_points_buffer =  ramaddr($FFFFDE6A)		; used to hold the value for exp points, such as when you defeat all enemies and you want to display text containing the value
 
-yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
+Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
 
-object_ram =  ramaddr($FFFFE000)
-push_start_button_text =  ramaddr($FFFFE000)	; blinking text in Title Screen
-copyright_text =  ramaddr($FFFFE040)			; text apperearing at bottom right corner of the Title Screen
-characters_ram = ramaddr($FFFFE400)
+Object_RAM =  ramaddr($FFFFE000)
+Push_start_button_text =  ramaddr($FFFFE000)	; blinking text in Title Screen
+Copyright_text =  ramaddr($FFFFE040)			; text apperearing at bottom right corner of the Title Screen
+Characters_RAM = ramaddr($FFFFE400)
 
-decom_buffer =  ramaddr($FFFFF400)
+Sprite_table_input = ramaddr($FFFFF000)	; $400 (1024) bytes; holds addresses of objects whose properties will be copied to the Sprite table in VRAM
+										; This section is divided into 64 lines and each line is 16 bytes long; the first word for each line is the number of
+										; of objects followed by the object addresses. Objects are ordered from highest to lowest Y position, that is starting from the bottom of the screen
 
-game_mode_index =  ramaddr($FFFFF600)
+Decom_buffer =  ramaddr($FFFFF400)
 
-joypad_held =  ramaddr($FFFFF602)
-joypad_pressed =  ramaddr($FFFFF603)
+Game_mode_index =  ramaddr($FFFFF600)
 
-vdp_reg1_values =  ramaddr($FFFFF610)
+Joypad_held =  ramaddr($FFFFF602)
+Joypad_pressed =  ramaddr($FFFFF603)
 
-sprite_count =  ramaddr($FFFFF618)		; number of sprite counter. Starts from 80 and when it reaches 0, you cannot create more sprites
+VDP_reg1_values =  ramaddr($FFFFF610)
 
-demo_timer =  ramaddr($FFFFF61A)			; general timer for events
+Sprite_count =  ramaddr($FFFFF618)		; number of sprite counter. Starts from 80 and when it reaches 0, you cannot create more sprites
 
-vblank_routine =  ramaddr($FFFFF62A)
+Demo_timer =  ramaddr($FFFFF61A)			; general timer for events
 
-sprite_link_field_count =  ramaddr($FFFFF62C)		; counter for link field Sprite attribute
+V_int_routine =  ramaddr($FFFFF62A)
 
-rng_seed =  ramaddr($FFFFF636)
+Link_field_count =  ramaddr($FFFFF62C)		; counter for link field Sprite attribute
 
-paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
+RNG_seed =  ramaddr($FFFFF636)
 
-chunk_table_addr =  ramaddr($FFFFF714)
-map_collision_data_addr =  ramaddr($FFFFF72E)
-collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
-screen_changed_flag =  ramaddr($FFFFF734)
+Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
 
-demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
-demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
-demo_input_index =  ramaddr($FFFFF754)		; determines what joypad command should be run
+Chunk_table_addr =  ramaddr($FFFFF714)
 
-building_index =  ramaddr($FFFFF760)
-portrait_index =  ramaddr($FFFFF762)
+Camera_Y_pos =  ramaddr($FFFFF718)
+Camera_X_pos =  ramaddr($FFFFF71A)
+Camera_Y_pos_copy =  ramaddr($FFFFF71C)
+Camera_X_pos_copy =  ramaddr($FFFFF71E)
+Camera_Y_step_counter =  ramaddr($FFFFF724)
+Camera_X_step_counter =  ramaddr($FFFFF726)
 
-sprite_table =  ramaddr($FFFFF800)
+Map_collision_data_addr =  ramaddr($FFFFF72E)
+Collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
+Screen_changed_flag =  ramaddr($FFFFF734)
 
-palette_table =  ramaddr($FFFFFB00)
+Demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
+Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
+Demo_input_index =  ramaddr($FFFFF754)		; determines what joypad command should be run
 
-system_stack =  ramaddr($FFFFFE00)
+Building_index =  ramaddr($FFFFF760)
+Portrait_index =  ramaddr($FFFFF762)
 
-controls_locked =  ramaddr($FFFFFFF0)		; flag: determines whether you can control character or not; 0 = can control characters; 1 = cannot control characters
+Sprite_table_buffer =  ramaddr($FFFFF800)
 
-checksum_four_cc =  ramaddr($FFFFFFFC) 		; four bytes: string that is checked for the checksum routine.
+Palette_table_buffer =  ramaddr($FFFFFB00)
+
+System_stack =  ramaddr($FFFFFE00)
+
+Controls_locked =  ramaddr($FFFFFFF0)		; flag: determines whether you can control character or not; 0 = can control characters; 1 = cannot control characters
+
+Checksum_four_CC =  ramaddr($FFFFFFFC) 		; four bytes: string that is checked for the checksum routine.
