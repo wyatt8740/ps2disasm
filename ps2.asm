@@ -638,7 +638,7 @@ loc_796:
 	move.w	#$4000, d5
 	move.w	(Enemy_num_1).w, d6		; get number of enemies of first group
 	moveq	#0, d7
-	move.w	d7, ($FFFFCB02).w
+	move.w	d7, (Enemy_group_1_num).w
 
 	lea	($FF0020).l, a4
 	move.w	(Enemy_1).w, d0		; get enemy ID of first group
@@ -650,7 +650,7 @@ loc_796:
 	bmi.w	loc_9B8
 	move.w	(Enemy_num_1).w, d7
 	addq.w	#1, d7
-	move.w	d7, ($FFFFCB02).w
+	move.w	d7, (Enemy_group_1_num).w
 	lea	(Char_battle_commands+4).w, a1
 	moveq	#7, d0
 -
@@ -3725,11 +3725,11 @@ loc_217C:
 
 	tst.w	(Enemy_num_2).w
 	bmi.w	loc_2196
-	move.w	($FFFFCB20).w, ($FFFFCB22).w
+	move.w	(Enemy_damage_1).w, (Enemy_damage_2).w
 loc_2196:
 	tst.w	(Enemy_num_1).w
 	bpl.s	loc_21A2
-	move.w	#0, ($FFFFCB20).w
+	move.w	#0, (Enemy_damage_1).w
 loc_21A2:
 	rts
 ; ------------------------------------------
@@ -4273,7 +4273,7 @@ loc_2736:
 	moveq	#0, d5
 	tst.w	(a5)
 	bne.s	+
-	move.w	($FFFFCB02).w, d5
+	move.w	(Enemy_group_1_num).w, d5
 +
 	move.w	(Enemy_1).w, (Enemy_index).w
 	tst.w	d5
@@ -4356,9 +4356,9 @@ CheckEnemyAlive:
 	bset	#5, 3(a2)
 	moveq	#0, d1
 	move.w	$C(a1), d1			; get experience points of enemy which was killed
-	add.l	d1, ($FFFFCB30).w	; add them to the total
+	add.l	d1, (Enemy_total_EXP).w	; add them to the total
 	move.w	$A(a1), d1		; get meseta value
-	add.l	d1, ($FFFFCB34).w	; add it to the total
+	add.l	d1, (Enemy_total_meseta).w	; add it to the total
 +
 	rts
 
@@ -4404,11 +4404,11 @@ loc_2888:
 loc_288E:
 	tst.w	d5
 	bne.s	loc_2898
-	add.w	d0, ($FFFFCB20).w
+	add.w	d0, (Enemy_damage_1).w
 	rts
 
 loc_2898:
-	add.w	d0, ($FFFFCB22).w
+	add.w	d0, (Enemy_damage_2).w
 	rts
 
 
@@ -4704,7 +4704,7 @@ loc_2B94:
 	moveq	#0, d5
 	tst.w	$36(a0)
 	beq.s	loc_2BA4
-	move.w	($FFFFCB02).w, d5
+	move.w	(Enemy_group_1_num).w, d5
 loc_2BA4:
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
@@ -10909,7 +10909,7 @@ loc_6F1C:
 	move.w	(Characters_RAM+x_pos).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, $FFFFC650.w
-	move.w	#0, $FFFFCB0E.w
+	move.w	#0, (Encounter_rate_decreased_flag).w
 loc_6F4E:
 	move.b	#SFXID_MapChanged, (Sound_queue).w
 	bra.s	loc_6FA6
@@ -11993,7 +11993,7 @@ loc_7C4A:
 	move.l	a0, ($FFFFDE00).w
 	jsr	(LoadDynWindowsInRam).l
 
-	move.w	#0, ($FFFFCB0C).w
+	move.w	#0, (Encounter_step_counter).w
 	move.w	#0, (Fight_active_flag).w
 	lea	(loc_2B1F0).l, a0
 	lea	($FF3000).l, a4
@@ -12736,7 +12736,7 @@ loc_85A0:
 loc_85B2:
 	move.l	d7, (a6)+
 	dbf	d6, loc_85B2
-	lea	($FFFFCB30).w, a6
+	lea	(Enemy_total_EXP).w, a6
 	moveq	#0, d7
 	move.w	#$33, d6
 -
@@ -12797,8 +12797,8 @@ loc_85D6:
 	moveq	#0, d0
 	move.l	d0, (Camera_Y_pos).w
 	move.l	d0, (Camera_Y_pos_copy).w
-	move.w	d0, $FFFFCB20.w
-	move.w	d0, $FFFFCB22.w
+	move.w	d0, (Enemy_damage_1).w
+	move.w	d0, (Enemy_damage_2).w
 	move.w	#$92, d0		; normal battle music
 	tst.b	(Enemy_formation).w ; The code expects the boss formation ID's to start from $100. This means that we skip the line following the beq.s condition when the MSB is 0
 	beq.s	+	; branch if this is a normal battle
@@ -13886,13 +13886,13 @@ Map_LoadData:
 	move.w	d1, $FFFFF722.w
 	moveq	#0, d0
 	move.b	(a1), d0
-	move.w	d0, ($FFFFCB06).w
+	move.w	d0, (Formations_index_1).w
 	movea.l	(a1)+, a0
 	lea	(Map_layout_BG).w, a4
 	bsr.w	DecompressData2
 	moveq	#0, d0
 	move.b	(a1), d0
-	move.w	d0, ($FFFFCB08).w
+	move.w	d0, (Formations_index_2).w
 	movea.l	(a1)+, a0
 	lea	(Map_layout_FG).w, a4
 	bsr.w	DecompressData2
@@ -15212,7 +15212,7 @@ loc_9F2E:
 -
 	cmpi.b	#$80, (Track_timer).w
 	bne.s	-
-	move.w	#$FFFF, $FFFFCB0E.w
+	move.w	#$FFFF, (Encounter_rate_decreased_flag).w
 	addq.w	#1, (Event_routine_2).w
 	bra.w	RemoveItemFromInventory
 ; -------------------------------------------
@@ -22546,7 +22546,7 @@ loc_ED06:
 	moveq	#0, d1
 	move.w	(Character_index_2).w, d2
 	beq.s	loc_ED12
-	move.w	($FFFFCB02).w, d2
+	move.w	(Enemy_group_1_num).w, d2
 loc_ED12:
 	bra.w	CommandAction_Defense
 ; -----------------------------------------
@@ -22909,8 +22909,8 @@ loc_F0C0:
 	move.l	#$66C066D, (a1)+
 +
 	moveq	#0, d0
-	move.w	d0, $FFFFCB20.w
-	move.w	d0, $FFFFCB22.w
+	move.w	d0, (Enemy_damage_1).w
+	move.w	d0, (Enemy_damage_2).w
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d1
 -
@@ -23060,7 +23060,7 @@ loc_F2A4:
 
 	tst.w	d2
 	beq.s	loc_F302
-	move.l	($FFFFCB30).w, d0	; get EXP
+	move.l	(Enemy_total_EXP).w, d0	; get EXP
 	divu.w	d2, d0		; divide the EXP by the number of characters alive
 	andi.l	#$FFFF, d0
 	addq.l	#1, d0
@@ -23086,7 +23086,7 @@ loc_F302:
 	rts
 loc_F308:
 	move.w	#$1213, (Script_ID).w
-	move.l	($FFFFCB34).w, d0	; get enemy's total meseta
+	move.l	(Enemy_total_meseta).w, d0	; get enemy's total meseta
 	add.l	d0, (Current_money).w			; add it to your money
 	move.l	d0, (Meseta_value).w		; move it so that it's displayed later in the victory message
 	move.w	#0, ($FFFFC602).w
@@ -25510,7 +25510,7 @@ loc_10B16:
 	bsr.w	loc_10A64
 	tst.w	d1
 	beq.s	loc_10B24
-	move.w	($FFFFCB02).w, d1
+	move.w	(Enemy_group_1_num).w, d1
 loc_10B24:
 	move.w	d1, (Character_index_2).w
 	rts
@@ -25850,11 +25850,11 @@ loc_10EA0:
 ; -------------------------------
 ; loc_10EB8
 Win_FirstEnemyInfo:
-	move.w	$FFFFCB20.w, d0
+	move.w	(Enemy_damage_1).w, d0
 	bra.s	loc_10EC2
 ; loc_10EBE
 Win_SecondEnemyInfo:
-	move.w	$FFFFCB22.w, d0
+	move.w	(Enemy_damage_2).w, d0
 loc_10EC2:
 	tst.b	d1
 	beq.s	loc_10ED4
@@ -27222,14 +27222,14 @@ loc_11716:
 	adda.w	d1, a1
 	moveq	#0, d2
 	move.b	(a1), d2
-	addq.w	#1, ($FFFFCB0C).w
+	addq.w	#1, (Encounter_step_counter).w
 	tst.w	(Jet_Scooter_flag).w
 	bne.s	+
-	addq.w	#1, ($FFFFCB0C).w
+	addq.w	#1, (Encounter_step_counter).w
 +
-	tst.w	$FFFFCB0E.w
+	tst.w	(Encounter_rate_decreased_flag).w
 	bne.s	loc_117C6
-	addq.w	#2, ($FFFFCB0C).w
+	addq.w	#2, (Encounter_step_counter).w
 	bra.s	loc_117C6
 
 loc_11778:
@@ -27246,29 +27246,29 @@ loc_11778:
 	adda.w	d1, a1
 	moveq	#0, d2
 	move.b	(a1), d2
-	addq.w	#2, ($FFFFCB0C).w
-	tst.w	$FFFFCB0E.w
+	addq.w	#2, (Encounter_step_counter).w
+	tst.w	(Encounter_rate_decreased_flag).w
 	bne.s	loc_117C6
-	addq.w	#2, ($FFFFCB0C).w
+	addq.w	#2, (Encounter_step_counter).w
 	bra.s	loc_117C6
 loc_117B0:
-	move.w	($FFFFCB06).w, d2
+	move.w	(Formations_index_1).w, d2
 	tst.b	$FFFFC737.w
 	beq.s	+
-	move.w	($FFFFCB08).w, d2
+	move.w	(Formations_index_2).w, d2
 +
 	tst.w	d2
 	beq.s	+		; no enemies, so return
-	addq.w	#2, ($FFFFCB0C).w
+	addq.w	#2, (Encounter_step_counter).w
 loc_117C6:
-	andi.w	#$FF, ($FFFFCB0C).w
+	andi.w	#$FF, (Encounter_step_counter).w
 	jsr	(UpdateRNGSeed).l
 	andi.w	#$FF, d0
-	move.w	($FFFFCB0C).w, d1
+	move.w	(Encounter_step_counter).w, d1
 	lsr.w	#3, d1
 	cmp.w	d1, d0
 	bcc.s	+	; rts
-	move.w	#0, ($FFFFCB0C).w
+	move.w	#0, (Encounter_step_counter).w
 	swap	d0
 	lea	(EnemyFormationTable).l, a1
 	lsl.w	#3, d2

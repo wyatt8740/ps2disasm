@@ -1183,12 +1183,21 @@ Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for tr
 Battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle
 
 Enemy_formation =  ramaddr($FFFFCB00)
+Enemy_group_1_num =  ramaddr($FFFFCB02)
+Formations_index_1 =  ramaddr($FFFFCB06)
+Formations_index_2 =  ramaddr($FFFFCB08)
 Encounter_step_flag =  ramaddr($FFFFCB0A)	; set to 1 if we're moving; 0 if not; used to determine if we can enter a random battle
+Encounter_step_counter =  ramaddr($FFFFCB0C)
+Encounter_rate_decreased_flag =  ramaddr($FFFFCB0E)	; affected by Hidapipe
 Enemy_num_1 =  ramaddr($FFFFCB10)
 Enemy_1 =  ramaddr($FFFFCB12)
 Enemy_num_2 =  ramaddr($FFFFCB14)
 Enemy_2 =  ramaddr($FFFFCB16)
 Escape_rate =  ramaddr($FFFFCB18)
+Enemy_damage_1 =  ramaddr($FFFFCB20)	; HP loss when enemy is attacked (first group)
+Enemy_damage_2 =  ramaddr($FFFFCB22)	; HP loss when enemy is attacked (second group)
+Enemy_total_EXP =  ramaddr($FFFFCB30)
+Enemy_total_meseta =  ramaddr($FFFFCB34)
 
 Battle_main_routine_index =  ramaddr($FFFFCC00)
 Fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
