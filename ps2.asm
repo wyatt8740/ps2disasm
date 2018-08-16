@@ -160,7 +160,7 @@ PtrGameMode_Ending:   jmp	(GameMode_Ending).l
 	nop
 PtrGameMode_Map:    jmp	(GameMode_Map).l
 	nop
-PtrGameMode_Building: jmp	(GameMode_Building).l
+PtrGameMode_Interaction: jmp	(GameMode_Interaction).l
 	nop
 PtrGameMode_Battle:   jmp	(GameMode_Battle).l
 	nop
@@ -5842,7 +5842,7 @@ loc_3786:
 	bpl.s	loc_381A
 	cmpi.b	#$FF, d0
 	bne.s	loc_37EC
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w
@@ -7779,9 +7779,9 @@ loc_4DBC:
 loc_4DBE:
 	subq.w	#1, $32(a0)
 	bpl.s	loc_4DD6
-	move.w	#BuildingID_EsperMansion, (Building_index).w
+	move.w	#InteractionID_EsperMansion, (Interaction_index).w
 	move.w	#$39, (Portrait_index).w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 loc_4DD6:
 	rts
 ; --------------------------------------------------------------
@@ -8859,7 +8859,7 @@ loc_5A8E:
 VInt:
 	movem.l	d0-a6, -(sp)
 	tst.b	(V_int_routine).w
-	beq.s	VBlankExit
+	beq.s	VInt_Exit
 	move.w	(VDP_control_port).l, d0
 	move.w	(VDP_reg1_values).w, d0	; get VDP reg #1 values
 	ori.b	#$40, d0				; enable display
@@ -8883,49 +8883,52 @@ VInt:
 +
 	move.b	(V_int_routine).w, d0	; get VInt index
 	andi.w	#$3C, d0
-	jsr	VBlankIndexTable-4(pc,d0.w)
+	jsr	VIntRoutines-4(pc,d0.w)
 	move.w	(VDP_reg1_values).w, d0	; get VDP reg #1 values
 	ori.b	#$40, d0				; enable display
 	move.w	d0, (VDP_control_port).l
 
-VBlankExit:
+VInt_Exit:
 	jsr	(SoundDriverInput).l
 	bsr.w	UpdateRNGSeed
 	move.b	#0, (V_int_routine).w
 	movem.l	(sp)+,d0-a6
 	rte
 
-VBlankIndexTable:
-	bra.w	VBlankSub_04_08
-	bra.w	VBlankSub_04_08
-	bra.w	loc_5B52
-	bra.w	VBlankSub_10
-	bra.w	VBlankSub_14
-	bra.w	loc_5BB0
-	bra.w	VBlankSub_1C_24
-	bra.w	loc_5B58
-	bra.w	VBlankSub_1C_24
+
+; =================================================================
+VIntRoutines:
+	bra.w	VInt_SegaTitle		; 4
+	bra.w	VInt_SegaTitle		; 8
+	bra.w	VInt_Ending			; $C
+	bra.w	VInt_Map			; $10
+	bra.w	VInt_Interaction	; $14
+	bra.w	VInt_Battle			; $18
+	bra.w	VInt_NormalUpdates		; $1C
+	bra.w	VInt_GamePause		; $20
+	bra.w	VInt_NormalUpdates		; $24
+; =================================================================
 
 
-VBlankSub_04_08:
-	bsr.w	VBlankSub_1C_24
+VInt_SegaTitle:
+	bsr.w	VInt_NormalUpdates
 	tst.w	(Demo_timer).w
 	beq.w	+		; don't decrease timer if already 0
 	subq.w	#1,(Demo_timer).w	; otherwise subtract 1 to timer
 +
 	rts
 
-loc_5B52:
-	bsr.w	VBlankSub_1C_24
+VInt_Ending:
+	bsr.w	VInt_NormalUpdates
 	rts
 
-loc_5B58:
+VInt_GamePause:
 	bsr.w	ReadJoypads
 	rts
 
 
-VBlankSub_10:
-	bsr.w	VBlankSub_1C_24
+VInt_Map:
+	bsr.w	VInt_NormalUpdates
 	tst.w	(Map_index).w
 	bne.s	loc_5B6E
 	tst.w	(Jet_Scooter_flag).w
@@ -8946,13 +8949,13 @@ loc_5B96:
 	bsr.w	ProcessWindows
 	rts
 
-VBlankSub_14:
-	bsr.w	VBlankSub_1C_24
+VInt_Interaction:
+	bsr.w	VInt_NormalUpdates
 	bsr.w	ProcessWindows
 	rts
 
-loc_5BB0:
-	bsr.w	VBlankSub_1C_24
+VInt_Battle:
+	bsr.w	VInt_NormalUpdates
 	lea	(VDP_control_port).l, a6
 	move.w	#$93C0, (a6)
 	move.w	#$9403, (a6)
@@ -8979,7 +8982,7 @@ loc_5BB0:
 	rts
 
 
-VBlankSub_1C_24:
+VInt_NormalUpdates:
 	bsr.w	ReadJoypads
 
 	; DMA 68k to VDP
@@ -9187,7 +9190,7 @@ CheckGamePause:
 
 GamePausedLoop:
 	move.b	#$20, (V_int_routine).w	; VInt index
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	btst	#Button_B, (Joypad_held).w	; check if B is being held down
 	bne.s	+	; if it is, return to enable slow motion
 	btst	#Button_C, (Joypad_pressed).w	; check if C is being pressed
@@ -9652,7 +9655,7 @@ loc_61F4:
 	move.w	#$14, d4		; duration
 -
 	move.b	#$24, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.s	PaletteFadeIn
 	dbf	d4, -
 
@@ -9711,7 +9714,7 @@ PaletteFadeFrom:
 	move.w	#$14, d4		; fade duration
 -
 	move.b	#$24, (V_int_routine).w	; V Blank index
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.s	PaletteFadeOut
 	dbf	d4, -
 	rts
@@ -9768,7 +9771,7 @@ loc_62CC:
 	move.w	#$14, d4
 loc_62F0:
 	move.b	#$24, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.s	loc_6302
 	dbf	d4, loc_62F0
 
@@ -9818,7 +9821,7 @@ loc_634E:
 	move.w	#$14, d4
 loc_635A:
 	move.b	#$24, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.s	loc_636C
 	dbf	d4, loc_635A
 	rts
@@ -10152,8 +10155,8 @@ loc_66C0:
 
 
 loc_66F6:
-	move.w	(Building_index).w, d0
-	cmpi.w	#BuildingID_GairaControlPanel, d0
+	move.w	(Interaction_index).w, d0
+	cmpi.w	#InteractionID_GairaControlPanel, d0
 	bne.w	loc_6754
 	cmpi.w	#4, (Event_routine).w
 	bcc.s	loc_6752
@@ -10511,7 +10514,7 @@ PaletteLoad2:
 	rts
 
 
-WaitForVBlank:
+WaitForVInt:
 	move	#$2500, sr
 -
 	tst.b	(V_int_routine).w
@@ -10560,7 +10563,7 @@ loc_6BD2:
 	moveq	#3, d4
 loc_6BD4:
 	move.b	#$24, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	dbf	d4, loc_6BD4
 
 	bsr.s	FadeArtTiles
@@ -10633,7 +10636,7 @@ loc_6C54:
 	moveq	#$1F, d5
 loc_6C68:
 	move.b	#$24, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	move.l	d0, d4
 	swap	d4
 	move.w	d7, d6
@@ -10881,14 +10884,14 @@ loc_6ED6:
 	rts
 
 loc_6EE6:
-	move.w	d0, (Building_index).w
+	move.w	d0, (Interaction_index).w
 	move.b	(a1)+, d0
 	move.w	d0, (Portrait_index).w
 	move.b	(a1)+, d0
 	move.w	d0, $FFFFF764.w
 	move.b	(a1), d0
 	move.w	d0, $FFFFF766.w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w
@@ -11066,7 +11069,7 @@ loc_711C:
 	dbf	d0, loc_711C
 	move.b	#SFXID_DangerousFloor, (Sound_queue).w
 	move.b	#$10, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	lea	(Palette_table_buffer).w, a1
 	lea	$FFFFFB80.w, a2
 	moveq	#$1F, d0
@@ -11076,7 +11079,7 @@ loc_7140:
 	moveq	#6, d0
 loc_7148:
 	move.b	#$10, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	dbf	d0, loc_7148
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d0
@@ -11246,7 +11249,7 @@ GameMode_Sega:
 	bsr.w	PaletteFadeTo
 -
 	move.b	#4, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.w	PaletteCycle
 	tst.w	(Demo_timer).w	; check timer
 	beq.w	+	; if timer is 0 move to title screen
@@ -11334,7 +11337,7 @@ GameMode_Title:
 
 -
 	move.b	#8, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	andi.b	#ButtonStart_Mask, (Joypad_pressed).w	; start press?
 	bne.w	MoveToGameMode_Intro		; if so, exit title screen
 	bsr.w	RunObjects
@@ -11353,7 +11356,7 @@ GameMode_Title:
 
 -
 	move.b	#8, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	andi.b	#ButtonStart_Mask, (Joypad_pressed).w
 	bne.w	MoveToGameMode_Intro
 	dbf	d4, -
@@ -11377,7 +11380,7 @@ GameMode_Title:
 
 -
 	move.b	#8, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	andi.b	#ButtonStart_Mask, (Joypad_pressed).w
 	bne.s	MoveToGameMode_Intro
 	dbf	d4, -
@@ -11393,7 +11396,7 @@ GameMode_TitleLoop:
 	move.w	#ObjID_PushStartButton5, (Push_start_button_text).w		; part of object ram
 	move.w	#ObjID_CopyrightText, (Copyright_text).w				; part of object ram
 	move.b	#8, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
 	tst.w	(Demo_timer).w
@@ -11404,7 +11407,7 @@ GameMode_TitleLoop:
 MoveToGameMode_Intro:
 	move.w	#0, (Controls_locked).w		; unlock controls
 	move.b	#GameModeID_Intro, (Game_mode_index).w
-	move.w	#BuildingID_RolfHouseStart, (Building_index).w
+	move.w	#InteractionID_RolfHouseStart, (Interaction_index).w
 	rts
 
 
@@ -11486,7 +11489,7 @@ loc_7660:
 	bsr.w	loc_62CC
 	move.w	#$120, ($FFFFF620).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#0, d0
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
@@ -11496,7 +11499,7 @@ loc_7660:
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF61C).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#8, d0
 	bsr.w	loc_7914
 	move.w	#$4584, d1
@@ -11507,7 +11510,7 @@ loc_7660:
 	move.w	#$120, ($FFFFF620).w
 	move.w	#$120, ($FFFFF61C).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#$10, d0
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
@@ -11517,7 +11520,7 @@ loc_7660:
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF620).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#$18, d0
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
@@ -11527,7 +11530,7 @@ loc_7660:
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF61C).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#$20, d0
 	bsr.w	loc_7914
 	move.w	#$4584, d1
@@ -11538,7 +11541,7 @@ loc_7660:
 	move.w	#$120, ($FFFFF620).w
 	move.w	#$120, ($FFFFF61C).w
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	moveq	#$28, d0
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
@@ -11553,7 +11556,7 @@ loc_7660:
 	moveq	#6, d5
 loc_77B2:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	move.w	d3, d0
 	bsr.w	loc_7914
 	addq.w	#8, d3
@@ -11584,7 +11587,7 @@ loc_7824:
 	moveq	#2, d0
 -
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	dbf	d0, -
 
 	bsr.w	RunObjects
@@ -11603,7 +11606,7 @@ loc_7824:
 
 loc_785C:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, (Joypad_pressed).w
 	beq.s	loc_785C
 
@@ -11692,7 +11695,7 @@ loc_7932:
 	bsr.w	PaletteLoad2
 loc_794A:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	add.w	d2, ($FFFFF61C).w
 	andi.w	#$1FF, ($FFFFF61C).w
 	bne.s	loc_7964
@@ -11709,9 +11712,9 @@ loc_7976:
 	bne.s	loc_794A
 loc_797C:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	move.b	#$C, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.w	CheckPrepareWindows
 	subq.w	#1, (Demo_timer).w
 	bne.s	loc_797C
@@ -11732,7 +11735,7 @@ loc_79C0:
 	move.w	#$3C, (Demo_timer).w
 loc_79D2:
 	move.b	#$C, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	subq.w	#1, (Demo_timer).w
 	bne.s	loc_79D2
 	move.w	#$168, (Demo_timer).w
@@ -12059,7 +12062,7 @@ loc_7D08:
 	move.w	d0, (VDP_control_port).l
 	move	#$2500, sr
 	move.b	#$10, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	cmpi.w	#$E00, (Event_flags).w
 	beq.s	loc_7D66
 	bsr.w	PaletteFadeTo
@@ -12071,7 +12074,7 @@ loc_7D66:
 GameMode_MapLoop:
 	bsr.w	CheckGamePause
 	move.b	#$10, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	tst.w	(Controls_locked).w
 	bne.s	+	; branch if controls are locked
 	bsr.w	RunObjects
@@ -12463,7 +12466,7 @@ loc_824C:
 ; ------------------------------------------------------------
 
 ; ------------------------------------------------------------
-GameMode_Building:
+GameMode_Interaction:
 	bsr.w	PaletteFadeFrom
 	move	#$2700, sr
 	move.w	(VDP_reg1_values).w, d0
@@ -12492,13 +12495,13 @@ loc_829E:
 	moveq	#2, d0
 	bsr.w	PaletteLoad1
 	move.l	#$54000002, (VDP_control_port).l
-	cmpi.w	#BuildingID_Library, (Building_index).w
+	cmpi.w	#InteractionID_Library, (Interaction_index).w
 	beq.s	loc_8304				; branch if we are in the library
-	cmpi.w	#BuildingID_CentralTowerRoof, (Building_index).w
+	cmpi.w	#InteractionID_CentralTowerRoof, (Interaction_index).w
 	beq.s	loc_8318				; branch if we are on the roof
-	cmpi.w	#BuildingID_TylerSpaceship, (Building_index).w
+	cmpi.w	#InteractionID_TylerSpaceship, (Interaction_index).w
 	beq.s	loc_8326				; branch if we are on Tyler's spaceship
-	cmpi.w	#BuildingID_EsperMansion, (Building_index).w
+	cmpi.w	#InteractionID_EsperMansion, (Interaction_index).w
 	beq.s	loc_8364				; branch if we are in the Esper Mansion
 
 	lea	(RolfPortraitArt).l, a0
@@ -12561,8 +12564,8 @@ loc_839A:
 	move.l	d0, (Camera_Y_pos).w
 	move.l	d0, (Camera_Y_pos_copy).w
 
-	lea	(BuildingMusicPtrs).l, a1
-	adda.w	(Building_index).w, a1
+	lea	(InteractionMusicPtrs).l, a1
+	adda.w	(Interaction_index).w, a1
 	move.b	(a1), d0
 	bsr.w	UpdateSoundQueue
 	move.w	(VDP_reg1_values).w, d0
@@ -12572,19 +12575,19 @@ loc_839A:
 	bsr.w	PaletteFadeTo
 
 
-GameMode_BuildingLoop:
+GameMode_InteractionLoop:
 	bsr.w	CheckGamePause
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
-	bsr.w	Building_CheckRoutine
+	bsr.w	Interaction_CheckRoutine
 	bsr.w	CheckPrepareWindows
 	bsr.w	loc_66F6
 	tst.w	(Screen_changed_flag).w
 	bne.s	loc_8406
-	cmpi.b	#GameModeID_Building, (Game_mode_index).w
-	beq.s	GameMode_BuildingLoop
+	cmpi.b	#GameModeID_Interaction, (Game_mode_index).w
+	beq.s	GameMode_InteractionLoop
 loc_8406:
 	rts
 
@@ -12645,9 +12648,9 @@ PtrPortrait_MotaTeleportEmployer:	dc.l	(pal_id_tele_empl_port<<$18)|MotTeleEmplP
 
 
 ; ===========================================================
-; Music pointers for the building
+; Music pointers for interaction places
 ; ===========================================================
-BuildingMusicPtrs:
+InteractionMusicPtrs:
 	dc.b	MusicID_MyHome
 	dc.b	MusicID_MyHome
 	dc.b	MusicID_StepUp
@@ -12822,7 +12825,7 @@ loc_86A2:
 loc_86DA:
 	bsr.w	CheckGamePause
 	move.b	#$18, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	movem.l	d5/a1-a3, -(sp)
 	lea	($FF6000).l, a1
 	moveq	#0, d1
@@ -12851,7 +12854,7 @@ loc_8730:
 GameMode_BattleLoop:
 	bsr.w	CheckGamePause
 	move.b	#$18, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	lea	($FF6000).l, a1
 	moveq	#0, d1
 	moveq	#$10, d0
@@ -12935,7 +12938,7 @@ GameOverScreen:
 GameOverScreenLoop:
 	bsr.w	CheckGamePause
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	bsr.w	CheckPrepareWindows
 	subq.w	#1, (Demo_timer).w
 	beq.s	loc_88B2
@@ -12994,7 +12997,7 @@ GameMode_Intro:
 	move.l	#$60000002, (VDP_control_port).l
 	lea	(FontsIconsArt).l, a0
 	bsr.w	DecompressData
-	tst.w	(Building_index).w
+	tst.w	(Interaction_index).w
 	bne.s	loc_8950		; branch to skip initialization (this happens when we return to the Intro Screen for various reasons, like soft reset, game over, etc.)
 	bsr.w	loc_89EE
 
@@ -13032,7 +13035,7 @@ loc_8970:
 
 GameMode_IntroLoop:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	IntroScr_CheckRoutine
@@ -15518,11 +15521,11 @@ Visiphone_ItemSelected:
 	rts
 
 +
-	move.w	#BuildingID_DataMemory, (Building_index).w
+	move.w	#InteractionID_DataMemory, (Interaction_index).w
 	move.w	#9, (Portrait_index).w
 	move.w	#0, $FFFFF764.w
 	move.w	#1, $FFFFF766.w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0		; get characters' y position
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w ; and save it
@@ -16725,7 +16728,7 @@ AddItemToInventory2:
 	rts
 
 
-Building_CheckRoutine:
+Interaction_CheckRoutine:
 	tst.w	(Window_index).w
 	bne.s	loc_AF02
 	tst.w	(Window_index_saved).w
@@ -16748,36 +16751,36 @@ loc_AF04:
 	rts
 
 loc_AF1A:
-	move.w	(Building_index).w, d0
+	move.w	(Interaction_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#$7C, d0
-	jmp	BuildingIndex(pc,d0.w)
+	jmp	InteractionIndex(pc,d0.w)
 ;----------------------------------------------------
-BuildingIndex:
+InteractionIndex:
 
-PtrBuilding_RolfHouseStart:			bra.w	Building_RolfHouseStart
-PtrBuilding_RolfHouse:				bra.w	Building_RolfHouse
-PtrBuilding_DataMemory:				bra.w	Building_DataMemory
-PtrBuilding_CloneLabs:				bra.w	Building_CloneLab
-PtrBuilding_Hospital:				bra.w	Building_Hospital
-PtrBuilding_WeaponStore:			bra.w	Building_WeaponStore
-PtrBuilding_ArmorStore:				bra.w	Building_ArmorStore
-PtrBuilding_ItemStore:				bra.w	Building_ItemStore
-PtrBuilding_CentralTowerOutside:	bra.w	Building_CentralTowerOutside
-PtrBuilding_CentralTowerRoom:		bra.w	Building_CentralTowerRoom
-PtrBuilding_Library:				bra.w	Building_Library
-PtrBuilding_CentralTowerRoof:		bra.w	Building_Roof
-PtrBuilding_UstvestiaHouse:			bra.w	Building_UstvestiaHouse
-PtrBuilding_InventorHouse:			bra.w	Building_InventorHouse
-PtrBuilding_CentralTowerGovernor:	bra.w	Building_CentralTowerGovernor
-PtrBuilding_TeleportStation:		bra.w	Building_TeleportStation
-PtrBuilding_GairaControlPanel:		bra.w	Building_GairaControlPanel
-PtrBuilding_TylerSpaceship:			bra.w	Building_TylerSpaceship
-PtrBuilding_EsperMansion:			bra.w	Building_EsperMansion
+PtrInteraction_RolfHouseStart:			bra.w	Interaction_RolfHouseStart
+PtrInteraction_RolfHouse:				bra.w	Interaction_RolfHouse
+PtrInteraction_DataMemory:				bra.w	Interaction_DataMemory
+PtrInteraction_CloneLabs:				bra.w	Interaction_CloneLab
+PtrInteraction_Hospital:				bra.w	Interaction_Hospital
+PtrInteraction_WeaponStore:			bra.w	Interaction_WeaponStore
+PtrInteraction_ArmorStore:				bra.w	Interaction_ArmorStore
+PtrInteraction_ItemStore:				bra.w	Interaction_ItemStore
+PtrInteraction_CentralTowerOutside:	bra.w	Interaction_CentralTowerOutside
+PtrInteraction_CentralTowerRoom:		bra.w	Interaction_CentralTowerRoom
+PtrInteraction_Library:				bra.w	Interaction_Library
+PtrInteraction_CentralTowerRoof:		bra.w	Interaction_Roof
+PtrInteraction_UstvestiaHouse:			bra.w	Interaction_UstvestiaHouse
+PtrInteraction_InventorHouse:			bra.w	Interaction_InventorHouse
+PtrInteraction_CentralTowerGovernor:	bra.w	Interaction_CentralTowerGovernor
+PtrInteraction_TeleportStation:		bra.w	Interaction_TeleportStation
+PtrInteraction_GairaControlPanel:		bra.w	Interaction_GairaControlPanel
+PtrInteraction_TylerSpaceship:			bra.w	Interaction_TylerSpaceship
+PtrInteraction_EsperMansion:			bra.w	Interaction_EsperMansion
 ;----------------------------------------------------
 
 
-Building_RolfHouseStart:
+Interaction_RolfHouseStart:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	RolfHouseSt_EventIndex-4(pc,d1.w)
@@ -16823,7 +16826,7 @@ loc_AFE6:
 	bra.w	CloseAllWindows
 ; ------------------------------------------
 
-Building_RolfHouse:
+Interaction_RolfHouse:
 	lsl.w	#2, d1
 	andi.w	#$3C, d1
 	jmp	RolfHouse_EventIndex-4(pc,d1.w)
@@ -17177,7 +17180,7 @@ SetCharNames:
 	rts
 
 
-Building_DataMemory:
+Interaction_DataMemory:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B3FC
 	lsl.w	#2, d1
@@ -17398,7 +17401,7 @@ loc_B654:
 	jmp	(EntryPoint).l
 ; ------------------------------------------
 
-Building_CloneLab:
+Interaction_CloneLab:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B678
 	lsl.w	#2, d1
@@ -17498,7 +17501,7 @@ loc_B750:
 	addq.w	#1, (Event_routine_2).w
 	rts
 loc_B78A:
-	move.w	#BuildingID_CentralTowerOutside, (Building_index).w
+	move.w	#InteractionID_CentralTowerOutside, (Interaction_index).w
 	move.w	#$15, (Portrait_index).w
 	move.w	#7, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
@@ -17553,7 +17556,7 @@ loc_B81C:
 	rts
 ; ------------------------------------------
 
-Building_Hospital:
+Interaction_Hospital:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B83A
 	lsl.w	#2, d1
@@ -17761,7 +17764,7 @@ loc_BA48:
 	rts
 ; ------------------------------------------
 
-Building_WeaponStore:
+Interaction_WeaponStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BA66
 	lsl.w	#2, d1
@@ -17904,7 +17907,7 @@ loc_BBD8:
 	rts
 ; ------------------------------------------
 
-Building_ArmorStore:
+Interaction_ArmorStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BBFC
 	lsl.w	#2, d1
@@ -18047,7 +18050,7 @@ loc_BD6E:
 	rts
 ; ------------------------------------------
 
-Building_ItemStore:
+Interaction_ItemStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BD92
 	lsl.w	#2, d1
@@ -18282,7 +18285,7 @@ loc_C026:
 	rts
 
 
-Building_CentralTowerOutside:
+Interaction_CentralTowerOutside:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	CentralTowOutEventIndex-4(pc,d1.w)
@@ -18347,7 +18350,7 @@ loc_C0EA:
 	rts
 loc_C0F6:
 	addi.w	#9, d1
-	move.w	d1, (Building_index).w
+	move.w	d1, (Interaction_index).w
 	move.w	d2, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
@@ -18360,13 +18363,13 @@ loc_C116:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C122:
-	move.w	#BuildingID_CentralTowerGovernor, (Building_index).w
+	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
 
 
-Building_CentralTowerRoom:
+Interaction_CentralTowerRoom:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C148
 	lsl.w	#2, d1
@@ -18557,7 +18560,7 @@ loc_C382:
 	rts
 
 
-Building_Library:
+Interaction_Library:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C3A8
 	lsl.w	#2, d1
@@ -18680,7 +18683,7 @@ LibraryTextIndArray:
 	even
 
 
-Building_Roof:
+Interaction_Roof:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C500
 	lsl.w	#2, d1
@@ -18766,7 +18769,7 @@ loc_C5EA:
 SpaceShipLoop:
 	bsr.w	CheckGamePause
 	move.b	#8, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	tst.w	(Demo_timer).w
@@ -18776,7 +18779,7 @@ SpaceShipLoop:
 	rts
 
 
-Building_UstvestiaHouse:
+Interaction_UstvestiaHouse:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C652
 	lsl.w	#2, d1
@@ -18910,7 +18913,7 @@ loc_C7AC:
 	moveq	#$77, d0
 loc_C7BE:
 	move.b	#$14, (V_int_routine).w
-	bsr.w	WaitForVBlank
+	bsr.w	WaitForVInt
 	dbf	d0, loc_C7BE
 	bsr.w	PaletteFadeTo
 	addq.w	#1, (Event_routine).w
@@ -19004,7 +19007,7 @@ Ustvestia_MusicPointers:
 
 	even
 
-Building_InventorHouse:
+Interaction_InventorHouse:
 	tst.w	(Event_routine_2).w
 	bne.w	CloseAllWindows
 	lsl.w	#2, d1
@@ -19071,7 +19074,7 @@ loc_C948:
 	rts
 
 
-Building_CentralTowerGovernor:
+Interaction_CentralTowerGovernor:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	ContTowGoverEventIndex-4(pc,d1.w)
@@ -19118,14 +19121,14 @@ loc_C9F4:
 	addq.w	#3, (Event_routine).w
 	rts
 loc_CA00:
-	move.w	#BuildingID_RolfHouseStart, (Building_index).w
+	move.w	#InteractionID_RolfHouseStart, (Interaction_index).w
 	move.w	#$37, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#1, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
 	bra.w	CloseAllWindows
 loc_CA22:
-	move.w	#BuildingID_Library, (Building_index).w
+	move.w	#InteractionID_Library, (Interaction_index).w
 	move.w	#8, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
@@ -19147,7 +19150,7 @@ loc_CA64:
 
 ; ==============================================
 ; Events at the Teleport Station
-Building_TeleportStation:
+Interaction_TeleportStation:
 	move.w	(Event_routine_2).w, d0
 	bne.w	loc_CA80
 	lsl.w	#2, d1
@@ -19293,7 +19296,7 @@ TeleportLocCoord:
 
 ; ==============================================
 
-Building_GairaControlPanel:
+Interaction_GairaControlPanel:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	GairaConPanEventIndex-4(pc,d1.w)
@@ -19327,7 +19330,7 @@ loc_CC10:
 loc_CC26:
 	bsr.s	loc_CC3E
 	bne.s	loc_CC3C
-	move.w	#BuildingID_TylerSpaceship, (Building_index).w
+	move.w	#InteractionID_TylerSpaceship, (Interaction_index).w
 	move.w	#$1C, (Portrait_index).w
 	move.w	#-1, (Screen_changed_flag).w
 loc_CC3C:
@@ -19340,7 +19343,7 @@ loc_CC48:
 	rts
 
 
-Building_TylerSpaceship:
+Interaction_TylerSpaceship:
 	lsl.w	#2, d1
 	andi.w	#$3C, d1
 	jmp	TylerSpcshipEventIndex-4(pc,d1.w)
@@ -19558,14 +19561,14 @@ loc_CE6E:
 	move.w	#$3D0, (Map_X_pos).w
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	move.w	#0, (Jet_Scooter_flag).w
-	move.w	#BuildingID_CentralTowerGovernor, (Building_index).w
+	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#8, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
 	rts
 
-Building_EsperMansion:
+Interaction_EsperMansion:
 	tst.w	(Event_routine_2).w
 	bne.w	CloseAllWindows
 	lsl.w	#2, d1
@@ -19851,7 +19854,7 @@ loc_D158:
 	rts
 
 Intro_RunRoutine:
-	move.w	(Building_index).w, d0
+	move.w	(Interaction_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#4, d0
 	jmp	IntroScr_EventIndex(pc,d0.w)
@@ -20041,7 +20044,7 @@ loc_D36E:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_D384:
-	move.w	#BuildingID_RolfHouse, (Building_index).w
+	move.w	#InteractionID_RolfHouse, (Interaction_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
 loc_D392:
@@ -20070,7 +20073,7 @@ loc_D3B6:
 	beq.s	loc_D412
 	move.w	$FFFFDEBC.w, d0
 	bsr.w	LoadSavedData
-	move.w	#BuildingID_DataMemory, (Building_index).w
+	move.w	#InteractionID_DataMemory, (Interaction_index).w
 	move.w	#9, (Portrait_index).w
 	move.w	$FFFFC65C.w, $FFFFF766.w
 	tst.w	$FFFFF766.w
@@ -20080,7 +20083,7 @@ loc_D3B6:
 	move.w	#$10, (Portrait_index).w
 +
 	move.w	#1, $FFFFF764.w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	rts
 loc_D412:
 	move.w	#$130A, (Script_ID).w		; "There is no data for that number. Enter a different number."
@@ -20221,7 +20224,7 @@ loc_D59C:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_D5EA:
-	move.w	#BuildingID_CentralTowerGovernor, (Building_index).w
+	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#0, (Demo_index).w
@@ -21063,7 +21066,7 @@ loc_DEE2:
 	move.w	#$20, (Map_X_pos).w
 	move.w	#-1, (Screen_changed_flag).w
 	move.w	#0, (Jet_Scooter_flag).w
-	move.w	#BuildingID_CloneLabs, (Building_index).w
+	move.w	#InteractionID_CloneLabs, (Interaction_index).w
 	move.w	#$B, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#6, (Demo_index).w
@@ -21140,9 +21143,9 @@ loc_DFD0:
 
 loc_DFE6:
 	move.b	#1, (a0)
-	move.w	#BuildingID_GairaControlPanel, (Building_index).w
+	move.w	#InteractionID_GairaControlPanel, (Interaction_index).w
 	move.w	#$1B, (Portrait_index).w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	rts
 
 loc_DFFE:
@@ -21205,9 +21208,9 @@ loc_E0A2:
 	addq.b	#1, $FFFFC743.w
 	bra.w	CloseAllWindows
 loc_E0AA:
-	move.w	#BuildingID_EsperMansion, (Building_index).w
+	move.w	#InteractionID_EsperMansion, (Interaction_index).w
 	move.w	#$39, (Portrait_index).w
-	move.b	#GameModeID_Building, (Game_mode_index).w
+	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	bra.s	loc_E0D8
 loc_E0BE:
 	tst.w	d2
