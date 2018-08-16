@@ -3230,7 +3230,7 @@ BattleCharacter_Fight:
 	move.w	#$1206, (Script_ID).w		; "'Character' is dead!"
 +
 	move.b	#0, battle_status(a0)
-	subq.w	#1, (Battle_turns_remaining).w
+	subq.w	#1, ($FFFFCC06).w
 	rts
 
 BattleCharacter_IsHit:
@@ -3278,9 +3278,9 @@ BattleCharacter_CheckAttack:
 	move.w	d0, (Character_index).w
 	lsl.w	#6, d0
 	adda.w	d0, a3
-	move.w	(a3), d0
+	move.w	(a3), d0	; get character's status
 	tst.b	d0
-	beq.w	loc_1D2E
+	beq.w	loc_1D2E	; branch if not paralyzed
 	lea	(Char_battle_commands).w, a5
 	move.w	fighter_id(a0), d1
 	lsl.w	#4, d1
@@ -3359,26 +3359,26 @@ loc_1D2A:
 	bra.w	loc_1F62
 
 loc_1D2E:
-	btst	#$E, d0
-	bne.s	loc_1D2A
+	btst	#$E, d0	; is character asleep?
+	bne.s	loc_1D2A	; if so, branch
 loc_1D34:
 	lea	(Char_battle_commands).w, a5
 	move.w	fighter_id(a0), d0		; get index for character
 	lsl.w	#4, d0			; get character we just selected
 	adda.w	d0, a5
-	move.w	(a5)+, d0
-	move.w	d0, (Battle_command_used).w
+	move.w	(a5)+, d0	; get command
+	move.w	d0, (Battle_command_used).w	; save it
 	lsl.w	#2, d0
 	andi.w	#$C, d0
-	jmp	Battle_CommandUsedIndex(pc,d0.w)
+	jmp	BattleCharacterCommands(pc,d0.w)
 ; ---------------------------------------------------------------
-Battle_CommandUsedIndex:
-	bra.w	CommandUsed_Attack
-	bra.w	CommandUsed_Technique
-	bra.w	CommandUsed_Item
-	bra.w	CommandUsed_Defense
+BattleCharacterCommands:
+	bra.w	BattleChar_DoAttack
+	bra.w	BattleChar_DoTechnique
+	bra.w	BattleChar_DoItem
+	bra.w	CommandUsed_DoDefense
 ; ---------------------------------------------------------------
-CommandUsed_Attack:
+BattleChar_DoAttack:
 	lea	(Character_stats).w, a3
 	move.w	fighter_id(a0), d0
 	lsl.w	#6, d0
@@ -3552,11 +3552,11 @@ loc_1F30:
 	rts
 
 loc_1F62:
-	move.w	#0, (Battle_turns_remaining).w
-	bclr	#0, 3(a0)
+	move.w	#0, ($FFFFCC06).w
+	bclr	#0, battle_status(a0)
 	rts
 ; ---------------------------------------------------------------
-CommandUsed_Technique:
+BattleChar_DoTechnique:
 	_btst	#2, 0(a3)
 	bne.w	loc_1FEA
 	move.w	(a5)+, d3
@@ -4078,7 +4078,7 @@ loc_2540:
 	move.w	#2, $22(a0)
 	rts
 ; ---------------------------------------------------------------
-CommandUsed_Item:
+BattleChar_DoItem:
 	move.w	(a5)+, d0
 	move.b	d0, (Item_index).w
 	move.w	d0, d2
@@ -4197,13 +4197,13 @@ ItemUsed_FireStaff:
 	moveq	#TechID_Foi, d3
 	bra.w	ProcessTechnique
 ; ---------------------------------------------------------------
-CommandUsed_Defense:
+CommandUsed_DoDefense:
 	lea	(Character_stats).w, a3
 	move.w	$36(a0), d0
 	lsl.w	#6, d0
 	adda.w	d0, a3
 	_bset	#0, 0(a3)
-	move.w	#0, (Battle_turns_remaining).w
+	move.w	#0, ($FFFFCC06).w
 	bclr	#0, 3(a0)
 	rts
 ; ---------------------------------------------------------------
@@ -4555,7 +4555,7 @@ BattleEnemy_Wait:
 loc_29F6:
 	andi.w	#$FFF3, (a3)
 	move.b	#0, 3(a0)
-	subq.w	#1, (Battle_turns_remaining).w
+	subq.w	#1, ($FFFFCC06).w
 	rts
 loc_2A06:
 	btst	#3, d0
@@ -4593,7 +4593,7 @@ loc_2A58:
 	andi.w	#7, d0
 	beq.s	loc_2A7C
 	subq.b	#1, 1(a3)
-	move.w	#0, (Battle_turns_remaining).w
+	move.w	#0, ($FFFFCC06).w
 	bclr	#0, 3(a0)
 loc_2A7A:
 	rts
@@ -5235,7 +5235,7 @@ BattleEnemy_Dead:
 	move.w	#0, (a0)
 	move.w	#4, $22(a0)
 	move.b	#0, 3(a0)
-	subq.w	#1, (Battle_turns_remaining).w
+	subq.w	#1, ($FFFFCC06).w
 	rts
 loc_3148:
 	move.b	#$10, 2(a0)
@@ -5386,7 +5386,7 @@ loc_32C2:
 	move.w	#0, $1A(a0)				; reset animation frame
 	btst	#0, 3(a0)
 	beq.s	loc_32E2
-	subq.w	#1, (Battle_turns_remaining).w
+	subq.w	#1, ($FFFFCC06).w
 	bclr	#0, 3(a0)
 loc_32E0:
 	rts
@@ -5402,7 +5402,7 @@ loc_32EE:
 	cmpi.b	#$FE, d0
 	bne.s	loc_3300
 	move.b	#1, 2(a0)
-	subq.w	#1, (Battle_turns_remaining).w
+	subq.w	#1, ($FFFFCC06).w
 	rts
 
 loc_3300:
@@ -5422,7 +5422,7 @@ loc_3308:
 	bne.s	loc_3386
 	move.b	#SFXID_Sword, (Sound_queue).w	; this is the generic sound when characters/enemies get hurt
 	move.w	#$30, $30(a2)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	lea	(Window_index).w, a1
 	move.w	(Battle_command_used).w, d0
 	bmi.s	loc_3386
@@ -5655,7 +5655,7 @@ loc_353A:
 	move.w	-$2E(a0), $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	rts
 
 loc_357C:
@@ -5686,7 +5686,7 @@ loc_3596:
 	move.w	d0, $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#7, $28(a3)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	rts
 
 loc_35DE:
@@ -5703,7 +5703,7 @@ loc_35DE:
 loc_360A:
 	move.w	$2C(a0), $6C(a0)
 	move.w	#1, $68(a0)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	move.b	($FFFFF642).w, (Sound_queue).w
 	rts
 
@@ -5737,7 +5737,7 @@ loc_366E:
 	move.w	d0, $16(a3)
 	move.l	$3C(a0), 4(a3)
 	move.w	#2, $28(a3)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	rts
 loc_368C:
 	move.w	#$12, (a3)
@@ -5756,7 +5756,7 @@ loc_36B0:
 	move.l	4(a0), 4(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, (Battle_turns_remaining).w
+	addq.w	#1, ($FFFFCC06).w
 	rts
 
 ; --------------------------------------------------------------
@@ -12769,7 +12769,7 @@ loc_85D6:
 	move.w	d0, (Battle_main_routine_index).w
 	move.w	d0, (Fight_active_flag).w
 	move.w	d0, (Fight_interrupted_flag).w
-	move.w	d0, (Battle_turns_remaining).w
+	move.w	d0, ($FFFFCC06).w
 	move.w	d0, ($FFFFCC98).w
 	move.w	d0, ($FFFFCC92).w
 	move.w	d0, $FFFFF650.w
@@ -22357,7 +22357,7 @@ Battle_CheckRoutines:
 	bne.s	+
 	tst.w	(Window_active_flag).w
 	bne.s	+
-	tst.w	(Battle_turns_remaining).w
+	tst.w	($FFFFCC06).w
 	bne.s	+
 	move.w	(Event_routine).w, d1
 	bne.s	Battle_RunRoutines
@@ -22993,7 +22993,7 @@ loc_F19E:
 	cmpi.w	#3, $22(a0)
 	beq.s	loc_F1CE
 	bset	#0, 3(a0)
-	move.w	#1, (Battle_turns_remaining).w
+	move.w	#1, ($FFFFCC06).w
 	subq.w	#1, (Event_routine).w
 loc_F1CE:
 	rts

@@ -1205,10 +1205,9 @@ Enemy_total_meseta =  ramaddr($FFFFCB34)
 Battle_main_routine_index =  ramaddr($FFFFCC00)
 Fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
 Fight_interrupted_flag =  ramaddr($FFFFCC04)	; flag: determines if you want to interrupt the fight and select other commands; 0 = continue fight; 1 = interrupt fight
-Battle_turns_remaining =  ramaddr($FFFFCC06)
 Battle_script_ID =	ramaddr($FFFFCC0C)
 Battle_command_used =  ramaddr($FFFFCC0E)
-Char_battle_commands =  ramaddr($FFFFCC10)	; word ; 16 bytes per character;
+Char_battle_commands =  ramaddr($FFFFCC10)	; 16 bytes per character;
 												; bytes 1-2 = Command index; 0 = attack; 1 = technique; 2 = item; 3 = defense
 												; bytes 3-4 = ID of technique or item if those commands are used
 												; bytes 5-6 = ID of target
