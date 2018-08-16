@@ -50,7 +50,7 @@ StatusPoison_Mask =  1<<StatusPoison	; $80
 ; ---------------------------------------------------------------------------
 ; Global properties and constants for objects
 obj_id = 0	; word
-render_flags = 2	; byte
+render_flags = 2	; bitfield;
 mappings = 4	; longword
 x_pos = $A	; longword
 y_pos = $E	; longword
@@ -60,8 +60,8 @@ routine = $22	; word
 
 ; ---------------------------------------------------------------------------
 ; Properties and constants applicable to map objects
-x_moving_flag = $14	; word
-y_moving_flag = $18	; word
+x_move_steps = $14	; word
+y_move_steps = $18	; word
 sprite_y_pos = $1E	; word ; Y position for sprites
 sprite_x_pos = $20 ; word ; X position for sprites
 mapping_frame = $24	; word

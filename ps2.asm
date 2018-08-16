@@ -199,10 +199,10 @@ RunObject:
 	lsl.w	#2, d0
 	jsr	(a1,d0.w)
 
-	btst	#0, 2(a0)
+	btst	#0, render_flags(a0)
 	bne.w	loc_3DC
-	bclr	#7, 2(a0)
-	btst	#3, 2(a0)
+	bclr	#7, render_flags(a0)
+	btst	#3, render_flags(a0)
 	beq.w	loc_3E4
 	move.l	$14(a0), d0
 	add.l	d0, $A(a0)
@@ -230,7 +230,7 @@ RunObject:
 	cmpi.w	#$180, d0
 	bcc.w	RunObjectEnd
 	move.w	d0, $1E(a0)
-	btst	#1, 2(a0)
+	btst	#1, render_flags(a0)
 	bne.s	RunObjectEnd
 	lea	(Sprite_table_input).w, a1
 	moveq	#0, d0
@@ -249,7 +249,7 @@ RunObject:
 	move.w	(a1), d1
 	adda.l	d1, a1
 	move.w	a0, (a1)
-	bset	#7, 2(a0)
+	bset	#7, render_flags(a0)
 
 RunObjectEnd:
 	rts
@@ -263,7 +263,7 @@ loc_3E4:
 	move.w	$A(a0), d0
 	add.w	$14(a0), d0
 	bmi.s	+
-	btst	#4, 2(a0)
+	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	($FFFFF722).w, d0
 	bcc.s	++
@@ -275,7 +275,7 @@ loc_3E4:
 	move.w	$E(a0), d0
 	add.w	$18(a0), d0
 	bmi.s	+
-	btst	#4, 2(a0)
+	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	($FFFFF720).w, d0
 	bcc.s	++
@@ -285,7 +285,7 @@ loc_3E4:
 +
 	move.w	d0, $E(a0)
 	move.w	$A(a0), d0
-	btst	#4, 2(a0)
+	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	(Camera_X_pos_copy).w, d0
 	bcc.s	+
@@ -300,7 +300,7 @@ loc_3E4:
 	bcc.w	RunObjectEnd
 	move.w	d0, $20(a0)
 	move.w	$E(a0), d0
-	btst	#4, 2(a0)
+	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	(Camera_Y_pos_copy).w, d0
 	bcc.s	+
@@ -315,11 +315,11 @@ loc_3E4:
 	cmpi.w	#$180, d0
 	bcc.w	RunObjectEnd
 	move.w	d0, $1E(a0)
-	btst	#1, 2(a0)
+	btst	#1, render_flags(a0)
 	bne.s	+++	; rts
 	lea	(Sprite_table_input).w, a1
 	moveq	#0, d0
-	btst	#5, 2(a0)
+	btst	#5, render_flags(a0)
 	bne.s	+
 	move.w	$1E(a0), d0
 	subi.w	#$80, d0
@@ -338,7 +338,7 @@ loc_3E4:
 	move.w	(a1), d1
 	adda.l	d1, a1
 	move.w	a0, (a1)
-	bset	#7, 2(a0)
+	bset	#7, render_flags(a0)
 +
 	rts
 
@@ -5877,11 +5877,11 @@ loc_381A:
 loc_382A:
 	move.w	d0, ($FFFFF756).w
 	bsr.w	loc_6F56
-	move.w	#0, x_moving_flag(a0)
-	move.w	#0, y_moving_flag(a0)
+	move.w	#0, x_move_steps(a0)
+	move.w	#0, y_move_steps(a0)
 	lea	(Joypad_held).w, a3
 	move.w	y_pos(a0), d3
-	move.w	y_moving_flag(a0), d1
+	move.w	y_move_steps(a0), d1
 
 ; MapChar_CheckMoveUp
 	btst	#ButtonUp, (a3)
@@ -5892,7 +5892,7 @@ loc_382A:
 	moveq	#0, d6
 	bsr.w	Obj_Move
 	bne.s	MapChar_ChkMoveDown
-	move.w	#-1, y_moving_flag(a0)
+	move.w	#-1, y_move_steps(a0)
 	bra.w	loc_38FC
 
 
@@ -5905,7 +5905,7 @@ MapChar_ChkMoveDown:
 	moveq	#1, d6
 	bsr.w	Obj_Move
 	bne.s	MapChar_ChkMoveLeft
-	move.w	#1, y_moving_flag(a0)
+	move.w	#1, y_move_steps(a0)
 	bra.s	loc_38FC
 
 
@@ -5925,7 +5925,7 @@ MapChar_ChkMoveLeft:
 	move.w	#$40, (Joypad_held).w
 	bra.s	loc_38F4
 loc_38C6:
-	move.w	#-1, x_moving_flag(a0)
+	move.w	#-1, x_move_steps(a0)
 	bra.w	loc_38FC
 
 MapChar_ChkMoveRight:
@@ -5937,7 +5937,7 @@ MapChar_ChkMoveRight:
 	moveq	#3, d6
 	bsr.w	Obj_Move
 	bne.s	loc_38F4
-	move.w	#1, x_moving_flag(a0)
+	move.w	#1, x_move_steps(a0)
 	bra.s	loc_38FC
 loc_38F4:
 	move.w	facing_dir(a0), mapping_frame(a0)
@@ -6005,8 +6005,8 @@ loc_39CA:
 
 loc_39D0:
 	move.w	facing_dir(a0), mapping_frame(a0)
-	move.w	#0, x_moving_flag(a0)
-	move.w	#0, y_moving_flag(a0)
+	move.w	#0, x_move_steps(a0)
+	move.w	#0, y_move_steps(a0)
 	rts
 
 ; =======================================
