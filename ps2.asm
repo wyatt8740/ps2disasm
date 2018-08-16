@@ -265,10 +265,10 @@ loc_3E4:
 	bmi.s	+
 	btst	#4, render_flags(a0)
 	bne.s	++
-	sub.w	($FFFFF722).w, d0
+	sub.w	(Camera_max_X_pos).w, d0
 	bcc.s	++
 +
-	add.w	($FFFFF722).w, d0
+	add.w	(Camera_max_X_pos).w, d0
 
 +
 	move.w	d0, $A(a0)
@@ -277,10 +277,10 @@ loc_3E4:
 	bmi.s	+
 	btst	#4, render_flags(a0)
 	bne.s	++
-	sub.w	($FFFFF720).w, d0
+	sub.w	(Camera_max_Y_pos).w, d0
 	bcc.s	++
 +
-	add.w	($FFFFF720).w, d0
+	add.w	(Camera_max_Y_pos).w, d0
 
 +
 	move.w	d0, $E(a0)
@@ -289,7 +289,7 @@ loc_3E4:
 	bne.s	++
 	sub.w	(Camera_X_pos_copy).w, d0
 	bcc.s	+
-	add.w	($FFFFF722).w, d0
+	add.w	(Camera_max_X_pos).w, d0
 +
 	addi.w	#$80, d0
 
@@ -304,7 +304,7 @@ loc_3E4:
 	bne.s	++
 	sub.w	(Camera_Y_pos_copy).w, d0
 	bcc.s	+
-	add.w	($FFFFF720).w, d0
+	add.w	(Camera_max_Y_pos).w, d0
 +
 	addi.w	#$80, d0
 
@@ -10775,22 +10775,22 @@ loc_6DDE:
 loc_6DE8:
 	add.w	$E(a0), d4		; add y position
 	bpl.s	loc_6DF4
-	add.w	$FFFFF720.w, d4
+	add.w	(Camera_max_Y_pos).w, d4
 	bra.s	loc_6DFE
 
 loc_6DF4:
-	cmp.w	$FFFFF720.w, d4
+	cmp.w	(Camera_max_Y_pos).w, d4
 	bcs.s	loc_6DFE
-	sub.w	$FFFFF720.w, d4
+	sub.w	(Camera_max_Y_pos).w, d4
 loc_6DFE:
 	add.w	$A(a0), d5		; add x position
 	bpl.s	loc_6E0A
-	add.w	$FFFFF722.w, d5
+	add.w	(Camera_max_X_pos).w, d5
 	bra.s	loc_6E14
 loc_6E0A:
-	cmp.w	$FFFFF722.w, d5
+	cmp.w	(Camera_max_X_pos).w, d5
 	bcs.s	loc_6E14
-	sub.w	$FFFFF722.w, d5
+	sub.w	(Camera_max_X_pos).w, d5
 loc_6E14:
 	move.w	d4, d1
 	move.w	d5, d2
@@ -10798,7 +10798,7 @@ loc_6E14:
 	andi.w	#$FE0, d5
 	lsr.w	#5, d4
 	lsr.w	#5, d5
-	move.w	$FFFFF722.w, d3
+	move.w	(Camera_max_X_pos).w, d3
 	lsr.w	#5, d3
 	mulu.w	d3, d4
 	add.l	d5, d4
@@ -13391,7 +13391,7 @@ loc_8C0E:
 	rts
 
 loc_8C28:
-	move.w	$FFFFF720.w, d2
+	move.w	(Camera_max_Y_pos).w, d2
 	move.w	(Camera_Y_pos_copy).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
@@ -13441,7 +13441,7 @@ loc_8C80:
 loc_8C92:
 	rts
 loc_8C94:
-	move.w	$FFFFF720.w, d2
+	move.w	(Camera_max_Y_pos).w, d2
 	tst.w	(a1)
 	beq.s	loc_8CA0
 	subi.w	#$E0, d2
@@ -13502,7 +13502,7 @@ loc_8D00:
 loc_8D12:
 	rts
 loc_8D14:
-	move.w	$FFFFF722.w, d2
+	move.w	(Camera_max_X_pos).w, d2
 	move.w	(Camera_X_pos_copy).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
@@ -13552,7 +13552,7 @@ loc_8D6C:
 loc_8D7E:
 	rts
 loc_8D80:
-	move.w	$FFFFF722.w, d2
+	move.w	(Camera_max_X_pos).w, d2
 	tst.w	(a1)
 	beq.s	loc_8D8C
 	subi.w	#$140, d2
@@ -13753,7 +13753,7 @@ loc_8F2E:
 	move.w	(a1)+, (a3)
 	rts
 loc_8F70:
-	move.w	$FFFFF720.w, d3
+	move.w	(Camera_max_Y_pos).w, d3
 	btst	#$D, d2
 	bne.s	loc_8F86
 	tst.w	$FFFFF712.w
@@ -13774,7 +13774,7 @@ loc_8F9A:
 	bcs.s	loc_8FA0
 	sub.w	d3, d4
 loc_8FA0:
-	move.w	$FFFFF722.w, d3
+	move.w	(Camera_max_X_pos).w, d3
 	btst	#$D, d2
 	bne.s	loc_8FB6
 	tst.w	$FFFFF712.w
@@ -13880,10 +13880,10 @@ Map_LoadData:
 	move.b	d0, d1
 	lsl.w	#4, d0
 	andi.w	#$F00, d0
-	move.w	d0, $FFFFF720.w
+	move.w	d0, (Camera_max_Y_pos).w
 	lsl.w	#8, d1
 	andi.w	#$F00, d1
-	move.w	d1, $FFFFF722.w
+	move.w	d1, (Camera_max_X_pos).w
 	moveq	#0, d0
 	move.b	(a1), d0
 	move.w	d0, (Formations_index_1).w
@@ -13951,7 +13951,7 @@ loc_915E:
 	dbf	d6, loc_915E
 
 	move.w	(Map_X_pos).w, d0
-	move.w	$FFFFF722.w, d1
+	move.w	(Camera_max_X_pos).w, d1
 	subi.w	#$A0, d0
 	bcc.s	loc_919A
 	add.w	d1, d0
@@ -13969,7 +13969,7 @@ loc_91AA:
 	move.w	d0, (Camera_X_pos_copy).w
 	move.w	d0, (Camera_X_pos).w
 	move.w	(Map_Y_pos).w, d0
-	move.w	$FFFFF720.w, d1
+	move.w	(Camera_max_Y_pos).w, d1
 	subi.w	#$80, d0
 	bcc.s	loc_91CA
 	add.w	d1, d0

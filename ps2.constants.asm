@@ -1295,6 +1295,8 @@ Camera_Y_pos =  ramaddr($FFFFF718)
 Camera_X_pos =  ramaddr($FFFFF71A)
 Camera_Y_pos_copy =  ramaddr($FFFFF71C)
 Camera_X_pos_copy =  ramaddr($FFFFF71E)
+Camera_max_Y_pos =  ramaddr($FFFFF720)
+Camera_max_X_pos =  ramaddr($FFFFF722)
 Camera_Y_step_counter =  ramaddr($FFFFF724)
 Camera_X_step_counter =  ramaddr($FFFFF726)
 
