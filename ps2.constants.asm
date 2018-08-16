@@ -75,12 +75,15 @@ anim_frame = $32	; word
 
 ; ---------------------------------------------------------------------------
 ; Properties and constants applicable to battle objects
+battle_status = 3	; bitfield;	bit 0 = attacking flag; bit 3 = display dead message flag; bit 4 = no damage flag; bit 5 = killed flag; bit 6 = hit flag; bit 7 = is-target flag
 saved_x_pos = $C	; word
 saved_y_pos = $10	; word
 battle_anim = $16	; word
 battle_anim_frame = $1A	; word
 attack_x_offset = $1C	; word
 anim_timer_start = $28	; word
+battle_target = $2C	; word
+hit_timer = $30	; word
 fighter_id = $36	; word
 ; ---------------------------------------------------------------------------
 
@@ -1202,6 +1205,7 @@ Enemy_total_meseta =  ramaddr($FFFFCB34)
 Battle_main_routine_index =  ramaddr($FFFFCC00)
 Fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
 Fight_interrupted_flag =  ramaddr($FFFFCC04)	; flag: determines if you want to interrupt the fight and select other commands; 0 = continue fight; 1 = interrupt fight
+Battle_turns_remaining =  ramaddr($FFFFCC06)
 Battle_script_ID =	ramaddr($FFFFCC0C)
 Battle_command_used =  ramaddr($FFFFCC0E)
 Char_battle_commands =  ramaddr($FFFFCC10)	; word ; 16 bytes per character;

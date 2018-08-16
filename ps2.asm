@@ -576,7 +576,7 @@ loc_796:
 	move.w	#$200, d5
 	move.w	(Party_members_num).w, d6
 -
-	lea	($FFFFE400).w, a4
+	lea	(Characters_RAM).w, a4
 	move.w	(a1), d1
 	lsl.w	#7, d1
 	adda.w	d1, a4
@@ -3201,39 +3201,42 @@ BattleCharacter_Init:
 ; ---------------------------------------------------------------
 BattleCharacter_Wait:
 	tst.w	(Fight_active_flag).w
-	bne.s	loc_1B4E
+	bne.s	BattleCharacter_Fight
 	move.w	saved_x_pos(a0), x_pos(a0)
 	move.w	saved_y_pos(a0), y_pos(a0)
 	move.b	#$10, render_flags(a0)		; display sprites
 	move.w	#0, mapping_frame(a0)		; get first sprite mappings
 	rts
+; ---------------------------------------------------------------
 
-loc_1B4E:
+
+; ---------------------------------------------------------------
+BattleCharacter_Fight:
 	move.w	#$128, y_pos(a0)	; Y position for characters
 	move.b	#$12, render_flags(a0)		; don't display sprites
-	btst	#7, 3(a0)
-	beq.w	loc_1C1C
-	btst	#6, 3(a0)
-	beq.w	loc_1C0E
-	subq.w	#1, $30(a0)
-	bpl.s	loc_1BA8
-	btst	#5, 3(a0)
-	beq.s	loc_1B9C
+	btst	#7, battle_status(a0)	; is character being targeted?
+	beq.w	BattleCharacter_CheckAttack		; if not, branch
+	btst	#6, battle_status(a0)	; was character hit?
+	beq.w	BattleCharacter_Display		; if not, branch
+	subq.w	#1, hit_timer(a0)
+	bpl.s	BattleCharacter_IsHit
+	btst	#5, battle_status(a0)	; was character killed?
+	beq.s	+				; if not, branch
 	move.w	#3, routine(a0)		; => BattleCharacter_Dead
-	bclr	#3, 3(a0)
-	bne.s	loc_1B9C
+	bclr	#3, battle_status(a0)
+	bne.s	+					; if set, don't display 'Is dead' message
 	move.w	fighter_id(a0), (Character_index).w
 	move.w	#WinID_BattleMessage, (Window_index).w
 	move.w	#$1206, (Script_ID).w		; "'Character' is dead!"
-loc_1B9C:
-	move.b	#0, 3(a0)
-	subq.w	#1, ($FFFFCC06).w
++
+	move.b	#0, battle_status(a0)
+	subq.w	#1, (Battle_turns_remaining).w
 	rts
 
-loc_1BA8:
-	btst	#4, 3(a0)
-	bne.s	loc_1C0E
-	move.w	$30(a0), d0
+BattleCharacter_IsHit:
+	btst	#4, battle_status(a0)	; did character receive no damage (e.g. 0 damage, miss, healing)?
+	bne.s	BattleCharacter_Display		; if so, branch
+	move.w	hit_timer(a0), d0
 	andi.w	#$F, d0
 	beq.s	loc_1BE4
 	cmpi.w	#8, d0
@@ -3252,24 +3255,24 @@ loc_1BE2:
 loc_1BE4:
 	move.b	#SFXID_DamageRedScreen, (Sound_queue).w
 	move.w	#$200, (Palette_table_buffer).w
-	cmpi.w	#$103, (Enemy_formation).w		; branch if it's not Mother Brain boss battle
-	bne.s	loc_1C0E
+	cmpi.w	#$103, (Enemy_formation).w
+	bne.s	BattleCharacter_Display		; branch if it's not Mother Brain boss battle
 	moveq	#0, d0
 	move.l	d0, ($FFFFFB70).w
 	move.l	d0, ($FFFFFB74).w
 	move.l	d0, ($FFFFFB78).w
 	move.l	d0, ($FFFFFB7C).w
 	move.w	d0, (Palette_table_buffer).w
-loc_1C0E:
-	move.w	#0, $24(a0)
+BattleCharacter_Display:
+	move.w	#0, mapping_frame(a0)
 	move.b	#$10, render_flags(a0)		; display sprites
 loc_1C1A:
 	rts
 
-loc_1C1C:
+BattleCharacter_CheckAttack:
 	move.w	saved_x_pos(a0), x_pos(a0)
-	btst	#0, 3(a0)
-	beq.s	loc_1C1A
+	btst	#0, battle_status(a0)	; is character attacking?
+	beq.s	loc_1C1A				; if not, return
 	lea	(Character_stats).w, a3
 	move.w	fighter_id(a0), d0
 	move.w	d0, (Character_index).w
@@ -3549,7 +3552,7 @@ loc_1F30:
 	rts
 
 loc_1F62:
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Battle_turns_remaining).w
 	bclr	#0, 3(a0)
 	rts
 ; ---------------------------------------------------------------
@@ -3738,7 +3741,7 @@ loc_21A2:
 TechAction_Shift:
 	move.w	$36(a0), d0
 	move.w	d0, $2C(a0)		; make sure caster is the target
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	+
 	bset	#4, 3(a2)
@@ -3828,7 +3831,7 @@ loc_22B6:
 TechAction_Shinb:
 	move.w	$36(a0), d0
 	move.w	d0, $2C(a0)
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bset	#4, 3(a2)
 	tst.w	(Escape_rate).w
 	beq.s	loc_22EA
@@ -3852,7 +3855,7 @@ loc_22FA:
 	move.w	(a5), $2C(a0)
 loc_22FE:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_231C
 	bset	#4, 3(a2)
@@ -3869,7 +3872,7 @@ TechAction_Deban:
 	move.w	(a5), $2C(a0)
 loc_2330:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_2348
 	bset	#4, 3(a2)
@@ -3890,7 +3893,7 @@ loc_235C:
 	move.w	(a5), $2C(a0)
 loc_2360:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_237E
 	bset	#4, 3(a2)
@@ -3917,7 +3920,7 @@ loc_239C:
 	move.w	(a5), $2C(a0)
 loc_23A2:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_23D2
 	tst.w	2(a1)
@@ -3950,7 +3953,7 @@ loc_23EC:
 	move.w	(a5), $2C(a0)
 loc_23F2:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_2416
 	tst.w	2(a1)
@@ -3974,7 +3977,7 @@ loc_2416:
 TechAction_Anti:
 	move.w	(a5), $2C(a0)
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	tst.w	2(a1)
 	beq.w	loc_1FEA
 	bset	#4, 3(a2)
@@ -3984,7 +3987,7 @@ TechAction_Anti:
 TechAction_Rever:
 	move.w	(a5), $2C(a0)
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	tst.w	2(a1)
 	bne.w	loc_1FEA
 	move.w	$C(a2), $A(a2)
@@ -4004,7 +4007,7 @@ TechAction_Megid:
 -
 	move.w	(a5)+, d0
 	beq.s	+
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	move.w	2(a1), d0
 	beq.s	+
 	lsr.w	#1, d0
@@ -4200,7 +4203,7 @@ CommandUsed_Defense:
 	lsl.w	#6, d0
 	adda.w	d0, a3
 	_bset	#0, 0(a3)
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Battle_turns_remaining).w
 	bclr	#0, 3(a0)
 	rts
 ; ---------------------------------------------------------------
@@ -4227,19 +4230,24 @@ BattleCharacter_Dead:
 	dc.b	$30, $15
 ; ===============================================================
 
-DisplayCharacterWhileFighting:
+
+; -----------------------------------------------------------------
+; d0 = character ID
+; -----------------------------------------------------------------
+Battle_TargetCharacter:
 	lea	(Character_stats).w, a1
 	move.w	d0, d1
 	lsl.w	#6, d0
 	adda.w	d0, a1
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
 	tst.w	2(a1)
-	beq.s	loc_270A	; return if character's dead
-	bset	#7, 3(a2)		; display character sprite while fighting (generally when casting something, being attacked, etc...)
-loc_270A:
+	beq.s	+		; return if character's dead
+	bset	#7, battle_status(a2)		; set is-target flag
++
 	rts
+; -----------------------------------------------------------------
 
 
 loc_270C:
@@ -4547,7 +4555,7 @@ BattleEnemy_Wait:
 loc_29F6:
 	andi.w	#$FFF3, (a3)
 	move.b	#0, 3(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Battle_turns_remaining).w
 	rts
 loc_2A06:
 	btst	#3, d0
@@ -4585,7 +4593,7 @@ loc_2A58:
 	andi.w	#7, d0
 	beq.s	loc_2A7C
 	subq.b	#1, 1(a3)
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Battle_turns_remaining).w
 	bclr	#0, 3(a0)
 loc_2A7A:
 	rts
@@ -4666,7 +4674,7 @@ Enemy_PickCharToAttack:
 	tst.w	2(a1)
 	beq.s	Enemy_PickCharToAttack	; branch if character being targeted is dead (so pick another one)
 	move.w	d1, d0
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	lsl.w	#7, d0
 	adda.w	d0, a2
 	move.w	$A(a0), $A(a2)			; make character's x position the same as that of the enemy's
@@ -4877,7 +4885,7 @@ loc_2D08:
 	move.w	(Party_members_num).w, d4
 loc_2D1C:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	tst.w	2(a1)
 	beq.s	loc_2D32
 	bsr.w	loc_2C28
@@ -4981,7 +4989,7 @@ loc_2E24:
 	move.w	(Party_members_num).w, d4
 loc_2E46:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	dbf	d4, loc_2E46
 
 	move.w	#$1219, (Battle_script_ID).w
@@ -5005,7 +5013,7 @@ loc_2E82:
 	moveq	#-1, d3
 loc_2E9C:
 	move.w	(a5)+, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	bclr	#7, 3(a2)
 	beq.s	loc_2EBE
 	btst	#4, 1(a1)
@@ -5025,7 +5033,7 @@ loc_2EBE:
 	cmpi.w	#7, d5
 	beq.w	loc_2D08
 	move.w	d2, d0
-	bsr.w	DisplayCharacterWhileFighting
+	bsr.w	Battle_TargetCharacter
 	ori.b	#$10, d5
 	move.b	d5, 1(a1)
 	bset	#7, 3(a2)
@@ -5227,7 +5235,7 @@ BattleEnemy_Dead:
 	move.w	#0, (a0)
 	move.w	#4, $22(a0)
 	move.b	#0, 3(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Battle_turns_remaining).w
 	rts
 loc_3148:
 	move.b	#$10, 2(a0)
@@ -5378,7 +5386,7 @@ loc_32C2:
 	move.w	#0, $1A(a0)				; reset animation frame
 	btst	#0, 3(a0)
 	beq.s	loc_32E2
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Battle_turns_remaining).w
 	bclr	#0, 3(a0)
 loc_32E0:
 	rts
@@ -5394,7 +5402,7 @@ loc_32EE:
 	cmpi.b	#$FE, d0
 	bne.s	loc_3300
 	move.b	#1, 2(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Battle_turns_remaining).w
 	rts
 
 loc_3300:
@@ -5402,7 +5410,7 @@ loc_3300:
 	bne.w	loc_338E
 
 loc_3308:
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	move.w	$2C(a0), d0
 	lsl.w	#7, d0
 	adda.w	d0, a2
@@ -5414,7 +5422,7 @@ loc_3308:
 	bne.s	loc_3386
 	move.b	#SFXID_Sword, (Sound_queue).w	; this is the generic sound when characters/enemies get hurt
 	move.w	#$30, $30(a2)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	lea	(Window_index).w, a1
 	move.w	(Battle_command_used).w, d0
 	bmi.s	loc_3386
@@ -5447,7 +5455,7 @@ loc_338C:
 loc_338E:
 	cmpi.b	#$FC, d0
 	bne.s	loc_33BE
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	move.w	$2C(a0), d0
 	lsl.w	#7, d0
 	adda.w	d0, a2
@@ -5471,7 +5479,7 @@ loc_33BE:
 	moveq	#0, d0
 	move.w	d0, $2C(a0)
 loc_33D4:
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	lsl.w	#7, d0
 	adda.w	d0, a2
 	moveq	#7, d2
@@ -5504,7 +5512,7 @@ loc_341A:
 loc_3428:
 	cmpi.b	#$FA, d0
 	bne.s	loc_3462
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	move.w	$2C(a0), d0
 	lsl.w	#7, d0
 	adda.w	d0, a2
@@ -5533,7 +5541,7 @@ loc_3462:
 	moveq	#0, d0
 	move.w	d0, $2C(a0)
 loc_347A:
-	lea	($FFFFE400).w, a2
+	lea	(Characters_RAM).w, a2
 	lsl.w	#7, d0
 	adda.w	d0, a2
 	moveq	#7, d2
@@ -5647,7 +5655,7 @@ loc_353A:
 	move.w	-$2E(a0), $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	rts
 
 loc_357C:
@@ -5678,7 +5686,7 @@ loc_3596:
 	move.w	d0, $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#7, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	rts
 
 loc_35DE:
@@ -5695,7 +5703,7 @@ loc_35DE:
 loc_360A:
 	move.w	$2C(a0), $6C(a0)
 	move.w	#1, $68(a0)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	move.b	($FFFFF642).w, (Sound_queue).w
 	rts
 
@@ -5729,7 +5737,7 @@ loc_366E:
 	move.w	d0, $16(a3)
 	move.l	$3C(a0), 4(a3)
 	move.w	#2, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	rts
 loc_368C:
 	move.w	#$12, (a3)
@@ -5748,7 +5756,7 @@ loc_36B0:
 	move.l	4(a0), 4(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Battle_turns_remaining).w
 	rts
 
 ; --------------------------------------------------------------
@@ -6328,7 +6336,7 @@ FollowingCharacter_Init:
 ; --------------------------------------------------------------
 FollowingCharacter_Main:
 	move.l	-$3C(a0), 4(a0)		; get same sprite mappings as leading character
-	move.l	($FFFFE400).w, d1
+	move.l	(Characters_RAM).w, d1
 	sub.l	a0, d1
 	lea	($FFFFDD00).w, a2
 	move.w	($FFFFF740).w, d0
@@ -8339,7 +8347,7 @@ ObjNeifirst_Init:
 	move.l	#loc_5D17A, 4(a0)
 	move.w	#4, $2C(a0)
 	move.w	#1, $22(a0)
-	tst.w	($FFFFE400).w
+	tst.w	(Characters_RAM).w
 	beq.s	+
 	tst.b	$FFFFC737.w
 	beq.s	ObjNeifirst_Main
@@ -11149,7 +11157,7 @@ Map_ChkTargetInteract:
 	moveq	#0, d5
 	move.b	(a2)+, d5
 	add.w	d4, d5
-	lea	($FFFFE400).w, a1
+	lea	(Characters_RAM).w, a1
 	move.w	#$2F, d6
 	cmpa.w	#$E800, a0
 	bcc.s	loc_7210
@@ -12002,7 +12010,7 @@ loc_7C4A:
 	lea	($FF3000).l, a4
 	bsr.w	DecompressData2
 	tst.w	(Map_index).w
-	bne.s	loc_7CA0	; branch if value is not Motavia level
+	bne.s	loc_7CA0	; branch if value is not Motavia
 	tst.w	(Jet_Scooter_flag).w
 	beq.s	loc_7CA0
 	move.w	(Map_Y_pos).w, ($FFFFC654).w
@@ -12018,7 +12026,7 @@ loc_7CAA:
 
 	tst.w	(Controls_locked).w
 	bne.s	loc_7CCE
-	move.w	#ObjID_MapCharacter,($FFFFE400).w
+	move.w	#ObjID_MapCharacter,(Characters_RAM).w
 	move.w	#3,($FFFFE424).w
 	move.w	(Map_X_pos).w,(Characters_RAM+x_pos).w
 	move.w	(Map_Y_pos).w,(Characters_RAM+y_pos).w
@@ -12028,7 +12036,7 @@ loc_7CCE:
 	bsr.w	Map_LoadData
 	bsr.w	Map_LoadObjects
 	bsr.w	loc_7E02
-	tst.w	($FFFFE400).w
+	tst.w	(Characters_RAM).w
 	beq.s	loc_7D08
 	lea	($FFFFE440).w, a0
 	move.w	#$308, d1
@@ -12098,7 +12106,7 @@ GameMode_MapLoop:
 	addq.w	#1, ($FFFFF622).w
 	bra.s	loc_7DCE
 loc_7DCA:
-	subq.w	#1,($FFFFF61E).w
+	subq.w	#1, ($FFFFF61E).w
 loc_7DCE:
 	tst.w	(Screen_changed_flag).w
 	bne.w	loc_7E00
@@ -12137,7 +12145,7 @@ loc_7E02:
 	bsr.w	DecompressData
 	moveq	#$35, d0
 	bsr.w	PaletteLoad1
-	move.w	#0, ($FFFFE400).w
+	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
 	move.w	#$26, $FFFFDE6E.w
 	move.w	#$8200, (Event_flags).w
@@ -12165,7 +12173,7 @@ loc_7E6A:
 	bsr.w	DecompressData
 	moveq	#$36, d0
 	bsr.w	PaletteLoad1
-	move.w	#0, ($FFFFE400).w
+	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
 	move.w	#$27, $FFFFDE6E.w
 	move.w	#$8300, (Event_flags).w
@@ -12190,7 +12198,7 @@ loc_7EE4:
 loc_7F14:
 	subq.b	#1, d1
 	bne.s	loc_7F44
-	move.w	#0, ($FFFFE400).w
+	move.w	#0, (Characters_RAM).w
 	move.w	#$12C, (Demo_timer).w
 	move.w	#$501, (Event_flags).w
 	move.w	#MapID_ClimatrolF7, (Map_index).w
@@ -12214,7 +12222,7 @@ loc_7F44:
 loc_7F80:
 	subq.b	#1, d1
 	bne.s	loc_7FB0
-	move.w	#0, ($FFFFE400).w
+	move.w	#0, (Characters_RAM).w
 	move.w	#$12C, (Demo_timer).w
 	move.w	#$704, (Event_flags).w
 	move.w	#MapID_ClimatrolF7, $FFFFF748.w
@@ -12248,7 +12256,7 @@ loc_7FDA:
 loc_7FF2:
 	subq.b	#1, d1
 	bne.s	loc_8010
-	move.w	#0, ($FFFFE400).w
+	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
 	move.w	#$36, $FFFFDE6E.w
 	move.w	#$8000, (Event_flags).w
@@ -12761,7 +12769,7 @@ loc_85D6:
 	move.w	d0, (Battle_main_routine_index).w
 	move.w	d0, (Fight_active_flag).w
 	move.w	d0, (Fight_interrupted_flag).w
-	move.w	d0, ($FFFFCC06).w
+	move.w	d0, (Battle_turns_remaining).w
 	move.w	d0, ($FFFFCC98).w
 	move.w	d0, ($FFFFCC92).w
 	move.w	d0, $FFFFF650.w
@@ -14942,7 +14950,7 @@ loc_9BEC:
 	rts
 
 loc_9BFE:
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	move.w	$2A(a0), d6
 	beq.s	+
 	divu.w	#3, d6
@@ -20436,7 +20444,7 @@ loc_D7FA:
 
 ProcessAButAction:
 	move.b	#SFXID_Selection, (Sound_queue).w
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	move.w	$2A(a0), d6
 	beq.s	loc_D810
 	divu.w	#3, d6
@@ -20621,7 +20629,7 @@ loc_DA26:
 	andi.w	#$FFF0, d0
 	move.w	d0, $FFFFC656.w
 	move.w	#0, (Jet_Scooter_flag).w
-	lea	($FFFFE400).w, a1
+	lea	(Characters_RAM).w, a1
 	move.w	(Party_members_num).w, d0
 loc_DA4C:
 	move.w	#0, $22(a1)
@@ -22349,7 +22357,7 @@ Battle_CheckRoutines:
 	bne.s	+
 	tst.w	(Window_active_flag).w
 	bne.s	+
-	tst.w	($FFFFCC06).w
+	tst.w	(Battle_turns_remaining).w
 	bne.s	+
 	move.w	(Event_routine).w, d1
 	bne.s	Battle_RunRoutines
@@ -22953,7 +22961,7 @@ loc_F134:
 	move.b	#$87, $FFFFF640.w
 	rts
 loc_F16E:
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	moveq	#$F, d0
 loc_F174:
 	move.b	#0, 3(a0)
@@ -22975,7 +22983,7 @@ loc_F188:
 	rts
 loc_F19E:
 	swap	d0
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	lsl.w	#7, d0
 	adda.w	d0, a0
 	addq.w	#1, (Battle_turn_index).w
@@ -22985,7 +22993,7 @@ loc_F19E:
 	cmpi.w	#3, $22(a0)
 	beq.s	loc_F1CE
 	bset	#0, 3(a0)
-	move.w	#1, ($FFFFCC06).w
+	move.w	#1, (Battle_turns_remaining).w
 	subq.w	#1, (Event_routine).w
 loc_F1CE:
 	rts
@@ -27288,7 +27296,7 @@ loc_117C6:
 RenderCharSprites:
 	lea	$FFFFD600.w, a4
 	lea	(Party_member_ID).w, a2
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	move.w	(Party_members_num).w, d3
 	addq.w	#1, d3
 	tst.w	(Map_index).w
@@ -27309,7 +27317,7 @@ RenderCharSprites:
 loc_1183A:
 	lea	$FFFFD600.w, a4
 	lea	(Party_member_ID).w, a2
-	lea	($FFFFE400).w, a0
+	lea	(Characters_RAM).w, a0
 	move.w	(Party_members_num).w, d3
 	addq.w	#1, d3
 	move.w	#$40, d1
