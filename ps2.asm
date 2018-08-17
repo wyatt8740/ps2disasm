@@ -3201,7 +3201,7 @@ BattleCharacter_Init:
 ; ---------------------------------------------------------------
 BattleCharacter_Wait:
 	tst.w	(Fight_active_flag).w
-	bne.s	BattleCharacter_Fight
+	bne.s	Character_Fight
 	move.w	saved_x_pos(a0), x_pos(a0)
 	move.w	saved_y_pos(a0), y_pos(a0)
 	move.b	#$10, render_flags(a0)		; display sprites
@@ -3211,15 +3211,15 @@ BattleCharacter_Wait:
 
 
 ; ---------------------------------------------------------------
-BattleCharacter_Fight:
+Character_Fight:
 	move.w	#$128, y_pos(a0)	; Y position for characters
 	move.b	#$12, render_flags(a0)		; don't display sprites
 	btst	#7, battle_status(a0)	; is character being targeted?
-	beq.w	BattleCharacter_CheckAttack		; if not, branch
+	beq.w	Character_CheckAttack		; if not, branch
 	btst	#6, battle_status(a0)	; was character hit?
-	beq.w	BattleCharacter_Display		; if not, branch
+	beq.w	Character_Display		; if not, branch
 	subq.w	#1, hit_timer(a0)
-	bpl.s	BattleCharacter_IsHit
+	bpl.s	Character_IsHit
 	btst	#5, battle_status(a0)	; was character killed?
 	beq.s	+				; if not, branch
 	move.w	#3, routine(a0)		; => BattleCharacter_Dead
@@ -3233,9 +3233,9 @@ BattleCharacter_Fight:
 	subq.w	#1, ($FFFFCC06).w
 	rts
 
-BattleCharacter_IsHit:
+Character_IsHit:
 	btst	#4, battle_status(a0)	; did character receive no damage (e.g. 0 damage, miss, healing)?
-	bne.s	BattleCharacter_Display		; if so, branch
+	bne.s	Character_Display		; if so, branch
 	move.w	hit_timer(a0), d0
 	andi.w	#$F, d0
 	beq.s	loc_1BE4
@@ -3256,20 +3256,20 @@ loc_1BE4:
 	move.b	#SFXID_DamageRedScreen, (Sound_queue).w
 	move.w	#$200, (Palette_table_buffer).w
 	cmpi.w	#$103, (Enemy_formation).w
-	bne.s	BattleCharacter_Display		; branch if it's not Mother Brain boss battle
+	bne.s	Character_Display		; branch if it's not Mother Brain boss battle
 	moveq	#0, d0
 	move.l	d0, ($FFFFFB70).w
 	move.l	d0, ($FFFFFB74).w
 	move.l	d0, ($FFFFFB78).w
 	move.l	d0, ($FFFFFB7C).w
 	move.w	d0, (Palette_table_buffer).w
-BattleCharacter_Display:
+Character_Display:
 	move.w	#0, mapping_frame(a0)
 	move.b	#$10, render_flags(a0)		; display sprites
 loc_1C1A:
 	rts
 
-BattleCharacter_CheckAttack:
+Character_CheckAttack:
 	move.w	saved_x_pos(a0), x_pos(a0)
 	btst	#0, battle_status(a0)	; is character attacking?
 	beq.s	loc_1C1A				; if not, return
@@ -3376,7 +3376,7 @@ BattleCharacterCommands:
 	bra.w	BattleChar_DoAttack
 	bra.w	BattleChar_DoTechnique
 	bra.w	BattleChar_DoItem
-	bra.w	CommandUsed_DoDefense
+	bra.w	BattleChar_DoDefense
 ; ---------------------------------------------------------------
 BattleChar_DoAttack:
 	lea	(Character_stats).w, a3
@@ -3388,7 +3388,7 @@ BattleChar_DoAttack:
 	move.b	right_hand(a3), d3		; get right hand weapon
 	addq.w	#1, (a5)
 	andi.w	#1, (a5)+
-	bne.s	loc_1D9E
+	bne.s	loc_1D9E		; branch if this is the first attack
 	move.b	left_hand(a3), d3		; get left hand weapon
 	move.w	d3, d0
 	lsl.w	#4, d0
@@ -3407,21 +3407,21 @@ loc_1D9E:
 	bcs.w	loc_1F62		; branch if item is before "Knife" in the inventory
 	cmpi.w	#$42, d0
 	bhi.w	loc_1F62
-	move.w	d0, $56(a0)
+	move.w	d0, child_battle_anim(a0)
 	mulu.w	#$C, d0
 	adda.w	d0, a6
 	moveq	#0, d6
 	move.b	(a6)+, d6
-	bne.w	BattleAttack_FixedDamage
+	bne.w	BattleAttack_FixedDamage	; if there's a value, weapon does fixed damage 
 	move.w	fighter_id(a0), battle_anim(a0)
 	moveq	#0, d0
-	move.b	(a6)+, d0
-	beq.s	loc_1DDE
-	move.w	#9, battle_anim(a0)
+	move.b	(a6)+, d0	; get range
+	beq.s	loc_1DDE	; branch if it's single-target
+	move.w	#9, battle_anim(a0)	; animation for slashers
 	subq.w	#1, d0
-	beq.s	loc_1E06
+	beq.s	BattleAttack_AllEnemies	; if 1, target all enemies
 loc_1DDE:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3430,38 +3430,42 @@ loc_1DDE:
 	bmi.s	+
 	bsr.w	CalculateAttackDamage
 +
-	bsr.w	loc_288E
-	bra.w	loc_1F30
+	bsr.w	Battle_SetEnemyDamage
+	bra.w	SetWeaponProperties
 
-loc_1E06:
-	bsr.w	loc_2736
+
+; -----------------------------------------------------------------
+BattleAttack_AllEnemies:
+	bsr.w	Battle_GetEnemyGroup
 	moveq	#4, d6
 loc_1E0C:
 	move.w	d6, d0
 	move.w	d0, d1
-	addq.w	#8, d1
+	addq.w	#8, d1	; enemy target index starts from 8
 	lea	(Enemy_stats).w, a1
 	lsl.w	#6, d0
 	adda.w	d0, a1
-	tst.w	2(a1)
-	beq.s	loc_1E4C		; branch if enemy's dead
+	tst.w	curr_hp(a1)
+	beq.s	.next		; branch if enemy's dead
 	lea	($FFFFE800).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
-	cmp.w	$36(a2), d5
-	bne.s	loc_1E4C
-	move.w	d1, $2C(a0)
-	bset	#7, 3(a2)
-	move.w	$A(a2), $A(a0)
+	cmp.w	fighter_id(a2), d5
+	bne.s	.next			; skip if this is not the enemy we're targeting
+	move.w	d1, battle_target(a0)
+	bset	#7, battle_status(a2)	; is-target flag
+	move.w	x_pos(a2), x_pos(a0)
 	bsr.w	CalculateHitRate
-	bmi.s	loc_1E48
+	bmi.s	.enemydamage
 	bsr.w	CalculateAttackDamage
-loc_1E48:
-	bsr.w	loc_288E
-loc_1E4C:
+.enemydamage:
+	bsr.w	Battle_SetEnemyDamage
+.next:
 	dbf	d6, loc_1E0C
 
-	bra.w	loc_1F30
+	bra.w	SetWeaponProperties
+; -----------------------------------------------------------------
+
 
 BattleAttack_FixedDamage:
 	move.w	#8, $16(a0)
@@ -3469,7 +3473,7 @@ BattleAttack_FixedDamage:
 	move.b	(a6)+, d4
 	subq.w	#1, d4
 	bne.s	loc_1EDA
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3503,16 +3507,16 @@ loc_1ECA:
 	bne.s	loc_1ED4
 	addq.w	#1, $32(a2)
 loc_1ED4:
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 loc_1ED8:
-	bra.s	loc_1F30
+	bra.s	SetWeaponProperties
 
 loc_1EDA:
 	move.w	#$B, $16(a0)
 	move.w	#8, $2C(a0)
 	move.w	#$1C0, $A(a0)
 loc_1EEC:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), d0
 	cmp.w	$A(a0), d0
 	bcc.s	loc_1EFE
@@ -3530,26 +3534,30 @@ loc_1F1A:
 	bsr.w	loc_284C
 loc_1F1E:
 	addq.w	#1, $32(a2)
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 	bsr.w	loc_2862
-	bne.s	loc_1F30
+	bne.s	SetWeaponProperties
 	dbf	d4, loc_1EEC
 
-loc_1F30:
-	move.b	(a6)+, ($FFFFF642).w	; move sound value to RAM
+
+; -----------------------------------------------------------------
+SetWeaponProperties:
+	move.b	(a6)+, (Battle_saved_sound).w	; move sound value to RAM
 	addq.w	#1, a6
 	move.b	(a6), d0
 	andi.w	#$7F, d0
 	bsr.w	loc_608A
-	move.l	(a6)+, $44(a0)
-	move.w	d5, $76(a0)
+	move.l	(a6)+, child_mappings(a0)
+	move.w	d5, child_enemy_group_start(a0)
 	moveq	#0, d0
 	move.b	(a6), d0
 	move.w	d0, $7A(a0)
 	move.l	(a6), $7C(a0)
-	move.w	#0, $1A(a0)
-	move.w	#2, $22(a0)
+	move.w	#0, battle_anim_frame(a0)
+	move.w	#2, routine(a0)	; => BattleCharacter_Act
 	rts
+; -----------------------------------------------------------------
+
 
 loc_1F62:
 	move.w	#0, ($FFFFCC06).w
@@ -3659,7 +3667,7 @@ TechniqueActionIndex:
 	bra.w	TechAction_Megid	; Megid
 ; ------------------------------------------
 TechAction_Foi:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3668,13 +3676,13 @@ TechAction_Foi:
 	bmi.s	+
 	bsr.w	CalculateTechniqueDamage
 +
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 	bra.w	loc_251C
 ; ------------------------------------------
 TechAction_Zan:
 	cmpi.w	#1, (Battle_command_used).w
 	bne.s	TechAction_Gra
-	bsr.w	loc_2736
+	bsr.w	Battle_GetEnemyGroup
 	move.w	#$120, $A(a0)
 	move.w	#8, $2C(a0)
 	lea	(Enemy_stats).w, a1
@@ -3690,7 +3698,7 @@ loc_2112:
 	bmi.s	loc_212E
 	bsr.w	CalculateTechniqueDamage
 loc_212E:
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 loc_2132:
 	adda.w	#$40, a1
 	adda.w	#$80, a2
@@ -3720,7 +3728,7 @@ loc_2162:
 	bmi.s	+
 	bsr.w	CalculateTechniqueDamage
 +
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 loc_217C:
 	adda.w	#$40, a1
 	adda.w	#$80, a2
@@ -3741,7 +3749,7 @@ loc_21A2:
 TechAction_Shift:
 	move.w	$36(a0), d0
 	move.w	d0, $2C(a0)		; make sure caster is the target
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	+
 	bset	#4, 3(a2)
@@ -3755,7 +3763,7 @@ TechAction_Shift:
 	bra.w	loc_24D0
 ; ------------------------------------------
 TechAction_Fanbi:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3769,7 +3777,7 @@ TechAction_Fanbi:
 	bcc.s	loc_220A
 	move.w	d1, 2(a3)
 loc_220A:
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 	bra.w	loc_251C
 ; ------------------------------------------
 TechAction_Conte:
@@ -3780,7 +3788,7 @@ TechAction_Conte:
 TechAction_Forsa:
 	move.w	#$120B, d3
 	moveq	#4, d4
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	#$120, $A(a0)
 	bra.s	loc_223C
 ; ------------------------------------------
@@ -3788,7 +3796,7 @@ TechAction_Doran:
 	move.w	#$120B, d3
 	moveq	#4, d4
 loc_2232:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 loc_223C:
 	addq.w	#8, d1
@@ -3806,7 +3814,7 @@ loc_223C:
 	bra.w	loc_24D0
 ; ------------------------------------------
 TechAction_Rimit:
-	bsr.w	loc_270C
+	bsr.w	Battle_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3831,7 +3839,7 @@ loc_22B6:
 TechAction_Shinb:
 	move.w	$36(a0), d0
 	move.w	d0, $2C(a0)
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bset	#4, 3(a2)
 	tst.w	(Escape_rate).w
 	beq.s	loc_22EA
@@ -3855,7 +3863,7 @@ loc_22FA:
 	move.w	(a5), $2C(a0)
 loc_22FE:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_231C
 	bset	#4, 3(a2)
@@ -3872,7 +3880,7 @@ TechAction_Deban:
 	move.w	(a5), $2C(a0)
 loc_2330:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_2348
 	bset	#4, 3(a2)
@@ -3893,7 +3901,7 @@ loc_235C:
 	move.w	(a5), $2C(a0)
 loc_2360:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_237E
 	bset	#4, 3(a2)
@@ -3920,7 +3928,7 @@ loc_239C:
 	move.w	(a5), $2C(a0)
 loc_23A2:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_23D2
 	tst.w	2(a1)
@@ -3953,7 +3961,7 @@ loc_23EC:
 	move.w	(a5), $2C(a0)
 loc_23F2:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bsr.w	loc_27C8
 	bmi.s	loc_2416
 	tst.w	2(a1)
@@ -3977,7 +3985,7 @@ loc_2416:
 TechAction_Anti:
 	move.w	(a5), $2C(a0)
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	tst.w	2(a1)
 	beq.w	loc_1FEA
 	bset	#4, 3(a2)
@@ -3987,7 +3995,7 @@ TechAction_Anti:
 TechAction_Rever:
 	move.w	(a5), $2C(a0)
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	tst.w	2(a1)
 	bne.w	loc_1FEA
 	move.w	$C(a2), $A(a2)
@@ -4007,7 +4015,7 @@ TechAction_Megid:
 -
 	move.w	(a5)+, d0
 	beq.s	+
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	move.w	2(a1), d0
 	beq.s	+
 	lsr.w	#1, d0
@@ -4064,7 +4072,7 @@ loc_251C:
 	jsr	(loc_F4F8).l
 
 loc_2540:
-	move.b	(a6)+, ($FFFFF642).w			; move sound value to RAM
+	move.b	(a6)+, (Battle_saved_sound).w			; move sound value to RAM
 	move.b	(a6), d0
 	andi.w	#$7F, d0
 	bsr.w	loc_608A
@@ -4197,7 +4205,7 @@ ItemUsed_FireStaff:
 	moveq	#TechID_Foi, d3
 	bra.w	ProcessTechnique
 ; ---------------------------------------------------------------
-CommandUsed_DoDefense:
+BattleChar_DoDefense:
 	lea	(Character_stats).w, a3
 	move.w	$36(a0), d0
 	lsl.w	#6, d0
@@ -4208,7 +4216,7 @@ CommandUsed_DoDefense:
 	rts
 ; ---------------------------------------------------------------
 BattleCharacter_Act:
-	lea	(CharBattle_AnimOffsets).l, a1
+	lea	(BattleCharAnimScriptOffs).l, a1
 	bsr.w	Battle_AnimateSprites
 	cmpi.w	#8, $16(a0)
 	bcc.s	loc_26CC
@@ -4234,7 +4242,7 @@ BattleCharacter_Dead:
 ; -----------------------------------------------------------------
 ; d0 = character ID
 ; -----------------------------------------------------------------
-Battle_TargetCharacter:
+Battle_SetTargetCharacter:
 	lea	(Character_stats).w, a1
 	move.w	d0, d1
 	lsl.w	#6, d0
@@ -4250,27 +4258,30 @@ Battle_TargetCharacter:
 ; -----------------------------------------------------------------
 
 
-loc_270C:
-	bsr.s	loc_2736
+; -----------------------------------------------------------------
+Battle_TargetEnemy:
+	bsr.s	Battle_GetEnemyGroup
 
-loc_270E:
+-
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
 	lea	(Enemy_stats).w, a1
 	move.w	d0, d1
 	lsl.w	#6, d0
 	adda.w	d0, a1
-	tst.w	2(a1)
-	beq.s	loc_270E		; branch (loop) until we get an enemy who is not dead
+	tst.w	curr_hp(a1)
+	beq.s	-		; branch (loop) until we get an enemy who is not dead
 	lea	($FFFFE800).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
-	cmp.w	$36(a2), d5
-	bne.s	loc_270E
+	cmp.w	fighter_id(a2), d5
+	bne.s	-
 	rts
+; -----------------------------------------------------------------
 
 
-loc_2736:
+; -----------------------------------------------------------------
+Battle_GetEnemyGroup:
 	move.w	(Enemy_num_1).w, d0		; get number of enemies of first group
 	move.w	(a5), d5
 	beq.s	+
@@ -4289,6 +4300,9 @@ loc_2736:
 	move.w	(Enemy_2).w, (Enemy_index).w
 +
 	rts
+; -----------------------------------------------------------------
+
+
 
 CalculateHitRate:
 	moveq	#0, d0
@@ -4409,7 +4423,9 @@ loc_2888:
 	movea.l	(sp)+, a1
 	rts
 
-loc_288E:
+
+; -----------------------------------------------------------------
+Battle_SetEnemyDamage:
 	tst.w	d5
 	bne.s	loc_2898
 	add.w	d0, (Enemy_damage_1).w
@@ -4418,6 +4434,7 @@ loc_288E:
 loc_2898:
 	add.w	d0, (Enemy_damage_2).w
 	rts
+; -----------------------------------------------------------------
 
 
 ; ---------------------------------------------------------------
@@ -4449,7 +4466,7 @@ loc_28DA:
 	move.w	#1, $22(a0)
 ; ---------------------------------------------------------------
 loc_28E6:
-	lea	(loc_27364).l, a1
+	lea	(WeaponAnimScriptOffs).l, a1
 	bsr.w	Battle_AnimateSprites
 	rts
 
@@ -4471,7 +4488,7 @@ loc_2906:
 	move.w	#1, $22(a0)
 ; ---------------------------------------------------------------
 loc_291E:
-	lea	(loc_27364).l, a1
+	lea	(WeaponAnimScriptOffs).l, a1
 	bsr.w	Battle_AnimateSprites
 	rts
 ; ---------------------------------------------------------------
@@ -4493,7 +4510,7 @@ loc_293E:
 	move.w	#1, $22(a0)
 ; ---------------------------------------------------------------
 loc_2956:
-	lea	(loc_27226).l, a1
+	lea	(TechniqueAnimScriptOffs).l, a1
 	bsr.w	Battle_AnimateSprites
 	rts
 
@@ -4588,7 +4605,7 @@ loc_2A4E:
 	bra.w	Battle_AnimateSprites
 
 loc_2A58:
-	move.b	#$80, ($FFFFF642).w
+	move.b	#$80, (Battle_saved_sound).w
 	move.w	#0, (Battle_command_used).w
 	andi.w	#7, d0
 	beq.s	loc_2A7C
@@ -4608,7 +4625,7 @@ loc_2A7C:
 	cmp.b	d0, d2		; is technique rate higher than random generated number?
 	bhi.w	Enemy_ProcessTechnique	; if so, branch
 loc_2A98:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 loc_2A9C:
 	move.w	#2, $22(a0)
 	move.b	$3D(a0), (Sound_queue).w	; enemy sound when attacking
@@ -4654,14 +4671,14 @@ loc_2B0C:
 loc_2B1E:
 	rts
 
-Enemy_PickCharToAttack:
+Enemy_TargetCharacter:
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
 	lea	(Battle_CharTargetChances).l, a1
 	adda.w	d0, a1
 	move.b	(a1), d0
 	cmp.w	(Party_members_num).w, d0
-	bhi.s	Enemy_PickCharToAttack
+	bhi.s	Enemy_TargetCharacter
 	lea	(Party_member_ID).w, a1
 	add.w	d0, d0
 	adda.w	d0, a1
@@ -4672,7 +4689,7 @@ Enemy_PickCharToAttack:
 	lsl.w	#6, d0
 	adda.w	d0, a1
 	tst.w	2(a1)
-	beq.s	Enemy_PickCharToAttack	; branch if character being targeted is dead (so pick another one)
+	beq.s	Enemy_TargetCharacter	; branch if character being targeted is dead (so pick another one)
 	move.w	d1, d0
 	lea	(Characters_RAM).w, a2
 	lsl.w	#7, d0
@@ -4870,7 +4887,7 @@ loc_2CEA:
 	neg.w	d6
 	bclr	#0, d6
 	bne.s	loc_2D08
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_2D00
 	bsr.w	Enemy_CalculateAttackDamage
@@ -4885,7 +4902,7 @@ loc_2D08:
 	move.w	(Party_members_num).w, d4
 loc_2D1C:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	tst.w	2(a1)
 	beq.s	loc_2D32
 	bsr.w	loc_2C28
@@ -4898,7 +4915,7 @@ loc_2D32:
 	rts
 ; -----------------------------------------------------------
 EnemyTechnique_Paralyze:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	tst.b	1(a1)
 	bne.w	loc_2A9C			;  branch if character is already paralyzed
 	bsr.w	loc_2C28
@@ -4923,7 +4940,7 @@ loc_2D64:
 	rts
 ; -----------------------------------------------------------
 loc_2D7C:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	_btst	#7, 0(a1)
 	bne.w	loc_2A9C			;  branch if character is already poisoned
 	bsr.w	loc_2C28
@@ -4935,7 +4952,7 @@ loc_2D9C:
 	rts
 ; -----------------------------------------------------------
 loc_2DA4:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	_btst	#6, 0(a1)
 	bne.w	loc_2A9C			; branch if character is already asleep
 	bsr.w	loc_2C28
@@ -4947,7 +4964,7 @@ loc_2DC4:
 	rts
 ; -----------------------------------------------------------
 loc_2DCC:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_2E1C
 	move.w	(Enemy_1).w, d1
@@ -4974,7 +4991,7 @@ loc_2DF6:
 loc_2E10:
 	move.w	$36(a0), d5
 	bset	#$E, d0
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 loc_2E1C:
 	move.w	#3, $22(a0)
 	rts
@@ -4989,7 +5006,7 @@ loc_2E24:
 	move.w	(Party_members_num).w, d4
 loc_2E46:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	dbf	d4, loc_2E46
 
 	move.w	#$1219, (Battle_script_ID).w
@@ -5013,7 +5030,7 @@ loc_2E82:
 	moveq	#-1, d3
 loc_2E9C:
 	move.w	(a5)+, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	bclr	#7, 3(a2)
 	beq.s	loc_2EBE
 	btst	#4, 1(a1)
@@ -5033,7 +5050,7 @@ loc_2EBE:
 	cmpi.w	#7, d5
 	beq.w	loc_2D08
 	move.w	d2, d0
-	bsr.w	Battle_TargetCharacter
+	bsr.w	Battle_SetTargetCharacter
 	ori.b	#$10, d5
 	move.b	d5, 1(a1)
 	bset	#7, 3(a2)
@@ -5059,7 +5076,7 @@ loc_2F2C:
 	move.w	d1, 2(a1)
 	move.w	$36(a0), d5
 	bset	#$E, d0
-	bsr.w	loc_288E
+	bsr.w	Battle_SetEnemyDamage
 loc_2F3C:
 	move.w	#3, $22(a0)
 	rts
@@ -5074,7 +5091,7 @@ loc_2F54:
 	rts
 ; -----------------------------------------------------------
 loc_2F5C:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2AA8
 	move.w	#3, $22(a0)
 	rts
@@ -5134,13 +5151,13 @@ loc_3000:
 	rts
 ; -----------------------------------------------------------
 loc_3004:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2AA8
 	move.w	#3, $22(a0)
 	rts
 ; -----------------------------------------------------------
 loc_3014:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_3024
 	move.w	#0, 6(a1)		; empty character's TP
@@ -5149,7 +5166,7 @@ loc_3024:
 	rts
 ; -----------------------------------------------------------
 loc_302C:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_3058
 	move.w	#$1220, (Battle_script_ID).w
@@ -5165,7 +5182,7 @@ loc_3058:
 	rts
 ; -----------------------------------------------------------
 loc_3060:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_3076
 	move.w	#0, $1E(a1)
@@ -5175,7 +5192,7 @@ loc_3076:
 	rts
 ; -----------------------------------------------------------
 loc_307E:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_309C
 	move.w	#$121E, (Battle_script_ID).w
@@ -5187,7 +5204,7 @@ loc_309C:
 	rts
 ; -----------------------------------------------------------
 loc_30A4:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_30C2
 	move.w	#$121F, (Battle_script_ID).w
@@ -5199,7 +5216,7 @@ loc_30C2:
 	rts
 ; -----------------------------------------------------------
 loc_30CA:
-	bsr.w	Enemy_PickCharToAttack
+	bsr.w	Enemy_TargetCharacter
 	bsr.w	loc_2C28
 	bmi.s	loc_30E0
 	move.w	#0, 2(a1)
@@ -5704,7 +5721,7 @@ loc_360A:
 	move.w	$2C(a0), $6C(a0)
 	move.w	#1, $68(a0)
 	addq.w	#1, ($FFFFCC06).w
-	move.b	($FFFFF642).w, (Sound_queue).w
+	move.b	(Battle_saved_sound).w, (Sound_queue).w
 	rts
 
 loc_3622:
@@ -9448,6 +9465,7 @@ loc_6088:
 	rts
 
 
+; -----------------------------------------------------------------
 loc_608A:
 	lea	(WeaponTechArtPtrs).l, a1
 	add.w	d0, d0
@@ -9463,6 +9481,7 @@ loc_608A:
 	dbf	d1, -
 
 	rts
+; -----------------------------------------------------------------
 
 
 ; Nemesis decompression to VRAM
@@ -41470,24 +41489,24 @@ loc_270E8:
 ; ==========================================================================
 ; Characters battle animation offsets
 ; ==========================================================================
-CharBattle_AnimOffsets:
-	dc.w	AnimOff_RolfAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_NeiAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_RudoAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_AmyAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_HughAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_AnnaAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_KainAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_ShirAttack-CharBattle_AnimOffsets
-	dc.w	AnimOff_GunSingleEnemy-CharBattle_AnimOffsets
-	dc.w	AnimOff_AnnaSlasher-CharBattle_AnimOffsets
-	dc.w	AnimOff_Casting-CharBattle_AnimOffsets
-	dc.w	AnimOff_GunMultEnemies-CharBattle_AnimOffsets
-	dc.w	AnimOff_ItemNoEffect-CharBattle_AnimOffsets
-	dc.w	AnimOff_DrkFrcSideEffect-CharBattle_AnimOffsets
+BattleCharAnimScriptOffs:
+	dc.w	AnimScript_RolfAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_NeiAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_RudoAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_AmyAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_HughAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_AnnaAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_KainAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_ShirAttack-BattleCharAnimScriptOffs
+	dc.w	AnimScript_GunSingleEnemy-BattleCharAnimScriptOffs
+	dc.w	AnimScript_AnnaSlasher-BattleCharAnimScriptOffs
+	dc.w	AnimScript_Casting-BattleCharAnimScriptOffs
+	dc.w	AnimScript_GunMultEnemies-BattleCharAnimScriptOffs
+	dc.w	AnimScript_ItemNoEffect-BattleCharAnimScriptOffs
+	dc.w	AnimScript_DrkFrcSideEffect-BattleCharAnimScriptOffs
 ; ==========================================================================
 
-AnimOff_RolfAttack:
+AnimScript_RolfAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06
@@ -41501,7 +41520,7 @@ AnimOff_RolfAttack:
 	even
 
 
-AnimOff_NeiAttack:
+AnimScript_NeiAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06
@@ -41512,7 +41531,7 @@ AnimOff_NeiAttack:
 	dc.b	$00
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_RudoAttack:
+AnimScript_RudoAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05, $05
 	dc.b	$06
@@ -41522,7 +41541,7 @@ AnimOff_RudoAttack:
 	dc.b	$00
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_AmyAttack:
+AnimScript_AmyAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06
@@ -41536,7 +41555,7 @@ AnimOff_AmyAttack:
 	even
 
 
-AnimOff_HughAttack:
+AnimScript_HughAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06, $06
@@ -41546,7 +41565,7 @@ AnimOff_HughAttack:
 	dc.b	$00
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_AnnaAttack:
+AnimScript_AnnaAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06
@@ -41561,7 +41580,7 @@ AnimOff_AnnaAttack:
 	even
 
 
-AnimOff_KainAttack:
+AnimScript_KainAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06, $06
@@ -41571,7 +41590,7 @@ AnimOff_KainAttack:
 	dc.b	$00
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_ShirAttack:
+AnimScript_ShirAttack:
 	dc.b	$04, $04, $04
 	dc.b	$05
 	dc.b	$06, $06, $06
@@ -41585,7 +41604,7 @@ AnimOff_ShirAttack:
 	even
 
 
-AnimOff_GunSingleEnemy:
+AnimScript_GunSingleEnemy:
 	dc.b	$01, $01, $01, $01
 	dc.b	$03
 	dc.b	$F5
@@ -41593,7 +41612,7 @@ AnimOff_GunSingleEnemy:
 	dc.b	$03, $03, $03, $03, $03, $03
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_AnnaSlasher:
+AnimScript_AnnaSlasher:
 	dc.b	$01, $01, $01, $01
 	dc.b	$02
 	dc.b	$F5
@@ -41601,7 +41620,7 @@ AnimOff_AnnaSlasher:
 	dc.b	$02, $02, $02, $02, $02, $02
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_Casting:
+AnimScript_Casting:
 	dc.b	$01, $01, $01, $01
 	dc.b	$02
 	dc.b	$F3
@@ -41609,7 +41628,7 @@ AnimOff_Casting:
 	dc.b	$02, $02, $02, $02, $02, $02
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_GunMultEnemies:
+AnimScript_GunMultEnemies:
 	dc.b	$01, $01, $01, $01
 	dc.b	$03
 	dc.b	$F5
@@ -41623,13 +41642,13 @@ AnimOff_GunMultEnemies:
 	even
 
 
-AnimOff_ItemNoEffect:
+AnimScript_ItemNoEffect:
 	dc.b	$01, $01, $01, $01
 	dc.b	$02, $02, $02, $02, $02, $02
 	dc.b	$02, $02, $02, $02, $02
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-AnimOff_DrkFrcSideEffect:
+AnimScript_DrkFrcSideEffect:
 	dc.b	$01, $01, $01, $01
 	dc.b	$01, $01, $01, $01
 	dc.b	$FD
@@ -41637,63 +41656,63 @@ AnimOff_DrkFrcSideEffect:
 ; ==========================================================================
 
 ; ==========================================================================
-loc_27226:
-	dc.w	loc_27290-loc_27226
-	dc.w	loc_27290-loc_27226
-	dc.w	loc_27290-loc_27226
-	dc.w	loc_272A0-loc_27226
-	dc.w	loc_272B6-loc_27226
-	dc.w	loc_272B6-loc_27226
-	dc.w	loc_272B6-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_272CA-loc_27226
-	dc.w	loc_272CA-loc_27226
-	dc.w	loc_272CA-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_272E4-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_272F0-loc_27226
-	dc.w	loc_272F0-loc_27226
-	dc.w	loc_272F0-loc_27226
-	dc.w	loc_27304-loc_27226
-	dc.w	loc_27304-loc_27226
-	dc.w	loc_27304-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27318-loc_27226
-	dc.w	loc_27326-loc_27226
-	dc.w	loc_272E4-loc_27226
-	dc.w	loc_272D8-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27342-loc_27226
-	dc.w	loc_27342-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27334-loc_27226
-	dc.w	loc_27356-loc_27226
+TechniqueAnimScriptOffs:
+	dc.w	AnimScript_Foi-TechniqueAnimScriptOffs		; None
+	dc.w	AnimScript_Foi-TechniqueAnimScriptOffs		; Foi
+	dc.w	AnimScript_Foi-TechniqueAnimScriptOffs		; Gifoi
+	dc.w	AnimScript_Nafoi-TechniqueAnimScriptOffs	; Nafoi
+	dc.w	AnimScript_Zan-TechniqueAnimScriptOffs		; Zan
+	dc.w	AnimScript_Zan-TechniqueAnimScriptOffs		; Gizan
+	dc.w	AnimScript_Zan-TechniqueAnimScriptOffs		; Nazan
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Gra
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Gigra
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Nagra
+	dc.w	AnimScript_Tsu-TechniqueAnimScriptOffs		; Tsu
+	dc.w	AnimScript_Tsu-TechniqueAnimScriptOffs		; Githu
+	dc.w	AnimScript_Tsu-TechniqueAnimScriptOffs		; Nathu
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Shift
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Fanbi
+	dc.w	AnimScript_Eijia-TechniqueAnimScriptOffs	; Eijia
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Brose
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Conte
+	dc.w	AnimScript_Gaj-TechniqueAnimScriptOffs		; Gaj
+	dc.w	AnimScript_Gaj-TechniqueAnimScriptOffs		; Gigaj
+	dc.w	AnimScript_Gaj-TechniqueAnimScriptOffs		; Nagaj
+	dc.w	AnimScript_Sag-TechniqueAnimScriptOffs		; Sag
+	dc.w	AnimScript_Sag-TechniqueAnimScriptOffs		; Gisag
+	dc.w	AnimScript_Sag-TechniqueAnimScriptOffs		; Nasag
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Gen
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Sagen
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Vol
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Savol
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Shiza
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Doran
+	dc.w	AnimScript_Gen-TechniqueAnimScriptOffs		; Rimit
+	dc.w	AnimScript_Shinb-TechniqueAnimScriptOffs	; Shinb 
+	dc.w	AnimScript_Eijia-TechniqueAnimScriptOffs	; Forsa
+	dc.w	AnimScript_Gra-TechniqueAnimScriptOffs		; Rimet
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Shu
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Sashu
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Deban
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Ner
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Saner
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Res
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Gires
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Nares
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Sar
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Gisar
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Nasar
+	dc.w	AnimScript_Sak-TechniqueAnimScriptOffs		; Sak
+	dc.w	AnimScript_Sak-TechniqueAnimScriptOffs		; Nasak
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Anti
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Rever
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Ryuka
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Hinas
+	dc.w	AnimScript_Shift-TechniqueAnimScriptOffs	; Musik
+	dc.w	AnimScript_Megid-TechniqueAnimScriptOffs	; Megid
 ; ==========================================================================
 
-loc_27290:
+AnimScript_Foi:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41713,7 +41732,7 @@ loc_27290:
 	even
 
 ; --------------------------------------------------------------------------
-loc_272A0:
+AnimScript_Nafoi:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41736,7 +41755,7 @@ loc_272A0:
 	dc.b	$12
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_272B6:
+AnimScript_Zan:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41758,7 +41777,7 @@ loc_272B6:
 	dc.b	$0C
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_272CA:
+AnimScript_Tsu:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41774,7 +41793,7 @@ loc_272CA:
 	dc.b	$06
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_272D8:
+AnimScript_Gra:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41791,7 +41810,7 @@ loc_272D8:
 	even
 
 ; --------------------------------------------------------------------------
-loc_272E4:
+AnimScript_Eijia:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41808,7 +41827,7 @@ loc_272E4:
 	even
 
 ; --------------------------------------------------------------------------
-loc_272F0:
+AnimScript_Gaj:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41833,7 +41852,7 @@ loc_272F0:
 	even
 
 ; --------------------------------------------------------------------------
-loc_27304:
+AnimScript_Sag:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41857,7 +41876,7 @@ loc_27304:
 	even
 
 ; --------------------------------------------------------------------------
-loc_27318:
+AnimScript_Gen:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03, $03
@@ -41873,7 +41892,7 @@ loc_27318:
 	even
 
 ; --------------------------------------------------------------------------
-loc_27326:
+AnimScript_Shinb:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03, $03
@@ -41889,7 +41908,7 @@ loc_27326:
 	even
 
 ; --------------------------------------------------------------------------
-loc_27334:
+AnimScript_Shift:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41908,7 +41927,7 @@ loc_27334:
 	even
 
 ; --------------------------------------------------------------------------
-loc_27342:
+AnimScript_Sak:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -41930,7 +41949,7 @@ loc_27342:
 	dc.b	$0C
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_27356:
+AnimScript_Megid:
 	dc.b	$01
 	dc.b	$02, $02
 	dc.b	$03, $03, $03
@@ -41943,82 +41962,82 @@ loc_27356:
 	dc.b	$FE
 
 ; ==========================================================================
-loc_27364:
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_273FC-loc_27364
-	dc.w	loc_27404-loc_27364
-	dc.w	loc_27422-loc_27364
-	dc.w	loc_27458-loc_27364
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_27458-loc_27364
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_273FC-loc_27364
-	dc.w	loc_27422-loc_27364
-	dc.w	loc_27460-loc_27364
-	dc.w	loc_2746A-loc_27364
-	dc.w	loc_27458-loc_27364
-	dc.w	loc_27460-loc_27364
-	dc.w	loc_27422-loc_27364
-	dc.w	loc_27474-loc_27364
-	dc.w	loc_273F4-loc_27364
-	dc.w	loc_27460-loc_27364
-	dc.w	loc_27422-loc_27364
-	dc.w	loc_2747C-loc_27364
-	dc.w	loc_27484-loc_27364
-	dc.w	loc_27422-loc_27364
-	dc.w	loc_27494-loc_27364
-	dc.w	loc_27494-loc_27364
-	dc.w	loc_2749A-loc_27364
-	dc.w	loc_274A4-loc_27364
-	dc.w	loc_274A4-loc_27364
-	dc.w	loc_274A4-loc_27364
-	dc.w	loc_274B0-loc_27364
-	dc.w	loc_274B8-loc_27364
-	dc.w	loc_274C6-loc_27364
-	dc.w	loc_274C6-loc_27364
-	dc.w	loc_274D8-loc_27364
-	dc.w	loc_274EA-loc_27364
-	dc.w	loc_27500-loc_27364
-	dc.w	loc_2750C-loc_27364
-	dc.w	loc_2750C-loc_27364
-	dc.w	loc_27514-loc_27364
-	dc.w	loc_2751C-loc_27364
-	dc.w	loc_27524-loc_27364
-	dc.w	loc_27532-loc_27364
-	dc.w	loc_27542-loc_27364
-	dc.w	loc_2754C-loc_27364
-	dc.w	loc_2755C-loc_27364
-	dc.w	loc_27572-loc_27364
-	dc.w	loc_2757E-loc_27364
-	dc.w	loc_27594-loc_27364
-	dc.w	loc_2759C-loc_27364
-	dc.w	loc_275A6-loc_27364
-	dc.w	loc_275B2-loc_27364
-	dc.w	loc_275BA-loc_27364
-	dc.w	loc_275C4-loc_27364
-	dc.w	loc_275D0-loc_27364
-	dc.w	loc_275D8-loc_27364
-	dc.w	loc_275E2-loc_27364
-	dc.w	loc_275EE-loc_27364
-	dc.w	loc_275F6-loc_27364
-	dc.w	loc_27602-loc_27364
-	dc.w	loc_2760E-loc_27364
-	dc.w	loc_2761E-loc_27364
-	dc.w	loc_27638-loc_27364
-	dc.w	loc_27648-loc_27364
-	dc.w	loc_274CC-loc_27364
-	dc.w	loc_27656-loc_27364
-	dc.w	loc_27666-loc_27364
-	dc.w	loc_27676-loc_27364
-	dc.w	loc_27686-loc_27364
-	dc.w	loc_27696-loc_27364
-	dc.w	loc_276A6-loc_27364
-	dc.w	loc_276B6-loc_27364
+WeaponAnimScriptOffs:
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Knife
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Dagger
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Scalpel
+	dc.w	AnimScript_SteelBar-WeaponAnimScriptOffs	; Steel Bar
+	dc.w	AnimScript_Boomerang-WeaponAnimScriptOffs	; Boomerang
+	dc.w	AnimScript_Slasher-WeaponAnimScriptOffs		; Slasher
+	dc.w	AnimScript_Sword-WeaponAnimScriptOffs		; Sword
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Whip
+	dc.w	AnimScript_Sword-WeaponAnimScriptOffs		; Ceramic Sword
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Ceramic Knife
+	dc.w	AnimScript_SteelBar-WeaponAnimScriptOffs	; Ceramic Bar
+	dc.w	AnimScript_Slasher-WeaponAnimScriptOffs		; Laser Slasher
+	dc.w	AnimScript_LasrSword-WeaponAnimScriptOffs	; Laser Sword
+	dc.w	AnimScript_LaserBar-WeaponAnimScriptOffs	; Laser Bar
+	dc.w	AnimScript_Sword-WeaponAnimScriptOffs		; Laser Knife
+	dc.w	AnimScript_LasrSword-WeaponAnimScriptOffs	; Sword of Anger
+	dc.w	AnimScript_Slasher-WeaponAnimScriptOffs		; Fire Slasher
+	dc.w	AnimScript_FireStaff-WeaponAnimScriptOffs	; Fire Staff
+	dc.w	AnimScript_Knife-WeaponAnimScriptOffs		; Laconia Mace
+	dc.w	AnimScript_LasrSword-WeaponAnimScriptOffs	; Laconia Dagger
+	dc.w	AnimScript_Slasher-WeaponAnimScriptOffs		; Laconia Slasher
+	dc.w	AnimScript_LacSword-WeaponAnimScriptOffs	; Laconia Sword
+	dc.w	AnimScript_NeiSword-WeaponAnimScriptOffs	; Nei Sword
+	dc.w	AnimScript_Slasher-WeaponAnimScriptOffs		; Nei Slasher
+	dc.w	AnimScript_BowGun-WeaponAnimScriptOffs		; Bow Gun
+	dc.w	AnimScript_BowGun-WeaponAnimScriptOffs		; Sonic Gun
+	dc.w	AnimScript_Shotgun-WeaponAnimScriptOffs		; Shotgun
+	dc.w	AnimScript_SilentShot-WeaponAnimScriptOffs	; Silent Shot
+	dc.w	AnimScript_SilentShot-WeaponAnimScriptOffs	; Poison Shot
+	dc.w	AnimScript_SilentShot-WeaponAnimScriptOffs	; Acid Shot
+	dc.w	AnimScript_Cannon-WeaponAnimScriptOffs		; Cannon
+	dc.w	AnimScript_Vulcan-WeaponAnimScriptOffs		; Vulcan
+	dc.w	AnimScript_LaserShot-WeaponAnimScriptOffs	; Laser Shot
+	dc.w	AnimScript_LaserShot-WeaponAnimScriptOffs	; Laser Cannon
+	dc.w	AnimScript_PlsCannon-WeaponAnimScriptOffs	; Pulse Cannon
+	dc.w	AnimScript_PlsVulcan-WeaponAnimScriptOffs	; Pulse Vulcan
+	dc.w	AnimScript_NeiShot-WeaponAnimScriptOffs		; Nei Shot
+	dc.w	loc_2750C-WeaponAnimScriptOffs
+	dc.w	loc_2750C-WeaponAnimScriptOffs
+	dc.w	loc_27514-WeaponAnimScriptOffs
+	dc.w	loc_2751C-WeaponAnimScriptOffs
+	dc.w	loc_27524-WeaponAnimScriptOffs
+	dc.w	loc_27532-WeaponAnimScriptOffs
+	dc.w	loc_27542-WeaponAnimScriptOffs
+	dc.w	loc_2754C-WeaponAnimScriptOffs
+	dc.w	loc_2755C-WeaponAnimScriptOffs
+	dc.w	loc_27572-WeaponAnimScriptOffs
+	dc.w	loc_2757E-WeaponAnimScriptOffs
+	dc.w	loc_27594-WeaponAnimScriptOffs
+	dc.w	loc_2759C-WeaponAnimScriptOffs
+	dc.w	loc_275A6-WeaponAnimScriptOffs
+	dc.w	loc_275B2-WeaponAnimScriptOffs
+	dc.w	loc_275BA-WeaponAnimScriptOffs
+	dc.w	loc_275C4-WeaponAnimScriptOffs
+	dc.w	loc_275D0-WeaponAnimScriptOffs
+	dc.w	loc_275D8-WeaponAnimScriptOffs
+	dc.w	loc_275E2-WeaponAnimScriptOffs
+	dc.w	loc_275EE-WeaponAnimScriptOffs
+	dc.w	loc_275F6-WeaponAnimScriptOffs
+	dc.w	loc_27602-WeaponAnimScriptOffs
+	dc.w	loc_2760E-WeaponAnimScriptOffs
+	dc.w	loc_2761E-WeaponAnimScriptOffs
+	dc.w	loc_27638-WeaponAnimScriptOffs
+	dc.w	loc_27648-WeaponAnimScriptOffs
+	dc.w	loc_274CC-WeaponAnimScriptOffs
+	dc.w	loc_27656-WeaponAnimScriptOffs
+	dc.w	loc_27666-WeaponAnimScriptOffs
+	dc.w	loc_27676-WeaponAnimScriptOffs
+	dc.w	loc_27686-WeaponAnimScriptOffs
+	dc.w	loc_27696-WeaponAnimScriptOffs
+	dc.w	loc_276A6-WeaponAnimScriptOffs
+	dc.w	loc_276B6-WeaponAnimScriptOffs
 ; ==========================================================================
 
-loc_273F4:
+AnimScript_Knife:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$FD
@@ -42026,7 +42045,7 @@ loc_273F4:
 	dc.b	$04, $04, $04
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_273FC:
+AnimScript_SteelBar:
 	dc.b	$01
 	dc.b    $02
 	dc.b    $03
@@ -42035,7 +42054,7 @@ loc_273FC:
 	dc.b    $05, $05
 	dc.b    $FE
 ; --------------------------------------------------------------------------
-loc_27404:
+AnimScript_Boomerang:
 	dc.b	$01
 	dc.b    $02
 	dc.b    $03
@@ -42067,7 +42086,7 @@ loc_27404:
 	dc.b    $00
 	dc.b    $FE
 ; --------------------------------------------------------------------------
-loc_27422:
+AnimScript_Slasher:
 	dc.b	$01
 	dc.b    $02
 	dc.b    $03
@@ -42108,7 +42127,7 @@ loc_27422:
 	dc.b    $00
 	dc.b    $FE
 ; --------------------------------------------------------------------------
-loc_27458:
+AnimScript_Sword:
 	dc.b	$01
 	dc.b    $02
 	dc.b    $FD
@@ -42116,7 +42135,7 @@ loc_27458:
 	dc.b    $04, $04, $04
 	dc.b    $FE
 ; --------------------------------------------------------------------------
-loc_27460:
+AnimScript_LasrSword:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42127,7 +42146,7 @@ loc_27460:
 	dc.b	$07, $07
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_2746A:
+AnimScript_LaserBar:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42138,7 +42157,7 @@ loc_2746A:
 	dc.b	$07, $07
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_27474:
+AnimScript_FireStaff:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$FD
@@ -42146,7 +42165,7 @@ loc_27474:
 	dc.b	$04, $04, $04
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_2747C:
+AnimScript_LacSword:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$FD
@@ -42154,7 +42173,7 @@ loc_2747C:
 	dc.b	$04, $04, $04
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_27484:
+AnimScript_NeiSword:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42173,7 +42192,7 @@ loc_27484:
 ; --------------------------------------------------------------------------
 	even
 
-loc_27494:
+AnimScript_BowGun:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$04
@@ -42181,7 +42200,7 @@ loc_27494:
 	dc.b	$05
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_2749A:
+AnimScript_Shotgun:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$FA
@@ -42193,7 +42212,7 @@ loc_2749A:
 ; --------------------------------------------------------------------------
 	even
 
-loc_274A4:
+AnimScript_SilentShot:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42209,7 +42228,7 @@ loc_274A4:
 
 	even
 
-loc_274B0:
+AnimScript_Cannon:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42221,7 +42240,7 @@ loc_274B0:
 
 	even
 
-loc_274B8:
+AnimScript_Vulcan:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42239,7 +42258,7 @@ loc_274B8:
 
 	even
 
-loc_274C6:
+AnimScript_LaserShot:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03, $03
@@ -42258,7 +42277,7 @@ loc_274CC:
 	dc.b	$FE
 ; --------------------------------------------------------------------------
 
-loc_274D8:
+AnimScript_PlsCannon:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42280,7 +42299,7 @@ loc_274D8:
 
 	even
 
-loc_274EA:
+AnimScript_PlsVulcan:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03
@@ -42304,7 +42323,7 @@ loc_274EA:
 	dc.b	$09
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_27500:
+AnimScript_NeiShot:
 	dc.b	$01
 	dc.b	$02
 	dc.b	$03

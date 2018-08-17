@@ -47,8 +47,12 @@ StatusAsleep_Mask =  1<<StatusAsleep	; $40
 StatusPoison_Mask =  1<<StatusPoison	; $80
 ; ---------------------------------------------------------------------------
 
+
 ; ---------------------------------------------------------------------------
 ; Global properties and constants for objects
+object_size = $40
+next_object = object_size
+
 obj_id = 0	; word
 render_flags = 2	; bitfield;
 mappings = 4	; longword
@@ -85,7 +89,16 @@ anim_timer_start = $28	; word
 battle_target = $2C	; word
 hit_timer = $30	; word
 fighter_id = $36	; word
+
+child_mappings = 4+object_size	; longword
+child_battle_anim = $16+object_size	; word
+child_battle_anim_frame = $1A+object_size	; word
+child_attack_x_offset = $1C+object_size	; word
+child_anim_timer_start = $28+object_size	; word
+child_battle_target = $2C+object_size	; word
+child_enemy_group_start = $36+object_size	; word
 ; ---------------------------------------------------------------------------
+
 
 ; function to determine the id in a table
 ; ptr = address of pointer in the table
@@ -1158,7 +1171,14 @@ Map_layout_BG =  ramaddr($FFFF9000)	; map layout for plane B
 Map_layout_FG =  ramaddr($FFFFA800)	; map layout for plane A
 
 Character_stats =  ramaddr($FFFFC000)
-
+Rolf_stats =  ramaddr($FFFFC000)
+Nei_stats =  ramaddr($FFFFC040)
+Rudo_stats =  ramaddr($FFFFC080)
+Amy_stats =  ramaddr($FFFFC0C0)
+Hugh_stats =  ramaddr($FFFFC100)
+Anna_stats =  ramaddr($FFFFC140)
+Kain_stats =  ramaddr($FFFFC180)
+Shir_stats =  ramaddr($FFFFC1C0)
 Enemy_stats =  ramaddr($FFFFC200)
 
 Party_members_num =  ramaddr($FFFFC600)		; current number of party members
@@ -1291,6 +1311,8 @@ Link_field_count =  ramaddr($FFFFF62C)		; counter for link field Sprite attribut
 RNG_seed =  ramaddr($FFFFF636)
 
 Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
+
+Battle_saved_sound =  ramaddr($FFFFF642)
 
 Chunk_table_addr =  ramaddr($FFFFF714)
 
