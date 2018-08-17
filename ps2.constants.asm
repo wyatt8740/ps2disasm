@@ -775,9 +775,7 @@ WinID_RolfPortrait2 =  id(PtrWin_RolfPortrait2)	; $72
 WinID_TeleportPlaceNames =  id(PtrWin_TeleportPlaceNames)	; $73
 WinID_UstvestiaSoundtracks =  id(PtrWin_UstvestiaSoundtracks)	; $74
 
-; Number of bytes for the dynamic windows + $B2 in order to occupy the RAM section until address $FFFF8C00. You can replace $B2 with 4 and it will be fine.
-; Why 4? Well, Bytes are allocated using a long-word sized instruction and by doing this, you can cut off from 1 to 3 bytes, because it's dyn_windows_size by 4 when
-; we fill the RAM section with these bytes. We don't want to leave out the remainder so we add 3, but we also want it even, so we make it 4.
+
 dyn_windows_size =  (DynamicWindowsEnd-DynamicWindowsStart)+$B2
 
 
@@ -1225,6 +1223,7 @@ Enemy_total_meseta =  ramaddr($FFFFCB34)
 Battle_main_routine_index =  ramaddr($FFFFCC00)
 Fight_active_flag =  ramaddr($FFFFCC02)		; flag: determines if you chose option "FIGHT" in battle; 0 = not fighting; 1 = fighting
 Fight_interrupted_flag =  ramaddr($FFFFCC04)	; flag: determines if you want to interrupt the fight and select other commands; 0 = continue fight; 1 = interrupt fight
+Fight_action_steps =  ramaddr($FFFFCC06)
 Battle_script_ID =	ramaddr($FFFFCC0C)
 Battle_command_used =  ramaddr($FFFFCC0E)
 Char_battle_commands =  ramaddr($FFFFCC10)	; 16 bytes per character;

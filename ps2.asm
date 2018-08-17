@@ -3230,7 +3230,7 @@ Character_Fight:
 	move.w	#$1206, (Script_ID).w		; "'Character' is dead!"
 +
 	move.b	#0, battle_status(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Fight_action_steps).w
 	rts
 
 Character_IsHit:
@@ -3560,7 +3560,7 @@ SetWeaponProperties:
 
 
 loc_1F62:
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Fight_action_steps).w
 	bclr	#0, battle_status(a0)
 	rts
 ; ---------------------------------------------------------------
@@ -4211,7 +4211,7 @@ BattleChar_DoDefense:
 	lsl.w	#6, d0
 	adda.w	d0, a3
 	_bset	#0, 0(a3)
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Fight_action_steps).w
 	bclr	#0, 3(a0)
 	rts
 ; ---------------------------------------------------------------
@@ -4572,7 +4572,7 @@ BattleEnemy_Wait:
 loc_29F6:
 	andi.w	#$FFF3, (a3)
 	move.b	#0, 3(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Fight_action_steps).w
 	rts
 loc_2A06:
 	btst	#3, d0
@@ -4610,7 +4610,7 @@ loc_2A58:
 	andi.w	#7, d0
 	beq.s	loc_2A7C
 	subq.b	#1, 1(a3)
-	move.w	#0, ($FFFFCC06).w
+	move.w	#0, (Fight_action_steps).w
 	bclr	#0, 3(a0)
 loc_2A7A:
 	rts
@@ -5252,7 +5252,7 @@ BattleEnemy_Dead:
 	move.w	#0, (a0)
 	move.w	#4, $22(a0)
 	move.b	#0, 3(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Fight_action_steps).w
 	rts
 loc_3148:
 	move.b	#$10, 2(a0)
@@ -5403,7 +5403,7 @@ loc_32C2:
 	move.w	#0, $1A(a0)				; reset animation frame
 	btst	#0, 3(a0)
 	beq.s	loc_32E2
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Fight_action_steps).w
 	bclr	#0, 3(a0)
 loc_32E0:
 	rts
@@ -5419,7 +5419,7 @@ loc_32EE:
 	cmpi.b	#$FE, d0
 	bne.s	loc_3300
 	move.b	#1, 2(a0)
-	subq.w	#1, ($FFFFCC06).w
+	subq.w	#1, (Fight_action_steps).w
 	rts
 
 loc_3300:
@@ -5439,7 +5439,7 @@ loc_3308:
 	bne.s	loc_3386
 	move.b	#SFXID_Sword, (Sound_queue).w	; this is the generic sound when characters/enemies get hurt
 	move.w	#$30, $30(a2)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	lea	(Window_index).w, a1
 	move.w	(Battle_command_used).w, d0
 	bmi.s	loc_3386
@@ -5672,7 +5672,7 @@ loc_353A:
 	move.w	-$2E(a0), $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	rts
 
 loc_357C:
@@ -5703,7 +5703,7 @@ loc_3596:
 	move.w	d0, $E(a3)
 	move.w	#0, $26(a3)
 	move.w	#7, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	rts
 
 loc_35DE:
@@ -5720,7 +5720,7 @@ loc_35DE:
 loc_360A:
 	move.w	$2C(a0), $6C(a0)
 	move.w	#1, $68(a0)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	move.b	(Battle_saved_sound).w, (Sound_queue).w
 	rts
 
@@ -5754,7 +5754,7 @@ loc_366E:
 	move.w	d0, $16(a3)
 	move.l	$3C(a0), 4(a3)
 	move.w	#2, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	rts
 loc_368C:
 	move.w	#$12, (a3)
@@ -5773,7 +5773,7 @@ loc_36B0:
 	move.l	4(a0), 4(a3)
 	move.w	#0, $26(a3)
 	move.w	#1, $28(a3)
-	addq.w	#1, ($FFFFCC06).w
+	addq.w	#1, (Fight_action_steps).w
 	rts
 
 ; --------------------------------------------------------------
@@ -12788,7 +12788,7 @@ loc_85D6:
 	move.w	d0, (Battle_main_routine_index).w
 	move.w	d0, (Fight_active_flag).w
 	move.w	d0, (Fight_interrupted_flag).w
-	move.w	d0, ($FFFFCC06).w
+	move.w	d0, (Fight_action_steps).w
 	move.w	d0, ($FFFFCC98).w
 	move.w	d0, ($FFFFCC92).w
 	move.w	d0, $FFFFF650.w
@@ -22376,7 +22376,7 @@ Battle_CheckRoutines:
 	bne.s	+
 	tst.w	(Window_active_flag).w
 	bne.s	+
-	tst.w	($FFFFCC06).w
+	tst.w	(Fight_action_steps).w
 	bne.s	+
 	move.w	(Event_routine).w, d1
 	bne.s	Battle_RunRoutines
@@ -23012,7 +23012,7 @@ loc_F19E:
 	cmpi.w	#3, $22(a0)
 	beq.s	loc_F1CE
 	bset	#0, 3(a0)
-	move.w	#1, ($FFFFCC06).w
+	move.w	#1, (Fight_action_steps).w
 	subq.w	#1, (Event_routine).w
 loc_F1CE:
 	rts
