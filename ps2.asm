@@ -8971,12 +8971,12 @@ loc_5B6E:
 loc_5B96:
 	bsr.w	loc_8E00
 	jsr	(loc_118F4).l
-	bsr.w	ProcessWindows
+	bsr.w	DrawWindows
 	rts
 
 VInt_Interaction:
 	bsr.w	VInt_NormalUpdates
-	bsr.w	ProcessWindows
+	bsr.w	DrawWindows
 	rts
 
 VInt_Battle:
@@ -9002,7 +9002,7 @@ VInt_Battle:
 	move.w	#$83, $FFFFF644.w
 	move.w	$FFFFF644.w, (a6)
 +
-	bsr.w	ProcessWindows
+	bsr.w	DrawWindows
 	bsr.w	loc_6018
 	rts
 
@@ -11742,7 +11742,7 @@ loc_797C:
 	bsr.w	WaitForVInt
 	move.b	#$C, (V_int_routine).w
 	bsr.w	WaitForVInt
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	subq.w	#1, (Demo_timer).w
 	bne.s	loc_797C
 loc_799A:
@@ -12109,7 +12109,7 @@ GameMode_MapLoop:
 	bsr.w	ProcessPlayerMenu
 +
 	bsr.w	ProcessAButtonPress
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	bsr.w	loc_5F74
 	jsr	(RenderCharSprites).l
 	bsr.w	loc_809C
@@ -12609,7 +12609,7 @@ GameMode_InteractionLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	Interaction_CheckRoutine
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	bsr.w	loc_66F6
 	tst.w	(Screen_changed_flag).w
 	bne.s	loc_8406
@@ -12836,8 +12836,8 @@ loc_85D6:
 +
 	bsr.w	UpdateSoundQueue
 loc_86A2:
-	bsr.w	CheckPrepareWindows
-	bsr.w	ProcessWindows
+	bsr.w	UpdateWindows
+	bsr.w	DrawWindows
 	tst.w	(Window_index).w
 	bne.s	loc_86A2
 	move.w	(VDP_reg1_values).w, d0
@@ -12892,7 +12892,7 @@ GameMode_BattleLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	Battle_CheckRoutines
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	bsr.w	loc_5F74
 	bsr.w	loc_67B8
 	move.b	(Joypad_pressed).w, d0
@@ -12966,7 +12966,7 @@ GameOverScreenLoop:
 	bsr.w	CheckGamePause
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	subq.w	#1, (Demo_timer).w
 	beq.s	loc_88B2
 	move.b	(Joypad_pressed).w, d0
@@ -13066,7 +13066,7 @@ GameMode_IntroLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	IntroScr_CheckRoutine
-	bsr.w	CheckPrepareWindows
+	bsr.w	UpdateWindows
 	tst.w	(Screen_changed_flag).w
 	bmi.s	loc_89E6
 	bne.s	loc_89E4
@@ -14157,7 +14157,7 @@ loc_9342:
 	dc.l	loc_43CD0, loc_484A2
 ; =============================================
 
-ProcessWindows:
+DrawWindows:
 	move.w	$FFFFDE40.w, d1
 	bne.w	loc_947A
 	move.w	(Window_index).w, d0
@@ -23410,34 +23410,34 @@ CharStartCommandsArray:
 
 	even
 
-CheckPrepareWindows:
+UpdateWindows:
 	tst.w	(Window_index).w
-	beq.s	PrepareWindows		; continue processing an already opened window
-	bmi.s	+	; rts
-	bset	#0, (Window_index).w	; set window flag to processed
-	bne.s	+						; if it was already processed, return
+	beq.s	.update		; continue processing an already opened window
+	bmi.s	.return	; rts
+	bset	#0, (Window_index).w	; set window-opening flag
+	bne.s	.return						; if it was already processed, return
 	move.w	(Window_index).w, d0
 	andi.w	#$FF, d0
 	move.w	d0, (Window_index_saved).w	; save index for further processing
 	move.w	#0, (Window_routine).w
 
-PrepareWindows:
+.update:
 	move.w	(Window_routine).w, d1
 	move.w	(Window_index_saved).w, d0
 	lsl.w	#2, d0
 	andi.w	#$3FC, d0
 	jsr	WindowsIndexTable(pc,d0.w)
 	cmpi.w	#2, (Window_routine).w
-	beq.s	+	; rts		; stop windows routine at 2 (3 routines per window)
-	addq.w	#1, (Window_routine).w	; process next windows routine next frame
-+
+	beq.s	.return	; rts		; stop windows routine at 2 (3 routines per window)
+	addq.w	#1, (Window_routine).w	; process next windows routine
+.return:
 	rts
 
 ; ========================================
 ; table of all the windows in the game
 ; ========================================
 WindowsIndexTable:
-	bra.w	Win_Null				; 0 -- when the Window_index is 0, then this checks for things like script since the window is already open
+	bra.w	Win_Null				; 0
 	bra.w	Win_PlayerMenu			; 1
 	bra.w	Win_MenuItemChar		; 2
 	bra.w	Win_MenuItemList		; 3
