@@ -4315,9 +4315,9 @@ Character_CheckAttackSuccess:
 	move.w	#$E5, d2	; 90% hit rate
 	cmpi.w	#$180, d0
 	bcs.s	+			; branch if lower than 384
-	move.w	#$FF, d2	; 100% hit rate (Yay!)
+	move.w	#$FF, d2	; 100% hit rate
 +
-	_btst	#4, 0(a3)	; if it's set, halve whole hit rate value --  don't know which enemy does this, probably Dark Force
+	_btst	#4, 0(a3)
 	beq.s	loc_2790
 	lsr.w	#1, d2		; halve value
 loc_2790:
