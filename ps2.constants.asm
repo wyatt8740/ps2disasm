@@ -2,7 +2,7 @@
 ; Constants
 ; ---------------------------------------------------------------------------
 
-; Character statistics
+; Character statistics. Enemies share some of them
 ; 'mod' means a stat modified by equipment
 status = 0	; byte
 paralyze_timer = 1	; byte
@@ -32,6 +32,14 @@ item_num = $27	; byte
 items = $28
 items_2 = $30
 name = $38	; 2 longwords ; the 1st longword contains spaces only; the 2nd longword is the character's name
+
+; Enemy statistics
+enemy_type = 1
+enemy_meseta = $A
+enemy_exp = $C
+enemy_tech = $25
+enemy_tech_use_rate = $26
+enemy_tech_success_rate = $27
 
 ; ---------------------------------------------------------------------------
 ; Character status
