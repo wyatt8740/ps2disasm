@@ -4684,7 +4684,7 @@ loc_2B1E:
 Enemy_TargetCharacter:
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
-	lea	(Battle_CharTargetChances).l, a1
+	lea	(EnemyTargetRates).l, a1
 	adda.w	d0, a1
 	move.b	(a1), d0
 	cmp.w	(Party_members_num).w, d0
@@ -4717,7 +4717,7 @@ Enemy_TargetCharacter:
 ; 0 and 1 = characters in front row
 ; 2 and 3 = characters in back row
 ; ==============================================
-Battle_CharTargetChances:
+EnemyTargetRates:
 	dc.b	$00
 	dc.b	$00
 	dc.b	$00
