@@ -4684,7 +4684,7 @@ loc_2B1E:
 Enemy_TargetCharacter:
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
-	lea	(EnemyTargetRates).l, a1
+	lea	(EnemyTargetPartyOffsets).l, a1
 	adda.w	d0, a1
 	move.b	(a1), d0
 	cmp.w	(Party_members_num).w, d0
@@ -4712,12 +4712,9 @@ Enemy_TargetCharacter:
 	rts
 
 ; ==============================================
-; Array determining the chances a character gets
-; attacked by the enemy
-; 0 and 1 = characters in front row
-; 2 and 3 = characters in back row
+; Table of party member offsets picked randomly and that will be the target
 ; ==============================================
-EnemyTargetRates:
+EnemyTargetPartyOffsets:
 	dc.b	$00
 	dc.b	$00
 	dc.b	$00
