@@ -633,12 +633,12 @@ loc_796:
 	adda.w	d0, a3
 	move.w	#$100, (Escape_rate).w
 	lea	(Enemy_stats).w, a6
-	lea	($FFFFE800).w, a5
+	lea	(Enemies_RAM).w, a5
 	lea	($FFFFFBC2).w, a0
 	move.w	#$4000, d5
 	move.w	(Enemy_num_1).w, d6		; get number of enemies of first group
 	moveq	#0, d7
-	move.w	d7, (Enemy_group_1_num).w
+	move.w	d7, (Enemy_group_2_start_num).w
 
 	lea	($FF0020).l, a4
 	move.w	(Enemy_1).w, d0		; get enemy ID of first group
@@ -650,7 +650,7 @@ loc_796:
 	bmi.w	loc_9B8
 	move.w	(Enemy_num_1).w, d7
 	addq.w	#1, d7
-	move.w	d7, (Enemy_group_1_num).w
+	move.w	d7, (Enemy_group_2_start_num).w
 	lea	(Char_battle_commands+4).w, a1
 	moveq	#7, d0
 -
@@ -3373,12 +3373,12 @@ loc_1D34:
 	jmp	BattleCharacterCommands(pc,d0.w)
 ; ---------------------------------------------------------------
 BattleCharacterCommands:
-	bra.w	BattleChar_DoAttack
-	bra.w	BattleChar_DoTechnique
-	bra.w	BattleChar_DoItem
-	bra.w	BattleChar_DoDefense
+	bra.w	Character_DoAttack
+	bra.w	Character_DoTechnique
+	bra.w	Character_DoItem
+	bra.w	Character_DoDefense
 ; ---------------------------------------------------------------
-BattleChar_DoAttack:
+Character_DoAttack:
 	lea	(Character_stats).w, a3
 	move.w	fighter_id(a0), d0
 	lsl.w	#6, d0
@@ -3419,9 +3419,9 @@ loc_1D9E:
 	beq.s	loc_1DDE	; branch if it's single-target
 	move.w	#9, battle_anim(a0)	; animation for slashers
 	subq.w	#1, d0
-	beq.s	BattleAttack_AllEnemies	; if 1, target all enemies
+	beq.s	Character_AllEnemies	; if 1, target all enemies
 loc_1DDE:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3435,7 +3435,7 @@ loc_1DDE:
 
 
 ; -----------------------------------------------------------------
-BattleAttack_AllEnemies:
+Character_AllEnemies:
 	bsr.w	Battle_GetEnemyGroup
 	moveq	#4, d6
 loc_1E0C:
@@ -3447,7 +3447,7 @@ loc_1E0C:
 	adda.w	d0, a1
 	tst.w	curr_hp(a1)
 	beq.s	.next		; branch if enemy's dead
-	lea	($FFFFE800).w, a2
+	lea	(Enemies_RAM).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
 	cmp.w	fighter_id(a2), d5
@@ -3473,7 +3473,7 @@ BattleAttack_FixedDamage:
 	move.b	(a6)+, d4
 	subq.w	#1, d4
 	bne.s	loc_1EDA
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3516,7 +3516,7 @@ loc_1EDA:
 	move.w	#8, $2C(a0)
 	move.w	#$1C0, $A(a0)
 loc_1EEC:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), d0
 	cmp.w	$A(a0), d0
 	bcc.s	loc_1EFE
@@ -3564,7 +3564,7 @@ loc_1F62:
 	bclr	#0, battle_status(a0)
 	rts
 ; ---------------------------------------------------------------
-BattleChar_DoTechnique:
+Character_DoTechnique:
 	_btst	#2, 0(a3)
 	bne.w	loc_1FEA
 	move.w	(a5)+, d3
@@ -3667,7 +3667,7 @@ TechniqueActionIndex:
 	bra.w	TechAction_Megid	; Megid
 ; ------------------------------------------
 TechAction_Foi:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3677,7 +3677,7 @@ TechAction_Foi:
 	bsr.w	Character_CalcTechDamage
 +
 	bsr.w	Battle_SetEnemyDamage
-	bra.w	loc_251C
+	bra.w	Character_SetupTechProperties
 ; ------------------------------------------
 TechAction_Zan:
 	cmpi.w	#1, (Battle_command_used).w
@@ -3686,7 +3686,7 @@ TechAction_Zan:
 	move.w	#$120, $A(a0)
 	move.w	#8, $2C(a0)
 	lea	(Enemy_stats).w, a1
-	lea	($FFFFE800).w, a2
+	lea	(Enemies_RAM).w, a2
 	moveq	#4, d4
 loc_2112:
 	tst.w	2(a1)
@@ -3704,11 +3704,11 @@ loc_2132:
 	adda.w	#$80, a2
 	dbf	d4, loc_2112
 
-	bra.w	loc_251C
+	bra.w	Character_SetupTechProperties
 ; ------------------------------------------
 TechAction_Gra:
 	bsr.s	loc_2148
-	bra.w	loc_251C
+	bra.w	Character_SetupTechProperties
 ; ------------------------------------------
 
 
@@ -3718,7 +3718,7 @@ loc_2148:
 	move.w	#8, $2C(a0)
 	moveq	#-1, d0
 	lea	(Enemy_stats).w, a1
-	lea	($FFFFE800).w, a2
+	lea	(Enemies_RAM).w, a2
 	moveq	#4, d4
 loc_2162:
 	tst.w	2(a1)
@@ -3747,23 +3747,23 @@ loc_21A2:
 ; if you want to use it on any party member, check how
 ; Shu or Sak code does it as an example
 TechAction_Shift:
-	move.w	$36(a0), d0
-	move.w	d0, $2C(a0)		; make sure caster is the target
+	move.w	fighter_id(a0), d0
+	move.w	d0, battle_target(a0)		; target self
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	+
-	bset	#4, 3(a2)
+	bset	#4, battle_status(a2)	; no damage
 	move.w	#$1209, (Battle_script_ID).w
-	moveq	#$14, d0		; raise stats by 20
-	add.w	d0, $14(a3)		; raise agility
-	add.w	d0, $18(a3)		; raise dexterity
-	add.w	d0, $1C(a3)		; raise attack 1
-	add.w	d0, $1A(a3)		; raise attack 2
+	moveq	#20, d0		; raise stats by 20
+	add.w	d0, agility(a3)		; raise agility
+	add.w	d0, dexterity(a3)		; raise dexterity
+	add.w	d0, attack_mod(a3)		; raise attack 1
+	add.w	d0, attack(a3)		; raise attack 2
 +
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Fanbi:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3778,7 +3778,7 @@ TechAction_Fanbi:
 	move.w	d1, 2(a3)
 loc_220A:
 	bsr.w	Battle_SetEnemyDamage
-	bra.w	loc_251C
+	bra.w	Character_SetupTechProperties
 ; ------------------------------------------
 TechAction_Conte:
 	move.w	#$120A, d3
@@ -3788,7 +3788,7 @@ TechAction_Conte:
 TechAction_Forsa:
 	move.w	#$120B, d3
 	moveq	#4, d4
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	#$120, $A(a0)
 	bra.s	loc_223C
 ; ------------------------------------------
@@ -3796,7 +3796,7 @@ TechAction_Doran:
 	move.w	#$120B, d3
 	moveq	#4, d4
 loc_2232:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 loc_223C:
 	addq.w	#8, d1
@@ -3811,10 +3811,10 @@ loc_223C:
 	_bset	d4, 0(a1)
 	move.w	d3, (Battle_script_ID).w
 +
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Rimit:
-	bsr.w	Battle_TargetEnemy
+	bsr.w	Character_TargetEnemy
 	move.w	$A(a2), $A(a0)
 	addq.w	#8, d1
 	move.w	d1, $2C(a0)
@@ -3834,7 +3834,7 @@ loc_22AC:
 	or.b	d1, 1(a1)
 	move.w	#$120C, (Battle_script_ID).w		; enemy is paralyzed text
 loc_22B6:
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Shinb:
 	move.w	$36(a0), d0
@@ -3850,7 +3850,7 @@ TechAction_Shinb:
 	move.b	#2, (Battle_main_routine_index).w
 	move.w	#2, (Event_routine).w
 loc_22EA:
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Shu:
 	moveq	#0, d4
@@ -3864,7 +3864,7 @@ loc_22FA:
 loc_22FE:
 	move.w	(a5)+, d0
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_231C
 	bset	#4, 3(a2)
 	move.w	#$120D, (Battle_script_ID).w
@@ -3872,7 +3872,7 @@ loc_22FE:
 loc_231C:
 	dbf	d4, loc_22FE
 
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Deban:
 	lea	(Party_member_ID).w, a5
@@ -3881,14 +3881,14 @@ TechAction_Deban:
 loc_2330:
 	move.w	(a5)+, d0
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_2348
 	bset	#4, 3(a2)
 	_bset	#1, 0(a1)
 loc_2348:
 	dbf	d4, loc_2330
 
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Ner:
 	moveq	#0, d4
@@ -3902,7 +3902,7 @@ loc_235C:
 loc_2360:
 	move.w	(a5)+, d0
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_237E
 	bset	#4, 3(a2)
 	move.w	#$120E, (Battle_script_ID).w
@@ -3910,7 +3910,7 @@ loc_2360:
 loc_237E:
 	dbf	d4, loc_2360
 
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Res:
 	moveq	#0, d4
@@ -3929,7 +3929,7 @@ loc_239C:
 loc_23A2:
 	move.w	(a5)+, d0
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_23D2
 	tst.w	2(a1)
 	beq.s	loc_23D2
@@ -3947,7 +3947,7 @@ loc_23D2:
 
 	tst.w	d3
 	beq.w	loc_1FEA			; branch if target character was dead
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Sak:
 	moveq	#0, d4
@@ -3962,7 +3962,7 @@ loc_23EC:
 loc_23F2:
 	move.w	(a5)+, d0
 	bsr.w	Battle_SetTargetCharacter
-	bsr.w	loc_27C8
+	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_2416
 	tst.w	2(a1)
 	beq.s	loc_2416
@@ -3980,7 +3980,7 @@ loc_2416:
 	move.w	#0, 2(a3)				; HP = 0
 	andi.b	#7, 3(a0)
 	ori.b	#$A8, 3(a0)
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Anti:
 	move.w	(a5), $2C(a0)
@@ -3990,7 +3990,7 @@ TechAction_Anti:
 	beq.w	loc_1FEA
 	bset	#4, 3(a2)
 	_bclr	#7, 0(a1)
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Rever:
 	move.w	(a5), $2C(a0)
@@ -4003,7 +4003,7 @@ TechAction_Rever:
 	bset	#4, 3(a2)
 	move.w	4(a1), 2(a1)
 	move.w	#1, $22(a2)
-	bra.w	loc_24D0
+	bra.w	Character_UseTechItem
 ; ------------------------------------------
 TechAction_Megid:
 	move.w	#$190, d6	; attack rate value = 400
@@ -4025,10 +4025,10 @@ TechAction_Megid:
 +
 	dbf	d4, -
 
-	bra.w	loc_251C
+	bra.w	Character_SetupTechProperties
 
 
-loc_24D0:
+Character_UseTechItem:
 	cmpi.w	#1, (Battle_command_used).w
 	beq.s	loc_24F2				; branch if we used the technique command
 	move.b	(Item_index).w, d2
@@ -4042,7 +4042,7 @@ loc_24D0:
 loc_24F2:
 	move.w	$36(a0), d1
 	jsr	(loc_F4F8).l
-	bra.s	loc_251C
+	bra.s	Character_SetupTechProperties
 
 loc_24FE:
 	lea	(Character_stats+items).w, a2		; get first item in the inventory
@@ -4059,7 +4059,7 @@ loc_24FE:
 	rts
 
 
-loc_251C:
+Character_SetupTechProperties:
 	cmpi.w	#1, (Battle_command_used).w
 	bne.s	loc_2540					; branch if we didn't use the technique command
 	moveq	#0, d1
@@ -4086,7 +4086,7 @@ loc_2540:
 	move.w	#2, $22(a0)
 	rts
 ; ---------------------------------------------------------------
-BattleChar_DoItem:
+Character_DoItem:
 	move.w	(a5)+, d0
 	move.b	d0, (Item_index).w
 	move.w	d0, d2
@@ -4205,7 +4205,7 @@ ItemUsed_FireStaff:
 	moveq	#TechID_Foi, d3
 	bra.w	ProcessTechnique
 ; ---------------------------------------------------------------
-BattleChar_DoDefense:
+Character_DoDefense:
 	lea	(Character_stats).w, a3
 	move.w	$36(a0), d0
 	lsl.w	#6, d0
@@ -4259,7 +4259,7 @@ Battle_SetTargetCharacter:
 
 
 ; -----------------------------------------------------------------
-Battle_TargetEnemy:
+Character_TargetEnemy:
 	bsr.s	Battle_GetEnemyGroup
 
 -
@@ -4271,7 +4271,7 @@ Battle_TargetEnemy:
 	adda.w	d0, a1
 	tst.w	curr_hp(a1)
 	beq.s	-		; branch (loop) until we get an enemy who is not dead
-	lea	($FFFFE800).w, a2
+	lea	(Enemies_RAM).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
 	cmp.w	fighter_id(a2), d5
@@ -4292,7 +4292,7 @@ Battle_GetEnemyGroup:
 	moveq	#0, d5
 	tst.w	(a5)
 	bne.s	+
-	move.w	(Enemy_group_1_num).w, d5
+	move.w	(Enemy_group_2_start_num).w, d5
 +
 	move.w	(Enemy_1).w, (Enemy_index).w
 	tst.w	d5
@@ -4318,9 +4318,9 @@ Character_CheckAttackSuccess:
 	move.w	#$FF, d2	; 100% hit rate
 +
 	_btst	#4, 0(a3)
-	beq.s	loc_2790
+	beq.s	Character_CheckAttackSuccess2
 	lsr.w	#1, d2		; halve value
-loc_2790:
+Character_CheckAttackSuccess2:
 	tst.w	d2
 	beq.s	+		; branch if hit rate is 0 -- always fails
 	bsr.w	UpdateRNGSeed
@@ -4344,15 +4344,15 @@ Character_CheckTechSuccess:
 +
 	move.b	($FFFFF73A).w, d1	; get technique type, specifically if it works for either biomonster or a robot
 	and.b	enemy_type(a1), d1		; check if bit is set in RAM
-	bne.s	loc_27C8		; if it's set, branch and process technique normally
+	bne.s	Character_CheckTechSuccess2		; if it's set, branch and process technique normally
 loc_27C0:
 	move.w	#$1204, (Battle_script_ID).w	; display "Didn't work" text
 	moveq	#0, d2	; make attack fail
-loc_27C8:
+Character_CheckTechSuccess2:
 	_btst	#3, 0(a3)
-	beq.s	loc_2790
+	beq.s	Character_CheckAttackSuccess2
 	lsr.w	#1, d2
-	bra.s	loc_2790
+	bra.s	Character_CheckAttackSuccess2
 ; -----------------------------------------------------------------
 
 
@@ -4415,7 +4415,7 @@ loc_2862:
 	move.l	a1, -(sp)
 	move.l	a2, -(sp)
 	lea	(Enemy_stats+2).w, a1
-	lea	($FFFFE800).w, a2
+	lea	(Enemies_RAM).w, a2
 	moveq	#4, d1
 loc_2870:
 	tst.w	(a1)
@@ -4725,40 +4725,44 @@ EnemyTargetPartyOffsets:
 	dc.b	$03
 ; ==============================================
 
-loc_2B86:
+
+; -----------------------------------------------------------------
+Enemy_GetEnemyAddress:
 	move.w	(Enemy_num_1).w, d0
-	move.w	$36(a0), d5
-	bne.s	loc_2B94
+	move.w	fighter_id(a0), d5
+	bne.s	+
 	move.w	(Enemy_num_2).w, d0
-loc_2B94:
++
 	tst.w	d0
-	bpl.s	loc_2BA4
+	bpl.s	.getenemy
 	moveq	#0, d5
-	tst.w	$36(a0)
-	beq.s	loc_2BA4
-	move.w	(Enemy_group_1_num).w, d5
-loc_2BA4:
+	tst.w	fighter_id(a0)
+	beq.s	.getenemy
+	move.w	(Enemy_group_2_start_num).w, d5
+.getenemy:
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
 	lea	(Enemy_stats).w, a1
 	move.w	d0, d1
 	lsl.w	#6, d0
 	adda.w	d0, a1
-	tst.w	2(a1)
-	beq.s	loc_2BA4		; branch (loop) if this enemy is dead
-	lea	($FFFFE800).w, a2
+	tst.w	curr_hp(a1)
+	beq.s	.getenemy
+	lea	(Enemies_RAM).w, a2
 	add.w	d0, d0
 	adda.w	d0, a2
-	cmp.w	$36(a2), d5
-	bne.s	loc_2BA4
+	cmp.w	fighter_id(a2), d5
+	bne.s	.getenemy
 	addq.w	#8, d1
-	move.w	d1, $2C(a0)
-	bset	#7, 3(a2)
-	bclr	#6, 3(a2)
-	move.w	#0, $1A(a0)
+	move.w	d1, battle_target(a0)
+	bset	#7, battle_status(a2)
+	bclr	#6, battle_status(a2)
+	move.w	#0, battle_anim_frame(a0)
 	rts
+; -----------------------------------------------------------------
 
 
+; -----------------------------------------------------------------
 Enemy_CalcAttackDamage:
 	bsr.w	UpdateRNGSeed
 	andi.l	#$1F, d0
@@ -4781,6 +4785,7 @@ loc_2C14:
 	bset	#5, 3(a2)
 +
 	rts
+; -----------------------------------------------------------------
 
 
 ; -----------------------------------------------------------------
@@ -5023,8 +5028,8 @@ loc_2E1C:
 
 ; -----------------------------------------------------------------
 EnemyTech_PlasmaRing:
-	addq.w	#1, ($FFFFCC92).w
-	cmpi.w	#9, ($FFFFCC92).w
+	addq.w	#1, (Plasma_ring_countup).w
+	cmpi.w	#9, (Plasma_ring_countup).w
 	bcs.w	loc_2A98
 	move.w	#0, $2C(a0)
 	move.w	#0, $1A(a0)
@@ -5089,7 +5094,7 @@ loc_2EBE:
 	rts
 ; -----------------------------------------------------------------
 EnemyTech_Heal:
-	bsr.w	loc_2B86
+	bsr.w	Enemy_GetEnemyAddress
 	bsr.w	Enemy_CheckTechSuccess
 	bmi.s	loc_2F3C
 	moveq	#20, d0	; heal 20 HP
@@ -5108,7 +5113,7 @@ loc_2F3C:
 	rts
 ; -----------------------------------------------------------------
 EnemyTech_FullHeal:
-	bsr.w	loc_2B86
+	bsr.w	Enemy_GetEnemyAddress
 	bsr.w	Enemy_CheckTechSuccess
 	bmi.s	loc_2F54
 	move.w	max_hp(a1), curr_hp(a1)
@@ -12816,7 +12821,7 @@ loc_85D6:
 	move.w	d0, (Fight_interrupted_flag).w
 	move.w	d0, (Fight_action_steps).w
 	move.w	d0, ($FFFFCC98).w
-	move.w	d0, ($FFFFCC92).w
+	move.w	d0, (Plasma_ring_countup).w
 	move.w	d0, $FFFFF650.w
 	move.w	d0, $FFFFF652.w
 	move.w	d0, $FFFFF654.w
@@ -22602,7 +22607,7 @@ loc_ED06:
 	moveq	#0, d1
 	move.w	(Character_index_2).w, d2
 	beq.s	loc_ED12
-	move.w	(Enemy_group_1_num).w, d2
+	move.w	(Enemy_group_2_start_num).w, d2
 loc_ED12:
 	bra.w	CommandAction_Defense
 ; -----------------------------------------
@@ -25566,7 +25571,7 @@ loc_10B16:
 	bsr.w	loc_10A64
 	tst.w	d1
 	beq.s	loc_10B24
-	move.w	(Enemy_group_1_num).w, d1
+	move.w	(Enemy_group_2_start_num).w, d1
 loc_10B24:
 	move.w	d1, (Character_index_2).w
 	rts

@@ -1212,7 +1212,7 @@ Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for tr
 Battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle
 
 Enemy_formation =  ramaddr($FFFFCB00)
-Enemy_group_1_num =  ramaddr($FFFFCB02)
+Enemy_group_2_start_num =  ramaddr($FFFFCB02)
 Formations_index_1 =  ramaddr($FFFFCB06)
 Formations_index_2 =  ramaddr($FFFFCB08)
 Encounter_step_flag =  ramaddr($FFFFCB0A)	; set to 1 if we're moving; 0 if not; used to determine if we can enter a random battle
@@ -1240,6 +1240,7 @@ Char_battle_commands =  ramaddr($FFFFCC10)	; 16 bytes per character;
 												; bytes 5-6 = ID of target
 
 Battle_turn_index = ramaddr($FFFFCC90)	; word
+Plasma_ring_countup = ramaddr($FFFFCC92)	; word	; incremented each time Army Eye has a turn; when it reaches 9, one of the enemies will use Plasma Ring
 Battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of fighter; bytes 3-4 = agility
 
 Script_ID =  ramaddr($FFFFCD00)
@@ -1293,6 +1294,7 @@ Object_RAM =  ramaddr($FFFFE000)
 Push_start_button_text =  ramaddr($FFFFE000)	; blinking text in Title Screen
 Copyright_text =  ramaddr($FFFFE040)			; text apperearing at bottom right corner of the Title Screen
 Characters_RAM = ramaddr($FFFFE400)
+Enemies_RAM = ramaddr($FFFFE800)
 
 Sprite_table_input = ramaddr($FFFFF000)	; $400 (1024) bytes; holds addresses of objects whose properties will be copied to the Sprite table in VRAM
 										; This section is divided into 64 lines and each line is 16 bytes long; the first word for each line is the number of
