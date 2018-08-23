@@ -4888,8 +4888,8 @@ EnemyTechniqueTable:
 	bra.w	EnemyTech_DrainHP	; 6
 	bra.w	EnemyTech_PlasmaRing	; 7
 	bra.w	EnemyTech_TurnEvil	; 8
-	bra.w	EnemyTech_HealSelf	; 9
-	bra.w	EnemyTech_FullHealSelf	; $A
+	bra.w	EnemyTech_Heal	; 9
+	bra.w	EnemyTech_FullHeal	; $A
 	bra.w	loc_2F5C	; $B
 	bra.w	EnemyTech_Split	; $C
 	bra.w	loc_3004	; $D
@@ -5088,7 +5088,7 @@ loc_2EBE:
 	move.w	#2, $22(a0)
 	rts
 ; -----------------------------------------------------------------
-EnemyTech_HealSelf:
+EnemyTech_Heal:
 	bsr.w	loc_2B86
 	bsr.w	Enemy_CheckTechSuccess
 	bmi.s	loc_2F3C
@@ -5107,7 +5107,7 @@ loc_2F3C:
 	move.w	#3, $22(a0)
 	rts
 ; -----------------------------------------------------------------
-EnemyTech_FullHealSelf:
+EnemyTech_FullHeal:
 	bsr.w	loc_2B86
 	bsr.w	Enemy_CheckTechSuccess
 	bmi.s	loc_2F54
