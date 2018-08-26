@@ -28355,10 +28355,17 @@ VDPCharacterMaps:
 ; bytes 1-10 = name of the item
 ; bytes 11 and 12 = price
 ; byte 13 = bitfield - determines allowed actions for items
-			; lower nibble = body part to wear item - 1 = head, 2 = select right or left hand, 3 = two-handed weapon
-			; 4 = body, 5 = feet
-			; bit 3 = show special text for this item, otherwise show "nothing happens" text
-			; higher nibbles = actions - bit 4 = item usable or not in battle;
+; 				lower 3 bits = body part to wear item:
+;					1 = head
+;					2 = one-handed weapon
+;					3 = two-handed weapon
+;					4 = body
+;					5 = feet
+; 				bit 3 = usable in map flag
+;				bit 4 = usable in battle flag
+;				bit 5 = storable flag
+;				bit 6 = revert to attack after usage
+;				bit 7 = sellable/droppable flag
 ; byte 14 = bitfield - determines which character can equip the item
 ; byte 15 = attack value
 ; byte 16 = defense value
