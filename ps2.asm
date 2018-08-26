@@ -28365,7 +28365,7 @@ VDPCharacterMaps:
 ;				bit 4 = usable in battle flag
 ;				bit 5 = storable flag
 ;				bit 6 = revert to attack after usage
-;				bit 7 = sellable/droppable flag
+;				bit 7 = sellable/disposable flag
 ; byte 14 = bitfield - determines which character can equip the item
 ; byte 15 = attack value
 ; byte 16 = defense value
