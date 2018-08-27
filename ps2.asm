@@ -507,7 +507,7 @@ PtrObj_EnemySkill2:				bra.w	Obj_EnemySkill2						; $12
 PtrObj_EnemyAttack2:			bra.w	Obj_EnemyAttack2					; $13
 PtrObj_MapCharacter:			bra.w	Obj_MapCharacter					; $14 - characters' sprites in the map
 PtrObj_FollowingCharacter:		bra.w	Obj_FollowingCharacter				; $15 - the characters behind the leading character
-PtrObj_MotaYoungMan:			bra.w	Obj_MotaYoungMan					; $16 - random young man in towns on Motavia
+PtrObj_NPC1:					bra.w	Obj_NPC1							; $16 - random young man in towns on Motavia
 PtrObj_MotaYoungWoman:			bra.w	Obj_MotaYoungWoman					; $17
 PtrObj_MotaOldMan:				bra.w	Obj_MotaOldMan						; $18
 PtrObj_MotaChild:				bra.w	Obj_MotaChild						; $19
@@ -1067,11 +1067,11 @@ MapObjectData:
 ; Byte 1 = Number which, after some calculation, represents the object and the index that
 ;			affects its behaviour. I put the calculation so that it's obvious which object
 ;			gets loaded. The number at the end of the calculation (e.g. +1) is the index of the
-;			AButton_ObjTypeIndex table.
+;			InteractionTypes table.
 ;
 ; Byte 2 = Index of the table depending of the type of object. So for example if the object is
 ;			the Treasure Chest, then the index of the 1st byte at the end of the calculation is +2 so
-;			it will branch to location ObjType_TreasureChests; then this 2nd byte is used to pick the
+;			it will branch to location Interact_TreasureChest; then this 2nd byte is used to pick the
 ;			item contained in the treasure chest
 ;
 ; Bytes 3-4 = X position
@@ -1082,7 +1082,7 @@ ObjectData_NoSprites:
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Paseo:
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$01
 	dc.w	$0178, $00D8
 
@@ -1090,7 +1090,7 @@ ObjectData_Paseo:
 	dc.b	$02
 	dc.w	$03A8, $00C8
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$03
 	dc.w	$00D8, $0038
 
@@ -1098,7 +1098,7 @@ ObjectData_Paseo:
 	dc.b	$04
 	dc.w	$0338, $0138
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$05
 	dc.w	$00B8, $01D8
 
@@ -1248,7 +1248,7 @@ ObjectData_Oputa:
 	dc.b	$1D
 	dc.w	$02B8, $0298
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$1E
 	dc.w	$0238, $0098
 
@@ -1256,15 +1256,15 @@ ObjectData_Oputa:
 	dc.b	$1F
 	dc.w	$0398, $01B8
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$20
 	dc.w	$02D8, $0208
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$21
 	dc.w	$0248, $0258
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$22
 	dc.w	$0358, $0278
 
@@ -1319,7 +1319,7 @@ ObjectData_Oputa:
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Zema:
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$2D
 	dc.w	$0068, $0078
 
@@ -1402,7 +1402,7 @@ ObjectData_Kueri:
 	dc.b	$3F
 	dc.w	$0188, $01D8
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$40
 	dc.w	$0028, $0238
 
@@ -1481,7 +1481,7 @@ ObjectData_Piata:
 	dc.b	$4D
 	dc.w	$0378, $0078
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$4E
 	dc.w	$0318, $00B8
 
@@ -1489,7 +1489,7 @@ ObjectData_Piata:
 	dc.b	$4F
 	dc.w	$02F8, $0078
 
-	dc.b	(ObjID_MotaYoungMan-$14)<<2+1
+	dc.b	(ObjID_NPC1-$14)<<2+1
 	dc.b	$50
 	dc.w	$0378, $0138
 
@@ -6438,21 +6438,31 @@ FollowingCharacter_Return:
 	rts
 ; --------------------------------------------------------------
 
-Obj_MotaYoungMan:
-	tst.b	3(a0)
-	bne.s	loc_3BCA
-	move.w	$22(a0), d0
+
+; -----------------------------------------------------------------
+; NPC that only moves up or down
+; -----------------------------------------------------------------
+Obj_NPC1:
+	tst.b	interacted_flag(a0)
+	bne.s	+
+	move.w	routine(a0), d0
 	asl.b	#2, d0
-	jsr	MotaYoungManRoutines(pc,d0.w)
-loc_3BCA:
+	jsr	NPC1Routines(pc,d0.w)
++
 	rts
-; --------------------------------------------------------------
-MotaYoungManRoutines:
-	bra.w	loc_3BD8
-	bra.w	loc_3C06
-	bra.w	loc_3D30
-; --------------------------------------------------------------
-loc_3BD8:
+; -----------------------------------------------------------------
+
+
+; =================================================================
+NPC1Routines:
+	bra.w	NPC1_Init
+	bra.w	NPC1_Main
+	bra.w	NPC1_Animate
+; =================================================================
+
+
+; -----------------------------------------------------------------
+NPC1_Init:
 	move.w	#$2431, 8(a0)
 	move.l	#Map_MotaYoungMan, 4(a0)
 	move.w	4(a0), $2A(a0)
@@ -6461,8 +6471,11 @@ loc_3BD8:
 	move.b	#0, $35(a0)
 	move.w	#1, $22(a0)
 	rts
-; --------------------------------------------------------------
-loc_3C06:
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
+NPC1_Main:
 	subq.w	#1, $28(a0)
 	bpl.w	loc_3D2E
 	bsr.w	UpdateRNGSeed
@@ -6548,8 +6561,11 @@ loc_3D20:
 
 loc_3D2E:
 	rts
-; --------------------------------------------------------------
-loc_3D30:
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
+NPC1_Animate:
 	subq.w	#1, $28(a0)
 	bpl.s	loc_3D50
 	move.w	#0, $18(a0)
@@ -6572,7 +6588,7 @@ loc_3D50:
 	move.w	#4, $26(a0)
 loc_3D7C:
 	rts
-; --------------------------------------------------------------
+; -----------------------------------------------------------------
 
 Obj_MotaYoungWoman:
 	tst.b	3(a0)
@@ -6745,8 +6761,8 @@ loc_3F9E:
 ; --------------------------------------------------------------
 MotaChildRoutines:
 	bra.w	loc_3FAC
-	bra.w	loc_3C06
-	bra.w	loc_3D30
+	bra.w	NPC1_Main
+	bra.w	NPC1_Animate
 ; --------------------------------------------------------------
 loc_3FAC:
 	move.w	#$2493, 8(a0)
@@ -7355,8 +7371,8 @@ loc_47DA:
 ; --------------------------------------------------------------
 loc_47DC:
 	bra.w	loc_47E8
-	bra.w	loc_3C06
-	bra.w	loc_3D30
+	bra.w	NPC1_Main
+	bra.w	NPC1_Animate
 ; --------------------------------------------------------------
 loc_47E8:
 	move.w	#$431, 8(a0)
@@ -7427,8 +7443,8 @@ loc_48BE:
 ; --------------------------------------------------------------
 loc_48C0:
 	bra.w	loc_48CC
-	bra.w	loc_3C06
-	bra.w	loc_3D30
+	bra.w	NPC1_Main
+	bra.w	NPC1_Animate
 ; --------------------------------------------------------------
 loc_48CC:
 	move.w	#$493, 8(a0)
@@ -12139,7 +12155,7 @@ GameMode_MapLoop:
 	bsr.w	BuildSprites
 	bsr.w	ProcessPlayerMenu
 +
-	bsr.w	ProcessAButtonPress
+	bsr.w	Map_CheckInteractions
 	bsr.w	UpdateWindows
 	bsr.w	loc_5F74
 	jsr	(RenderCharSprites).l
@@ -20467,7 +20483,7 @@ CopyrightString:
 
 	even
 
-ProcessAButtonPress:
+Map_CheckInteractions:
 	tst.w	(Window_index).w
 	bne.s	loc_D7FA
 	tst.w	(Window_index_saved).w
@@ -20487,12 +20503,12 @@ ProcessAButtonPress:
 
 	move.b	(Joypad_pressed).w, d0
 	btst	#Button_A, d0			; A button press
-	bne.s	ProcessAButAction	; branch if pressed
+	bne.s	Map_Interact	; branch if pressed
 loc_D7FA:
 	rts
 
 
-ProcessAButAction:
+Map_Interact:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	lea	(Characters_RAM).w, a0
 	move.w	$2A(a0), d6
@@ -20503,7 +20519,7 @@ loc_D810:
 	bsr.w	Map_ChkTargetInteract		; check if we're interacting with something
 	beq.s	loc_D84A					; branch if we are not interacting with anything and display the there's nothing message
 
-	lea	(AButton_TargetFacingDirArray).l, a2
+	lea	(Interact_TargetFacingDirs).l, a2
 	adda.w	d0, a2
 	tst.w	$18(a1)
 	bne.s	loc_D7FA
@@ -20529,10 +20545,10 @@ loc_D862:
 	move.b	$FFFFDE6E.w, d0
 	lsl.w	#2, d0
 	andi.w	#$C, d0
-	jmp	AButton_ObjTypeIndex(pc,d0.w)
+	jmp	InteractionTypes(pc,d0.w)
 
 ; =================================
-AButton_TargetFacingDirArray:
+Interact_TargetFacingDirs:
 	dc.b	$03
 	dc.b	$00
 	dc.b	$09
@@ -20542,13 +20558,13 @@ AButton_TargetFacingDirArray:
 	even
 
 ; -------------------------------------------------------------
-AButton_ObjTypeIndex:
-	bra.w	ObjType_Events				; 0
-	bra.w	ObjType_People				; 1
-	bra.w	ObjType_TreasureChests		; 2
-	bra.w	ObjType_TeimDarum			; 3
+InteractionTypes:
+	bra.w	Interact_Event				; 0
+	bra.w	Interact_NPC				; 1
+	bra.w	Interact_TreasureChest		; 2
+	bra.w	Interact_TeimDarum			; 3
 ; -------------------------------------------------------------
-ObjType_Events:
+Interact_Event:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0
@@ -20558,9 +20574,9 @@ ObjType_Events:
 	adda.w	d0, a0
 	lsl.w	#2, d1
 	andi.w	#$1FC, d1
-	jmp	EventType_DialogueIndex(pc,d1.w)
+	jmp	EventJumpTable(pc,d1.w)
 ; ----------------------------------------
-EventType_DialogueIndex:
+EventJumpTable:
 	bra.w	loc_D9AA	; 0
 	bra.w	loc_DA74	; 1
 	bra.w	loc_DA80	; 2
@@ -21632,7 +21648,7 @@ loc_E4E4:
 loc_E4F6:
 	rts
 ; -------------------------------------------------------------
-ObjType_People:
+Interact_NPC:
 	tst.w	($FFFFDE72).w
 	bne.s	loc_E53A
 	moveq	#0, d1
@@ -22072,7 +22088,7 @@ loc_E730:
 	even
 
 ; -------------------------------------------------------------
-ObjType_TreasureChests:
+Interact_TreasureChest:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d1
@@ -22273,7 +22289,7 @@ TreasureChestContentArray:
 
 
 ; -------------------------------------------------------------
-ObjType_TeimDarum:
+Interact_TeimDarum:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0

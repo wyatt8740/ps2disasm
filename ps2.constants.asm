@@ -72,6 +72,8 @@ routine = $22	; word
 
 ; ---------------------------------------------------------------------------
 ; Properties and constants applicable to map objects
+interacted_flag = 3	; generally for NPCs, however other objects such as chests seem to use this flag;
+					; if $FF, it means we're in the middle of a conversation with an NPC
 x_move_steps = $14	; word
 y_move_steps = $18	; word
 sprite_y_pos = $1E	; word ; Y position for sprites
@@ -177,7 +179,7 @@ ObjID_EnemySkill2 =  id(PtrObj_EnemySkill2)							; $12
 ObjID_EnemyAttack2 =  id(PtrObj_EnemyAttack2)						; $13
 ObjID_MapCharacter =  id(PtrObj_MapCharacter)						; $14
 ObjID_FollowingCharacter =  id(PtrObj_FollowingCharacter)			; $15
-ObjID_MotaYoungMan =  id(PtrObj_MotaYoungMan)						; $16
+ObjID_NPC1 =  id(PtrObj_NPC1)										; $16
 ObjID_MotaYoungWoman =  id(PtrObj_MotaYoungWoman)					; $17
 ObjID_MotaOldMan =  id(PtrObj_MotaOldMan)							; $18
 ObjID_MotaChild =  id(PtrObj_MotaChild)								; $19
