@@ -1208,6 +1208,8 @@ Planet_index =  ramaddr($FFFFC658)			; 0 = Motavia; 1 = Dezolis
 
 Character_names =  ramaddr($FFFFC660)
 
+
+Town_flags =  ramaddr($FFFFC700)
 Event_flags =  ramaddr($FFFFC710)
 Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for treasure chests are
 
@@ -1289,6 +1291,8 @@ Tech_TP_consumption =  ramaddr($FFFFDE67)	; holds the value of the TP consumptio
 Item_index =  ramaddr($FFFFDE68)
 Meseta_value =  ramaddr($FFFFDE6A)			; price for items, services, etc...
 EXP_points_buffer =  ramaddr($FFFFDE6A)		; used to hold the value for exp points, such as when you defeat all enemies and you want to display text containing the value
+Interaction_type =  ramaddr($FFFFDE6E)
+Interaction_subtype =  ramaddr($FFFFDE6F)
 
 Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
 

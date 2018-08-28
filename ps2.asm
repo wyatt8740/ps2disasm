@@ -824,7 +824,7 @@ Map_LoadObjects:
 
 +
 	lea	(Party_member_join_next).w, a1
-	lea	($FFFFC700).w, a2
+	lea	(Town_flags).w, a2
 	move.w	(Map_index).w, d0
 	bne.s	+
 	tst.b	($FFFFC716).w
@@ -905,7 +905,7 @@ Map_LoadObjects:
 ; Trigger Teim and Darum event
 	move.w	#1, ($FFFFDE70).w
 	move.w	#0, ($FFFFDE72).w
-	move.w	#$302, ($FFFFDE6E).w
+	move.w	#$302, (Interaction_type).w
 	move.w	#1, (Demo_flag).w
 	move.w	#2, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
@@ -10945,7 +10945,7 @@ loc_6EA6:
 	bne.s	loc_6ED6
 	move.w	#1, $FFFFDE70.w
 	move.w	#0, ($FFFFDE72).w
-	move.w	#$303, $FFFFDE6E.w
+	move.w	#$303, (Interaction_type).w
 	moveq	#-1, d4
 	rts
 
@@ -11168,7 +11168,7 @@ loc_7162:
 	bne.s	loc_7184
 	move.w	d2, (Character_index).w
 	move.w	#1, $FFFFDE70.w
-	move.w	#$30, $FFFFDE6E.w
+	move.w	#$30, (Interaction_type).w
 loc_7184:
 	dbf	d0, loc_7162
 loc_7188:
@@ -12213,7 +12213,7 @@ loc_7E02:
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
-	move.w	#$26, $FFFFDE6E.w
+	move.w	#$26, (Interaction_type).w
 	move.w	#$8200, (Event_flags).w
 	move.b	#MusicID_Power, (Sound_queue).w
 	move.b	#$87, $FFFFF640.w
@@ -12241,7 +12241,7 @@ loc_7E6A:
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
-	move.w	#$27, $FFFFDE6E.w
+	move.w	#$27, (Interaction_type).w
 	move.w	#$8300, (Event_flags).w
 	tst.w	$FFFFC042.w			; is Nei dead?
 	bne.s	+			; if not, branch
@@ -12254,7 +12254,7 @@ loc_7EE4:
 	subq.b	#1, d1
 	bne.s	loc_7F14
 	move.w	#1, $FFFFDE70.w
-	move.w	#$28, $FFFFDE6E.w
+	move.w	#$28, (Interaction_type).w
 	move.w	#$403, (Event_flags).w
 	move.w	#MapID_MotaviaOutside, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
@@ -12276,7 +12276,7 @@ loc_7F44:
 	subq.b	#1, d1
 	bne.s	loc_7F80
 	move.w	#1, $FFFFDE70.w
-	move.w	#$29, $FFFFDE6E.w
+	move.w	#$29, (Interaction_type).w
 	move.w	#$12C, (Demo_timer).w
 	move.w	#$602, (Event_flags).w
 	move.w	#MapID_MotaviaOutside, (Map_index).w
@@ -12300,7 +12300,7 @@ loc_7FB0:
 	subq.b	#1, d1
 	bne.s	loc_7FCE
 	move.w	#1, $FFFFDE70.w
-	move.w	#$2A, $FFFFDE6E.w
+	move.w	#$2A, (Interaction_type).w
 	move.w	#0, (Event_flags).w
 	move.b	#$84, $FFFFF640.w
 	rts
@@ -12316,7 +12316,7 @@ loc_7FDA:
 	subq.b	#1, d1
 	bne.s	loc_7FF2
 	move.w	#1, $FFFFDE70.w
-	move.w	#$2D, $FFFFDE6E.w
+	move.w	#$2D, (Interaction_type).w
 	move.w	#0, (Event_flags).w
 	rts
 loc_7FF2:
@@ -12324,14 +12324,14 @@ loc_7FF2:
 	bne.s	loc_8010
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, $FFFFDE70.w
-	move.w	#$36, $FFFFDE6E.w
+	move.w	#$36, (Interaction_type).w
 	move.w	#$8000, (Event_flags).w
 	rts
 loc_8010:
 	subq.b	#1, d1
 	bne.s	loc_8022
 	move.w	#1, $FFFFDE70.w
-	move.w	#$31, $FFFFDE6E.w
+	move.w	#$31, (Interaction_type).w
 	rts
 loc_8022:
 	subq.b	#1, d1
@@ -12350,19 +12350,19 @@ loc_8028:
 	move.w	#$214, $FFFFEC8A.w
 	move.w	#$1B1, $FFFFEC8E.w
 	move.w	#1, $FFFFDE70.w
-	move.w	#$37, $FFFFDE6E.w
+	move.w	#$37, (Interaction_type).w
 	rts
 loc_8070:
 	subq.b	#1, d1
 	bne.s	loc_8082
 	move.w	#1, $FFFFDE70.w
-	move.w	#$38, $FFFFDE6E.w
+	move.w	#$38, (Interaction_type).w
 	rts
 loc_8082:
 	subq.b	#1, d1
 	bne.s	loc_8094
 	move.w	#1, $FFFFDE70.w
-	move.w	#$3B, $FFFFDE6E.w
+	move.w	#$3B, (Interaction_type).w
 	rts
 loc_8094:
 	move.w	#0, (Event_flags).w
@@ -12448,7 +12448,7 @@ loc_817C:
 	rts
 loc_817E:
 	move.w	#1, $FFFFDE70.w
-	move.w	#$2E, $FFFFDE6E.w
+	move.w	#$2E, (Interaction_type).w
 	move.w	#0, (Event_flags).w
 	rts
 loc_8192:
@@ -12481,7 +12481,7 @@ loc_81C4:
 	tst.w	d1
 	bne.w	loc_8BBA
 	move.w	#1, $FFFFDE70.w
-	move.w	$FFFFF780.w, $FFFFDE6E.w
+	move.w	$FFFFF780.w, (Interaction_type).w
 	addq.w	#1, $FFFFF780.w
 loc_81E4:
 	rts
@@ -19266,7 +19266,7 @@ loc_CAD8:
 	bsr.w	CheckIfDoublePrice	; of course check if we're on Dezolis and if we're wearing the Mogic or Magic Cap
 	move.l	d0, (Meseta_value).w		; move price in RAM
 	move.w	#$C01, (Script_ID).w		; "Welcome to the Teleport Station!"
-	lea	($FFFFC700).w, a2
+	lea	(Town_flags).w, a2
 	moveq	#0, d0
 	moveq	#$B, d1
 loc_CAF0:
@@ -20327,7 +20327,7 @@ SaveData:
 	add.w	d2, d3
 	dbf	d1, -
 
-	lea	$FFFFC700.w, a1
+	lea	(Town_flags).w, a1
 	move.w	#$FF, d1
 -
 	move.b	(a1)+, d2
@@ -20455,7 +20455,7 @@ LoadSavedData:
 	addq.w	#2, a0
 	dbf	d1, -
 
-	lea	$FFFFC700.w, a1
+	lea	(Town_flags).w, a1
 	move.w	#$FF, d1
 -
 	move.b	(a0), (a1)+
@@ -20538,11 +20538,11 @@ loc_D84A:
 	move.w	#WinID_ScriptMessage, (Window_index).w
 	move.w	#1, $FFFFDE70.w
 	move.w	#0, ($FFFFDE72).w
-	move.w	d4, $FFFFDE6E.w
+	move.w	d4, (Interaction_type).w
 	moveq	#0, d2
 loc_D862:
 	moveq	#0, d0
-	move.b	$FFFFDE6E.w, d0
+	move.b	(Interaction_type).w, d0
 	lsl.w	#2, d0
 	andi.w	#$C, d0
 	jmp	InteractionTypes(pc,d0.w)
@@ -20557,93 +20557,103 @@ Interact_TargetFacingDirs:
 
 	even
 
-; -------------------------------------------------------------
+
+; =================================================================
 InteractionTypes:
 	bra.w	Interact_Event				; 0
 	bra.w	Interact_NPC				; 1
 	bra.w	Interact_TreasureChest		; 2
 	bra.w	Interact_TeimDarum			; 3
-; -------------------------------------------------------------
+; =================================================================
+
+
+; -----------------------------------------------------------------
 Interact_Event:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0
-	move.b	($FFFFDE6F).w, d0
+	move.b	(Interaction_subtype).w, d0
 	move.w	d0, d1
 	lea	(Event_flags).w, a0
 	adda.w	d0, a0
 	lsl.w	#2, d1
 	andi.w	#$1FC, d1
 	jmp	EventJumpTable(pc,d1.w)
-; ----------------------------------------
+; -----------------------------------------------------------------
+
+
+; =================================================================
 EventJumpTable:
-	bra.w	loc_D9AA	; 0
-	bra.w	loc_DA74	; 1
-	bra.w	loc_DA80	; 2
-	bra.w	loc_DA8C	; 3
-	bra.w	loc_DA98	; 4
-	bra.w	loc_E9A8	; 5
-	bra.w	loc_DAA4	; 6
-	bra.w	loc_DAD4	; 7
-	bra.w	loc_DB22	; 8
-	bra.w	loc_DB30	; 9
-	bra.w	loc_DB3E	; $A
-	bra.w	loc_DB4C	; $B
-	bra.w	loc_DB5A	; $C
-	bra.w	loc_DB68	; $D
-	bra.w	loc_DB76	; $E
-	bra.w	loc_DB84	; $F
-	bra.w	loc_DB90	; $10
-	bra.w	loc_DBB2	; $11
-	bra.w	loc_DBF8	; $12
-	bra.w	loc_DC1E	; $13
-	bra.w	loc_DC1E	; $14
-	bra.w	loc_DC1E	; $15
-	bra.w	loc_DC1E	; $16
-	bra.w	loc_DC36	; $17
-	bra.w	loc_DC84	; $18
-	bra.w	loc_DC84	; $19
-	bra.w	loc_DC84	; $1A
-	bra.w	loc_DC90	; $1B
-	bra.w	loc_DC9C	; $1C
-	bra.w	loc_DC9C	; $1D
-	bra.w	loc_DC9C	; $1E
-	bra.w	loc_DC9C	; $1F
-	bra.w	loc_DC9C	; $20
-	bra.w	loc_DC9C	; $21
-	bra.w	loc_DC9C	; $22
-	bra.w	loc_DC9C	; $23
-	bra.w	loc_DC90	; $24
-	bra.w	loc_DCA8	; $25
-	bra.w	loc_DD52	; $26
-	bra.w	loc_DDD0	; $27
-	bra.w	loc_DE1E	; $28
-	bra.w	loc_DE42	; $29
-	bra.w	loc_DEC6	; $2A
-	bra.w	loc_DF24	; $2B
-	bra.w	loc_DF32	; $2C
-	bra.w	loc_DF32	; $2D
-	bra.w	loc_DFA8	; $2E
-	bra.w	loc_DFE6	; $2F
-	bra.w	loc_DFFE	; $30
-	bra.w	loc_E042	; $31
-	bra.w	loc_E05A	; $32
-	bra.w	loc_E07A	; $33
-	bra.w	loc_E0AA	; $34
-	bra.w	loc_E0BE	; $35
-	bra.w	loc_E0F8	; $36
-	bra.w	loc_E122	; $37
-	bra.w	loc_E1E4	; $38
-	bra.w	loc_E29E	; $39
-	bra.w	loc_E2E2	; $3A
-	bra.w	loc_E47C	; $3B
-	bra.w	loc_E4B4	; $3C
-	bra.w	loc_E4C0	; $3D
-	bra.w	loc_E4CC	; $3E
-	bra.w	loc_E4D8	; $3F
-	bra.w	loc_E4E4	; $40
-; ----------------------------------------
-loc_D9AA:
+	bra.w	Event_Talk	; 0
+	bra.w	Event_BlownUpBuilding	; 1
+	bra.w	Event_ControlTower	; 2
+	bra.w	Event_DeadBody	; 3
+	bra.w	Event_FakeMaruera	; 4
+	bra.w	TeimDarum_Idle	; 5
+	bra.w	Event_JetScooter	; 6
+	bra.w	Event_Piano	; 7
+	bra.w	Event_Newspaper1	; 8
+	bra.w	Event_Newspaper2	; 9
+	bra.w	Event_Newspaper3	; $A
+	bra.w	Event_Newspaper4	; $B
+	bra.w	Event_Newspaper5	; $C
+	bra.w	Event_Newspaper6	; $D
+	bra.w	Event_Newspaper7	; $E
+	bra.w	Event_UnderwaterPassage	; $F
+	bra.w	Event_MarueraTree	; $10
+	bra.w	Event_DeadBodyLetter	; $11
+	bra.w	Event_GetRecorder	; $12
+	bra.w	Event_GetCard	; $13
+	bra.w	Event_GetCard	; $14
+	bra.w	Event_GetCard	; $15
+	bra.w	Event_GetCard	; $16
+	bra.w	Event_Teim	; $17
+	bra.w	Event_DynamiteDoor	; $18
+	bra.w	Event_DynamiteDoor	; $19
+	bra.w	Event_DynamiteDoor	; $1A
+	bra.w	Event_Door	; $1B
+	bra.w	Event_CardSlot	; $1C
+	bra.w	Event_CardSlot	; $1D
+	bra.w	Event_CardSlot	; $1E
+	bra.w	Event_CardSlot	; $1F
+	bra.w	Event_CardSlot	; $20
+	bra.w	Event_CardSlot	; $21
+	bra.w	Event_CardSlot	; $22
+	bra.w	Event_CardSlot	; $23
+	bra.w	Event_Door	; $24
+	bra.w	Event_Neifirst	; $25
+	bra.w	Event_NeiDeath	; $26
+	bra.w	Event_NeifirstDeath	; $27
+	bra.w	Event_ClimatrolOverflow	; $28
+	bra.w	Event_ClimatrolExplosions	; $29
+	bra.w	Event_ReturnFromClimatrol	; $2A
+	bra.w	Event_UzoEntrance	; $2B
+	bra.w	Event_Gaira	; $2C
+	bra.w	Event_Gaira	; $2D
+	bra.w	Event_GairaExplosion	; $2E
+	bra.w	Event_GairaControlPanel	; $2F
+	bra.w	Event_CharacterDead	; $30
+	bra.w	Event_ShirGone	; $31
+	bra.w	Event_EsperMansionEntrance	; $32
+	bra.w	Event_Esper	; $33
+	bra.w	Event_Lutz	; $34
+	bra.w	Event_DarkForce	; $35
+	bra.w	Event_DarkForceBattle	; $36
+	bra.w	Event_MotherBrain	; $37
+	bra.w	Event_AfterMotherBrain	; $38
+	bra.w	Event_Earthmen	; $39
+	bra.w	Event_EarthmenSpeech	; $3A
+	bra.w	Event_IntroText1	; $3B
+	bra.w	Event_IntroText2	; $3C
+	bra.w	Event_IntroText3	; $3D
+	bra.w	Event_IntroText4	; $3E
+	bra.w	Event_IntroText5	; $3F
+	bra.w	Event_IntroText6	; $40
+; =================================================================
+
+
+
+Event_Talk:
 	tst.w	d2
 	bne.s	loc_DA26
 	tst.w	(Map_index).w
@@ -20722,25 +20732,27 @@ JetScooter_CharOffPosOffsets:
 	even
 
 
-loc_DA74:
+Event_BlownUpBuilding:
 	move.w	#$170A, (Script_ID).w		; "Those scoundrels seem to have blown open the door with dynamite and stolen the things."
 	addq.w	#1, ($FFFFDE72).w
 	rts
 
-loc_DA80:
+Event_ControlTower:
 	move.w	#$1709, (Script_ID).w		; "This is the control tower which links the town and Mother Brain in one network."
 	addq.w	#1, ($FFFFDE72).w
 	rts
 
-loc_DA8C:
-	move.w	#$170B, (Script_ID).w
+Event_DeadBody:
+	move.w	#$170B, (Script_ID).w		; "Those are bodies of the scoundrels. I wonder if the Biohazards killed them?"
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DA98:
-	move.w	#$170F, (Script_ID).w
+
+Event_FakeMaruera:
+	move.w	#$170F, (Script_ID).w		; "It looks like a Maruera-tree, but it isn't."
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DAA4:
+
+Event_JetScooter:
 	tst.w	d2
 	bne.s	loc_DAC2
 	cmpi.b	#1, (a0)
@@ -20756,7 +20768,7 @@ loc_DAC2:
 	move.w	#1, (Jet_Scooter_flag).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DAD4:
+Event_Piano:
 	tst.w	d2
 	bne.s	loc_DAE0
 	move.w	#$1711, (Script_ID).w
@@ -20782,40 +20794,40 @@ loc_DB1C:
 	addq.w	#1, ($FFFFDE72).w
 	rts
 
-loc_DB22:
+Event_Newspaper1:
 	move.l	#$17191712, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
 
-loc_DB30:
+Event_Newspaper2:
 	move.l	#$17191713, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB3E:
+Event_Newspaper3:
 	move.l	#$17191714, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB4C:
+Event_Newspaper4:
 	move.l	#$17191715, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB5A:
+Event_Newspaper5:
 	move.l	#$17191716, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB68:
+Event_Newspaper6:
 	move.l	#$17191717, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB76:
+Event_Newspaper7:
 	move.l	#$17191718, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB84:
+Event_UnderwaterPassage:
 	move.w	#$1720, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DB90:
+Event_MarueraTree:
 	tst.w	d2
 	bne.s	loc_DBAC
 	tst.b	(a0)
@@ -20827,9 +20839,9 @@ loc_DBA0:
 	addq.w	#1, ($FFFFDE72).w
 	rts
 loc_DBAC:
-	moveq	#$B, d0
-	bra.w	loc_E84A
-loc_DBB2:
+	moveq	#ItemID_MruraLeaf, d0
+	bra.w	Interact_AddItem
+Event_DeadBodyLetter:
 	tst.w	d2
 	bne.s	loc_DBD4
 	move.b	(a0), d0
@@ -20848,21 +20860,21 @@ loc_DBD4:
 	addq.w	#1, $FFFFDE70.w
 	cmpi.b	#1, (a0)
 	beq.s	loc_DBF2
-	moveq	#1, d0
-	bsr.w	loc_E84A
+	moveq	#ItemID_SmallKey, d0
+	bsr.w	Interact_AddItem
 	bne.s	loc_DBF0
 	move.w	#0, ($FFFFDE72).w
 loc_DBF0:
 	rts
 
 loc_DBF2:
-	moveq	#9, d0
-	bra.w	loc_E84A
-loc_DBF8:
+	moveq	#ItemID_Letter, d0
+	bra.w	Interact_AddItem
+Event_GetRecorder:
 	tst.b	(a0)
 	bne.s	loc_DC12
-	moveq	#$A, d0
-	bsr.w	loc_E84A
+	moveq	#ItemID_Recorder, d0
+	bsr.w	Interact_AddItem
 	bne.s	loc_DC10
 	cmpi.w	#3, (Party_member_join_next).w
 	bne.s	loc_DC10
@@ -20873,16 +20885,16 @@ loc_DC12:
 	move.w	#$1708, (Script_ID).w		; "There seems to be nothing unusual here."
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DC1E:
+Event_GetCard:
 	tst.b	(a0)
 	bne.s	loc_DC2A
 	subi.w	#$E, d0
-	bra.w	loc_E84A
+	bra.w	Interact_AddItem
 loc_DC2A:
 	move.w	#$1708, (Script_ID).w		; "There seems to be nothing unusual here."
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DC36:
+Event_Teim:
 	tst.w	d2
 	bne.s	loc_DC64
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
@@ -20907,19 +20919,19 @@ loc_DC64:
 	move.b	#SFXID_ItemReceived, (Sound_queue).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DC84:
+Event_DynamiteDoor:
 	move.w	#$170D, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DC90:
+Event_Door:
 	move.w	#$170E, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DC9C:
+Event_CardSlot:
 	move.w	#$171B, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_DCA8:
+Event_Neifirst:
 	tst.w	d2
 	bne.s	loc_DCBC
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
@@ -20967,7 +20979,7 @@ loc_DD12:
 	move.w	(Party_members_num).w, $FFFFC624.w
 	move.w	#0, (Party_members_num).w
 	rts
-loc_DD52:
+Event_NeiDeath:
 	tst.w	d2
 	bne.s	loc_DD58
 	rts
@@ -21015,7 +21027,7 @@ loc_DDBC:
 loc_DDCE:
 	rts
 
-loc_DDD0:
+Event_NeifirstDeath:
 	tst.w	d2
 	bne.s	loc_DDD6
 	rts
@@ -21045,7 +21057,7 @@ loc_DDFC:
 	move.w	#-1, (Screen_changed_flag).w
 	rts
 
-loc_DE1E:
+Event_ClimatrolOverflow:
 	tst.w	d2
 	bne.s	loc_DE24
 	rts
@@ -21060,7 +21072,7 @@ loc_DE3A:
 	move.w	#-1, (Screen_changed_flag).w
 	rts
 
-loc_DE42:
+Event_ClimatrolExplosions:
 	tst.w	d2
 	bne.s	loc_DE48
 	rts
@@ -21122,7 +21134,7 @@ RandomExpl_PosOffsets:
 
 	even
 
-loc_DEC6:
+Event_ReturnFromClimatrol:
 	tst.w	d2
 	bne.s	loc_DECC
 	rts
@@ -21146,11 +21158,11 @@ loc_DEE2:
 	move.w	#6, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
 	rts
-loc_DF24:
+Event_UzoEntrance:
 	move.w	#$171F, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	bra.w	loc_DDA2
-loc_DF32:
+Event_Gaira:
 	tst.w	d2
 	bne.s	loc_DF38
 	rts
@@ -21189,7 +21201,7 @@ loc_DF78:
 	addq.w	#8, a0
 	dbf	d0, loc_DF78
 	bra.w	SetCharEquipment
-loc_DFA8:
+Event_GairaExplosion:
 	tst.w	d2
 	bne.s	loc_DFAE
 	rts
@@ -21215,14 +21227,14 @@ loc_DFD0:
 	addq.w	#1, ($FFFFDE72).w
 	rts
 
-loc_DFE6:
+Event_GairaControlPanel:
 	move.b	#1, (a0)
 	move.w	#InteractionID_GairaControlPanel, (Interaction_index).w
 	move.w	#$1B, (Portrait_index).w
 	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	rts
 
-loc_DFFE:
+Event_CharacterDead:
 	tst.w	d2
 	bne.s	loc_E004
 	rts
@@ -21248,13 +21260,13 @@ loc_E026:
 loc_E03C:
 	addq.w	#1, ($FFFFDE72).w
 	rts
-loc_E042:
+Event_ShirGone:
 	move.w	#WinID_ScriptMessage, (Window_index).w
 	move.w	#$1722, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	move.w	#0, (Event_flags).w
 	rts
-loc_E05A:
+Event_EsperMansionEntrance:
 	move.w	#$1688, (Script_ID).w
 	tst.w	(Character_stats+curr_hp).w
 	beq.s	loc_E072
@@ -21264,7 +21276,7 @@ loc_E072:
 	move.w	#1, ($FFFFDE72).w
 	rts
 
-loc_E07A:
+Event_Esper:
 	tst.w	d2
 	bne.s	loc_E096
 	move.w	#$1697, (Script_ID).w
@@ -21281,12 +21293,12 @@ loc_E096:
 loc_E0A2:
 	addq.b	#1, $FFFFC743.w
 	bra.w	CloseAllWindows
-loc_E0AA:
+Event_Lutz:
 	move.w	#InteractionID_EsperMansion, (Interaction_index).w
 	move.w	#$39, (Portrait_index).w
 	move.b	#GameModeID_Interaction, (Game_mode_index).w
 	bra.s	loc_E0D8
-loc_E0BE:
+Event_DarkForce:
 	tst.w	d2
 	bne.s	loc_E0CE
 	move.w	#$171A, (Script_ID).w
@@ -21304,7 +21316,7 @@ loc_E0D8:
 	move.w	d0, (Map_X_pos).w
 	move.w	#-1, (Screen_changed_flag).w
 	rts
-loc_E0F8:
+Event_DarkForceBattle:
 	tst.w	d2
 	bne.s	loc_E0FE
 	rts
@@ -21319,7 +21331,7 @@ loc_E114:
 	move.w	#$102, (Enemy_formation).w		; Dark Force boss battle
 	move.b	#GameModeID_Battle, (Game_mode_index).w
 	rts
-loc_E122:
+Event_MotherBrain:
 	tst.w	d2
 	bne.s	loc_E128
 	rts
@@ -21384,7 +21396,7 @@ loc_E1D2:
 	move.b	#1, $FFFFEC02.w
 	move.w	#0, $FFFFF656.w
 	rts
-loc_E1E4:
+Event_AfterMotherBrain:
 	tst.w	d2
 	bne.s	loc_E1EA
 	rts
@@ -21444,9 +21456,9 @@ loc_E288:
 	bsr.w	CloseAllWindows
 	move.w	#1, (Demo_flag).w
 	addq.w	#1, (Demo_input_index).w
-	move.w	#$39, $FFFFDE6E.w
+	move.w	#$39, (Interaction_type).w
 	rts
-loc_E29E:
+Event_Earthmen:
 	tst.w	d2
 	bne.s	+
 	rts
@@ -21465,9 +21477,9 @@ loc_E2C4:
 	move.w	#1, (Demo_flag).w
 	move.w	#$A, (Demo_index).w
 	move.w	#0, (Demo_input_index).w
-	move.w	#$3A, $FFFFDE6E.w
+	move.w	#$3A, (Interaction_type).w
 	rts
-loc_E2E2:
+Event_EarthmenSpeech:
 	tst.w	d2
 	bne.s	loc_E2E8
 	rts
@@ -21605,7 +21617,7 @@ NoahEnding_TeleportedCharPos:
 	dc.w	$B8, $208
 ; ==========================================
 
-loc_E47C:
+Event_IntroText1:
 	move.w	#$4A0, $FFFFC648.w
 	move.w	#$1E0, $FFFFC64A.w
 	move.w	#$1401, d1
@@ -21623,23 +21635,23 @@ loc_E4A8:
 	addq.w	#1, ($FFFFDE72).w
 loc_E4B2:
 	rts
-loc_E4B4:
+Event_IntroText2:
 	move.w	#$120, $FFFFC648.w
 	move.w	#$1402, d1
 	bra.s	loc_E48C
-loc_E4C0:
+Event_IntroText3:
 	move.w	#$760, $FFFFC64A.w
 	move.w	#$1403, d1
 	bra.s	loc_E48C
-loc_E4CC:
+Event_IntroText4:
 	move.w	#$340, $FFFFC648.w
 	move.w	#$1404, d1
 	bra.s	loc_E48C
-loc_E4D8:
+Event_IntroText5:
 	move.w	#$3F0, $FFFFC64A.w
 	move.w	#$1405, d1
 	bra.s	loc_E48C
-loc_E4E4:
+Event_IntroText6:
 	move.w	#$1406, d1
 	bsr.s	loc_E48C
 	tst.w	(Demo_timer).w
@@ -21653,7 +21665,7 @@ Interact_NPC:
 	bne.s	loc_E53A
 	moveq	#0, d1
 	move.w	d1, (Character_index).w
-	move.b	($FFFFDE6F).w, d1
+	move.b	(Interaction_subtype).w, d1
 	beq.s	loc_E554
 	cmpi.b	#$5D, d1
 	bcs.s	loc_E560
@@ -21664,9 +21676,9 @@ Interact_NPC:
 	cmpi.b	#$87, d1
 	beq.w	loc_E690
 	cmpi.b	#$88, d1
-	beq.w	loc_E05A
+	beq.w	Event_EsperMansionEntrance
 	cmpi.b	#$8F, d1
-	beq.w	loc_E07A
+	beq.w	Event_Esper
 
 	bra.w	loc_E5D0
 
@@ -22092,7 +22104,7 @@ Interact_TreasureChest:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d1
-	move.b	($FFFFDE6F).w, d1
+	move.b	(Interaction_subtype).w, d1
 	beq.s	TreasureChest_Empty
 	lea	(Treasure_chest_flags).w, a0
 	adda.w	d1, a0
@@ -22117,7 +22129,7 @@ TreasureChest_Locked:
 
 loc_E804:
 	move.w	(a1), d0
-	bmi.s	loc_E84A
+	bmi.s	Interact_AddItem
 	beq.w	loc_E8B4
 	ext.l	d0
 	move.l	d0, (Meseta_value).w
@@ -22140,7 +22152,7 @@ loc_E804:
 +
 	rts
 
-loc_E84A:
+Interact_AddItem:
 	move.b	d0, (Item_index).w
 	move.w	#$1702, (Script_ID).w		; "'CHARACTER' has found 'ITEM'."
 	lea	(Party_member_ID).w, a1
@@ -22293,19 +22305,19 @@ Interact_TeimDarum:
 	tst.w	($FFFFDE72).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0
-	move.b	($FFFFDE6F).w, d0
-	beq.w	loc_D9AA
+	move.b	(Interaction_subtype).w, d0
+	beq.w	Event_Talk
 	move.w	d0, d1
 	lsl.w	#2, d1
 	andi.w	#$7C, d1
 	jmp	loc_E99C-4(pc,d1.w)
 ; ----------------------------------------
 loc_E99C:
-	bra.w	loc_E9A8
+	bra.w	TeimDarum_Idle
 	bra.w	loc_E9BA
 	bra.w	loc_EAC2
 ; ----------------------------------------
-loc_E9A8:
+TeimDarum_Idle:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	move.w	#$1801, (Script_ID).w		; "I've seen that face! He tried to kill Nei seven months ago! This is bad news. Let's go back for awhile."
 	addq.w	#1, ($FFFFDE72).w
@@ -26162,7 +26174,7 @@ CloseAllWindows:
 	move.w	d0, (Window_index_saved).w
 	move.w	d0, (Event_routine).w
 	move.w	d0, (Event_routine_2).w
-	move.w	d0, $FFFFDE6E.w
+	move.w	d0, (Interaction_type).w
 	move.w	d0, $FFFFDE70.w
 	move.w	d0, ($FFFFDE72).w
 	move.w	(Current_active_objects_num).w, d0
