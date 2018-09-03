@@ -1310,6 +1310,7 @@ Decom_buffer =  ramaddr($FFFFF400)
 
 Game_mode_index =  ramaddr($FFFFF600)
 
+Joypad_ctrl =  ramaddr($FFFFF602)
 Joypad_held =  ramaddr($FFFFF602)
 Joypad_pressed =  ramaddr($FFFFF603)
 
@@ -1346,7 +1347,8 @@ Screen_changed_flag =  ramaddr($FFFFF734)
 
 Demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
 Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
-Demo_input_index =  ramaddr($FFFFF754)		; determines what joypad command should be run
+Demo_input_frame =  ramaddr($FFFFF754)		; determines what joypad command should be run
+Joypad_demo =  ramaddr($FFFFF756)
 
 Interaction_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)

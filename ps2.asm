@@ -908,7 +908,7 @@ Map_LoadObjects:
 	move.w	#$302, (Interaction_type).w
 	move.w	#1, (Demo_flag).w
 	move.w	#2, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	move.b	#$8F, d0			; "A Prologue" music
 	bra.w	UpdateSoundQueue
 
@@ -5892,7 +5892,7 @@ loc_3786:
 	lsl.w	#2, d0
 	adda.w	d0, a1
 	movea.l	(a1), a1
-	move.w	(Demo_input_index).w, d0
+	move.w	(Demo_input_frame).w, d0
 	adda.w	d0, a1
 	move.b	(a1), d0
 	bpl.s	loc_381A
@@ -5926,12 +5926,12 @@ loc_3818:
 
 loc_381A:
 	lsl.w	#8, d0
-	move.w	d0, (Joypad_held).w
-	andi.w	#$F00, (Joypad_held).w
-	addq.w	#1, (Demo_input_index).w
+	move.w	d0, (Joypad_ctrl).w
+	andi.w	#$F00, (Joypad_ctrl).w
+	addq.w	#1, (Demo_input_frame).w
 
 loc_382A:
-	move.w	d0, ($FFFFF756).w
+	move.w	d0, (Joypad_demo).w
 	bsr.w	loc_6F56
 	move.w	#0, x_move_steps(a0)
 	move.w	#0, y_move_steps(a0)
@@ -6026,7 +6026,7 @@ loc_390E:
 loc_3956:
 	move.w	#0, (Camera_X_step_counter).w
 	move.w	#0, (Camera_Y_step_counter).w
-	btst	#4, $FFFFF756.w
+	btst	#4, (Joypad_demo).w
 	bne.s	loc_397A
 	cmpi.w	#$C8, sprite_y_pos(a0)
 	bhi.s	loc_3980
@@ -6041,7 +6041,7 @@ loc_3980:
 	bne.s	loc_3996
 	move.w	#1, (Camera_Y_step_counter).w
 loc_3996:
-	btst	#6, $FFFFF756.w
+	btst	#6, (Joypad_demo).w
 	bne.s	loc_39AE
 	cmpi.w	#$D8, sprite_x_pos(a0)
 	bhi.s	loc_39B4
@@ -15055,7 +15055,7 @@ loc_9C4C:
 	move.w	#1, (Script_ID).w		; "'Character' uses 'Item'...."
 	move.w	#1, (Demo_flag).w
 	move.w	#4, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	bra.w	RemoveItemFromInventory
 loc_9C6E:
 	move.w	#$14, (Script_ID).w		; "'Character' takes out 'Item' and puts it back."
@@ -15073,7 +15073,7 @@ ItemAction_KeyTube:
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
 	move.w	#1, (Demo_flag).w
 	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	bra.w	RemoveItemFromInventory
 loc_9CAA:
 	move.w	#$16, (Script_ID).w		; "It is a metal pole, 20cm long,with markings."
@@ -15139,7 +15139,7 @@ loc_9D3E:
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
 	move.w	#1, (Demo_flag).w
 	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 loc_9D6A:
 	addq.w	#1, (Event_routine_2).w
 	rts
@@ -16319,7 +16319,7 @@ TechEffect_Musik:
 	bne.s	+
 	move.w	#1, (Demo_flag).w
 	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 +
 	rts
 loc_AA3E:
@@ -16892,7 +16892,7 @@ loc_AFC2:
 loc_AFE6:
 	move.w	#0, (Demo_flag).w
 	move.w	#0, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	move.w	#1, (Party_members_num).w
 	move.w	#1, (Party_members_joined).w
 	move.l	#CharID_Nei, (Party_member_ID).w
@@ -17578,7 +17578,7 @@ loc_B78A:
 	move.w	#InteractionID_CentralTowerOutside, (Interaction_index).w
 	move.w	#$15, (Portrait_index).w
 	move.w	#7, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	bra.w	CloseAllWindows
 ; ------------------------------------------
 loc_B7A6:
@@ -19199,7 +19199,7 @@ loc_CA00:
 	move.w	#$37, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#1, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	bra.w	CloseAllWindows
 loc_CA22:
 	move.w	#InteractionID_Library, (Interaction_index).w
@@ -19639,7 +19639,7 @@ loc_CE6E:
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#8, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	rts
 
 Interaction_EsperMansion:
@@ -20302,7 +20302,7 @@ loc_D5EA:
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#0, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	move.w	#-1, (Screen_changed_flag).w
 	rts
 ; ------------------------------------------
@@ -21156,7 +21156,7 @@ loc_DEE2:
 	move.w	#$B, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#6, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	rts
 Event_UzoEntrance:
 	move.w	#$171F, (Script_ID).w
@@ -21441,7 +21441,7 @@ loc_E248:
 	move.w	#$8001, (Window_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#9, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 loc_E26A:
 	rts
 loc_E26C:
@@ -21455,7 +21455,7 @@ loc_E26C:
 loc_E288:
 	bsr.w	CloseAllWindows
 	move.w	#1, (Demo_flag).w
-	addq.w	#1, (Demo_input_index).w
+	addq.w	#1, (Demo_input_frame).w
 	move.w	#$39, (Interaction_type).w
 	rts
 Event_Earthmen:
@@ -21476,7 +21476,7 @@ loc_E2C4:
 	bsr.w	CloseAllWindows
 	move.w	#1, (Demo_flag).w
 	move.w	#$A, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 	move.w	#$3A, (Interaction_type).w
 	rts
 Event_EarthmenSpeech:
@@ -22402,7 +22402,7 @@ loc_EA76:
 	move.w	#$8001, (Window_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#3, (Demo_index).w
-	move.w	#0, (Demo_input_index).w
+	move.w	#0, (Demo_input_frame).w
 loc_EA98:
 	rts
 loc_EA9A:
