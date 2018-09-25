@@ -1271,6 +1271,8 @@ Music_tracks = $FFD030
 SFX_tracks = $FFD150
 Special_SFX_tracks = $FFD1E0
 
+Character_pos_table = ramaddr($FFFFDD00)
+
 Current_active_objects_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
 
 Window_index =  ramaddr($FFFFDE10)		; type of window to open
@@ -1344,7 +1346,7 @@ Camera_X_step_counter =  ramaddr($FFFFF726)
 Map_collision_data_addr =  ramaddr($FFFFF72E)
 Collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
 Screen_changed_flag =  ramaddr($FFFFF734)
-
+Character_pos_table_index = ramaddr($FFFFF740)
 Demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
 Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
 Demo_input_frame =  ramaddr($FFFFF754)		; determines what joypad command should be run

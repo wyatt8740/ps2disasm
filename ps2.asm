@@ -5851,7 +5851,7 @@ loc_372C:
 	move.w	$24(a0), $2A(a0)
 	move.w	#4, $2C(a0)
 	move.w	#1, routine(a0)
-	lea	($FFFFDD00).w, a2
+	lea	(Character_pos_table).w, a2
 	move.w	#$3F, d0
 loc_3746:
 	move.w	x_pos(a0), (a2)+
@@ -6005,10 +6005,10 @@ loc_38FC:
 	move.w	#1, $30(a0)
 
 loc_390E:
-	lea	($FFFFDD00).w, a2
-	adda.w	($FFFFF740).w, a2
-	addq.w	#4, ($FFFFF740).w
-	andi.w	#$FF, ($FFFFF740).w
+	lea	(Character_pos_table).w, a2
+	adda.w	(Character_pos_table_index).w, a2
+	addq.w	#4, (Character_pos_table_index).w
+	andi.w	#$FF, (Character_pos_table_index).w
 	move.w	x_pos(a0), (a2)+
 	move.w	y_pos(a0), (a2)
 	subq.w	#1, anim_frame_timer(a0)
@@ -6386,8 +6386,8 @@ FollowingCharacter_Main:
 	move.l	-$3C(a0), 4(a0)		; get same sprite mappings as leading character
 	move.l	(Characters_RAM).w, d1
 	sub.l	a0, d1
-	lea	($FFFFDD00).w, a2
-	move.w	($FFFFF740).w, d0
+	lea	(Character_pos_table).w, a2
+	move.w	(Character_pos_table_index).w, d0
 	add.w	d1, d0
 	andi.w	#$FF, d0
 	adda.w	d0, a2
