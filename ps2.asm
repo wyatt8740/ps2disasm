@@ -4791,7 +4791,9 @@ loc_2C14:
 ; -----------------------------------------------------------------
 Enemy_CheckTechSuccess:
 	lea	(EnemyTechSuccessRate).l, a4
-	move.w	luck(a1), d0	; d0 = character's luck
+	;moveq	#0, d0
+	move.w	luck(a1), d0	; d0 = character's luck....d0 should be cleared (uncomment instruction above) otherwise you can end up
+							; with a random number in the higher word, and that screws up the division right below
 	beq.s	+				; if 0, branch
 	divu.w	#50, d0		; divide luck by 50....turns d0 into index
 +
