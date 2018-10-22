@@ -4822,10 +4822,6 @@ Enemy_CheckTechSuccess:
 
 
 ; ===========================================================
-; The enemy data has a byte which represents the initial index for this
-; table. This initial index is added to the character's position, thus
-; making the final index that is used for this table
-;
 ; $FF = 100% success
 ; $E5 = 90% success
 ; $CC = 80% success
