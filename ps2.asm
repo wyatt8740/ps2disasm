@@ -11385,7 +11385,7 @@ GameMode_Title:
 	bsr.w	UpdateSoundQueue
 	moveq	#0, d0
 	move.l	d0, ($FFFFF61C).w	; clear y position
-	move.w	d0,(Controls_locked).w
+	move.w	d0,(Opening_ending_flag).w
 	move.w	d0,(Window_active_flag).w
 	move.w	#$8006, (VDP_control_port).l
 	move.w	#$8B00, (VDP_control_port).l
@@ -11477,14 +11477,14 @@ GameMode_TitleLoop:
 	beq.s	GameMode_TitleLoop
 
 MoveToGameMode_Intro:
-	move.w	#0, (Controls_locked).w		; unlock controls
+	move.w	#0, (Opening_ending_flag).w
 	move.b	#GameModeID_Intro, (Game_mode_index).w
 	move.w	#InteractionID_RolfHouseStart, (Interaction_index).w
 	rts
 
 
 MoveToOpeningScreen:
-	move.w	#1, (Controls_locked).w
+	move.w	#1, (Opening_ending_flag).w
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	move.w	#MapID_MotaviaOutside, (Map_index).w
 	move.w	#$520, (Map_Y_pos).w
@@ -11552,7 +11552,7 @@ loc_7660:
 
 	move.w	d0, (Character_index).w
 	move.w	#$168, (Demo_timer).w
-	move.w	#1, (Controls_locked).w
+	move.w	#1, (Opening_ending_flag).w
 	move.w	#$9011, (VDP_control_port).l
 	move.w	(VDP_reg1_values).w, d0
 	ori.b	#$40, d0
@@ -12088,7 +12088,7 @@ loc_7CAA:
 	move.l	d7, (a6)+
 	dbf	d6, loc_7CAA
 
-	tst.w	(Controls_locked).w
+	tst.w	(Opening_ending_flag).w
 	bne.s	loc_7CCE
 	move.w	#ObjID_MapCharacter,(Characters_RAM).w
 	move.w	#3,($FFFFE424).w
@@ -12147,8 +12147,8 @@ GameMode_MapLoop:
 	bsr.w	CheckGamePause
 	move.b	#$10, (V_int_routine).w
 	bsr.w	WaitForVInt
-	tst.w	(Controls_locked).w
-	bne.s	+	; branch if controls are locked
+	tst.w	(Opening_ending_flag).w
+	bne.s	+
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
 	bsr.w	ProcessPlayerMenu
@@ -12174,8 +12174,8 @@ loc_7DCA:
 loc_7DCE:
 	tst.w	(Screen_changed_flag).w
 	bne.w	loc_7E00
-	tst.w	(Controls_locked).w
-	beq.s	loc_7DEC		; branch if controls are not locked
+	tst.w	(Opening_ending_flag).w
+	beq.s	loc_7DEC
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#ButtonStart_Mask, d0			; start press
 	beq.s	loc_7DF6	; branch if start was not pressed
@@ -20492,7 +20492,7 @@ Map_CheckInteractions:
 	bne.s	loc_D7FA
 	move.w	($FFFFDE70).w, d2
 	bne.w	loc_D862
-	tst.w	(Controls_locked).w
+	tst.w	(Opening_ending_flag).w
 	bne.s	loc_D7FA
 	tst.w	(Demo_flag).w
 	bne.s	loc_D7FA
@@ -24036,7 +24036,7 @@ loc_FBE8:
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.s	loc_FBFE
-	tst.w	(Controls_locked).w
+	tst.w	(Opening_ending_flag).w
 	bne.s	loc_FBFE
 	move.w	#1, $FFFFCD20.w
 loc_FBFE:

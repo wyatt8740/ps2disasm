@@ -1361,6 +1361,6 @@ Palette_table_buffer =  ramaddr($FFFFFB00)
 
 System_stack =  ramaddr($FFFFFE00)
 
-Controls_locked =  ramaddr($FFFFFFF0)		; flag: determines whether you can control character or not; 0 = can control characters; 1 = cannot control characters
+Opening_ending_flag =  ramaddr($FFFFFFF0)
 
 Checksum_four_CC =  ramaddr($FFFFFFFC) 		; four bytes: string that is checked for the checksum routine.
