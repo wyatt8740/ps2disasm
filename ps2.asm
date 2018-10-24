@@ -3287,8 +3287,8 @@ Character_CheckAttack:
 	adda.w	d1, a5
 	tst.w	(a5)
 	bne.s	+			; branch if command is not attack
-	addq.w	#1, 4(a5)
-	andi.w	#1, 4(a5)
+	addq.w	#1, 4(a5)	; this should be 2(a5)
+	andi.w	#1, 4(a5)	; this should be 2(a5)
 	bne.w	loc_1F62
 +
 	btst	#4, d0
@@ -3404,7 +3404,7 @@ loc_1D9E:
 	lea	(WeaponProperties).l, a6
 	move.w	d3, d0
 	subi.w	#ItemID_Knife, d0
-	bcs.w	loc_1F62		; branch if item is before "Knife" in the inventory
+	bcs.w	loc_1F62	; branch if character has no weapon
 	cmpi.w	#$42, d0
 	bhi.w	loc_1F62
 	move.w	d0, child_battle_anim(a0)
