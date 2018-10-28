@@ -1203,6 +1203,8 @@ Map_Y_pos =  ramaddr($FFFFC642)
 Map_X_pos =  ramaddr($FFFFC644)
 
 Jet_Scooter_flag =  ramaddr($FFFFC652)		; flag: 0 = not on jet scooter; 1 = on jet scooter
+Jet_Scooter_Y_pos =  ramaddr($FFFFC654)
+Jet_Scooter_X_pos =  ramaddr($FFFFC656)
 
 Planet_index =  ramaddr($FFFFC658)			; 0 = Motavia; 1 = Dezolis
 

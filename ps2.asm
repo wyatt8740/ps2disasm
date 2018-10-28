@@ -832,8 +832,8 @@ Map_LoadObjects:
 	tst.b	(Event_flags).w
 	bne.s	+
 	move.w	#ObjID_JetScooter, ($FFFFE800).w
-	move.w	($FFFFC654).w, ($FFFFE80E).w
-	move.w	($FFFFC656).w, ($FFFFE80A).w
+	move.w	(Jet_Scooter_Y_pos).w, ($FFFFE80E).w
+	move.w	(Jet_Scooter_X_pos).w, ($FFFFE80A).w
 	move.w	#6, ($FFFFE824).w
 	move.w	#6, ($FFFFE82A).w
 +
@@ -891,8 +891,8 @@ Map_LoadObjects:
 	bne.s	+
 	tst.w	d1
 	bmi.s	+
-	move.w	d1, ($FFFFC654).w
-	move.w	d2, ($FFFFC656).w
+	move.w	d1, (Jet_Scooter_Y_pos).w
+	move.w	d2, (Jet_Scooter_X_pos).w
 +
 	cmpi.w	#$E, d0
 	bne.s	+
@@ -12077,8 +12077,8 @@ loc_7C4A:
 	bne.s	loc_7CA0	; branch if value is not Motavia
 	tst.w	(Jet_Scooter_flag).w
 	beq.s	loc_7CA0
-	move.w	(Map_Y_pos).w, ($FFFFC654).w
-	move.w	(Map_X_pos).w, ($FFFFC656).w
+	move.w	(Map_Y_pos).w, (Jet_Scooter_Y_pos).w
+	move.w	(Map_X_pos).w, (Jet_Scooter_X_pos).w
 
 loc_7CA0:
 	lea	(Object_RAM).w, a6
@@ -14988,7 +14988,7 @@ ItemAction_NoAction:
 ItemAction_SmallKey:
 	tst.w	d1
 	bne.s	loc_9BEC
-	bsr.w	loc_9BFE
+	bsr.w	CheckItemInteract
 	beq.s	loc_9BE0	; we didn't interact with anything (next to no object) so display item description
 	cmpi.b	#2, $2E(a1)
 	bne.s	loc_9BE0
@@ -14996,7 +14996,7 @@ ItemAction_SmallKey:
 	move.b	$2F(a1), d1
 	lea	(Treasure_chest_flags).w, a1
 	adda.w	d1, a1
-	bclr	#7, (a1)					; mark container as unlocked
+	bclr	#7, (a1)					; mark chest as unlocked
 	beq.s	loc_9BE0					; if it's already unlocked, branch
 	move.w	#1, (Script_ID).w		; "'Character' uses 'Item'...."
 	rts
@@ -15013,74 +15013,93 @@ loc_9BEC:
 	addq.w	#1, (Event_routine_2).w
 	rts
 
-loc_9BFE:
+
+; -----------------------------------------------------------------
+CheckItemInteract:
 	lea	(Characters_RAM).w, a0
-	move.w	$2A(a0), d6
+	move.w	facing_dir(a0), d6
 	beq.s	+
 	divu.w	#3, d6
 +
 	bsr.w	Map_ChkTargetInteract
 	rts
+; -----------------------------------------------------------------
 
-loc_9C12:
-	bsr.w	loc_9BFE
+
+; -----------------------------------------------------------------
+; Returns
+;
+; d1 = event flag offset; 0 if item is not found
+; a1 = event flag address
+; -----------------------------------------------------------------
+GetItemEventFlag:
+	bsr.w	CheckItemInteract
 	beq.s	+
-	tst.b	$2E(a1)
+	tst.b	type(a1)
 	bne.s	+
 	moveq	#0, d1
-	move.b	$2F(a1), d1
+	move.b	subtype(a1), d1
 	lea	(Event_flags).w, a1
 	adda.w	d1, a1
 	rts
 +
 	moveq	#0, d1
 	rts
-; -------------------------------------------
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
 ItemAction_Dynamite:
 	tst.w	d1
 	bne.w	CloseAllWindows
-	bsr.s	loc_9C12
-	beq.s	loc_9C6E
+	bsr.s	GetItemEventFlag
+	beq.s	.nouse
 	cmpi.b	#$18, d1
-	beq.s	loc_9C4C
+	beq.s	.use
 	cmpi.b	#$19, d1
-	beq.s	loc_9C4C
+	beq.s	.use
 	cmpi.b	#$1A, d1
-	bne.s	loc_9C6E
-loc_9C4C:
+	bne.s	.nouse
+.use:
 	bset	#0, (a1)
-	bne.s	loc_9C6E
+	bne.s	.nouse
 	move.w	#1, (Script_ID).w		; "'Character' uses 'Item'...."
 	move.w	#1, (Demo_flag).w
 	move.w	#4, (Demo_index).w
 	move.w	#0, (Demo_input_frame).w
 	bra.w	RemoveItemFromInventory
-loc_9C6E:
+
+.nouse:
 	move.w	#$14, (Script_ID).w		; "'Character' takes out 'Item' and puts it back."
 	rts
-; -------------------------------------------
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
 ItemAction_KeyTube:
 	tst.w	d1
 	bne.w	CloseAllWindows
-	bsr.w	loc_9C12
-	beq.s	loc_9CAA
+	bsr.w	GetItemEventFlag
+	beq.s	.nouse
 	cmpi.b	#$1B, d1
-	bne.s	loc_9CAA
+	bne.s	.nouse
 	bset	#0, (a1)
-	bne.s	loc_9CAA
+	bne.s	.nouse
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
 	move.w	#1, (Demo_flag).w
 	move.w	#5, (Demo_index).w
 	move.w	#0, (Demo_input_frame).w
 	bra.w	RemoveItemFromInventory
-loc_9CAA:
+
+.nouse:
 	move.w	#$16, (Script_ID).w		; "It is a metal pole, 20cm long,with markings."
 	rts
-; -------------------------------------------
+; -----------------------------------------------------------------
+
 ItemAction_MruraGum:
 	tst.w	d1
 	bne.s	loc_9CD6
-	bsr.w	loc_9C12
+	bsr.w	GetItemEventFlag
 	beq.s	loc_9CCA
 	cmpi.b	#$F, d1
 	bne.s	loc_9CCA
@@ -15110,25 +15129,26 @@ loc_9CD6:
 ItemAction_GreenCard:
 	moveq	#$1C, d0
 	move.w	#$1C, (Script_ID).w		; "It's a card which shines like a green emerald!"
-	bra.s	loc_9D3E
+	bra.s	ItemAction_Cards
 ; -------------------------------------------
 ItemAction_BlueCard:
 	moveq	#$1E, d0
 	move.w	#$1D, (Script_ID).w		; "It's a card which is a bluish aquamarine color."
-	bra.s	loc_9D3E
+	bra.s	ItemAction_Cards
 ; -------------------------------------------
 ItemAction_YellowCard:
 	moveq	#$20, d0
 	move.w	#$1E, (Script_ID).w		; "It's a yellow card, like the sands of Mota."
-	bra.s	loc_9D3E
+	bra.s	ItemAction_Cards
 ; -------------------------------------------
 ItemAction_RedCard:
 	moveq	#$22, d0
 	move.w	#$1F, (Script_ID).w		; "It's a card which is red like the setting sun."
-loc_9D3E:
+
+ItemAction_Cards:
 	tst.w	d1
 	bne.s	loc_9D92
-	bsr.w	loc_9C12
+	bsr.w	GetItemEventFlag
 	beq.s	loc_9D6A
 	cmp.b	d0, d1
 	bne.s	loc_9D70
@@ -16302,7 +16322,7 @@ TechEffect_Musik:
 	bne.w	CloseAllWindows
 	bsr.w	Map_TechEffect_SubtractTP
 	move.w	#WinID_ScriptMessage, (Window_index).w
-	bsr.w	loc_9C12
+	bsr.w	GetItemEventFlag
 	beq.s	loc_AA3E
 	cmpi.b	#7, d1
 	bne.s	loc_AA3E
@@ -20531,7 +20551,7 @@ loc_D810:
 	move.w	d0, $2A(a1)
 	move.b	#$FF, 3(a1)
 loc_D846:
-	move.w	$2E(a1), d4
+	move.w	type(a1), d4
 loc_D84A:
 	move.w	#WinID_ScriptMessage, (Window_index).w
 	move.w	#1, $FFFFDE70.w
@@ -20545,16 +20565,15 @@ loc_D862:
 	andi.w	#$C, d0
 	jmp	InteractionTypes(pc,d0.w)
 
-; =================================
+; =================================================================
 Interact_TargetFacingDirs:
 	dc.b	$03
 	dc.b	$00
 	dc.b	$09
 	dc.b	$06
-; =================================
+; =================================================================
 
 	even
-
 
 ; =================================================================
 InteractionTypes:
@@ -20698,10 +20717,10 @@ loc_DA10:
 loc_DA26:
 	move.w	$FFFFE80E.w, d0
 	andi.w	#$FFF0, d0
-	move.w	d0, $FFFFC654.w
+	move.w	d0, (Jet_Scooter_Y_pos).w
 	move.w	$FFFFE80A.w, d0
 	andi.w	#$FFF0, d0
-	move.w	d0, $FFFFC656.w
+	move.w	d0, (Jet_Scooter_X_pos).w
 	move.w	#0, (Jet_Scooter_flag).w
 	lea	(Characters_RAM).w, a1
 	move.w	(Party_members_num).w, d0
@@ -21810,8 +21829,8 @@ loc_E688:
 loc_E690:
 	move.w	#$1685, (Script_ID).w	;
 	move.b	#1, $FFFFC716.w				; events after Roron (Jet Scooter and other stuff activated)
-	move.w	#$730, $FFFFC654.w
-	move.w	#$590, $FFFFC656.w
+	move.w	#$730, (Jet_Scooter_Y_pos).w
+	move.w	#$590, (Jet_Scooter_X_pos).w
 	move.w	#1, ($FFFFDE72).w
 	rts
 
