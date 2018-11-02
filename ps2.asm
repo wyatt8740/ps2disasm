@@ -6461,13 +6461,14 @@ NPC1Routines:
 
 ; -----------------------------------------------------------------
 NPC1_Init:
-	move.w	#$2431, 8(a0)
-	move.l	#Map_MotaYoungMan, 4(a0)
-	move.w	4(a0), $2A(a0)
+	move.w	#$2431, art_tile(a0)
+	move.l	#Map_MotaYoungMan, mappings(a0)
+	move.w	mappings(a0), facing_dir(a0)	; facing direction should be either 0, 3, 6, 9; this line is using the mappings offset which is wrong;
+											; this also applies to other NPC objects
 	move.w	#4, $2C(a0)
 	move.w	#$20, $28(a0)
 	move.b	#0, $35(a0)
-	move.w	#1, $22(a0)
+	move.w	#1, routine(a0)
 	rts
 ; -----------------------------------------------------------------
 

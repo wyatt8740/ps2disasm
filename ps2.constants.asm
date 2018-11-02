@@ -64,6 +64,7 @@ next_object = object_size
 obj_id = 0	; word
 render_flags = 2	; bitfield;
 mappings = 4	; longword
+art_tile = 8	; word
 x_pos = $A	; longword
 y_pos = $E	; longword
 routine = $22	; word
