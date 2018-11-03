@@ -4378,7 +4378,7 @@ Character_CalcAttackDamage:
 	move.b	(a4), d1	; get weapon attack value
 	addq.w	#2, d1		; add 2 to it
 	mulu.w	d1, d0		; multiply character's attack value by this number
-	lsr.w	#8, d0		; divide total attack value by 256
+	lsr.w	#8, d0		; divide total attack value by 256...This should be 'lsr.l' otherwise the value gets truncated
 CheckEnemyAlive:
 	sub.w	d0, 2(a1)			; subtract damage from enemy's current HP
 	bhi.s	+		; return if enemy is still alive
@@ -4653,7 +4653,7 @@ loc_2AA8:
 	divu.w	d1, d0
 	move.w	$1C(a3), d1
 	mulu.w	d1, d0
-	lsr.w	#8, d0
+	lsr.w	#8, d0			; This should be 'lsr.l' otherwise the value gets truncated
 	beq.s	loc_2AE8
 	_btst	#1, 0(a1)
 	bne.s	loc_2AE4
