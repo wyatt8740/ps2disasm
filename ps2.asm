@@ -3844,6 +3844,8 @@ TechAction_Shinb:
 	tst.w	(Escape_rate).w
 	beq.s	loc_22EA
 ; The following subroutine requires the Enemy_stats address to be loaded in a1, but it's missing in this section.
+; Uncomment the line below to fix it
+	;lea	(Enemy_stats).w, a1
 	bsr.w	Character_CheckTechSuccess
 	bmi.s	loc_22EA
 	move.w	#$1202, (Battle_script_ID).w
