@@ -4267,7 +4267,7 @@ loc_1F489:
 	dc.b	$C4
 
 loc_1F49C:
-	dc.b	"There isn't anyboby"		; TYPO ALERT!!!
+	dc.b	"There isn't anyboby"
 	dc.b	$C1
 	dc.b	"else but us on this"
 	dc.b	$C3
