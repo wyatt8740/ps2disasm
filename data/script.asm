@@ -1659,8 +1659,7 @@ loc_1B044:
 	dc.b	"piano!"
 	dc.b	$C5
 
-; it always sounded to me that it's Rolf who says the line, but it's actually Ustvestia. To be honest I realized this
-; when playing the Japanese version. It's translated poorly in my opinion. He says that you should leave since he's very busy
+
 loc_1B077:
 	dc.b	"Well, actually, I'm kind"
 	dc.b	$C1
@@ -1686,7 +1685,7 @@ loc_1B0F4:
 	dc.b	$C5
 
 loc_1B10B:
-	dc.b	"Hey, he looks smart."		; For those who don't know, Ustvestia is gay, so "smart" was used to cover this up
+	dc.b	"Hey, he looks smart."
 	dc.b	$C1
 	dc.b	"I'll give lessons for"
 	dc.b	$C3
@@ -3532,8 +3531,7 @@ Script_People:
 	dc.b	loc_20942-loc_20907		; $A1
 	dc.b	loc_209AA-loc_20942		; $A2
 
-; no idea why this guy says a line talking about Central Tower. In the Japanese version he says: "This is Paseo, the largest city on Motavia"
-; He doesn't say it using a fully structured Japanese sentence, meaning he leaves out particles and whatnot...
+
 loc_1DED0:
 	dc.b	"This is Central Tower"
 	dc.b	$C1
@@ -3737,7 +3735,7 @@ loc_1E4B7:
 loc_1E4F1:
 	dc.b	"The scoundrels must"
 	dc.b	$C1
-	dc.b	"have two more dynamite"		; how does he know that? :D
+	dc.b	"have two more dynamite"
 	dc.b	$C3
 	dc.b	"sticks. Unless we take"
 	dc.b	$C1
@@ -5729,8 +5727,8 @@ loc_21D2D:
 	dc.b	$C1
 	dc.b	"warriors who rescued"
 	dc.b	$C1
-	dc.b	"Algol!\I And then"			; the only time they use the full name...
-	dc.b	$BB, " "		; yeah, it's a space
+	dc.b	"Algol!\I And then"
+	dc.b	$BB, " "
 	dc.b	$C3
 	dc.b	"and the others came"
 	dc.b	$C1
@@ -5995,7 +5993,7 @@ loc_2248A:
 	dc.b	$C1
 	dc.b	"realize we were"
 	dc.b	$C3
-	dc.b	"destroying ourselves\I"	; sigh... Why is the " character in the middle of the sentence?
+	dc.b	"destroying ourselves\I"
 	dc.b	$C1
 	dc.b	"until it was too late."
 	dc.b	$C3
@@ -6090,7 +6088,7 @@ loc_227B5:
 	dc.b	$C4
 
 loc_2287E:
-	dc.b	$BB, "and the rest of the"			; again no space after the character's name <_<
+	dc.b	$BB, "and the rest of the"
 	dc.b	$C1
 	dc.b	"company stood in"
 	dc.b	$C1
@@ -6373,7 +6371,7 @@ loc_230C0:
 loc_2314C:
 	dc.b	"the symbol of Algo, was"
 	dc.b	$C1
-	dc.b	"fighting the dark force"		;  It should be Dark Force
+	dc.b	"fighting the dark force"
 	dc.b	$C1
 	dc.b	"in that dream. The dark"
 	dc.b	$C3
@@ -6393,7 +6391,7 @@ loc_231DB:
 	dc.b	$C1
 	dc.b	"anyone trying to destroy"
 	dc.b	$C1
-	dc.b	"Algo. You,", $BB, ", must"		; no space between comma and character's name
+	dc.b	"Algo. You,", $BB, ", must"
 	dc.b	$C3
 	dc.b	"arm yourself for battle."
 	dc.b	$C1
