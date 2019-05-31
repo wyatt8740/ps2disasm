@@ -1252,8 +1252,14 @@ Battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of 
 
 Script_ID =  ramaddr($FFFFCD00)
 Window_active_flag =  ramaddr($FFFFCD10)
-Text_render_type =  ramaddr($FFFFCD20)	; word ; 0 = prints one letter at the time; 1 = prints all text in one frame 
-Text_buffer_pointer =	ramaddr($FFFFCD12)
+Text_offset =	ramaddr($FFFFCD12)	; longword
+Text_plane_offset =	ramaddr($FFFFCD16)	; word
+Text_plane_offset_start =	ramaddr($FFFFCD18)	; word
+Text_curr_line =	ramaddr($FFFFCD1A)	; word
+Text_max_line_num =	ramaddr($FFFFCD1C)	; word
+Text_line_scroll_speed =	ramaddr($FFFFCD1E)	; word
+Text_render_type =  ramaddr($FFFFCD20)	; word ; 0 = prints one letter at the time; 1 = prints all text in one frame
+Text_auto_timer =  ramaddr($FFFFCD22)	; word ; when it reaches 0, text will continue automatically
 Text_buffer =  ramaddr($FFFFCD40)
 
 Sound_RAM =  ramaddr($FFFFD000)

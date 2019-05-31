@@ -11763,10 +11763,10 @@ loc_7914:
 	bra.w	PlaneMapToVRAM
 
 loc_7932:
-	move.w	d1, $FFFFCD16.w
-	move.w	d1, $FFFFCD18.w
-	move.w	#0, $FFFFCD1A.w
-	move.w	#$C, $FFFFCD1C.w
+	move.w	d1, (Text_plane_offset).w
+	move.w	d1, (Text_plane_offset_start).w
+	move.w	#0, (Text_curr_line).w
+	move.w	#$C, (Text_max_line_num).w
 	bsr.w	PaletteLoad2
 loc_794A:
 	move.b	#$14, (V_int_routine).w
@@ -12996,10 +12996,10 @@ GameOverScreen:
 	moveq	#pal_id_title, d0
 	bsr.w	PaletteLoad1
 	move.w	#$4514, d0
-	move.w	d0, $FFFFCD16.w
-	move.w	d0, $FFFFCD18.w
-	move.w	#0, $FFFFCD1A.w
-	move.w	#4, $FFFFCD1C.w
+	move.w	d0, (Text_plane_offset).w
+	move.w	d0, (Text_plane_offset_start).w
+	move.w	#0, (Text_curr_line).w
+	move.w	#4, (Text_max_line_num).w
 	move.w	#$1218, (Script_ID).w		; "ROLF and the others failed to restore peace to the planet Algo."
 	move.w	#CharID_Rolf, (Character_index).w
 	move.w	#$708, (Demo_timer).w
@@ -14386,10 +14386,10 @@ CheckRenderScript:
 	beq.w	loc_96EC		; if no window is open, branch
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	movea.l	(Text_buffer_pointer).w, a1
+	movea.l	(Text_offset).w, a1
 -
 	bsr.s	RenderScript
-	move.l	a1, (Text_buffer_pointer).w
+	move.l	a1, (Text_offset).w
 	tst.w	(Text_render_type).w
 	bne.s	-
 	rts
@@ -14399,25 +14399,25 @@ RenderScript:
 	move.b	(a1), d1
 	cmpi.b	#$C1, d1
 	bne.s	loc_95F4
-	subq.w	#1, $FFFFCD1E.w
+	subq.w	#1, (Text_line_scroll_speed).w
 	bpl.s	loc_95F2
-	move.w	#3, $FFFFCD1E.w
-	move.w	$FFFFCD1A.w, d0
-	cmp.w	$FFFFCD1C.w, d0
+	move.w	#3, (Text_line_scroll_speed).w
+	move.w	(Text_curr_line).w, d0
+	cmp.w	(Text_max_line_num).w, d0
 	beq.s	loc_95D4
-	addq.w	#1, $FFFFCD1A.w
+	addq.w	#1, (Text_curr_line).w
 	bra.s	loc_95DC
 loc_95D4:
 	movea.l	a1, a4
 	bsr.w	loc_9666
 	movea.l	a4, a1
 loc_95DC:
-	move.w	$FFFFCD18.w, d0
-	move.w	$FFFFCD1A.w, d1
+	move.w	(Text_plane_offset_start).w, d0
+	move.w	(Text_curr_line).w, d1
 	lsl.w	#7, d1
 	add.w	d1, d0
 	andi.w	#$CFFF, d0
-	move.w	d0, $FFFFCD16.w
+	move.w	d0, (Text_plane_offset).w
 	addq.w	#1, a1
 loc_95F2:
 	rts
@@ -14426,7 +14426,7 @@ loc_95F4:
 	cmpi.b	#$C2, d1
 	bne.s	loc_9608
 	bsr.w	loc_96AE
-	move.w	$FFFFCD18.w, $FFFFCD16.w
+	move.w	(Text_plane_offset_start).w, (Text_plane_offset).w
 	addq.w	#1, a1
 	rts
 loc_9608:
@@ -14439,7 +14439,7 @@ DrawScriptToVDP:
 	add.w	d1, d1
 	lea	(VDPCharacterMaps).l, a4
 	adda.w	d1, a4
-	move.w	$FFFFCD16.w, d0
+	move.w	(Text_plane_offset).w, d0
 	andi.w	#$CFFF, d0
 	move.w	d0, (a2)
 	move.w	#3, (a2)
@@ -14452,29 +14452,29 @@ DrawScriptToVDP:
 	move.w	#3, (a2)
 	move.b	(a4), d2
 	move.w	d2, (a3)
-	move.w	$FFFFCD16.w, d0
+	move.w	(Text_plane_offset).w, d0
 	move.b	d0, d1
 	andi.b	#$80, d1
 	addq.b	#2, d0
 	andi.b	#$7F, d0
 	or.b	d1, d0
 	andi.w	#$EFFF, d0
-	move.w	d0, $FFFFCD16.w
+	move.w	d0, (Text_plane_offset).w
 	addq.w	#1, a1
 	rts
 loc_9666:
-	move.w	$FFFFCD18.w, d0
+	move.w	(Text_plane_offset_start).w, d0
 	addi.w	#$80, d0
 	andi.w	#$FFF, d0
 	move.w	#$17, d1
-	move.w	$FFFFCD1C.w, d2
+	move.w	(Text_max_line_num).w, d2
 	beq.s	loc_96AE
 	movea.l	$FFFFDE00.w, a1
 	bsr.w	loc_99A8
-	move.w	$FFFFCD18.w, d0
+	move.w	(Text_plane_offset_start).w, d0
 	andi.w	#$CFFF, d0
 	move.w	#$17, d1
-	move.w	$FFFFCD1C.w, d2
+	move.w	(Text_max_line_num).w, d2
 	movea.l	$FFFFDE00.w, a1
 	bsr.w	loc_997E
 	move.w	#$17, d1
@@ -14484,10 +14484,10 @@ loc_96A0:
 	dbf	d1, loc_96A0
 	rts
 loc_96AE:
-	move.w	$FFFFCD18.w, d0
+	move.w	(Text_plane_offset_start).w, d0
 	andi.w	#$CFFF, d0
 	move.w	#$17, d1
-	move.w	$FFFFCD1C.w, d2
+	move.w	(Text_max_line_num).w, d2
 	bne.s	loc_96C4
 	move.w	#$13, d1
 loc_96C4:
@@ -14503,7 +14503,7 @@ loc_96D0:
 	move.w	d5, d0
 	add.l	d7, d0
 	dbf	d2, loc_96CC
-	move.w	#0, $FFFFCD1A.w
+	move.w	#0, (Text_curr_line).w
 	rts
 
 loc_96EC:
@@ -18412,7 +18412,7 @@ loc_C086:
 	rts
 
 loc_C09A:
-	move.w	#$B4, $FFFFCD22.w
+	move.w	#$B4, (Text_auto_timer).w
 	move.w	#$D02, (Script_ID).w
 	addq.w	#3, (Event_routine).w
 	rts
@@ -21128,7 +21128,7 @@ loc_DE8E:
 	adda.w	#$40, a1
 	dbf	d2, loc_DE62
 
-	move.w	#$12C, $FFFFCD22.w
+	move.w	#$12C, (Text_auto_timer).w
 	addq.w	#1, $FFFFDE70.w
 	rts
 
@@ -23995,19 +23995,19 @@ loc_FB00:
 	or.b	d6, d0
 	addi.w	#$80, d0
 	andi.w	#$CFFF, d0
-	move.w	d0, $FFFFCD16.w
-	move.w	d0, $FFFFCD18.w
+	move.w	d0, (Text_plane_offset).w
+	move.w	d0, (Text_plane_offset_start).w
 	bsr.w	CheckLoadScript
-	move.w	#0, $FFFFCD1A.w
-	move.w	#2, $FFFFCD1C.w
-	move.w	#3, $FFFFCD1E.w
-	move.w	#$3C, $FFFFCD22.w
+	move.w	#0, (Text_curr_line).w
+	move.w	#2, (Text_max_line_num).w
+	move.w	#3, (Text_line_scroll_speed).w
+	move.w	#$3C, (Text_auto_timer).w
 loc_FB4E:
 	move.w	#0, (Window_index_saved).w
 	rts
 
 ScriptControlCodes:
-	movea.l	(Text_buffer_pointer).w, a0
+	movea.l	(Text_offset).w, a0
 	move.b	(a0)+, d0
 	cmpi.b	#$C3, d0
 	bne.s	loc_FB7A
@@ -24015,7 +24015,7 @@ ScriptControlCodes:
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.w	loc_FBFE
 	move.b	#SFXID_Selection, (Sound_queue).w
-	move.l	a0, (Text_buffer_pointer).w
+	move.l	a0, (Text_offset).w
 	rts
 loc_FB7A:
 	cmpi.b	#$C4, d0
@@ -24030,14 +24030,14 @@ loc_FB84:
 loc_FB92:
 	cmpi.b	#$C6, d0
 	bne.s	loc_FBCE
-	subq.w	#1, $FFFFCD22.w
+	subq.w	#1, (Text_auto_timer).w
 	bmi.s	loc_FBA8
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.s	loc_FBFE
 loc_FBA8:
 	move.b	#SFXID_Selection, (Sound_queue).w
-	move.w	#$3C, $FFFFCD22.w
+	move.w	#$3C, (Text_auto_timer).w
 	move.w	#0, (Joypad_held).w
 	move.w	#0, (Window_active_flag).w
 	lea	(Window_index).w, a1
@@ -24049,9 +24049,9 @@ loc_FBC4:
 loc_FBCE:
 	cmpi.b	#$C7, d0
 	bne.s	loc_FBE8
-	subq.w	#1, $FFFFCD22.w
+	subq.w	#1, (Text_auto_timer).w
 	bpl.s	loc_FBFE
-	move.w	#$3C, $FFFFCD22.w
+	move.w	#$3C, (Text_auto_timer).w
 	move.w	#0, (Window_active_flag).w
 	rts
 loc_FBE8:
@@ -24741,13 +24741,13 @@ loc_1028C:
 	or.b	d6, d0
 	addi.w	#$80, d0
 	andi.w	#$CFFF, d0
-	move.w	d0, $FFFFCD16.w
-	move.w	d0, $FFFFCD18.w
+	move.w	d0, (Text_plane_offset).w
+	move.w	d0, (Text_plane_offset_start).w
 	bsr.w	CheckLoadScript
-	move.w	#0, $FFFFCD1A.w
-	move.w	#6, $FFFFCD1C.w
-	move.w	#3, $FFFFCD1E.w
-	move.w	#$3C, $FFFFCD22.w
+	move.w	#0, (Text_curr_line).w
+	move.w	#6, (Text_max_line_num).w
+	move.w	#3, (Text_line_scroll_speed).w
+	move.w	#$3C, (Text_auto_timer).w
 loc_102DA:
 	move.w	#0, (Window_index_saved).w
 	rts
@@ -25659,13 +25659,13 @@ loc_10B56:
 	or.b	d6, d0
 	addi.w	#$80, d0
 	andi.w	#$CFFF, d0
-	move.w	d0, $FFFFCD16.w
-	move.w	d0, $FFFFCD18.w
+	move.w	d0, (Text_plane_offset).w
+	move.w	d0, (Text_plane_offset_start).w
 	bsr.w	CheckLoadScript
-	move.w	#0, $FFFFCD1A.w
-	move.w	#0, $FFFFCD1C.w
-	move.w	#0, $FFFFCD1E.w
-	move.w	#$3C, $FFFFCD22.w
+	move.w	#0, (Text_curr_line).w
+	move.w	#0, (Text_max_line_num).w
+	move.w	#0, (Text_line_scroll_speed).w
+	move.w	#$3C, (Text_auto_timer).w
 loc_10BA4:
 	move.w	#0, (Window_index_saved).w
 	rts
@@ -26234,11 +26234,11 @@ LoadScript:
 
 	lea	(Party_member_ID).w, a4
 	lea	(Text_buffer).w, a2
-	move.l	a2, (Text_buffer_pointer).w
+	move.l	a2, (Text_offset).w
 	cmpi.b	#$C2, (a1)
 	beq.s	LoadScript_ChkCharName
-	move.w	$FFFFCD16.w, d0
-	cmp.w	$FFFFCD18.w, d0
+	move.w	(Text_plane_offset).w, d0
+	cmp.w	(Text_plane_offset_start).w, d0
 	bne.w	loc_11250
 
 LoadScript_ChkCharName:
