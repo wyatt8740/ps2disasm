@@ -3,12 +3,12 @@
 ; will be mapped to VRAM data.
 ; The ID's for the section and one of its text data are loaded in RAM in this way usually:
 ;
-; 	move.w	#$XXXX, (script_id).w
+; 	move.w	#$XXXX, (Script_id).w
 ;
 ; where the higher byte represents the pointer of a section, and the lower byte is the text data pointer that
 ; that will be displayed. As an example, if we write
 ;
-;	move.w	#$1102, (script_id).w
+;	move.w	#$1102, (Script_id).w
 ;
 ; , we fetch the Script_Governor pointer section ($11) and the text data pointer (02), so that data will be
 ; loaded.
@@ -49,15 +49,15 @@
 ;   text processing by putting a $C4 and load other text data, if any, in another sitting. Check the code to see how this is handled.
 ;   Generally you see an instruction in the following format:
 ;
-;   move.l	#$01090004, (script_id).w
+;   move.l	#$01090004, (Script_id).w
 ;
 ;   First it loads and process the #$0109 text section and after it's done it will process the #$0004 section. You have 16 bytes of space to
 ;   put your text ID's, so there could be something like
 ;
-;   move.l	#$11121113, (script_id).w
-;	move.l	#$11141115, (script_id+4).w
-;	move.l	#$11161117, (script_id+8).w
-;	move.l	#$11181119, (script_id+$C).w
+;   move.l	#$11121113, (Script_id).w
+;	move.l	#$11141115, (Script_id+4).w
+;	move.l	#$11161117, (Script_id+8).w
+;	move.l	#$11181119, (Script_id+$C).w
 ;
 ;   and the software will process all the text defined by the ID's above in sequence.
 ;

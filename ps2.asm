@@ -14209,7 +14209,7 @@ DrawWindows:
 	move.w	$FFFFDE40.w, d1
 	bne.w	loc_947A
 	move.w	(Window_index).w, d0
-	beq.w	CheckRunScript
+	beq.w	CheckRenderScript
 	bmi.w	loc_94EE
 	andi.w	#$FF, d0
 	lea	(WindowArtLayoutPtrs-8).l, a1
@@ -14381,20 +14381,20 @@ loc_954C:
 loc_9586:
 	rts
 
-CheckRunScript:
+CheckRenderScript:
 	move.w	(Window_active_flag).w, d1
 	beq.w	loc_96EC		; if no window is open, branch
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	movea.l	(Text_buffer_pointer).w, a1
-CheckRunScript_Part2:
-	bsr.s	RunScript
+-
+	bsr.s	RenderScript
 	move.l	a1, (Text_buffer_pointer).w
-	tst.w	$FFFFCD20.w
-	bne.s	CheckRunScript_Part2
+	tst.w	(Text_render_type).w
+	bne.s	-
 	rts
 
-RunScript:
+RenderScript:
 	moveq	#0, d1
 	move.b	(a1), d1
 	cmpi.b	#$C1, d1
@@ -14432,7 +14432,7 @@ loc_95F4:
 loc_9608:
 	cmpi.b	#$C3, d1
 	bcs.s	DrawScriptToVDP
-	move.w	#0, $FFFFCD20.w
+	move.w	#0, (Text_render_type).w
 	rts
 
 DrawScriptToVDP:
@@ -23638,7 +23638,7 @@ WindowsIndexTable:
 Win_Null:
 	tst.w	(Window_active_flag).w
 	beq.s	+
-	bsr.w	loc_FB56
+	bsr.w	ScriptControlCodes
 +
 	bsr.w	CheckLoadScript
 	rts
@@ -24006,7 +24006,7 @@ loc_FB4E:
 	move.w	#0, (Window_index_saved).w
 	rts
 
-loc_FB56:
+ScriptControlCodes:
 	movea.l	(Text_buffer_pointer).w, a0
 	move.b	(a0)+, d0
 	cmpi.b	#$C3, d0
@@ -24060,7 +24060,7 @@ loc_FBE8:
 	beq.s	loc_FBFE
 	tst.w	(Opening_ending_flag).w
 	bne.s	loc_FBFE
-	move.w	#1, $FFFFCD20.w
+	move.w	#1, (Text_render_type).w
 loc_FBFE:
 	rts
 
