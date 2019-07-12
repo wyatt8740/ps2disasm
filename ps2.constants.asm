@@ -62,7 +62,7 @@ object_size = $40
 next_object = object_size
 
 obj_id = 0	; word
-render_flags = 2	; bitfield;
+render_flags = 2	; bitfield; bit 0 = if set, delete object
 mappings = 4	; longword
 art_tile = 8	; word
 x_pos = $A	; longword
@@ -90,7 +90,7 @@ anim_frame = $32	; word
 
 ; ---------------------------------------------------------------------------
 ; Properties and constants applicable to battle objects
-battle_status = 3	; bitfield;	bit 0 = attacking flag; bit 3 = display dead message flag; bit 4 = no damage flag; bit 5 = killed flag; bit 6 = hit flag; bit 7 = is-target flag
+battle_status = 3	; bitfield;	bit 0 = attacking flag; bit 1 = animaction for child objects, if set, use parent animation number + 1; bit 3 = display dead message flag; bit 4 = no damage flag; bit 5 = killed flag; bit 6 = hit flag; bit 7 = is-target flag
 saved_x_pos = $C	; word
 saved_y_pos = $10	; word
 battle_anim = $16	; word
@@ -108,6 +108,8 @@ child_attack_x_offset = $1C+object_size	; word
 child_anim_timer_start = $28+object_size	; word
 child_battle_target = $2C+object_size	; word
 child_enemy_group_start = $36+object_size	; word
+
+parent_battle_status = -(object_size-battle_status)
 ; ---------------------------------------------------------------------------
 
 
