@@ -38300,264 +38300,264 @@ AnimEnemyUseSkill:
 ; ===============================================================================
 AnimEnemyAttack:
 	dc.w	Anim_FireAntIdle-AnimEnemyAttack	; 0
-	dc.w	loc_26564-AnimEnemyAttack	; 1
-	dc.w	loc_26564-AnimEnemyAttack	; 2
-	dc.w	loc_26564-AnimEnemyAttack	; 3
+	dc.w	Anim_FireAntAttack-AnimEnemyAttack	; 1
+	dc.w	Anim_FireAntAttack-AnimEnemyAttack	; 2
+	dc.w	Anim_FireAntAttack-AnimEnemyAttack	; 3
 	dc.w	Anim_WaspyAct-AnimEnemyAttack	; 4
 	dc.w	Anim_WaspyAct-AnimEnemyAttack	; 5
 	dc.w	Anim_WaspyAct-AnimEnemyAttack	; 6
-	dc.w	loc_26598-AnimEnemyAttack	; 7
-	dc.w	loc_26598-AnimEnemyAttack	; 8
-	dc.w	loc_26598-AnimEnemyAttack	; 9
-	dc.w	loc_265C2-AnimEnemyAttack	; $A
-	dc.w	loc_265C2-AnimEnemyAttack	; $B
-	dc.w	loc_265C2-AnimEnemyAttack	; $C
-	dc.w	loc_265FA-AnimEnemyAttack	; $D
-	dc.w	loc_265FA-AnimEnemyAttack	; $E
-	dc.w	loc_265FA-AnimEnemyAttack	; $F
-	dc.w	loc_26634-AnimEnemyAttack	; $10
-	dc.w	loc_26634-AnimEnemyAttack	; $11
-	dc.w	loc_26634-AnimEnemyAttack	; $12
+	dc.w	Anim_SpinnerAttack-AnimEnemyAttack	; 7
+	dc.w	Anim_SpinnerAttack-AnimEnemyAttack	; 8
+	dc.w	Anim_SpinnerAttack-AnimEnemyAttack	; 9
+	dc.w	Anim_BeeAttack-AnimEnemyAttack	; $A
+	dc.w	Anim_BeeAttack-AnimEnemyAttack	; $B
+	dc.w	Anim_BeeAttack-AnimEnemyAttack	; $C
+	dc.w	Anim_PoisonerAttack-AnimEnemyAttack	; $D
+	dc.w	Anim_PoisonerAttack-AnimEnemyAttack	; $E
+	dc.w	Anim_PoisonerAttack-AnimEnemyAttack	; $F
+	dc.w	Anim_HitTailAttack-AnimEnemyAttack	; $10
+	dc.w	Anim_HitTailAttack-AnimEnemyAttack	; $11
+	dc.w	Anim_HitTailAttack-AnimEnemyAttack	; $12
 	dc.w	Anim_SquatUseSkill-AnimEnemyAttack	; $13
 	dc.w	Anim_SquatUseSkill-AnimEnemyAttack	; $14
 	dc.w	Anim_SquatUseSkill-AnimEnemyAttack	; $15
 	dc.w	Anim_HeadRotAct-AnimEnemyAttack	; $16
 	dc.w	Anim_HeadRotAct-AnimEnemyAttack	; $17
 	dc.w	Anim_HeadRotAct-AnimEnemyAttack	; $18
-	dc.w	loc_26756-AnimEnemyAttack	; $19
-	dc.w	loc_26756-AnimEnemyAttack	; $1A
-	dc.w	loc_26756-AnimEnemyAttack	; $1B
-	dc.w	loc_2679A-AnimEnemyAttack	; $1C
-	dc.w	loc_2679A-AnimEnemyAttack	; $1D
-	dc.w	loc_2679A-AnimEnemyAttack	; $1E
-	dc.w	loc_267D4-AnimEnemyAttack	; $1F
-	dc.w	loc_267D4-AnimEnemyAttack	; $20
-	dc.w	loc_267D4-AnimEnemyAttack	; $21
-	dc.w	loc_26814-AnimEnemyAttack	; $22
-	dc.w	loc_26814-AnimEnemyAttack	; $23
-	dc.w	loc_26814-AnimEnemyAttack	; $24
-	dc.w	loc_26848-AnimEnemyAttack	; $25
-	dc.w	loc_26848-AnimEnemyAttack	; $26
-	dc.w	loc_26848-AnimEnemyAttack	; $27
-	dc.w	loc_268A2-AnimEnemyAttack	; $28
-	dc.w	loc_268B0-AnimEnemyAttack	; $29
-	dc.w	loc_268CA-AnimEnemyAttack	; $2A
-	dc.w	loc_2691C-AnimEnemyAttack	; $2B
-	dc.w	loc_2691C-AnimEnemyAttack	; $2C
-	dc.w	loc_2691C-AnimEnemyAttack	; $2D
+	dc.w	Anim_WhistleAttack-AnimEnemyAttack	; $19
+	dc.w	Anim_WhistleAttack-AnimEnemyAttack	; $1A
+	dc.w	Anim_WhistleAttack-AnimEnemyAttack	; $1B
+	dc.w	Anim_LocustAttack-AnimEnemyAttack	; $1C
+	dc.w	Anim_LocustAttack-AnimEnemyAttack	; $1D
+	dc.w	Anim_LocustAttack-AnimEnemyAttack	; $1E
+	dc.w	Anim_AmoebaAttack-AnimEnemyAttack	; $1F
+	dc.w	Anim_AmoebaAttack-AnimEnemyAttack	; $20
+	dc.w	Anim_AmoebaAttack-AnimEnemyAttack	; $21
+	dc.w	Anim_PoleziAttack-AnimEnemyAttack	; $22
+	dc.w	Anim_PoleziAttack-AnimEnemyAttack	; $23
+	dc.w	Anim_PoleziAttack-AnimEnemyAttack	; $24
+	dc.w	Anim_LeecherAttack-AnimEnemyAttack	; $25
+	dc.w	Anim_LeecherAttack-AnimEnemyAttack	; $26
+	dc.w	Anim_LeecherAttack-AnimEnemyAttack	; $27
+	dc.w	Anim_Unused1Attack-AnimEnemyAttack	; $28
+	dc.w	Anim_Unused2Attack-AnimEnemyAttack	; $29
+	dc.w	Anim_Unused3Attack-AnimEnemyAttack	; $2A
+	dc.w	Anim_PulserAttack-AnimEnemyAttack	; $2B
+	dc.w	Anim_PulserAttack-AnimEnemyAttack	; $2C
+	dc.w	Anim_PulserAttack-AnimEnemyAttack	; $2D
 	dc.w	Anim_RotWoodAct-AnimEnemyAttack	; $2E
 	dc.w	Anim_RotWoodAct-AnimEnemyAttack	; $2F
 	dc.w	Anim_RotWoodAct-AnimEnemyAttack	; $30
-	dc.w	loc_26978-AnimEnemyAttack	; $31
-	dc.w	loc_26978-AnimEnemyAttack	; $32
-	dc.w	loc_26978-AnimEnemyAttack	; $33
-	dc.w	loc_269AE-AnimEnemyAttack	; $34
-	dc.w	loc_269AE-AnimEnemyAttack	; $35
-	dc.w	loc_269AE-AnimEnemyAttack	; $36
-	dc.w	loc_269FA-AnimEnemyAttack	; $37
-	dc.w	loc_26A02-AnimEnemyAttack	; $38
-	dc.w	loc_26A08-AnimEnemyAttack	; $39
-	dc.w	loc_26A14-AnimEnemyAttack	; $3A
-	dc.w	loc_26A14-AnimEnemyAttack	; $3B
-	dc.w	loc_26A14-AnimEnemyAttack	; $3C
-	dc.w	loc_26A4E-AnimEnemyAttack	; $3D
-	dc.w	loc_26A4E-AnimEnemyAttack	; $3E
-	dc.w	loc_26A4E-AnimEnemyAttack	; $3F
-	dc.w	loc_26A92-AnimEnemyAttack	; $40
-	dc.w	loc_26A92-AnimEnemyAttack	; $41
-	dc.w	loc_26A92-AnimEnemyAttack	; $42
+	dc.w	Anim_WolfangAttack-AnimEnemyAttack	; $31
+	dc.w	Anim_WolfangAttack-AnimEnemyAttack	; $32
+	dc.w	Anim_WolfangAttack-AnimEnemyAttack	; $33
+	dc.w	Anim_PugHitAttack-AnimEnemyAttack	; $34
+	dc.w	Anim_PugHitAttack-AnimEnemyAttack	; $35
+	dc.w	Anim_PugHitAttack-AnimEnemyAttack	; $36
+	dc.w	Anim_Unused4Attack-AnimEnemyAttack	; $37
+	dc.w	Anim_Unused5Attack-AnimEnemyAttack	; $38
+	dc.w	Anim_Unused6Attack-AnimEnemyAttack	; $39
+	dc.w	Anim_WirefaceAttack-AnimEnemyAttack	; $3A
+	dc.w	Anim_WirefaceAttack-AnimEnemyAttack	; $3B
+	dc.w	Anim_WirefaceAttack-AnimEnemyAttack	; $3C
+	dc.w	Anim_TerakiteAttack-AnimEnemyAttack	; $3D
+	dc.w	Anim_TerakiteAttack-AnimEnemyAttack	; $3E
+	dc.w	Anim_TerakiteAttack-AnimEnemyAttack	; $3F
+	dc.w	Anim_FireEyeAttack-AnimEnemyAttack	; $40
+	dc.w	Anim_FireEyeAttack-AnimEnemyAttack	; $41
+	dc.w	Anim_FireEyeAttack-AnimEnemyAttack	; $42
 	dc.w	Anim_CatmanAct-AnimEnemyAttack	; $43
 	dc.w	Anim_CatmanAct-AnimEnemyAttack	; $44
 	dc.w	Anim_CatmanAct-AnimEnemyAttack	; $45
-	dc.w	loc_26AF6-AnimEnemyAttack	; $46
-	dc.w	loc_26AF6-AnimEnemyAttack	; $47
-	dc.w	loc_26AF6-AnimEnemyAttack	; $48
-	dc.w	loc_26B2A-AnimEnemyAttack	; $49
-	dc.w	loc_26B2A-AnimEnemyAttack	; $4A
-	dc.w	loc_26B2A-AnimEnemyAttack	; $4B
-	dc.w	loc_26B80-AnimEnemyAttack	; $4C
-	dc.w	loc_26B80-AnimEnemyAttack	; $4D
-	dc.w	loc_26B80-AnimEnemyAttack	; $4E
-	dc.w	loc_26BC0-AnimEnemyAttack	; $4F
-	dc.w	loc_26BC0-AnimEnemyAttack	; $50
-	dc.w	loc_26BC0-AnimEnemyAttack	; $51
-	dc.w	loc_26BF0-AnimEnemyAttack	; $52
-	dc.w	loc_26BF0-AnimEnemyAttack	; $53
-	dc.w	loc_26BF0-AnimEnemyAttack	; $54
-	dc.w	loc_26C4A-AnimEnemyAttack	; $55
-	dc.w	loc_26C4A-AnimEnemyAttack	; $56
-	dc.w	loc_26C4A-AnimEnemyAttack	; $57
-	dc.w	loc_26CA2-AnimEnemyAttack	; $58
-	dc.w	loc_26CA2-AnimEnemyAttack	; $59
-	dc.w	loc_26CA2-AnimEnemyAttack	; $5A
+	dc.w	Anim_MechomanAttack-AnimEnemyAttack	; $46
+	dc.w	Anim_MechomanAttack-AnimEnemyAttack	; $47
+	dc.w	Anim_MechomanAttack-AnimEnemyAttack	; $48
+	dc.w	Anim_MazgammaAttack-AnimEnemyAttack	; $49
+	dc.w	Anim_MazgammaAttack-AnimEnemyAttack	; $4A
+	dc.w	Anim_MazgammaAttack-AnimEnemyAttack	; $4B
+	dc.w	Anim_MetalmanAttack-AnimEnemyAttack	; $4C
+	dc.w	Anim_MetalmanAttack-AnimEnemyAttack	; $4D
+	dc.w	Anim_MetalmanAttack-AnimEnemyAttack	; $4E
+	dc.w	Anim_Cooley61Attack-AnimEnemyAttack	; $4F
+	dc.w	Anim_Cooley61Attack-AnimEnemyAttack	; $50
+	dc.w	Anim_Cooley61Attack-AnimEnemyAttack	; $51
+	dc.w	Anim_EyesoreAttack-AnimEnemyAttack	; $52
+	dc.w	Anim_EyesoreAttack-AnimEnemyAttack	; $53
+	dc.w	Anim_EyesoreAttack-AnimEnemyAttack	; $54
+	dc.w	Anim_ArmyEyeAttack-AnimEnemyAttack	; $55
+	dc.w	Anim_ArmyEyeAttack-AnimEnemyAttack	; $56
+	dc.w	Anim_ArmyEyeAttack-AnimEnemyAttack	; $57
+	dc.w	Anim_VanAttack-AnimEnemyAttack	; $58
+	dc.w	Anim_VanAttack-AnimEnemyAttack	; $59
+	dc.w	Anim_VanAttack-AnimEnemyAttack	; $5A
 	dc.w	Anim_OrangahUseSkill-AnimEnemyAttack	; $5B
 	dc.w	Anim_OrangahUseSkill-AnimEnemyAttack	; $5C
 	dc.w	Anim_OrangahUseSkill-AnimEnemyAttack	; $5D
 	dc.w	Anim_MastodonAct-AnimEnemyAttack	; $5E
 	dc.w	Anim_MastodonAct-AnimEnemyAttack	; $5F
 	dc.w	Anim_MastodonAct-AnimEnemyAttack	; $60
-	dc.w	loc_26D6E-AnimEnemyAttack	; $61
-	dc.w	loc_26D6E-AnimEnemyAttack	; $62
-	dc.w	loc_26D6E-AnimEnemyAttack	; $63
-	dc.w	loc_26DAA-AnimEnemyAttack	; $64
-	dc.w	loc_26DAA-AnimEnemyAttack	; $65
-	dc.w	loc_26DAA-AnimEnemyAttack	; $66
-	dc.w	loc_26DDA-AnimEnemyAttack	; $67
-	dc.w	loc_26DDA-AnimEnemyAttack	; $68
-	dc.w	loc_26DDA-AnimEnemyAttack	; $69
-	dc.w	loc_26E08-AnimEnemyAttack	; $6A
-	dc.w	loc_26E08-AnimEnemyAttack	; $6B
-	dc.w	loc_26E08-AnimEnemyAttack	; $6C
-	dc.w	loc_26E50-AnimEnemyAttack	; $6D
-	dc.w	loc_26E50-AnimEnemyAttack	; $6E
-	dc.w	loc_26E50-AnimEnemyAttack	; $6F
-	dc.w	loc_26E78-AnimEnemyAttack	; $70
-	dc.w	loc_26E78-AnimEnemyAttack	; $71
-	dc.w	loc_26E78-AnimEnemyAttack	; $72
-	dc.w	loc_26EA0-AnimEnemyAttack	; $73
-	dc.w	loc_26EA0-AnimEnemyAttack	; $74
-	dc.w	loc_26EA0-AnimEnemyAttack	; $75
-	dc.w	loc_26EF0-AnimEnemyAttack	; $76
-	dc.w	loc_26EF0-AnimEnemyAttack	; $77
-	dc.w	loc_26EF0-AnimEnemyAttack	; $78
-	dc.w	loc_26F4A-AnimEnemyAttack	; $79
-	dc.w	loc_26F4A-AnimEnemyAttack	; $7A
-	dc.w	loc_26F4A-AnimEnemyAttack	; $7B
-	dc.w	loc_26FB6-AnimEnemyAttack	; $7C
-	dc.w	loc_27010-AnimEnemyAttack	; $7D
-	dc.w	loc_270C2-AnimEnemyAttack	; $7E
+	dc.w	Anim_DezoOwlAttack-AnimEnemyAttack	; $61
+	dc.w	Anim_DezoOwlAttack-AnimEnemyAttack	; $62
+	dc.w	Anim_DezoOwlAttack-AnimEnemyAttack	; $63
+	dc.w	Anim_RabbitAttack-AnimEnemyAttack	; $64
+	dc.w	Anim_RabbitAttack-AnimEnemyAttack	; $65
+	dc.w	Anim_RabbitAttack-AnimEnemyAttack	; $66
+	dc.w	Anim_WrestlerAttack-AnimEnemyAttack	; $67
+	dc.w	Anim_WrestlerAttack-AnimEnemyAttack	; $68
+	dc.w	Anim_WrestlerAttack-AnimEnemyAttack	; $69
+	dc.w	Anim_LungAttack-AnimEnemyAttack	; $6A
+	dc.w	Anim_LungAttack-AnimEnemyAttack	; $6B
+	dc.w	Anim_LungAttack-AnimEnemyAttack	; $6C
+	dc.w	Anim_DarksideAttack-AnimEnemyAttack	; $6D
+	dc.w	Anim_DarksideAttack-AnimEnemyAttack	; $6E
+	dc.w	Anim_DarksideAttack-AnimEnemyAttack	; $6F
+	dc.w	Anim_MystcapeAttack-AnimEnemyAttack	; $70
+	dc.w	Anim_MystcapeAttack-AnimEnemyAttack	; $71
+	dc.w	Anim_MystcapeAttack-AnimEnemyAttack	; $72
+	dc.w	Anim_ArchDrgnAttack-AnimEnemyAttack	; $73
+	dc.w	Anim_ArchDrgnAttack-AnimEnemyAttack	; $74
+	dc.w	Anim_ArchDrgnAttack-AnimEnemyAttack	; $75
+	dc.w	Anim_FirefallAttack-AnimEnemyAttack	; $76
+	dc.w	Anim_FirefallAttack-AnimEnemyAttack	; $77
+	dc.w	Anim_FirefallAttack-AnimEnemyAttack	; $78
+	dc.w	Anim_WizardAttack-AnimEnemyAttack	; $79
+	dc.w	Anim_WizardAttack-AnimEnemyAttack	; $7A
+	dc.w	Anim_WizardAttack-AnimEnemyAttack	; $7B
+	dc.w	Anim_NeifirstAttack-AnimEnemyAttack	; $7C
+	dc.w	Anim_DarkForceAttack-AnimEnemyAttack	; $7D
+	dc.w	Anim_MombrainAttack-AnimEnemyAttack	; $7E
 	dc.w	loc_27048-AnimEnemyAttack	; $7F
 ; ==========================================================================
 
 ; ==========================================================================
 AnimEnemySkill:
 	dc.w	Anim_FireAntIdle-AnimEnemySkill	; 0
-	dc.w	loc_26564-AnimEnemySkill	; 1
-	dc.w	loc_26564-AnimEnemySkill	; 2
-	dc.w	loc_26564-AnimEnemySkill	; 3
+	dc.w	Anim_FireAntAttack-AnimEnemySkill	; 1
+	dc.w	Anim_FireAntAttack-AnimEnemySkill	; 2
+	dc.w	Anim_FireAntAttack-AnimEnemySkill	; 3
 	dc.w	Anim_WaspyAct-AnimEnemySkill	; 4
 	dc.w	Anim_WaspyAct-AnimEnemySkill	; 5
 	dc.w	Anim_WaspyAct-AnimEnemySkill	; 6
-	dc.w	loc_26598-AnimEnemySkill	; 7
-	dc.w	loc_26598-AnimEnemySkill	; 8
-	dc.w	loc_26598-AnimEnemySkill	; 9
-	dc.w	loc_265C2-AnimEnemySkill	; $A
-	dc.w	loc_265C2-AnimEnemySkill	; $B
-	dc.w	loc_265C2-AnimEnemySkill	; $C
-	dc.w	loc_265FA-AnimEnemySkill	; $D
-	dc.w	loc_265FA-AnimEnemySkill	; $E
-	dc.w	loc_265FA-AnimEnemySkill	; $F
-	dc.w	loc_26634-AnimEnemySkill	; $10
-	dc.w	loc_26634-AnimEnemySkill	; $11
-	dc.w	loc_26634-AnimEnemySkill	; $12
+	dc.w	Anim_SpinnerAttack-AnimEnemySkill	; 7
+	dc.w	Anim_SpinnerAttack-AnimEnemySkill	; 8
+	dc.w	Anim_SpinnerAttack-AnimEnemySkill	; 9
+	dc.w	Anim_BeeAttack-AnimEnemySkill	; $A
+	dc.w	Anim_BeeAttack-AnimEnemySkill	; $B
+	dc.w	Anim_BeeAttack-AnimEnemySkill	; $C
+	dc.w	Anim_PoisonerAttack-AnimEnemySkill	; $D
+	dc.w	Anim_PoisonerAttack-AnimEnemySkill	; $E
+	dc.w	Anim_PoisonerAttack-AnimEnemySkill	; $F
+	dc.w	Anim_HitTailAttack-AnimEnemySkill	; $10
+	dc.w	Anim_HitTailAttack-AnimEnemySkill	; $11
+	dc.w	Anim_HitTailAttack-AnimEnemySkill	; $12
 	dc.w	Anim_SquatUseSkill-AnimEnemySkill	; $13
 	dc.w	Anim_SquatUseSkill-AnimEnemySkill	; $14
 	dc.w	Anim_SquatUseSkill-AnimEnemySkill	; $15
 	dc.w	Anim_HeadRotAct-AnimEnemySkill	; $16
 	dc.w	Anim_HeadRotAct-AnimEnemySkill	; $17
 	dc.w	Anim_HeadRotAct-AnimEnemySkill	; $18
-	dc.w	loc_26762-AnimEnemySkill	; $19
-	dc.w	loc_26762-AnimEnemySkill	; $1A
-	dc.w	loc_26762-AnimEnemySkill	; $1B
-	dc.w	loc_267A6-AnimEnemySkill	; $1C
-	dc.w	loc_267A6-AnimEnemySkill	; $1D
-	dc.w	loc_267A6-AnimEnemySkill	; $1E
-	dc.w	loc_267D4-AnimEnemySkill	; $1F
-	dc.w	loc_267D4-AnimEnemySkill	; $20
-	dc.w	loc_267DE-AnimEnemySkill	; $21
-	dc.w	loc_267E8-AnimEnemySkill	; $22
-	dc.w	loc_26814-AnimEnemySkill	; $23
-	dc.w	loc_26814-AnimEnemySkill	; $24
-	dc.w	loc_26852-AnimEnemySkill	; $25
-	dc.w	loc_26852-AnimEnemySkill	; $26
-	dc.w	loc_26852-AnimEnemySkill	; $27
-	dc.w	loc_268D8-AnimEnemySkill	; $28
-	dc.w	loc_268DC-AnimEnemySkill	; $29
-	dc.w	loc_268DC-AnimEnemySkill	; $2A
-	dc.w	loc_26928-AnimEnemySkill	; $2B
-	dc.w	loc_26928-AnimEnemySkill	; $2C
-	dc.w	loc_26934-AnimEnemySkill	; $2D
-	dc.w	loc_26938-AnimEnemySkill	; $2E
+	dc.w	Anim_WhistleSkill-AnimEnemySkill	; $19
+	dc.w	Anim_WhistleSkill-AnimEnemySkill	; $1A
+	dc.w	Anim_WhistleSkill-AnimEnemySkill	; $1B
+	dc.w	Anim_LocustSkill-AnimEnemySkill	; $1C
+	dc.w	Anim_LocustSkill-AnimEnemySkill	; $1D
+	dc.w	Anim_LocustSkill-AnimEnemySkill	; $1E
+	dc.w	Anim_AmoebaAttack-AnimEnemySkill	; $1F
+	dc.w	Anim_AmoebaAttack-AnimEnemySkill	; $20
+	dc.w	Anim_SlugmessSkill-AnimEnemySkill	; $21
+	dc.w	Anim_PoleziSkill-AnimEnemySkill	; $22
+	dc.w	Anim_PoleziAttack-AnimEnemySkill	; $23
+	dc.w	Anim_PoleziAttack-AnimEnemySkill	; $24
+	dc.w	Anim_LeecherSkill-AnimEnemySkill	; $25
+	dc.w	Anim_LeecherSkill-AnimEnemySkill	; $26
+	dc.w	Anim_LeecherSkill-AnimEnemySkill	; $27
+	dc.w	Anim_Unused1Skill-AnimEnemySkill	; $28
+	dc.w	Anim_Unused2Skill-AnimEnemySkill	; $29
+	dc.w	Anim_Unused2Skill-AnimEnemySkill	; $2A
+	dc.w	Anim_PulserSkill-AnimEnemySkill	; $2B
+	dc.w	Anim_PulserSkill-AnimEnemySkill	; $2C
+	dc.w	Anim_BlastoidSkill-AnimEnemySkill	; $2D
+	dc.w	Anim_BlastoidSkill2-AnimEnemySkill	; $2E
 	dc.w	Anim_RotWoodAct-AnimEnemySkill	; $2F
 	dc.w	Anim_RotWoodAct-AnimEnemySkill	; $30
-	dc.w	loc_2697E-AnimEnemySkill	; $31
-	dc.w	loc_2697E-AnimEnemySkill	; $32
-	dc.w	loc_2697E-AnimEnemySkill	; $33
-	dc.w	loc_269C2-AnimEnemySkill	; $34
-	dc.w	loc_269C2-AnimEnemySkill	; $35
-	dc.w	loc_269C2-AnimEnemySkill	; $36
-	dc.w	loc_26A08-AnimEnemySkill	; $37
-	dc.w	loc_26A08-AnimEnemySkill	; $38
-	dc.w	loc_26A08-AnimEnemySkill	; $39
-	dc.w	loc_26A14-AnimEnemySkill	; $3A
-	dc.w	loc_26A14-AnimEnemySkill	; $3B
-	dc.w	loc_26A14-AnimEnemySkill	; $3C
-	dc.w	loc_26A5C-AnimEnemySkill	; $3D
-	dc.w	loc_26A5C-AnimEnemySkill	; $3E
-	dc.w	loc_26A5C-AnimEnemySkill	; $3F
-	dc.w	loc_26AA0-AnimEnemySkill	; $40
-	dc.w	loc_26AA0-AnimEnemySkill	; $41
-	dc.w	loc_26AA0-AnimEnemySkill	; $42
+	dc.w	Anim_WolfangSkill-AnimEnemySkill	; $31
+	dc.w	Anim_WolfangSkill-AnimEnemySkill	; $32
+	dc.w	Anim_WolfangSkill-AnimEnemySkill	; $33
+	dc.w	Anim_PugHitSkill-AnimEnemySkill	; $34
+	dc.w	Anim_PugHitSkill-AnimEnemySkill	; $35
+	dc.w	Anim_PugHitSkill-AnimEnemySkill	; $36
+	dc.w	Anim_Unused6Attack-AnimEnemySkill	; $37
+	dc.w	Anim_Unused6Attack-AnimEnemySkill	; $38
+	dc.w	Anim_Unused6Attack-AnimEnemySkill	; $39
+	dc.w	Anim_WirefaceAttack-AnimEnemySkill	; $3A
+	dc.w	Anim_WirefaceAttack-AnimEnemySkill	; $3B
+	dc.w	Anim_WirefaceAttack-AnimEnemySkill	; $3C
+	dc.w	Anim_TerakiteSkill-AnimEnemySkill	; $3D
+	dc.w	Anim_TerakiteSkill-AnimEnemySkill	; $3E
+	dc.w	Anim_TerakiteSkill-AnimEnemySkill	; $3F
+	dc.w	Anim_FireEyeSkill-AnimEnemySkill	; $40
+	dc.w	Anim_FireEyeSkill-AnimEnemySkill	; $41
+	dc.w	Anim_FireEyeSkill-AnimEnemySkill	; $42
 	dc.w	Anim_CatmanAct-AnimEnemySkill	; $43
 	dc.w	Anim_CatmanAct-AnimEnemySkill	; $44
 	dc.w	Anim_CatmanAct-AnimEnemySkill	; $45
-	dc.w	loc_26B0A-AnimEnemySkill	; $46
-	dc.w	loc_26B0A-AnimEnemySkill	; $47
-	dc.w	loc_26B0A-AnimEnemySkill	; $48
-	dc.w	loc_26B2A-AnimEnemySkill	; $49
-	dc.w	loc_26B2A-AnimEnemySkill	; $4A
-	dc.w	loc_26B2A-AnimEnemySkill	; $4B
-	dc.w	loc_26B9A-AnimEnemySkill	; $4C
-	dc.w	loc_26B9A-AnimEnemySkill	; $4D
-	dc.w	loc_26B9A-AnimEnemySkill	; $4E
-	dc.w	loc_26BC0-AnimEnemySkill	; $4F
-	dc.w	loc_26BC0-AnimEnemySkill	; $50
-	dc.w	loc_26BC0-AnimEnemySkill	; $51
-	dc.w	loc_26C00-AnimEnemySkill	; $52
-	dc.w	loc_26C0C-AnimEnemySkill	; $53
-	dc.w	loc_26C0C-AnimEnemySkill	; $54
-	dc.w	loc_26C54-AnimEnemySkill	; $55
-	dc.w	loc_26C6A-AnimEnemySkill	; $56
-	dc.w	loc_26C6A-AnimEnemySkill	; $57
-	dc.w	loc_26CC4-AnimEnemySkill	; $58
-	dc.w	loc_26CC4-AnimEnemySkill	; $59
-	dc.w	loc_26CC4-AnimEnemySkill	; $5A
+	dc.w	Anim_MechomanSkill-AnimEnemySkill	; $46
+	dc.w	Anim_MechomanSkill-AnimEnemySkill	; $47
+	dc.w	Anim_MechomanSkill-AnimEnemySkill	; $48
+	dc.w	Anim_MazgammaAttack-AnimEnemySkill	; $49
+	dc.w	Anim_MazgammaAttack-AnimEnemySkill	; $4A
+	dc.w	Anim_MazgammaAttack-AnimEnemySkill	; $4B
+	dc.w	Anim_MetalmanSkill-AnimEnemySkill	; $4C
+	dc.w	Anim_MetalmanSkill-AnimEnemySkill	; $4D
+	dc.w	Anim_MetalmanSkill-AnimEnemySkill	; $4E
+	dc.w	Anim_Cooley61Attack-AnimEnemySkill	; $4F
+	dc.w	Anim_Cooley61Attack-AnimEnemySkill	; $50
+	dc.w	Anim_Cooley61Attack-AnimEnemySkill	; $51
+	dc.w	Anim_EyesoreSkill-AnimEnemySkill	; $52
+	dc.w	Anim_HvysolidSkill-AnimEnemySkill	; $53
+	dc.w	Anim_HvysolidSkill-AnimEnemySkill	; $54
+	dc.w	Anim_ArmyEyeSkill-AnimEnemySkill	; $55
+	dc.w	Anim_TrcrbaseSkill-AnimEnemySkill	; $56
+	dc.w	Anim_TrcrbaseSkill-AnimEnemySkill	; $57
+	dc.w	Anim_VanSkill-AnimEnemySkill	; $58
+	dc.w	Anim_VanSkill-AnimEnemySkill	; $59
+	dc.w	Anim_VanSkill-AnimEnemySkill	; $5A
 	dc.w	Anim_OrangahUseSkill-AnimEnemySkill	; $5B
 	dc.w	Anim_OrangahUseSkill-AnimEnemySkill	; $5C
 	dc.w	Anim_OrangahUseSkill-AnimEnemySkill	; $5D
 	dc.w	Anim_MastodonAct-AnimEnemySkill	; $5E
 	dc.w	Anim_MastodonAct-AnimEnemySkill	; $5F
 	dc.w	Anim_MastodonAct-AnimEnemySkill	; $60
-	dc.w	loc_26D6E-AnimEnemySkill	; $61
-	dc.w	loc_26D6E-AnimEnemySkill	; $62
-	dc.w	loc_26D6E-AnimEnemySkill	; $63
-	dc.w	loc_26DAA-AnimEnemySkill	; $64
-	dc.w	loc_26DAA-AnimEnemySkill	; $65
-	dc.w	loc_26DAA-AnimEnemySkill	; $66
-	dc.w	loc_26DDA-AnimEnemySkill	; $67
-	dc.w	loc_26DDA-AnimEnemySkill	; $68
-	dc.w	loc_26DDA-AnimEnemySkill	; $69
-	dc.w	loc_26E08-AnimEnemySkill	; $6A
-	dc.w	loc_26E08-AnimEnemySkill	; $6B
-	dc.w	loc_26E08-AnimEnemySkill	; $6C
-	dc.w	loc_26E50-AnimEnemySkill	; $6D
-	dc.w	loc_26E50-AnimEnemySkill	; $6E
-	dc.w	loc_26E50-AnimEnemySkill	; $6F
-	dc.w	loc_26E78-AnimEnemySkill	; $70
-	dc.w	loc_26E78-AnimEnemySkill	; $71
-	dc.w	loc_26E78-AnimEnemySkill	; $72
-	dc.w	loc_26EA0-AnimEnemySkill	; $73
-	dc.w	loc_26EA0-AnimEnemySkill	; $74
-	dc.w	loc_26EA0-AnimEnemySkill	; $75
-	dc.w	loc_26EF8-AnimEnemySkill	; $76
-	dc.w	loc_26EF8-AnimEnemySkill	; $77
-	dc.w	loc_26EF8-AnimEnemySkill	; $78
-	dc.w	loc_26F54-AnimEnemySkill	; $79
-	dc.w	loc_26F54-AnimEnemySkill	; $7A
-	dc.w	loc_26F54-AnimEnemySkill	; $7B
-	dc.w	loc_26FBE-AnimEnemySkill	; $7C
-	dc.w	loc_2704E-AnimEnemySkill	; $7D
-	dc.w	loc_270E8-AnimEnemySkill	; $7E
+	dc.w	Anim_DezoOwlAttack-AnimEnemySkill	; $61
+	dc.w	Anim_DezoOwlAttack-AnimEnemySkill	; $62
+	dc.w	Anim_DezoOwlAttack-AnimEnemySkill	; $63
+	dc.w	Anim_RabbitAttack-AnimEnemySkill	; $64
+	dc.w	Anim_RabbitAttack-AnimEnemySkill	; $65
+	dc.w	Anim_RabbitAttack-AnimEnemySkill	; $66
+	dc.w	Anim_WrestlerAttack-AnimEnemySkill	; $67
+	dc.w	Anim_WrestlerAttack-AnimEnemySkill	; $68
+	dc.w	Anim_WrestlerAttack-AnimEnemySkill	; $69
+	dc.w	Anim_LungAttack-AnimEnemySkill	; $6A
+	dc.w	Anim_LungAttack-AnimEnemySkill	; $6B
+	dc.w	Anim_LungAttack-AnimEnemySkill	; $6C
+	dc.w	Anim_DarksideAttack-AnimEnemySkill	; $6D
+	dc.w	Anim_DarksideAttack-AnimEnemySkill	; $6E
+	dc.w	Anim_DarksideAttack-AnimEnemySkill	; $6F
+	dc.w	Anim_MystcapeAttack-AnimEnemySkill	; $70
+	dc.w	Anim_MystcapeAttack-AnimEnemySkill	; $71
+	dc.w	Anim_MystcapeAttack-AnimEnemySkill	; $72
+	dc.w	Anim_ArchDrgnAttack-AnimEnemySkill	; $73
+	dc.w	Anim_ArchDrgnAttack-AnimEnemySkill	; $74
+	dc.w	Anim_ArchDrgnAttack-AnimEnemySkill	; $75
+	dc.w	Anim_FirefallSkill-AnimEnemySkill	; $76
+	dc.w	Anim_FirefallSkill-AnimEnemySkill	; $77
+	dc.w	Anim_FirefallSkill-AnimEnemySkill	; $78
+	dc.w	Anim_WizardSkill-AnimEnemySkill	; $79
+	dc.w	Anim_WizardSkill-AnimEnemySkill	; $7A
+	dc.w	Anim_WizardSkill-AnimEnemySkill	; $7B
+	dc.w	Anim_NeifirstSkill-AnimEnemySkill	; $7C
+	dc.w	Anim_DarkFrceSkill-AnimEnemySkill	; $7D
+	dc.w	Anim_MombrainSkill-AnimEnemySkill	; $7E
 	dc.w	loc_27084-AnimEnemySkill	; $7F
 	dc.w	loc_270AA-AnimEnemySkill	; $80
 	dc.w	loc_26AA8-AnimEnemySkill	; $81
@@ -38651,7 +38651,7 @@ Anim_FireAntUseSkill:
 
 	even
 
-loc_26564:
+Anim_FireAntAttack:
 	dc.b	$0F
 	dc.b	$10
 	dc.b	$11
@@ -38721,7 +38721,7 @@ Anim_SpinnerUseSkill:
 
 	even
 
-loc_26598:
+Anim_SpinnerAttack:
 	dc.b	$0B, $0B
 	dc.b	$0C, $0C
 	dc.b	$0D
@@ -38767,7 +38767,7 @@ Anim_BeeAct:
 
 	even
 
-loc_265C2:
+Anim_BeeAttack:
 	dc.b	$07
 	dc.b	$08
 	dc.b	$09
@@ -38833,7 +38833,7 @@ Anim_PoisonerUseSkill:
 
 	even
 
-loc_265FA:
+Anim_PoisonerAttack:
 	dc.b	$0A
 	dc.b	$0B
 	dc.b	$0C
@@ -38904,7 +38904,7 @@ Anim_HitTailUseSkill:
 
 	even
 
-loc_26634:
+Anim_HitTailAttack:
 	dc.b	$11
 	dc.b	$12
 	dc.b	$13
@@ -39175,7 +39175,7 @@ Anim_WhistleUseSkill:
 	dc.b	$0D
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26756:
+Anim_WhistleAttack:
 	dc.b	$12
 	dc.b	$13
 	dc.b	$14
@@ -39189,7 +39189,7 @@ loc_26756:
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26762:
+Anim_WhistleSkill:
 	dc.b	$1C
 	dc.b	$1D
 	dc.b	$1E
@@ -39241,7 +39241,7 @@ Anim_LocustUseSkill:
 	dc.b	$09, $09, $09
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_2679A:
+Anim_LocustAttack:
 	dc.b	$0B
 	dc.b	$0C
 	dc.b	$0D
@@ -39255,7 +39255,7 @@ loc_2679A:
 	dc.b	$14
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_267A6:
+Anim_LocustSkill:
 	dc.b	$0B
 	dc.b	$0C
 	dc.b	$0D
@@ -39311,7 +39311,7 @@ Anim_AmoebaUseSkill:
 	dc.b	$01
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_267D4:
+Anim_AmoebaAttack:
 	dc.b	$00, $00
 	dc.b	$09
 	dc.b	$0A
@@ -39322,7 +39322,7 @@ loc_267D4:
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_267DE:
+Anim_SlugmessSkill:
 	dc.b	$00, $00
 	dc.b	$0F
 	dc.b	$10
@@ -39335,7 +39335,7 @@ loc_267DE:
 
 	even
 
-loc_267E8:
+Anim_PoleziSkill:
 	dc.b	$00, $00
 	dc.b	$13
 	dc.b	$14
@@ -39388,7 +39388,7 @@ Anim_PoleziaxUseSkill:
 
 	even
 
-loc_26814:
+Anim_PoleziAttack:
 	dc.b	$0D
 	dc.b	$0E
 	dc.b	$0F
@@ -39452,7 +39452,7 @@ Anim_LeecherUseSkill:
 
 	even
 
-loc_26848:
+Anim_LeecherAttack:
 	dc.b	$00, $00
 	dc.b	$19, $19, $19, $19, $19
 	dc.b	$FD
@@ -39461,7 +39461,7 @@ loc_26848:
 
 	even
 
-loc_26852:
+Anim_LeecherSkill:
 	dc.b	$00, $00
 	dc.b	$1A, $1A, $1A, $1A
 	dc.b	$1B, $1B, $1B, $1B
@@ -39554,7 +39554,7 @@ Anim_Unused3Act:
 	dc.b	$08
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_268A2:
+Anim_Unused1Attack:
 	dc.b	$15, $15
 	dc.b	$16, $16
 	dc.b	$19, $19, $19, $19
@@ -39567,7 +39567,7 @@ loc_268A2:
 
 	even
 
-loc_268B0:
+Anim_Unused2Attack:
 	dc.b	$15, $15
 	dc.b	$16, $16
 	dc.b	$1A, $1A
@@ -39587,7 +39587,7 @@ loc_268B0:
 	dc.b	$16
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_268CA:
+Anim_Unused3Attack:
 	dc.b	$15, $15
 	dc.b	$16, $16
 	dc.b	$19
@@ -39596,13 +39596,13 @@ loc_268CA:
 	dc.b	$1A, $1A, $1A, $1A, $1A, $1A
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_268D8:
+Anim_Unused1Skill:
 	dc.b	$1A
 	dc.b	$1B
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_268DC:
+Anim_Unused2Skill:
 	dc.b	$1A
 	dc.b	$1B
 	dc.b	$F8
@@ -39675,7 +39675,7 @@ Anim_BlastoidUseSkill:
 
 	even
 
-loc_2691C:
+Anim_PulserAttack:
 	dc.b	$09
 	dc.b	$0A
 	dc.b	$0B
@@ -39689,7 +39689,7 @@ loc_2691C:
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26928:
+Anim_PulserSkill:
 	dc.b	$11
 	dc.b	$12
 	dc.b	$13
@@ -39705,13 +39705,13 @@ loc_26928:
 
 	even
 
-loc_26934:
+Anim_BlastoidSkill:
 	dc.b	$00
 	dc.b	$1A
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26938:
+Anim_BlastoidSkill2:
 	dc.b	$00
 	dc.b	$1B
 	dc.b	$FD
@@ -39788,7 +39788,7 @@ Anim_WolfangUseSkill:
 
 	even
 
-loc_26978:
+Anim_WolfangAttack:
 	dc.b	$08
 	dc.b	$09
 	dc.b	$0A
@@ -39798,7 +39798,7 @@ loc_26978:
 
 	even
 
-loc_2697E:
+Anim_WolfangSkill:
 	dc.b	$08
 	dc.b	$09
 	dc.b	$0A
@@ -39846,7 +39846,7 @@ Anim_PugHitUseSkill:
 
 	even
 
-loc_269AE:
+Anim_PugHitAttack:
 	dc.b	$00, $00
 	dc.b	$0E
 	dc.b	$0F
@@ -39863,7 +39863,7 @@ loc_269AE:
 
 	even
 
-loc_269C2:
+Anim_PugHitSkill:
 	dc.b	$00, $00
 	dc.b	$0E, $0E
 	dc.b	$06
@@ -39923,7 +39923,7 @@ Anim_Unused4UseSkill:
 
 	even
 
-loc_269FA:
+Anim_Unused4Attack:
 	dc.b	$06
 	dc.b	$07
 	dc.b	$08
@@ -39933,7 +39933,7 @@ loc_269FA:
 	dc.b	$06
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26A02:
+Anim_Unused5Attack:
 	dc.b	$09
 	dc.b	$0A
 	dc.b	$0B
@@ -39941,7 +39941,7 @@ loc_26A02:
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26A08:
+Anim_Unused6Attack:
 	dc.b	$0D
 	dc.b	$0E
 	dc.b	$0F
@@ -39961,7 +39961,7 @@ Anim_WirefaceAct:
 	dc.b	$F0
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26A14:
+Anim_WirefaceAttack:
 	dc.b	$03
 	dc.b	$04
 	dc.b	$05
@@ -40016,7 +40016,7 @@ Anim_TerakiteUseSkill:
 	dc.b	$04
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26A4E:
+Anim_TerakiteAttack:
 	dc.b	$05
 	dc.b	$06
 	dc.b	$07
@@ -40034,7 +40034,7 @@ loc_26A4E:
 
 	even
 
-loc_26A5C:
+Anim_TerakiteSkill:
 	dc.b	$0A
 	dc.b	$0B
 	dc.b	$0C
@@ -40080,7 +40080,7 @@ Anim_FireEyeUseSkill:
 
 	even
 
-loc_26A92:
+Anim_FireEyeAttack:
 	dc.b	$11, $11
 	dc.b	$12, $12
 	dc.b	$13
@@ -40096,7 +40096,7 @@ loc_26A92:
 
 	even
 
-loc_26AA0:
+Anim_FireEyeSkill:
 	dc.b	$04
 	dc.b	$05
 	dc.b	$06
@@ -40174,7 +40174,7 @@ Anim_MechomanAct:
 	dc.b	$03
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26AF6:
+Anim_MechomanAttack:
 	dc.b	$10
 	dc.b	$11
 	dc.b	$12
@@ -40193,7 +40193,7 @@ loc_26AF6:
 	dc.b	$FB
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26B0A:
+Anim_MechomanSkill:
 	dc.b	$1B
 	dc.b	$1C
 	dc.b	$1D
@@ -40225,7 +40225,7 @@ Anim_MazgammaAct:
 
 	even
 
-loc_26B2A:
+Anim_MazgammaAttack:
 	dc.b	$06
 	dc.b	$07
 	dc.b	$08
@@ -40296,7 +40296,7 @@ Anim_MetalmanUseSkill:
 	dc.b	$07, $07, $07
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26B80:
+Anim_MetalmanAttack:
 	dc.b	$0D
 	dc.b	$0E
 	dc.b	$0F
@@ -40320,7 +40320,7 @@ loc_26B80:
 	dc.b	$00, $00, $00, $00, $00
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26B9A:
+Anim_MetalmanSkill:
 	dc.b	$20
 	dc.b	$21
 	dc.b	$22
@@ -40360,7 +40360,7 @@ Anim_Cooley61Act:
 
 	even
 
-loc_26BC0:
+Anim_Cooley61Attack:
 	dc.b	$05
 	dc.b	$06
 	dc.b	$07
@@ -40424,7 +40424,7 @@ Anim_HvysolidUseSkill:
 
 	even
 
-loc_26BF0:
+Anim_EyesoreAttack:
 	dc.b	$1C, $1C
 	dc.b	$1D, $1D
 	dc.b	$1E, $1E
@@ -40435,7 +40435,7 @@ loc_26BF0:
 	dc.b	$FD
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26C00:
+Anim_EyesoreSkill:
 	dc.b	$0E
 	dc.b	$0F
 	dc.b	$10
@@ -40449,7 +40449,7 @@ loc_26C00:
 	dc.b	$F8
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26C0C:
+Anim_HvysolidSkill:
 	dc.b	$23, $23
 	dc.b	$24, $24
 	dc.b	$25, $25
@@ -40507,7 +40507,7 @@ Anim_ArmyEyeUseSkill:
 	dc.b	$EF
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26C4A:
+Anim_ArmyEyeAttack:
 	dc.b	$09
 	dc.b	$0A
 	dc.b	$0B
@@ -40521,7 +40521,7 @@ loc_26C4A:
 
 	even
 
-loc_26C54:
+Anim_ArmyEyeSkill:
 	dc.b	$10
 	dc.b	$11
 	dc.b	$12
@@ -40545,7 +40545,7 @@ loc_26C54:
 	dc.b	$14
 	dc.b	$FE
 ; ---------------------------------------------------------------------
-loc_26C6A:
+Anim_TrcrbaseSkill:
 	dc.b	$1A
 	dc.b	$1B
 	dc.b	$1C
@@ -40611,7 +40611,7 @@ Anim_VanUseSkill:
 	dc.b	$05
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26CA2:
+Anim_VanAttack:
 	dc.b	$11
 	dc.b	$12
 	dc.b	$13
@@ -40642,7 +40642,7 @@ loc_26CA2:
 
 	even
 
-loc_26CC4:
+Anim_VanSkill:
 	dc.b	$0B
 	dc.b	$0C
 	dc.b	$0D
@@ -40777,7 +40777,7 @@ Anim_DezoOwlUseSkill:
 
 	even
 
-loc_26D6E:
+Anim_DezoOwlAttack:
 	dc.b	$00, $00
 	dc.b	$08, $08, $08, $08, $08, $08, $08
 	dc.b	$FD
@@ -40841,7 +40841,7 @@ Anim_RabbitUseSkill:
 
 	even
 
-loc_26DAA:
+Anim_RabbitAttack:
 	dc.b	$11
 	dc.b	$12
 	dc.b	$13
@@ -40894,7 +40894,7 @@ Anim_WrestlerUseSkill:
 
 	even
 
-loc_26DDA:
+Anim_WrestlerAttack:
 	dc.b	$00, $00
 	dc.b	$0F
 	dc.b	$10
@@ -40942,7 +40942,7 @@ Anim_LungUseSkill:
 	dc.b	$EF
 	dc.b	$FF
 ; ---------------------------------------------------------------------
-loc_26E08:
+Anim_LungAttack:
 	dc.b	$0C
 	dc.b	$0E
 	dc.b	$0D
@@ -40995,7 +40995,7 @@ Anim_DarksideAct:
 
 	even
 
-loc_26E50:
+Anim_DarksideAttack:
 	dc.b	$12
 	dc.b	$13
 	dc.b	$FD
@@ -41031,7 +41031,7 @@ Anim_MystcapeUseSkill:
 	dc.b	$02
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_26E78:
+Anim_MystcapeAttack:
 	dc.b	$00, $00
 	dc.b	$0C
 	dc.b	$0D, $0D
@@ -41070,7 +41070,7 @@ Anim_ArchDrgnAct:
 
 	even
 
-loc_26EA0:
+Anim_ArchDrgnAttack:
 	dc.b	$0D
 	dc.b	$0E
 	dc.b	$0D
@@ -41157,7 +41157,7 @@ Anim_FirefallUseSkill:
 	dc.b	$FB
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_26EF0:
+Anim_FirefallAttack:
 	dc.b	$1E, $1E
 	dc.b	$1F
 	dc.b	$20
@@ -41166,7 +41166,7 @@ loc_26EF0:
 	dc.b	$FD
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_26EF8:
+Anim_FirefallSkill:
 	dc.b	$0D, $0D
 	dc.b	$0E, $0E
 	dc.b	$0F
@@ -41222,7 +41222,7 @@ Anim_WizardUseSkill:
 	dc.b	$0D, $0D, $0D, $0D, $0D, $0D, $0D
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_26F4A:
+Anim_WizardAttack:
 	dc.b	$00, $00, $00
 	dc.b	$0E
 	dc.b	$0F
@@ -41232,7 +41232,7 @@ loc_26F4A:
 	dc.b	$FD
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_26F54:
+Anim_WizardSkill:
 	dc.b	$00, $00
 	dc.b	$13
 	dc.b	$14
@@ -41341,7 +41341,7 @@ Anim_NeifirstUseSkill:
 	dc.b	$16
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_26FB6:
+Anim_NeifirstAttack:
 	dc.b	$17
 	dc.b	$18
 	dc.b	$19
@@ -41351,7 +41351,7 @@ loc_26FB6:
 	dc.b	$FD
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_26FBE:
+Anim_NeifirstSkill:
 	dc.b	$1C
 	dc.b	$1D
 	dc.b	$1E
@@ -41400,7 +41400,7 @@ Anim_DarkFrceUseSkill:
 	dc.b	$EF
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_27010:
+Anim_DarkForceAttack:
 	dc.b	$0E, $0E
 	dc.b	$0F, $0F
 	dc.b	$10, $10
@@ -41444,7 +41444,7 @@ loc_27048:
 	dc.b	$11, $11, $11, $11, $11
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_2704E:
+Anim_DarkFrceSkill:
 	dc.b	$08, $08
 	dc.b	$09, $09
 	dc.b	$0A, $0A
@@ -41514,7 +41514,7 @@ Anim_MombrainUseSkill:
 	dc.b	$EF
 	dc.b	$FF
 ; --------------------------------------------------------------------------
-loc_270C2:
+Anim_MombrainAttack:
 	dc.b	$02, $02, $02
 	dc.b	$03, $03, $03
 	dc.b	$04, $04
@@ -41541,7 +41541,7 @@ loc_270C2:
 	dc.b	$17
 	dc.b	$FE
 ; --------------------------------------------------------------------------
-loc_270E8:
+Anim_MombrainSkill:
 	dc.b	$02, $02, $02
 	dc.b	$03, $03, $03
 	dc.b	$04, $04
