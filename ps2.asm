@@ -29152,7 +29152,7 @@ Item_LacDagger:
 	dc.w	$47E0
 	dc.b	$A2
 	dc.b	CharID_Shir_Mask
-	dc.b	$04, $16				;  Attack power is only 4. Don't think this was intentional...
+	dc.b	$04, $16				;  Attack power should be 45, just like the Japanese version
 
 Item_ACSlasher:
 	nametxt	"AC SLASHR "	; Should be LAC SLASHR
