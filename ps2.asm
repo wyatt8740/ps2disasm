@@ -23,6 +23,8 @@
 ; the original ROM. When hacking, you don't need this so you can set it to 1 if you want
 zeroOffsetOptimization = 0
 
+bugfixes = 0			; if 1, include bug fixes
+
 	cpu 68000
 	include "ps2.macrosetup.asm"
 
@@ -3287,8 +3289,14 @@ Character_CheckAttack:
 	adda.w	d1, a5
 	tst.w	(a5)
 	bne.s	+			; branch if command is not attack
+; Fix: paralysis recover offsets
+	if bugfixes=1
+	addq.w	#1, 2(a5)	; this should be 2(a5)
+	andi.w	#1, 2(a5)	; this should be 2(a5)
+	else
 	addq.w	#1, 4(a5)	; this should be 2(a5)
 	andi.w	#1, 4(a5)	; this should be 2(a5)
+	endif
 	bne.w	loc_1F62
 +
 	btst	#4, d0
@@ -3843,9 +3851,10 @@ TechAction_Shinb:
 	bset	#4, 3(a2)
 	tst.w	(Escape_rate).w
 	beq.s	loc_22EA
-; The following subroutine requires the Enemy_stats address to be loaded in a1, but it's missing in this section.
-; Uncomment the line below to fix it
-	;lea	(Enemy_stats).w, a1
+; Fix: Shinb
+	if bugfixes=1
+	lea	(Enemy_stats).w, a1
+	endif
 	bsr.w	Character_CheckTechSuccess
 	bmi.s	loc_22EA
 	move.w	#$1202, (Battle_script_ID).w
@@ -4309,7 +4318,12 @@ Battle_GetEnemyGroup:
 Character_CheckAttackSuccess:
 	moveq	#0, d0
 	move.w	$18(a3), d0		; get character's dexterity
-	lsl.w	#8, d0			; move it to higher byte -- should be lsl.l to get the full register otherwise the value gets truncated and considers only the lower 2 bytes
+; Fix: dexterity truncation
+	if bugfixes=1
+	lsl.l	#8, d0
+	else
+	lsl.w	#8, d0
+	endif
 	divu.w	$14(a1), d0		; divide it by the enemy's agility
 	move.w	#$CC, d2 	; 80% hit rate
 	cmpi.w	#$80, d0
@@ -4378,7 +4392,12 @@ Character_CalcAttackDamage:
 	move.b	(a4), d1	; get weapon attack value
 	addq.w	#2, d1		; add 2 to it
 	mulu.w	d1, d0		; multiply character's attack value by this number
-	lsr.w	#8, d0		; divide total attack value by 256...This should be 'lsr.l' otherwise the value gets truncated
+; Fix: damage truncation
+	if bugfixes=1
+	lsr.l	#8, d0		; divide total attack value by 256
+	else
+	lsr.w	#8, d0		; divide total attack value by 256
+	endif
 CheckEnemyAlive:
 	sub.w	d0, 2(a1)			; subtract damage from enemy's current HP
 	bhi.s	+		; return if enemy is still alive
@@ -4653,7 +4672,12 @@ loc_2AA8:
 	divu.w	d1, d0
 	move.w	$1C(a3), d1
 	mulu.w	d1, d0
-	lsr.w	#8, d0			; This should be 'lsr.l' otherwise the value gets truncated
+; Fix: damage truncation
+	if bugfixes=1
+	lsr.l	#8, d0
+	else
+	lsr.w	#8, d0
+	endif
 	beq.s	loc_2AE8
 	_btst	#1, 0(a1)
 	bne.s	loc_2AE4
@@ -4793,9 +4817,11 @@ loc_2C14:
 ; -----------------------------------------------------------------
 Enemy_CheckTechSuccess:
 	lea	(EnemyTechSuccessRate).l, a4
-	;moveq	#0, d0
-	move.w	luck(a1), d0	; d0 = character's luck....d0 should be cleared (uncomment instruction above) otherwise you can end up
-							; with a random number in the higher word, and that screws up the division right below
+; Fix: luck
+	if bugfixes=1
+	moveq	#0, d0
+	endif
+	move.w	luck(a1), d0	; d0 = character's luck
 	beq.s	+				; if 0, branch
 	divu.w	#50, d0		; divide luck by 50....turns d0 into index
 +
@@ -5238,10 +5264,17 @@ EnemyTech_AgilityDown:
 	bsr.w	Enemy_TargetCharacter
 	bsr.w	Enemy_CheckTechSuccess
 	bmi.s	+
-	move.w	#$121F, (Battle_script_ID).w	; This loads the "Agility decreased" text, but this technique actually lowers defense instead of agility
-	subi.w	#20, defense(a1)			; this should be "agility"
+	move.w	#$121F, (Battle_script_ID).w
+; Fix: agility should be used
+	if bugfixes=1
+	subi.w	#20, agility(a1)
 	bcc.s	+
-	move.w	#0, defense(a1)				; this should be "agility"
+	move.w	#0, agility(a1)
+	else
+	subi.w	#20, defense(a1)
+	bcc.s	+
+	move.w	#0, defense(a1)
+	endif
 +
 	move.w	#3, $22(a0)
 	rts
@@ -11706,6 +11739,17 @@ loc_785C:
 	bsr.w	WaitForVInt
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, (Joypad_pressed).w
 	beq.s	loc_785C
+	
+; Fix: clear event flags before going back to Sega screen
+	if bugfixes=1
+	lea	($FFFFC700).w, a0
+	moveq	#0, d0
+	moveq	#0, d7
+	move.w	#$3F, d7
+-
+	move.l	d0, (a0)+
+	dbf	d7, -
+	endif
 
 	move.w	#$9001, (VDP_control_port).l
 	move.b	#GameModeID_Sega, (Game_mode_index).w	; Sega screen
@@ -15836,7 +15880,12 @@ loc_A48A:
 	tst.w	(Party_members_num).w
 	bne.s	+			; branch if Rolf is not alone
 	move.w	#WinID_ScriptMessage, (Window_index).w
-	move.w	#$927, (Script_ID).w		; huh? Wrong pointer here. This is the text "Hey,Shir is coming back!".
+; Fix: wrong text pointer
+	if bugfixes=1
+	move.w	#4, (Script_ID).w
+	else
+	move.w	#$927, (Script_ID).w
+	endif
 	addq.w	#2, (Event_routine_2).w
 	rts
 
@@ -16128,8 +16177,10 @@ loc_A7C2:
 	dbf	d2, loc_A78A
 	move.w	#((6<<8)|WinID_MenuCharStats), (Window_index).w
 	addq.w	#1, (Event_routine_2).w
-; sound for the Sar techniques is missing; I included the sound ID used for the res technique right below. Just uncomment it if you want it
-	;move.b	#SFXID_Healed, (Sound_queue).w
+; Fix: include sound
+	if bugfixes=1
+	move.b	#SFXID_Healed, (Sound_queue).w
+	endif
 
 loc_A7D0:
 	rts
@@ -16189,8 +16240,10 @@ loc_A830:
 loc_A860:
 	move.w	#((6<<8)|WinID_MenuCharStats), (Window_index).w
 	addq.w	#1, (Event_routine_2).w
-; sound for Sak is missing; I included the sound ID used for the res technique right below. Just uncomment it if you want it
-	;move.b	#SFXID_Healed, (Sound_queue).w
+; Fix: missing sound
+	if bugfixes=1
+	move.b	#SFXID_Healed, (Sound_queue).w
+	endif
 loc_A86A:
 	rts
 loc_A86C:
@@ -16241,8 +16294,10 @@ loc_A8DC:
 	dbf	d0, loc_A8C8
 	move.w	#((6<<8)|WinID_MenuCharStats), (Window_index).w
 	addq.w	#1, (Event_routine_2).w
-; sound for Nasak is missing; I included the sound ID used for the res technique right below. Just uncomment it if you want it
-	;move.b	#SFXID_Healed, (Sound_queue).w
+; Fix: missing sound
+	if bugfixes=1
+	move.b	#SFXID_Healed, (Sound_queue).w
+	endif
 loc_A8EA:
 	rts
 loc_A8EC:
@@ -16297,8 +16352,10 @@ loc_A95C:
 	bclr	#7, (a2)
 	move.w	#((6<<8)|WinID_MenuCharStats), (Window_index).w
 	addq.w	#1, (Event_routine_2).w
-; sound for Anti is missing; I included the sound ID used when you have the poison status effect cured at the hospital. Just uncomment it if you want it
-	;move.b	#SFXID_PoisonCured, (Sound_queue).w
+; Fix: missing sound
+	if bugfixes=1
+	move.b	#SFXID_PoisonCured, (Sound_queue).w
+	endif
 loc_A980:
 	rts
 loc_A982:
@@ -18544,9 +18601,19 @@ loc_C1D8:
 loc_C1EA:
 	tst.w	(Event_routine_3).w
 	beq.s	loc_C1FC
+; Fix: inventory glitch
+	if bugfixes=1
+	lea	(Character_stats+item_num).w, a2
+	move.w	(Character_index).w, d1
+	lsl.w	#6, d1
+	adda.w	d1, a2
+	tst.b	(a2)
+	beq.s	loc_C218
+	endif
 	move.w	#WinID_MenuItemList, (Window_index).w
 	addq.w	#1, (Event_routine).w
 	rts
+	
 loc_C1FC:
 	lea	(Character_stats+item_num).w, a2
 	move.w	(Character_index).w, d1
@@ -19142,10 +19209,22 @@ GumInvHouseEventIndex:
 
 loc_C8CA:
 	move.w	#WinID_ScriptMessage2, (Window_index).w
-	move.w	#$B08, (Script_ID).w		; this is never used as it is overwritten immediately below. This part of text was probably meant to be used after the inventor gives the gum and you enter his house again.
+	move.w	#$B08, (Script_ID).w
+; Fix: unused text for the Kueri inventor
+	if bugfixes=1
+	cmpi.b	#2, (Event_flags+$10).w
+	beq.s	+
 	move.w	#$B01, (Script_ID).w
 	addq.w	#1, (Event_routine).w
 	rts
++
+	addq.w	#1, (Event_routine_2).w
+	rts
+	else
+	move.w	#$B01, (Script_ID).w
+	addq.w	#1, (Event_routine).w
+	rts
+	endif
 loc_C8E2:
 	moveq	#ItemID_MruraLeaf, d2
 	bsr.w	CheckItemExistInventory
@@ -19186,6 +19265,10 @@ loc_C948:
 	move.b	#ItemID_MruraGum, (Item_index).w
 	move.w	(Character_index).w, d1
 	bsr.w	AddItemToInventory2
+; Fix: add flag for the unused text for the Kueri inventor
+	if bugfixes=1
+	addq.b	#1, (Event_flags+$10).w
+	endif
 	move.b	#SFXID_ItemReceived, (Sound_queue).w
 	move.w	#$B06, (Script_ID).w
 	rts
@@ -19729,8 +19812,12 @@ loc_CF58:
 	cmpi.b	#NeiEquipmentArrayEnd-NeiEquipmentArray, d5
 	bne.s	loc_CF74			; if we don't have all the Nei items, branch
 	move.b	#1, ($FFFFC744).w
-	move.w	#$1690, (Script_ID).w		; this instruction causes a bug: when this piece of text gets loaded in memory it overwrites the sound ram and other stuff (Music Freeze bug).
-											; split the text in the script section by putting a C4 and replace the 'move.w	#$1690' with 'move.l	#$16901693', or '#$16901692'
+; Fix: RAM overflow (music freeze)
+	if bugfixes=1
+	move.l	#$16901693, (Script_ID).w
+	else
+	move.w	#$1690, (Script_ID).w
+	endif
 	move.b	#0, (Treasure_chest_flags+Chest_NeiSword).w
 loc_CF74:
 	addq.w	#1, (Event_routine_2).w
@@ -21400,7 +21487,11 @@ loc_E162:
 	bne.s	loc_E184
 	tst.w	(Yes_no_input).w
 	beq.s	loc_E178
+	if bugfixes=1
+	move.l	#$18161817, (Script_ID).w
+	else
 	move.w	#$1816, (Script_ID).w
+	endif
 	addq.w	#4, ($FFFFDE70).w
 	rts
 loc_E178:
@@ -21872,7 +21963,12 @@ loc_E6B0:
 	dc.b	$9C
 	dc.b	$9C
 	dc.b	$9D
-	dc.b	$94		; wrong pointer here: this says one of Lutz's lines on Dezolis
+; Fix: wrong text pointer
+	if bugfixes=1
+	dc.b	$96
+	else
+	dc.b	$94
+	endif
 	dc.b	$9F
 	dc.b	$9F
 	dc.b	$A0
@@ -23351,15 +23447,29 @@ BattleRun_Check:
 	move.w	#WinID_BattleMessage, (Window_index).w
 	move.w	#$1202, (Script_ID).w
 	bsr.w	DetectLeadingCharacter	; get character who's in the lead to display name in the message
+; Fix: running away from bosses
+	if bugfixes=1
+	tst.w	(Escape_rate).w
+	beq.s	+
 	jsr	(UpdateRNGSeed).l
 	andi.w	#$FF, d0		; random number from 0-255
 	cmp.w	(Escape_rate).w, d0	; compare random number with escape rate
-	bls.s	+				;  branch to get to the next entry in the table, so you manage to run away -- a little oversight here: if the number generated is 0, you can also escape from boss battles!
-							; one fix would be to include a check for boss battles before this check
+	bls.s	++				;  branch to get to the next entry in the table, so you manage to run away
++
 	addq.w	#1, (Event_routine).w	; we failed to run away
 +
 	addq.w	#1, (Event_routine).w
 	rts
+	else
+	jsr	(UpdateRNGSeed).l
+	andi.w	#$FF, d0		; random number from 0-255
+	cmp.w	(Escape_rate).w, d0	; compare random number with escape rate
+	bls.s	+				;  branch to get to the next entry in the table, so you manage to run away
+	addq.w	#1, (Event_routine).w	; we failed to run away
++
+	addq.w	#1, (Event_routine).w
+	rts
+	endif
 
 BattleRun_Successful:
 	move.b	#GameModeID_Map, (Game_mode_index).w	; exit battle screen
@@ -23876,8 +23986,14 @@ loc_F9BA:
 	bsr.w	loc_11064
 	andi.b	#$30, d0
 	beq.s	loc_FA10
+; Fix: input
+	if bugfixes=1
+	andi.b	#$20, d0
+	bne.s	loc_F9D4
+	else
 	andi.b	#$10, d0
 	beq.s	loc_F9D4
+	endif
 	rts
 loc_F9D4:
 	tst.w	($FFFFDE84).w
@@ -24460,8 +24576,14 @@ loc_FF80:
 	bsr.w	loc_11064
 	andi.b	#$30, d0
 	beq.s	loc_FFD6
+; Fix: input
+	if bugfixes=1
+	andi.b	#$20, d0
+	bne.s	loc_FF9A
+	else
 	andi.b	#$10, d0
 	beq.s	loc_FF9A
+	endif
 	rts
 loc_FF9A:
 	tst.w	($FFFFDE9C).w
@@ -24662,8 +24784,14 @@ loc_10192:
 	bsr.w	loc_11064
 	andi.b	#$30, d0
 	beq.s	loc_101E4
+; Fix: input
+	if bugfixes=1
+	andi.b	#$20, d0
+	bne.s	loc_101B2
+	else
 	andi.b	#$10, d0
 	beq.s	loc_101B2
+	endif
 	move.w	#0, ($FFFFDEA8).w
 	rts
 loc_101B2:
@@ -24714,8 +24842,14 @@ loc_10222:
 	bsr.w	loc_11064
 	andi.b	#$30, d0
 	beq.s	loc_1027E
+; Fix: input
+	if bugfixes=1
+	andi.b	#$20, d0
+	bne.s	loc_10242
+	else
 	andi.b	#$10, d0
 	beq.s	loc_10242
+	endif
 	move.w	#0, ($FFFFDEA8).w
 	rts
 loc_10242:
@@ -29152,10 +29286,16 @@ Item_LacDagger:
 	dc.w	$47E0
 	dc.b	$A2
 	dc.b	CharID_Shir_Mask
-	dc.b	$04, $16				;  Attack power should be 45, just like the Japanese version
+; Fix: Laconia Dagger attack power
+	if bugfixes=1
+	dc.b	$2D
+	else
+	dc.b	$04
+	endif
+	dc.b	$16
 
 Item_ACSlasher:
-	nametxt	"AC SLASHR "	; Should be LAC SLASHR
+	nametxt	"AC SLASHR "
 	dc.w	$5DC0
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
@@ -33048,12 +33188,13 @@ HughExpTable:
 	dc.b	$0A, $6A, $D0	; Experience points
 
 ;		HP   TP   STR  MEN  AGI  LUCK DEX  ATK  DEF
-	dc.b	007, 005, 007, 005, 004, 008, 007, 003, 003, $10
-							; This ^
-							; is where Hugh learns Gires, but
-		; the increment for the techniques learned only applies to the battle techniques.
-		; I'm not sure if this was intentional, but if you don't like this,
-                ; replace the value $10 with $11 and it will be fine.
+	dc.b	007, 005, 007, 005, 004, 008, 007, 003, 003
+; Fix: Hugh learning Gires
+	if bugfixes=1
+	dc.b	$11
+	else
+	dc.b	$10
+	endif
 
 	dc.b	31		; Level
 	dc.b	$0C, $04, $26	; Experience points
@@ -54511,6 +54652,69 @@ loc_54D98:
 	dc.b	$FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $FF ;0x180
 	dc.b	$00 ;0x0 (0x00054F23-0x00054F24, Entry count: 0x00000001) [Unknown data]
 loc_54F24:
+; Fix: collision detection (Menobe ground floor)
+	if bugfixes=1
+	dc.b	$01, $01, $FF, $FF, $FF, $FF, $01, $01, $FF, $FF, $FF, $FF, $02, $01, $C0, $01
+	dc.b	$FF, $FF, $16, $3F, $FE, $00, $00, $02, $01, $FF, $FF, $80, $00, $16, $00, $00 ;0x0 (0x00054F24-0x00055028, Entry count: 0x00000104)
+	dc.b	$7F, $FF, $01, $01, $FF, $FF, $FF, $FF, $03, $16, $F0, $07, $80, $00, $0A, $0F
+	dc.b	$F8, $00, $00, $01, $00, $00, $7F, $FF, $01, $01, $FF, $FF, $00, $00, $16, $16 ;0x20
+	dc.b	$16, $0A, $0A, $0C, $05, $05, $05, $05, $05, $0B, $0A, $0A, $16, $16, $01, $01
+	dc.b	$7F, $FF, $FF, $FF, $16, $02, $0A, $33, $E6, $00, $00, $01, $00, $00, $7F, $FF ;0x40
+	dc.b	$16, $16, $0C, $21, $22, $0B, $16, $16, $02, $01, $FF, $FF, $00, $00, $0A, $00
+	dc.b	$00, $26, $B2, $16, $16, $0C, $21, $09, $08, $22, $0B, $16, $01, $01, $7F, $FF ;0x60
+	dc.b	$FF, $FF, $16, $02, $0A, $2C, $9A, $00, $00, $01, $00, $00, $7F, $FF, $16, $16
+	dc.b	$26, $09, $0D, $0E, $08, $25, $16, $16, $02, $16, $3F, $FF, $C0, $01, $0A, $00 ;0x80
+	dc.b	$00, $0D, $D8, $01, $01, $0C, $21, $25, $26, $22, $0B, $02, $16, $FF, $FE, $20
+	dc.b	$00, $0A, $00, $00, $1F, $FF, $01, $01, $01, $01, $0A, $D4, $95, $FF, $FC, $26 ;0xA0
+	dc.b	$02, $25, $11, $11, $26, $02, $25, $16, $01, $01, $05, $09, $FB, $80, $00, $01
+	dc.b	$01, $16, $0C, $0A, $09, $08, $0B, $0E, $08, $0A, $0A, $22, $25, $02, $26, $21 ;0xC0
+	dc.b	$0A, $0A, $09, $0D, $0C, $02, $05, $EF, $C0, $00, $00, $0A, $00, $10, $05, $EB
+	dc.b	$09, $08, $07, $0B, $16, $01, $01, $01, $16, $26, $11, $25, $12, $26, $01, $0A ;0xE0
+	dc.b	$AE, $3A, $6F, $90 ;0x100
+	dc.b	$25, $26, $22, $05, $21, $25, $26, $12, $25, $12, $26, $11, $25, $16, $01, $01
+	dc.b	$0A, $0D, $69, $87, $F0, $01, $01, $16, $26, $25, $12, $12, $0E, $08, $22, $0B ;0x0 (0x00055028-0x000551F7, Entry count: 0x000001CF)
+	dc.b	$0E, $08, $09, $0D, $0C, $21, $01, $0A, $4C, $58, $0D, $BD, $12, $09, $0D, $12
+	dc.b	$12, $12, $26, $25, $16, $01, $01, $01, $16, $26, $25, $12, $26, $01, $0A, $D3 ;0x20
+	dc.b	$E5, $1B, $D8, $25, $0E, $08, $09, $0D, $26, $02, $12, $25, $12, $0E, $25, $16
+	dc.b	$01, $01, $0A, $0D, $6C, $C8, $89, $01, $01, $16, $26, $25, $12, $12, $0E, $08 ;0x40
+	dc.b	$22, $0B, $0E, $05, $06, $07, $05, $0D, $0C, $21, $01, $0A, $9B, $F8, $0C, $2E
+	dc.b	$24, $0D, $12, $25, $16, $01, $01, $01, $16, $26, $22, $0B, $12, $02, $12, $26 ;0x60
+	dc.b	$01, $0A, $E6, $B3, $96, $18, $22, $0B, $11, $11, $0C, $21, $25, $12, $12, $12
+	dc.b	$07, $08, $06, $25, $16, $01, $01, $0A, $06, $B6, $73, $E7, $01, $01, $16, $0E ;0x80
+	dc.b	$08, $25, $12, $12, $0E, $08, $22, $0B, $0C, $21, $01, $0A, $1D, $B0, $16, $77
+	dc.b	$09, $0D, $12, $12, $26, $09, $0D, $16, $01, $01, $01, $16, $26, $22, $0B, $12 ;0xA0
+	dc.b	$01, $0A, $39, $4E, $51, $34, $0E, $08, $22, $0B, $16, $0C, $21, $09, $0D, $12
+	dc.b	$02, $12, $12, $0C, $21, $25, $16, $01, $01, $0A, $07, $7A, $9D, $5C, $01, $01 ;0xC0
+	dc.b	$16, $16, $26, $25, $12, $02, $0E, $08, $25, $16, $26, $09, $0D, $01, $0A, $DB
+	dc.b	$70, $03, $2D, $12, $12, $26, $25, $16, $16, $01, $01, $01, $16, $16, $0E, $08 ;0xE0
+	dc.b	$22, $0B, $12, $12, $01, $0A, $CD, $41, $EA, $60, $0E, $08, $25, $16, $26, $05
+	dc.b	$05, $05, $0D, $12, $12, $0C, $21, $09, $0D, $16, $16, $01, $01, $0A, $0B, $B6 ;0x100
+	dc.b	$45, $DF, $01, $01, $16, $16, $26, $25, $12, $12, $12, $12, $0E, $06, $25, $26
+	dc.b	$01, $0A, $C6, $E8, $09, $9E, $12, $12, $12, $26, $25, $16, $16, $01, $01, $01 ;0x120
+	dc.b	$16, $16, $0E, $08, $22, $0B, $12, $01, $0A, $BD, $DF, $BC, $C8, $12, $25, $26
+	dc.b	$12, $0C, $21, $09, $0D, $16, $16, $01, $01, $0A, $0D, $CD, $F5, $5F, $01, $01 ;0x140
+	dc.b	$16, $16, $26, $22, $0B, $12, $12, $25, $16, $26, $01, $0A, $69, $D8, $04, $E0
+	dc.b	$12, $02, $0C, $21, $25, $16, $16, $01, $01, $01, $16, $16, $16, $0E, $08, $22 ;0x160
+	dc.b	$05, $0B, $12, $0B, $01, $0A, $DD, $5C, $E3, $90, $02, $25, $16, $26, $12, $12
+	dc.b	$0C, $05, $21, $09, $0D, $16, $16, $16, $01, $01, $0A, $06, $78, $ED, $5B, $01 ;0x180
+	dc.b	$01, $01, $16, $16, $0E, $08, $22, $05, $25, $12, $25, $16, $26, $12, $01, $0A
+	dc.b	$8F, $30, $03, $3E, $0C, $05, $21, $09, $0D, $16, $16, $01, $01, $01, $01, $01 ;0x1A0
+	dc.b	$16, $16, $16, $0E, $08, $22, $01, $0A, $3D, $DE, $3E, $60, $05, $0B, $25 ;0x1C0
+	dc.b	$26, $0C, $07, $21, $09, $0D, $16, $16, $16, $01, $01, $01, $0A, $01, $8F, $05
+	dc.b	$D8, $01, $01, $01, $01, $16, $16, $16, $0E, $05, $08, $02, $22, $05, $0B, $12 ;0x0 (0x000551F7-0x00055275, Entry count: 0x0000007E)
+	dc.b	$25, $26, $0C, $05, $21, $03, $0A, $F8, $C0, $00, $E3, $16, $00, $38, $07, $00
+	dc.b	$01, $00, $07, $F8, $00, $09, $05, $0D, $0E, $05, $08, $01, $0A, $E5, $43, $E3 ;0x20
+	dc.b	$80, $22, $06, $25, $16, $26, $05, $05, $21, $09, $05, $0D, $16, $16, $16, $01
+	dc.b	$01, $01, $01, $02, $01, $FC, $00, $00, $00, $0A, $00, $38, $7D, $4F, $16, $16 ;0x40
+	dc.b	$16, $16, $0E, $05, $05, $08, $25, $16, $26, $02, $03, $0A, $0E, $00, $00, $0F
+	dc.b	$16, $01, $E0, $01, $F0, $01, $00, $1F, $FE, $00, $09, $05, $05, $0D ;0x60
+	dc.b	$04, $05, $7C, $1F, $00, $00, $0A, $01, $40, $78, $00, $16, $00, $80, $07, $C0
+	dc.b	$01, $00, $00, $00, $3F, $0E, $0D, $0E, $0D, $03, $01, $FF, $00, $00, $00, $16 ;0x0 (0x00055275-0x00055298, Entry count: 0x00000023)
+	dc.b	$00, $FE, $00 ;0x20
+	dc.b	$80, $0A, $00, $01, $FF, $7F, $02, $16, $3F, $80, $00, $00, $01, $00, $7F, $FF
+	dc.b	$FF, $0A, $0A, $01, $01, $FF, $FF, $FF, $FF, $FF ;0x0 (0x00055298-0x000552B2, Entry count: 0x0000001A)
+
+	else
 	dc.b	$01, $01, $FF, $FF, $FF, $FF, $01, $01, $FF, $FF, $FF, $FF, $02, $01, $C0, $01
 	dc.b	$FF, $FF, $16, $3F, $FE, $00, $00, $02, $01, $FF, $FF, $80, $00, $16, $00, $00 ;0x0 (0x00054F24-0x00055028, Entry count: 0x00000104)
 	dc.b	$7F, $FF, $01, $01, $FF, $FF, $FF, $FF, $03, $16, $F0, $07, $80, $00, $0A, $0F
@@ -54570,7 +54774,59 @@ loc_54F24:
 	dc.b	$00, $FE, $00 ;0x20
 	dc.b	$80, $0A, $00, $01, $FF, $7F, $02, $16, $3F, $80, $00, $00, $01, $00, $7F, $FF
 	dc.b	$FF, $0A, $0A, $01, $01, $FF, $FF, $FF, $FF, $FF ;0x0 (0x00055298-0x000552B2, Entry count: 0x0000001A)
+	endif
 loc_552B2:
+; Fix: collision detection (Menobe 1st floor)
+	if bugfixes=1
+	dc.b	$01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF
+	dc.b	$FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00 ;0x0 (0x000552B2-0x0005558D, Entry count: 0x000002DB)
+	dc.b	$FF, $FF, $FF, $FF, $02, $00, $FF, $FF, $F8, $0F, $0A, $00, $00, $07, $F0, $01
+	dc.b	$00, $FF, $FF, $FF, $FF, $01, $00, $F0, $07, $FF, $FF, $0A, $0A, $09, $08, $0A ;0x20
+	dc.b	$09, $08, $0A, $0A, $01, $00, $FF, $FF, $E0, $03, $0A, $0A, $09, $0D, $26, $0A
+	dc.b	$25, $0E, $08, $0A, $0A, $01, $00, $FF, $FF, $FF, $FF, $02, $00, $C0, $01, $FF ;0x40
+	dc.b	$FF, $0A, $32, $A6, $00, $00, $09, $0D, $26, $25, $0E, $08, $01, $00, $FF, $FF
+	dc.b	$C0, $01, $0A, $09, $0D, $0A, $0C, $21, $0A, $22, $0B, $0A, $0E, $08, $0A, $01 ;0x60
+	dc.b	$00, $FF, $FF, $FF, $FF, $02, $00, $C0, $01, $FF, $FF, $0A, $25, $D2, $00, $00
+	dc.b	$25, $03, $26, $25, $03, $26, $01, $0A, $1F, $FF, $ED, $5B, $00, $00, $00, $22 ;0x80
+	dc.b	$26, $03, $25, $21, $02, $0A, $FF, $FC, $1C, $00, $05, $00, $00, $01, $F8, $00
+	dc.b	$00, $00, $00, $00, $09, $08, $12, $12, $03, $0A, $9C, $1D, $82, $0C, $12, $60 ;0xA0
+	dc.b	$02, $60, $10, $05, $01, $C0, $08, $C0, $0E, $0D, $09, $06, $07, $08, $00, $00
+	dc.b	$01, $0A, $15, $B1, $73, $66, $00, $00, $00, $12, $0D, $12, $02, $0E, $23, $12 ;0xC0
+	dc.b	$07, $0B, $12, $0C, $06, $12, $01, $0A, $4E, $D8, $1F, $D9, $12, $24, $0D, $02
+	dc.b	$26, $12, $00, $00, $00, $00, $00, $12, $12, $26, $01, $0A, $F9, $4D, $5B, $9C ;0xE0
+	dc.b	$22, $0B, $12, $0C, $21, $12, $03, $25, $12, $12, $26, $00, $00, $01, $0A, $1D
+	dc.b	$68, $FC, $1D, $00, $00, $00, $0B, $12, $12, $12, $0E, $06, $22, $05, $1F, $05 ;0x100
+	dc.b	$21, $12, $01, $0A, $9F, $5C, $1C, $AB, $07, $0D, $12, $26, $00, $00, $00, $00
+	dc.b	$00, $22, $0B, $03, $12, $12, $01, $0A, $F6, $3B, $DB, $8C, $12, $00, $00, $00 ;0x120
+	dc.b	$12, $12, $12, $0C, $21, $12, $00, $00, $02, $00, $E0, $00, $01, $C0, $0A, $1E
+	dc.b	$EA, $6E, $3D, $25, $12, $12, $0E, $08, $12, $12, $02, $0A, $2E, $3C, $0E, $5B ;0x140
+	dc.b	$00, $00, $03, $F0, $00, $09, $0D, $12, $12, $12, $26, $22, $0B, $12, $12, $02
+	dc.b	$0A, $3A, $2E, $61, $38, $00, $01, $C0, $00, $07, $0E, $08, $12, $12, $24, $0D ;0x160
+	dc.b	$12, $03, $12, $12, $26, $21, $02, $00, $F0, $00, $01, $C0, $0A, $0F, $0C, $9E
+	dc.b	$3C, $25, $12, $12, $12, $12, $03, $0E, $08, $09, $0D, $02, $0A, $67, $78, $0F ;0x180
+	dc.b	$3B, $00, $00, $07, $F0, $00, $02, $12, $12, $26, $22, $21, $12, $02, $0A, $CE
+	dc.b	$39, $FE, $78, $00, $01, $C0, $00, $07, $0E, $08, $09, $0D, $0C, $21, $02, $00 ;0x1A0
+	dc.b	$F8, $00, $01, $C0, $0A, $01, $F8, $E2, $23, $12, $12, $02, $12, $12, $0E, $05
+	dc.b	$08, $09, $05, $0D, $02, $0A, $7E, $E0, $06, $9B, $00, $00, $0F, $F8, $00, $12 ;0x1C0
+	dc.b	$26, $12, $12, $07, $0B, $12, $03, $12, $88, $01, $70, $40, $0A, $72, $2E, $8C
+	dc.b	$B0, $00, $01, $C0, $00, $0F, $26, $25, $0C, $21, $03, $00, $FC, $00, $01, $C0 ;0x1E0
+	dc.b	$0A, $02, $CF, $8A, $29, $12, $01, $00, $70, $06, $22, $0B, $26, $25, $02, $0A
+	dc.b	$E1, $60, $03, $63, $00, $00, $1F, $FC, $00, $03, $12, $0C, $21, $12, $12, $22 ;0x200
+	dc.b	$05, $0B, $02, $0A, $92, $2D, $62, $E0, $00, $01, $C0, $00, $1F, $12, $03, $12
+	dc.b	$26, $25, $12, $02, $0C, $1F, $21, $12, $02, $00, $FE, $00, $01, $C0, $0A, $01 ;0x220
+	dc.b	$B8, $FA, $2D, $12, $22, $05, $0B, $26, $25, $12, $02, $0A, $87, $C0, $00, $CE
+	dc.b	$00, $00, $3F, $FF, $00, $0C, $05, $21, $02, $12, $12, $22, $02, $0A, $32, $2C ;0x240
+	dc.b	$BD, $80, $00, $01, $C0, $00, $7F, $05, $0B, $12, $26, $25, $12, $0C, $21, $12
+	dc.b	$02, $00, $FF, $80, $01, $C0, $0A, $00, $73, $0A, $28, $12, $12, $03, $22, $05 ;0x260
+	dc.b	$0B, $26, $25, $0C, $1F, $21, $02, $0A, $E7, $00, $00, $1C, $00, $00, $FF, $FF
+	dc.b	$E0, $12, $12, $12, $12, $02, $0A, $62, $23, $FC, $00, $00, $01, $C0, $03, $FF ;0x280
+	dc.b	$12, $22, $05, $21, $22, $05, $21, $02, $00, $FF, $F8, $01, $C0, $0A, $00, $07
+	dc.b	$FE, $2F, $03, $01, $00, $0F, $FF, $FF, $FF, $12, $0A, $0A, $0A, $02, $0A, $FE ;0x2A0
+	dc.b	$3F, $80, $00, $00, $01, $C0, $7F, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00
+	dc.b	$FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $FF ;0x2C0
+	dc.b	$00 ;0x0 (0x0005558D-0x0005558E, Entry count: 0x00000001) [Unknown data]
+	
+	else
 	dc.b	$01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF
 	dc.b	$FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00 ;0x0 (0x000552B2-0x0005558D, Entry count: 0x000002DB)
 	dc.b	$FF, $FF, $FF, $FF, $02, $00, $FF, $FF, $F8, $0F, $0A, $00, $00, $07, $F0, $01
@@ -54618,7 +54874,59 @@ loc_552B2:
 	dc.b	$3F, $80, $00, $00, $01, $C0, $7F, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00
 	dc.b	$FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $FF ;0x2C0
 	dc.b	$00 ;0x0 (0x0005558D-0x0005558E, Entry count: 0x00000001) [Unknown data]
+	endif
 loc_5558E:
+; Fix: collision detection (Menobe 2nd floor)
+	if bugfixes=1
+	dc.b	$01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF
+	dc.b	$FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00 ;0x0 (0x0005558E-0x000557B7, Entry count: 0x00000229)
+	dc.b	$FF, $FF, $FF, $FF, $02, $00, $FF, $FF, $F8, $0F, $0A, $00, $00, $07, $F0, $01
+	dc.b	$00, $FF, $FF, $FF, $FF, $01, $00, $F0, $07, $FF, $FF, $0A, $0A, $09, $08, $0A ;0x20
+	dc.b	$09, $08, $0A, $0A, $01, $00, $FF, $FF, $E0, $03, $0A, $0A, $09, $0D, $26, $0A
+	dc.b	$25, $0E, $08, $0A, $0A, $01, $00, $FF, $FF, $FF, $FF, $02, $00, $C0, $01, $FF ;0x40
+	dc.b	$FF, $0A, $32, $A6, $00, $00, $09, $0D, $26, $25, $0E, $08, $02, $00, $FF, $FF
+	dc.b	$C0, $01, $0A, $00, $00, $26, $B2, $09, $0D, $26, $25, $0E, $08, $01, $00, $FF ;0x60
+	dc.b	$FF, $FF, $FF, $02, $00, $C0, $01, $FF, $FF, $0A, $26, $B2, $00, $00, $25, $02
+	dc.b	$26, $25, $02, $26, $01, $0A, $1F, $FF, $EE, $BB, $00, $00, $00, $22, $26, $25 ;0x80
+	dc.b	$21, $01, $0A, $FF, $FC, $1C, $09, $00, $00, $00, $00, $00, $09, $05, $05, $05
+	dc.b	$05, $06, $08, $12, $02, $0A, $9E, $BD, $E0, $1C, $05, $00, $00, $0F, $C0, $12 ;0xA0
+	dc.b	$12, $26, $25, $12, $09, $08, $00, $00, $02, $0A, $14, $E0, $52, $A6, $12, $08
+	dc.b	$11, $A0, $01, $00, $00, $00, $25, $02, $03, $0E, $23, $07, $0B, $26, $25, $0C ;0xC0
+	dc.b	$06, $01, $0A, $C4, $94, $1D, $E1, $09, $0D, $02, $12, $03, $02, $26, $12, $00
+	dc.b	$00, $00, $00, $00, $25, $12, $12, $12, $26, $01, $0A, $F8, $8E, $5D, $1C, $22 ;0xE0
+	dc.b	$0B, $26, $25, $0C, $21, $12, $12, $25, $12, $12, $12, $26, $00, $00, $02, $0A
+	dc.b	$18, $9C, $DC, $1B, $12, $05, $60, $20, $04, $00, $00, $00, $25, $0E, $08, $22 ;0x100
+	dc.b	$20, $05, $1F, $21, $01, $0A, $1A, $1C, $1C, $BE, $12, $09, $0D, $12, $12, $02
+	dc.b	$12, $26, $00, $00, $00, $00, $00, $22, $25, $12, $26, $01, $0A, $EE, $3F, $B3 ;0x120
+	dc.b	$98, $02, $00, $00, $00, $25, $12, $12, $26, $21, $12, $00, $00, $03, $00, $E0
+	dc.b	$00, $01, $C0, $12, $10, $1C, $00, $0A, $0A, $0E, $E2, $7E, $35, $25, $0E, $08 ;0x140
+	dc.b	$02, $0A, $2B, $BC, $0A, $5D, $00, $00, $03, $F0, $00, $09, $0D, $12, $12, $26
+	dc.b	$12, $22, $0B, $12, $12, $02, $0A, $36, $3E, $6B, $28, $00, $01, $C0, $00, $07 ;0x160
+	dc.b	$0E, $08, $12, $09, $0D, $12, $12, $0C, $21, $12, $02, $00, $F0, $00, $01, $C0
+	dc.b	$0A, $0D, $7E, $9E, $3C, $12, $25, $12, $0E, $08, $09, $0D, $03, $0A, $53, $78 ;0x180
+	dc.b	$0D, $38, $12, $24, $00, $02, $07, $00, $00, $07, $F0, $00, $03, $02, $26, $22
+	dc.b	$0B, $02, $0A, $C2, $20, $3D, $78, $00, $01, $C0, $00, $07, $26, $05, $05, $08 ;0x1A0
+	dc.b	$09, $05, $05, $25, $12, $12, $12, $12, $21, $02, $00, $F8, $00, $01, $C0, $0A
+	dc.b	$05, $93, $5A, $2D, $12, $25, $02, $12, $03, $12, $26, $26, $25, $25, $02, $0A ;0x1C0
+	dc.b	$F5, $F0, $06, $97, $00, $00, $0F, $F8, $00, $12, $12, $12, $22, $0B, $12, $02
+	dc.b	$0A, $DA, $25, $EC, $70, $00, $01, $C0, $00, $0F, $26, $26, $25, $12, $25, $12 ;0x1E0
+	dc.b	$26, $06, $12, $02, $00, $FC, $00, $01, $C0, $0A, $02, $C6, $1A, $2D, $12, $22
+	dc.b	$0B, $12, $09, $05, $05, $21, $26, $25, $06, $02, $0A, $39, $60, $03, $62, $00 ;0x200
+	dc.b	$00, $1F, $FC, $00, $07, $08, $0C, $21, $12 ;0x220
+	dc.b	$12, $22, $1F, $0B, $25, $02, $0A, $FA, $2F, $23, $A0, $00, $01, $C0, $00, $1F
+	dc.b	$26, $25, $03, $26, $0C, $05, $21, $12, $02, $00, $FE, $00, $01, $C0 ;0x0 (0x000557B7-0x000557D5, Entry count: 0x0000001E)
+	dc.b	$0A, $01, $F8, $FA, $2F, $22, $05, $25, $26, $25, $02, $0A, $87, $C0, $00, $D6
+	dc.b	$00, $00, $3F, $FF, $00, $26, $05, $21, $03, $12, $12, $22, $02, $0A, $3A, $2E ;0x0 (0x000557D5-0x0005586A, Entry count: 0x00000095)
+	dc.b	$3F, $80, $00, $01, $C0, $00, $7F, $05, $0B, $26, $25, $0C, $07, $21, $02, $00
+	dc.b	$FF, $80, $01, $C0, $0A, $00, $7F, $82, $28, $22, $05, $0B, $02, $26, $25, $0C ;0x20
+	dc.b	$05, $21, $02, $0A, $FF, $00, $00, $1B, $00, $00, $FF, $FF, $E0, $12, $02, $0A
+	dc.b	$62, $23, $B8, $00, $00, $01, $C0, $03, $FF, $12, $22, $05, $21, $22, $05, $21 ;0x40
+	dc.b	$12, $12, $02, $00, $FF, $F8, $01, $C0, $0A, $00, $07, $FE, $3F, $01, $00, $0F
+	dc.b	$FF, $FF, $FF, $0A, $0A, $0A, $0A, $02, $0A, $FE, $3F, $80, $00, $00, $01, $C0 ;0x60
+	dc.b	$7F, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00
+	dc.b	$FF, $FF, $FF, $FF, $FF ;0x80	
+	
+	else
 	dc.b	$01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF
 	dc.b	$FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00 ;0x0 (0x0005558E-0x000557B7, Entry count: 0x00000229)
 	dc.b	$FF, $FF, $FF, $FF, $02, $00, $FF, $FF, $F8, $0F, $0A, $00, $00, $07, $F0, $01
@@ -54666,6 +54974,7 @@ loc_5558E:
 	dc.b	$FF, $FF, $FF, $0A, $0A, $0A, $0A, $02, $0A, $FE, $3F, $80, $00, $00, $01, $C0 ;0x60
 	dc.b	$7F, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00
 	dc.b	$FF, $FF, $FF, $FF, $FF ;0x80
+	endif
 loc_5586A:
 	dc.b	$01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF
 	dc.b	$FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00, $FF, $FF, $FF, $FF, $01, $00 ;0x0 (0x0005586A-0x00055AD3, Entry count: 0x00000269)

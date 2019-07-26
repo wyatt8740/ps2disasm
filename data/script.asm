@@ -4792,7 +4792,11 @@ loc_20333:
 	dc.b	"what we needed."
 	dc.b	$C3
 	dc.b	"People started to fight"
+	if bugfixes=1
+	dc.b	$C4
+	else
 	dc.b	$C1
+	endif
 
 loc_203E0:
 	dc.b	"for what Mother Brain"
@@ -5240,9 +5244,12 @@ loc_20FF2:
 	dc.b	"There is a high rocky"
 	dc.b	$C1
 	dc.b	"mountain in front of"
-	dc.b	$C4		; this should be $C3
-
-; cut-off text
+; Fix: Cut-off text
+	if bugfixes=1
+	dc.b	$C3
+	else
+	dc.b	$C4
+	endif
 	dc.b	$BB, " and the others!"
 	dc.b	$C1
 	dc.b	"Is this Uzo mountain?"
@@ -5252,9 +5259,12 @@ loc_21045:
 	dc.b	"The color of water"
 	dc.b	$C1
 	dc.b	"around here certainly"
-	dc.b	$C4		; this should be $C3
-
-; cut-off text
+; Fix: Cut-off text
+	if bugfixes=1
+	dc.b	$C3
+	else
+	dc.b	$C4
+	endif
 	dc.b	"seems different."
 	dc.b	$C1
 	dc.b	"It seems to be water"
@@ -5658,9 +5668,20 @@ loc_21AC1:
 	dc.b	$C1
 	dc.b	"down the path of"
 	dc.b	$C1
+	if bugfixes=1
+	dc.b	"destruction."
+	dc.b	$C4
 
 loc_21B89:
-	dc.b	"destruction."	; this word should be in the piece of text above since this very piece of dialogue is called separately when you give another answer
+	dc.b	"On your way, then,"
+	dc.b	$C1
+	dc.b	"because there is nothing"
+	dc.b	$C1
+	dc.b	"you can do.\I"
+	dc.b	$C4
+	else
+loc_21B89:
+	dc.b	"destruction."
 	dc.b	$C1
 	dc.b	"On your way, then,"
 	dc.b	$C3
@@ -5668,6 +5689,7 @@ loc_21B89:
 	dc.b	$C1
 	dc.b	"you can do.\I"
 	dc.b	$C4
+	endif
 
 loc_21BCF:
 	dc.b	"\II will show no mercy."
