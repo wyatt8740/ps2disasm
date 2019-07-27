@@ -806,8 +806,19 @@ Map_LoadObjects:
 	lsl.w	#1, d0
 	adda.w	(a2,d0.w), a2
 	lea	($FFFFE800).w, a3
+; Fix
+	if bugfixes=1
+	move.w	#$1F, d1
+	tst.w	(Map_index).w
+	bne.s	+
+	lea	$40(a3), a3
+	subq.w	#1, d1
++
+	move.w	#$40, d0	; object length (64 bytes)
+	else
 	move.w	#$40, d0	; object length (64 bytes)
 	move.w	#$1F, d1	; maximum of 32 objects per map
+	endif
 -
 	tst.w	(a2)
 	beq.s	+			; if we reached the end of the objects to load, branch
@@ -2392,9 +2403,12 @@ ObjectData_BiosystemsLabGroundF:
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MotaWorldMap:
+; Fix
+	if bugfixes=0
 	dc.b	(ObjID_JetScooter-$14)<<2
 	dc.b	$06
 	dc.w	$0588, $0738
+	endif
 
 	dc.b	(ObjID_InvisibleBlock2-$14)<<2
 	dc.b	$0F
@@ -2901,6 +2915,10 @@ BattleCursor_Init:
 	move.w	#$85B6, 8(a0)
 	move.l	#Map_Cursors, 4(a0)
 	move.w	#1, $22(a0)
+; Fix: reset option index
+	if bugfixes=1
+	move.w	#0, ($FFFFDE50).w
+	endif
 ; ---------------------------------------------------
 BattleCursor_Main:
 	tst.w	(Window_index).w
@@ -3291,11 +3309,11 @@ Character_CheckAttack:
 	bne.s	+			; branch if command is not attack
 ; Fix: paralysis recover offsets
 	if bugfixes=1
-	addq.w	#1, 2(a5)	; this should be 2(a5)
-	andi.w	#1, 2(a5)	; this should be 2(a5)
+	addq.w	#1, 2(a5)
+	andi.w	#1, 2(a5)
 	else
-	addq.w	#1, 4(a5)	; this should be 2(a5)
-	andi.w	#1, 4(a5)	; this should be 2(a5)
+	addq.w	#1, 4(a5)
+	andi.w	#1, 4(a5)
 	endif
 	bne.w	loc_1F62
 +
@@ -5959,8 +5977,14 @@ loc_3818:
 
 loc_381A:
 	lsl.w	#8, d0
+; Fix
+	if bugfixes=1
+	andi.w	#$8000, (Joypad_ctrl).w
+	or.w	d0, (Joypad_ctrl).w
+	else
 	move.w	d0, (Joypad_ctrl).w
 	andi.w	#$F00, (Joypad_ctrl).w
+	endif
 	addq.w	#1, (Demo_input_frame).w
 
 loc_382A:
@@ -6498,8 +6522,12 @@ NPC1Routines:
 NPC1_Init:
 	move.w	#$2431, art_tile(a0)
 	move.l	#Map_MotaYoungMan, mappings(a0)
-	move.w	mappings(a0), facing_dir(a0)	; facing direction should be either 0, 3, 6, 9; this line is using the mappings offset which is wrong;
-											; this also applies to other NPC objects
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$20, $28(a0)
 	move.b	#0, $35(a0)
@@ -6641,7 +6669,12 @@ MotaYoungWomanRoutines:
 loc_3D9C:
 	move.w	#$246A, 8(a0)
 	move.l	#Map_MotaYoungWoman, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$20, $28(a0)
 	move.b	#0, $34(a0)
@@ -6776,7 +6809,12 @@ MotaOldManRoutines:
 loc_3F60:
 	move.w	#$24BE, 8(a0)
 	move.l	#Map_MotaOldMan, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$28, $28(a0)
 	move.b	#0, $34(a0)
@@ -6801,7 +6839,12 @@ MotaChildRoutines:
 loc_3FAC:
 	move.w	#$2493, 8(a0)
 	move.l	#Map_MotaChild, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#8, $28(a0)
 	move.b	#0, $35(a0)
@@ -6826,7 +6869,12 @@ loc_3FEC:
 loc_3FF8:
 	move.w	#$2400, 8(a0)
 	move.l	#loc_59EBA, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$28, $28(a0)
 	move.b	#0, $34(a0)
@@ -7016,7 +7064,12 @@ loc_429A:
 loc_42A6:
 	move.w	#$400, 8(a0)
 	move.l	#loc_59F62, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$30, $28(a0)
 	move.b	#0, $34(a0)
@@ -7225,7 +7278,12 @@ MuskCatRoutines:
 loc_456C:
 	move.w	#$400, 8(a0)
 	move.l	#loc_5A394, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$30, $28(a0)
 	move.b	#0, $34(a0)
@@ -7411,7 +7469,12 @@ loc_47DC:
 loc_47E8:
 	move.w	#$431, 8(a0)
 	move.l	#Map_MotaYoungMan, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$20, $28(a0)
 	move.b	#0, $35(a0)
@@ -7435,7 +7498,12 @@ loc_4828:
 loc_4834:
 	move.w	#$46A, 8(a0)
 	move.l	#Map_MotaYoungWoman, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$20, $28(a0)
 	move.b	#0, $34(a0)
@@ -7459,7 +7527,12 @@ loc_4874:
 loc_4880:
 	move.w	#$4BE, 8(a0)
 	move.l	#Map_MotaOldMan, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#$28, $28(a0)
 	move.b	#0, $34(a0)
@@ -7483,7 +7556,12 @@ loc_48C0:
 loc_48CC:
 	move.w	#$493, 8(a0)
 	move.l	#Map_MotaChild, 4(a0)
-	move.w	4(a0), $2A(a0)
+; Fix: facing direction
+	if bugfixes=1
+	move.w	#3, facing_dir(a0)	; default to DOWN
+	else
+	move.w	mappings(a0), facing_dir(a0)
+	endif
 	move.w	#4, $2C(a0)
 	move.w	#8, $28(a0)
 	move.b	#0, $35(a0)
@@ -12137,6 +12215,10 @@ loc_7C4A:
 	move.l	a0, ($FFFFDE00).w
 	jsr	(LoadDynWindowsInRam).l
 
+; Fix
+	if bugfixes=1
+	clr.w	(Encounter_step_flag).w
+	endif
 	move.w	#0, (Encounter_step_counter).w
 	move.w	#0, (Fight_active_flag).w
 	lea	(loc_2B1F0).l, a0
@@ -20784,7 +20866,11 @@ EventJumpTable:
 
 Event_Talk:
 	tst.w	d2
+	if bugfixes=1
+	bne.w	loc_DA26
+	else
 	bne.s	loc_DA26
+	endif
 	tst.w	(Map_index).w
 	bne.s	loc_D9BA
 	tst.w	(Jet_Scooter_flag).w
@@ -20796,6 +20882,12 @@ loc_D9BA:
 	rts
 
 loc_D9C6:
+; Fix: update position to avoid potential crash
+	if bugfixes=1
+	move.w	($FFFFE80E).w, (Characters_RAM+y_pos).w	; update characters' Y position to be the same as that of the Jet Scooter
+	move.w	($FFFFE80A).w, (Characters_RAM+x_pos).w	; update characters' X position to be the same as that of the Jet Scooter
+	move.w	($FFFFE82A).w, ($FFFFE42A).w	; same facing direction
+	endif
 	lea	($FFFFE800).w, a0
 	lea	(JetScooter_CharOffPosOffsets).l, a1
 	move.w	$2A(a0), d0
@@ -75587,7 +75679,12 @@ Battle_MechomanMap:
 	dc.w	loc_97E68-Battle_MechomanMap
 	dc.w	loc_97E7E-Battle_MechomanMap
 	dc.w	loc_97E94-Battle_MechomanMap
-	dc.w	loc_97E94-Battle_MechomanMap	; should be loc_97EAA-Battle_MechomanMap
+; Fix
+	if bugfixes=1
+	dc.w	loc_97EAA-Battle_MechomanMap
+	else
+	dc.w	loc_97E94-Battle_MechomanMap
+	endif
 	dc.w	loc_97EC0-Battle_MechomanMap
 	dc.w	loc_97ED6-Battle_MechomanMap
 	dc.w	loc_97EE2-Battle_MechomanMap
