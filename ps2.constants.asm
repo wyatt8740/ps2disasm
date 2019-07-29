@@ -1216,6 +1216,8 @@ Character_names =  ramaddr($FFFFC660)
 
 Town_flags =  ramaddr($FFFFC700)
 Event_flags =  ramaddr($FFFFC710)
+Map_event_load =  ramaddr($FFFFC710)
+Map_event_run =  ramaddr($FFFFC711)
 Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for treasure chests are
 
 Battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle

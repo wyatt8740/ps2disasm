@@ -842,7 +842,7 @@ Map_LoadObjects:
 	bne.s	+
 	tst.b	($FFFFC716).w
 	beq.s	+
-	tst.b	(Event_flags).w
+	tst.b	(Map_event_load).w
 	bne.s	+
 	move.w	#ObjID_JetScooter, ($FFFFE800).w
 	move.w	(Jet_Scooter_Y_pos).w, ($FFFFE80E).w
@@ -5091,7 +5091,7 @@ loc_2E46:
 	move.w	#MapID_Gaira, (Map_index).w			; move to Gaira
 	move.w	#$2B0, (Map_Y_pos).w
 	move.w	#$50, (Map_X_pos).w
-	move.w	#$A00, (Event_flags).w
+	move.w	#$A00, (Map_event_load).w
 	rts
 ; -----------------------------------------------------------------
 EnemyTech_TurnEvil:
@@ -5928,7 +5928,7 @@ MapCharacter_Main:
 	bpl.w	loc_390E
 
 loc_3786:
-	tst.b	(Event_flags).w
+	tst.b	(Map_event_load).w
 	bne.w	loc_39D0
 	tst.w	(Window_index).w
 	bne.w	loc_39D0
@@ -11261,7 +11261,7 @@ loc_70D6:
 	move.w	d0, (Map_Y_pos).w
 	move.w	#$210, (Map_X_pos).w
 	move.w	#-1, (Screen_changed_flag).w
-	move.w	#$E00, (Event_flags).w
+	move.w	#$E00, (Map_event_load).w
 loc_7102:
 	rts
 loc_7104:
@@ -11625,7 +11625,7 @@ MoveToOpeningScreen:
 	move.w	#MapID_MotaviaOutside, (Map_index).w
 	move.w	#$520, (Map_Y_pos).w
 	move.w	#$5B0, (Map_X_pos).w
-	move.w	#$1007, (Event_flags).w
+	move.w	#$1007, (Map_event_load).w
 	move.w	#$3C, ($FFFFF780).w
 	move.b	#$82, ($FFFFF640).w	; keep playing same music
 	rts
@@ -12186,7 +12186,7 @@ EndingCredits_Script:
 
 ; ------------------------------------------------------------
 GameMode_Map:
-	cmpi.w	#$E00,(Event_flags).w
+	cmpi.w	#$E00, (Map_event_load).w
 	beq.s	loc_7C22
 	bsr.w	PaletteFadeFrom
 	bra.s	loc_7C26
@@ -12250,7 +12250,7 @@ loc_7CCE:
 	move.w	#$300,($FFFFE408).w
 	bsr.w	Map_LoadData
 	bsr.w	Map_LoadObjects
-	bsr.w	loc_7E02
+	bsr.w	Map_EventLoad
 	tst.w	(Characters_RAM).w
 	beq.s	loc_7D08
 	lea	($FFFFE440).w, a0
@@ -12266,7 +12266,7 @@ loc_7CF6:
 	dbf	d0, loc_7CF6
 
 loc_7D08:
-	bclr	#7, (Event_flags).w
+	bclr	#7, (Map_event_load).w
 	bne.s	+
 	bsr.w	loc_9002
 +
@@ -12286,7 +12286,7 @@ loc_7D08:
 	move	#$2500, sr
 	move.b	#$10, (V_int_routine).w
 	bsr.w	WaitForVInt
-	cmpi.w	#$E00, (Event_flags).w
+	cmpi.w	#$E00, (Map_event_load).w
 	beq.s	loc_7D66
 	bsr.w	PaletteFadeTo
 	bra.s	GameMode_MapLoop
@@ -12308,7 +12308,7 @@ GameMode_MapLoop:
 	bsr.w	UpdateWindows
 	bsr.w	loc_5F74
 	jsr	(RenderCharSprites).l
-	bsr.w	loc_809C
+	bsr.w	Map_EventRun
 	jsr	(ProcessRandomBattle).l
 	bsr.w	loc_6430
 	btst	#6, ($FFFFF712).w
@@ -12340,14 +12340,17 @@ loc_7DF6:
 loc_7E00:
 	rts
 
-loc_7E02:
-	move.b	(Event_flags).w, d1
-	bne.s	+
+
+; -----------------------------------------------------------------
+Map_EventLoad:
+	move.b	(Map_event_load).w, d1
+	bne.s	EventLoad_NeiDeath
 	rts
 
-+
+; 1
+EventLoad_NeiDeath:
 	subq.b	#1, d1
-	bne.s	loc_7E6A
+	bne.s	EventLoad_NeifirstDeath
 	move	#$2700,sr
 	lea	(loc_AF4EA).l, a1
 	move.l	#$410C0003, d0
@@ -12362,15 +12365,16 @@ loc_7E02:
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$26, (Interaction_type).w
-	move.w	#$8200, (Event_flags).w
+	move.w	#$26, (Interaction_type).w ; => Event_NeiDeath
+	move.w	#$8200, (Map_event_load).w
 	move.b	#MusicID_Power, (Sound_queue).w
 	move.b	#$87, ($FFFFF640).w
 	rts
 
-loc_7E6A:
+; 2
+EventLoad_NeifirstDeath:
 	subq.b	#1, d1
-	bne.s	loc_7EE4
+	bne.s	EventLoad_ClimatrolOverflow
 	move	#$2700, sr
 	lea	(loc_AF4EA).l, a1
 	move.l	#$410C0003, d0
@@ -12390,8 +12394,8 @@ loc_7E6A:
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$27, (Interaction_type).w
-	move.w	#$8300, (Event_flags).w
+	move.w	#$27, (Interaction_type).w	; => Event_NeifirstDeath
+	move.w	#$8300, (Map_event_load).w
 	tst.w	($FFFFC042).w			; is Nei dead?
 	bne.s	+			; if not, branch
 	move.b	#MusicID_Power, (Sound_queue).w		; otherwise play Power music
@@ -12399,94 +12403,117 @@ loc_7E6A:
 	move.b	#$87, ($FFFFF640).w
 	rts
 
-loc_7EE4:
+; 3
+EventLoad_ClimatrolOverflow:
 	subq.b	#1, d1
 	bne.s	loc_7F14
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$28, (Interaction_type).w
-	move.w	#$403, (Event_flags).w
+	move.w	#$28, (Interaction_type).w	; => Event_ClimatrolOverflow
+	move.w	#$403, (Map_event_load).w
 	move.w	#MapID_MotaviaOutside, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
 	move.b	#$82, ($FFFFF640).w
 	rts
+
+; 4
 loc_7F14:
 	subq.b	#1, d1
 	bne.s	loc_7F44
 	move.w	#0, (Characters_RAM).w
 	move.w	#$12C, (Demo_timer).w
-	move.w	#$501, (Event_flags).w
+	move.w	#$501, (Map_event_load).w
 	move.w	#MapID_ClimatrolF7, (Map_index).w
 	move.w	#$1A0, (Map_Y_pos).w
 	move.w	#$300, (Map_X_pos).w
 	move.b	#$87, ($FFFFF640).w
 	rts
+
+; 5
 loc_7F44:
 	subq.b	#1, d1
 	bne.s	loc_7F80
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$29, (Interaction_type).w
 	move.w	#$12C, (Demo_timer).w
-	move.w	#$602, (Event_flags).w
+	move.w	#$602, (Map_event_load).w
 	move.w	#MapID_MotaviaOutside, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
 	move.b	#1, ($FFFFC735).w
 	move.b	#$82, ($FFFFF640).w
 	rts
+
+; 6
 loc_7F80:
 	subq.b	#1, d1
 	bne.s	loc_7FB0
 	move.w	#0, (Characters_RAM).w
 	move.w	#$12C, (Demo_timer).w
-	move.w	#$704, (Event_flags).w
+	move.w	#$704, (Map_event_load).w
 	move.w	#MapID_ClimatrolF7, ($FFFFF748).w
 	move.w	#$1A0, ($FFFFF74A).w
 	move.w	#$300, ($FFFFF74C).w
 	move.b	#$87, ($FFFFF640).w
 	rts
+
+; 7
 loc_7FB0:
 	subq.b	#1, d1
 	bne.s	loc_7FCE
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$2A, (Interaction_type).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	move.b	#$84, ($FFFFF640).w
 	rts
+
+; 8
 loc_7FCE:
 	subq.b	#1, d1
 	bne.s	loc_7FD4
 	rts
+
+; 9
 loc_7FD4:
 	subq.b	#1, d1
-	bne.s	loc_7FDA
+	bne.s	EventLoad_Gaira
 	rts
-loc_7FDA:
+
+; $A
+EventLoad_Gaira:
 	subq.b	#1, d1
 	bne.s	loc_7FF2
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$2D, (Interaction_type).w
-	move.w	#0, (Event_flags).w
+	move.w	#$2D, (Interaction_type).w	; => Event_Gaira
+	move.w	#0, (Map_event_load).w
 	rts
+
+; $B
 loc_7FF2:
 	subq.b	#1, d1
 	bne.s	loc_8010
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$36, (Interaction_type).w
-	move.w	#$8000, (Event_flags).w
+	move.w	#$8000, (Map_event_load).w
 	rts
+
+; $C
 loc_8010:
 	subq.b	#1, d1
 	bne.s	loc_8022
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$31, (Interaction_type).w
 	rts
+
+; $D
 loc_8022:
 	subq.b	#1, d1
-	bne.s	loc_8028
+	bne.s	EventLoad_MotherBrain
 	rts
-loc_8028:
+
+; $E
+EventLoad_MotherBrain:
 	subq.b	#1, d1
 	bne.s	loc_8070
 	move.w	#0, ($FFFFE424).w
@@ -12499,34 +12526,45 @@ loc_8028:
 	move.w	#$214, ($FFFFEC8A).w
 	move.w	#$1B1, ($FFFFEC8E).w
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$37, (Interaction_type).w
+	move.w	#$37, (Interaction_type).w	; => Event_MotherBrain
 	rts
+
+; $F
 loc_8070:
 	subq.b	#1, d1
-	bne.s	loc_8082
+	bne.s	EventLoad_Opening
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$38, (Interaction_type).w
 	rts
-loc_8082:
+
+; $10
+EventLoad_Opening:
 	subq.b	#1, d1
 	bne.s	loc_8094
 	move.w	#1, ($FFFFDE70).w
-	move.w	#$3B, (Interaction_type).w
+	move.w	#$3B, (Interaction_type).w	; => Event_OpeningText1
 	rts
+
+; $11
 loc_8094:
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	rts
+; -----------------------------------------------------------------
 
 
-loc_809C:
-	move.b	($FFFFC711).w, d1
+; -----------------------------------------------------------------
+Map_EventRun:
+	move.b	(Map_event_run).w, d1
 	bne.s	+
 	rts
 
+; 1
 +
 	subq.b	#1, d1
 	bne.s	+
 	bra.w	loc_8240
+
+; 2
 +
 	subq.b	#1, d1
 	bne.s	loc_80D4
@@ -12540,6 +12578,7 @@ loc_809C:
 	move.l	d0, ($FFFFF620).w
 	bra.w	loc_8240
 
+; 3
 loc_80D4:
 	subq.b	#1, d1
 	bne.s	loc_810E
@@ -12557,6 +12596,7 @@ loc_80D4:
 	move.l	d0, ($FFFFF620).w
 	rts
 
+; 4
 loc_810E:
 	subq.b	#1, d1
 	bne.s	loc_8130
@@ -12568,6 +12608,8 @@ loc_810E:
 	move.w	($FFFFF74C).w, (Map_X_pos).w
 loc_812E:
 	rts
+
+; 5
 loc_8130:
 	subq.b	#1, d1
 	bne.s	loc_815C
@@ -12581,9 +12623,11 @@ loc_8130:
 	bra.w	loc_824C
 loc_815A:
 	rts
+
+; 6
 loc_815C:
 	subq.b	#1, d1
-	bne.s	loc_8192
+	bne.s	EventRun_Opening
 	tst.w	($FFFFDE70).w
 	bne.s	loc_817C
 	tst.w	(Window_index).w
@@ -12598,9 +12642,11 @@ loc_817C:
 loc_817E:
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$2E, (Interaction_type).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	rts
-loc_8192:
+
+; 7
+EventRun_Opening:
 	subq.b	#1, d1
 	bne.s	loc_81E6
 	tst.w	($FFFFDE70).w
@@ -12634,6 +12680,8 @@ loc_81C4:
 	addq.w	#1, ($FFFFF780).w
 loc_81E4:
 	rts
+
+; 8
 loc_81E6:
 	subq.b	#1, d1
 	bne.s	loc_8224
@@ -12654,9 +12702,13 @@ loc_81E6:
 	move.w	#$101, (Enemy_formation).w		; Army Eye boss battle
 	move.b	#GameModeID_Battle, (Game_mode_index).w
 loc_821E:
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
+
+; 9
 loc_8224:
 	rts
+; -----------------------------------------------------------------
+
 
 loc_8226:
 	bsr.w	UpdateRNGSeed
@@ -12677,7 +12729,7 @@ loc_8240:
 	rts
 
 loc_824C:
-	move.b	#0, ($FFFFC711).w
+	move.b	#0, (Map_event_run).w
 	move.w	#-1, (Screen_changed_flag).w
 	rts
 
@@ -14963,7 +15015,7 @@ ProcessPlayerMenu:
 	bne.s	loc_9A20
 	tst.w	(Demo_flag).w
 	bne.s	+	; rts
-	tst.b	(Event_flags).w
+	tst.b	(Map_event_load).w
 	bne.s	+	; rts
 
 	move.b	(Joypad_pressed).w, d0
@@ -15320,7 +15372,7 @@ loc_9D70:
 	bne.s	loc_9D6A
 	moveq	#0, d0
 	move.b	(Item_index).w, d0
-	move.w	#8, (Event_flags).w
+	move.w	#8, (Map_event_load).w
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
 	bra.w	RemoveItemFromInventory
 loc_9D92:
@@ -19873,7 +19925,7 @@ loc_CF0A:
 	bne.s	loc_CF38
 	move.l	#$190B190E, (Script_ID).w
 	addq.w	#4, (Event_routine).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	move.b	#0, (Treasure_chest_flags+Chest_Prism).w
 	rts
 loc_CF38:
@@ -20051,7 +20103,7 @@ ProcessStealItem_Continue:
 	addq.w	#2, a1
 	move.w	#0, (a1)
 	subq.w	#1, (Party_members_num).w
-	move.w	#$C00, (Event_flags).w
+	move.w	#$C00, (Map_event_load).w
 	rts
 
 ; ===============================================
@@ -20710,7 +20762,7 @@ Map_CheckInteractions:
 	bne.s	loc_D7FA
 	tst.w	(Demo_flag).w
 	bne.s	loc_D7FA
-	tst.b	(Event_flags).w
+	tst.b	(Map_event_load).w
 	bne.s	loc_D7FA
 
 	move.b	(Joypad_pressed).w, d0
@@ -20854,12 +20906,12 @@ EventJumpTable:
 	bra.w	Event_AfterMotherBrain	; $38
 	bra.w	Event_Earthmen	; $39
 	bra.w	Event_EarthmenSpeech	; $3A
-	bra.w	Event_IntroText1	; $3B
-	bra.w	Event_IntroText2	; $3C
-	bra.w	Event_IntroText3	; $3D
-	bra.w	Event_IntroText4	; $3E
-	bra.w	Event_IntroText5	; $3F
-	bra.w	Event_IntroText6	; $40
+	bra.w	Event_OpeningText1	; $3B
+	bra.w	Event_OpeningText2	; $3C
+	bra.w	Event_OpeningText3	; $3D
+	bra.w	Event_OpeningText4	; $3E
+	bra.w	Event_OpeningText5	; $3F
+	bra.w	Event_OpeningText6	; $40
 ; =================================================================
 
 
@@ -21192,7 +21244,7 @@ loc_DD12:
 	addq.w	#1, ($FFFFDE72).w
 	move.w	#$100, (Enemy_formation).w		; Neifirst boss battle
 	move.b	#GameModeID_Battle, (Game_mode_index).w
-	move.w	#$100, (Event_flags).w
+	move.w	#$100, (Map_event_load).w
 	move.l	(Party_member_ID).w, ($FFFFC618).w
 	move.l	($FFFFC60C).w, ($FFFFC61C).w
 	move.l	#$10000, (Party_member_ID).w
@@ -21392,7 +21444,7 @@ loc_DF38:
 	move.w	#$1839, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
 	move.w	#$708, (Demo_timer).w
-	move.w	#6, (Event_flags).w
+	move.w	#6, (Map_event_load).w
 	lea	(Character_stats).w, a0
 	lea	($FFFFDA00).w, a1
 	bsr.w	FillMemBlock3
@@ -21485,7 +21537,7 @@ Event_ShirGone:
 	move.w	#WinID_ScriptMessage, (Window_index).w
 	move.w	#$1722, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	rts
 Event_EsperMansionEntrance:
 	move.w	#$1688, (Script_ID).w
@@ -21510,7 +21562,7 @@ loc_E090:
 loc_E096:
 	tst.b	($FFFFC743).w
 	beq.s	loc_E0A2
-	move.w	#$D00, (Event_flags).w
+	move.w	#$D00, (Map_event_load).w
 loc_E0A2:
 	addq.b	#1, ($FFFFC743).w
 	bra.w	CloseAllWindows
@@ -21527,7 +21579,7 @@ Event_DarkForce:
 	rts
 loc_E0CE:
 	move.b	#1, (a0)
-	move.w	#$B00, (Event_flags).w
+	move.w	#$B00, (Map_event_load).w
 loc_E0D8:
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
@@ -21565,7 +21617,7 @@ loc_E128:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	move.w	#$1813, (Script_ID).w
 	addq.w	#1, ($FFFFDE70).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 loc_E150:
 	rts
 loc_E152:
@@ -21614,7 +21666,7 @@ loc_E1B6:
 	move.b	#1, (a0)
 	move.w	#$103, (Enemy_formation).w		; Mother Brain boss battle
 	move.b	#GameModeID_Battle, (Game_mode_index).w
-	move.w	#$F00, (Event_flags).w
+	move.w	#$F00, (Map_event_load).w
 	rts
 loc_E1D2:
 	addq.w	#1, ($FFFFDE72).w
@@ -21630,7 +21682,7 @@ loc_E1EA:
 	bne.s	loc_E236
 	move.w	#0, (Character_index).w
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
-	move.w	#0, (Event_flags).w
+	move.w	#0, (Map_event_load).w
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d0
 	lea	(Character_stats+curr_hp).w, a2
@@ -21842,7 +21894,7 @@ NoahEnding_TeleportedCharPos:
 	dc.w	$B8, $208
 ; ==========================================
 
-Event_IntroText1:
+Event_OpeningText1:
 	move.w	#$4A0, ($FFFFC648).w
 	move.w	#$1E0, ($FFFFC64A).w
 	move.w	#$1401, d1
@@ -21860,23 +21912,23 @@ loc_E4A8:
 	addq.w	#1, ($FFFFDE72).w
 loc_E4B2:
 	rts
-Event_IntroText2:
+Event_OpeningText2:
 	move.w	#$120, ($FFFFC648).w
 	move.w	#$1402, d1
 	bra.s	loc_E48C
-Event_IntroText3:
+Event_OpeningText3:
 	move.w	#$760, ($FFFFC64A).w
 	move.w	#$1403, d1
 	bra.s	loc_E48C
-Event_IntroText4:
+Event_OpeningText4:
 	move.w	#$340, ($FFFFC648).w
 	move.w	#$1404, d1
 	bra.s	loc_E48C
-Event_IntroText5:
+Event_OpeningText5:
 	move.w	#$3F0, ($FFFFC64A).w
 	move.w	#$1405, d1
 	bra.s	loc_E48C
-Event_IntroText6:
+Event_OpeningText6:
 	move.w	#$1406, d1
 	bsr.s	loc_E48C
 	tst.w	(Demo_timer).w
@@ -69074,7 +69126,7 @@ Battle_CarrierMap:
 	dc.w	loc_8185A-Battle_CarrierMap
 	dc.w	loc_818A8-Battle_CarrierMap
 	dc.w	loc_818EA-Battle_CarrierMap
-	dc.w	loc_8192C-Battle_CarrierMap
+	dc.w	EventRun_OpeningC-Battle_CarrierMap
 	dc.w	loc_8196E-Battle_CarrierMap
 	dc.w	loc_819BC-Battle_CarrierMap
 	dc.w	loc_81A16-Battle_CarrierMap
@@ -69166,7 +69218,7 @@ loc_818EA:
 	dc.b	$00, $31, $00, $32, $00, $33, $08, $33, $08, $32, $08, $31
 	dc.b	$00, $00, $00, $34, $00, $35, $08, $35, $08, $34, $00, $00
 
-loc_8192C:
+EventRun_OpeningC:
 	dc.b	$FF
 	dc.b	$E8, $FF, $D8
 	dc.b	$05, $04
