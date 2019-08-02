@@ -1344,14 +1344,14 @@ RNG_seed =  ramaddr($FFFFF636)
 
 Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
 
-Battle_saved_sound =  ramaddr($FFFFF642)
+Battle_saved_sound =  ramaddr($FFFFF642)      
 
 Chunk_table_addr =  ramaddr($FFFFF714)
 
-Camera_Y_pos =  ramaddr($FFFFF718)
-Camera_X_pos =  ramaddr($FFFFF71A)
-Camera_Y_pos_copy =  ramaddr($FFFFF71C)
-Camera_X_pos_copy =  ramaddr($FFFFF71E)
+Camera_Y_pos_FG =  ramaddr($FFFFF718)
+Camera_X_pos_FG =  ramaddr($FFFFF71A)
+Camera_Y_pos_BG =  ramaddr($FFFFF71C)
+Camera_X_pos_BG =  ramaddr($FFFFF71E)
 Camera_max_Y_pos =  ramaddr($FFFFF720)
 Camera_max_X_pos =  ramaddr($FFFFF722)
 Camera_Y_step_counter =  ramaddr($FFFFF724)

@@ -289,7 +289,7 @@ loc_3E4:
 	move.w	$A(a0), d0
 	btst	#4, render_flags(a0)
 	bne.s	++
-	sub.w	(Camera_X_pos_copy).w, d0
+	sub.w	(Camera_X_pos_BG).w, d0
 	bcc.s	+
 	add.w	(Camera_max_X_pos).w, d0
 +
@@ -304,7 +304,7 @@ loc_3E4:
 	move.w	$E(a0), d0
 	btst	#4, render_flags(a0)
 	bne.s	++
-	sub.w	(Camera_Y_pos_copy).w, d0
+	sub.w	(Camera_Y_pos_BG).w, d0
 	bcc.s	+
 	add.w	(Camera_max_Y_pos).w, d0
 +
@@ -12568,11 +12568,11 @@ Map_EventRun:
 +
 	subq.b	#1, d1
 	bne.s	loc_80D4
-	move.w	(Camera_Y_pos_copy).w, d2
+	move.w	(Camera_Y_pos_BG).w, d2
 	andi.w	#$FF, d2
 	bsr.w	loc_8226
 	move.l	d0, ($FFFFF61C).w
-	move.w	(Camera_X_pos_copy).w, d2
+	move.w	(Camera_X_pos_BG).w, d2
 	andi.w	#$1FF, d2
 	bsr.w	loc_8226
 	move.l	d0, ($FFFFF620).w
@@ -12582,13 +12582,13 @@ Map_EventRun:
 loc_80D4:
 	subq.b	#1, d1
 	bne.s	loc_810E
-	move.w	(Camera_Y_pos_copy).w, d2
+	move.w	(Camera_Y_pos_BG).w, d2
 	andi.l	#$FF, d2
 	bsr.w	UpdateRNGSeed
 	andi.l	#$10001, d0
 	add.l	d2, d0
 	move.l	d0, ($FFFFF61C).w
-	move.w	(Camera_X_pos_copy).w, d2
+	move.w	(Camera_X_pos_BG).w, d2
 	andi.l	#$1FF, d2
 	bsr.w	UpdateRNGSeed
 	andi.l	#$10001, d0
@@ -12652,7 +12652,7 @@ EventRun_Opening:
 	tst.w	($FFFFDE70).w
 	bne.s	loc_81E4
 	move.w	($FFFFC648).w, d0
-	sub.w	(Camera_Y_pos_copy).w, d0
+	sub.w	(Camera_Y_pos_BG).w, d0
 	beq.s	loc_81AE
 	bcc.s	loc_81AC
 	moveq	#-1, d0
@@ -12662,7 +12662,7 @@ loc_81AC:
 loc_81AE:
 	move.w	d0, (Camera_Y_step_counter).w
 	move.w	($FFFFC64A).w, d1
-	sub.w	(Camera_X_pos_copy).w, d1
+	sub.w	(Camera_X_pos_BG).w, d1
 	beq.s	loc_81C4
 	bcc.s	loc_81C2
 	moveq	#-1, d1
@@ -12836,8 +12836,8 @@ loc_839A:
 	moveq	#0, d0
 	move.l	d0, ($FFFFF61C).w
 	move.l	d0, ($FFFFF620).w
-	move.l	d0, (Camera_Y_pos).w
-	move.l	d0, (Camera_Y_pos_copy).w
+	move.l	d0, (Camera_Y_pos_FG).w
+	move.l	d0, (Camera_Y_pos_BG).w
 
 	lea	(InteractionMusicPtrs).l, a1
 	adda.w	(Interaction_index).w, a1
@@ -13073,8 +13073,8 @@ loc_85D6:
 	move.l	#((6<<$18)|(WinID_BattleThirdCharStats<<$10)|(6<<8)|WinID_BattleFourthCharStats), (Window_index+4).w
 	move.w	#((7<<8)|WinID_BattleOptions), (Window_index+8).w
 	moveq	#0, d0
-	move.l	d0, (Camera_Y_pos).w
-	move.l	d0, (Camera_Y_pos_copy).w
+	move.l	d0, (Camera_Y_pos_FG).w
+	move.l	d0, (Camera_Y_pos_BG).w
 	move.w	d0, (Enemy_damage_1).w
 	move.w	d0, (Enemy_damage_2).w
 	move.w	#$92, d0		; normal battle music
@@ -13653,24 +13653,24 @@ loc_8BEA:
 loc_8BEE:
 	btst	#6, ($FFFFF712).w
 	bne.s	loc_8C0E
-	move.w	(Camera_Y_pos_copy).w, d0
+	move.w	(Camera_Y_pos_BG).w, d0
 	andi.w	#$FF, d0
 	move.w	d0, ($FFFFF61E).w
-	move.w	(Camera_X_pos_copy).w, d0
+	move.w	(Camera_X_pos_BG).w, d0
 	andi.w	#$1FF, d0
 	move.w	d0, ($FFFFF622).w
 loc_8C0E:
-	move.w	(Camera_Y_pos).w, d0
+	move.w	(Camera_Y_pos_FG).w, d0
 	andi.w	#$FF, d0
 	move.w	d0, ($FFFFF61C).w
-	move.w	(Camera_X_pos).w, d0
+	move.w	(Camera_X_pos_FG).w, d0
 	andi.w	#$1FF, d0
 	move.w	d0, ($FFFFF620).w
 	rts
 
 loc_8C28:
 	move.w	(Camera_max_Y_pos).w, d2
-	move.w	(Camera_Y_pos_copy).w, d1
+	move.w	(Camera_Y_pos_BG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	bcs.s	loc_8C42
@@ -13682,7 +13682,7 @@ loc_8C3A:
 	beq.s	loc_8C42
 	moveq	#0, d1
 loc_8C42:
-	move.w	d1, (Camera_Y_pos_copy).w
+	move.w	d1, (Camera_Y_pos_BG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8C54
@@ -13692,7 +13692,7 @@ loc_8C54:
 	beq.s	loc_8C5C
 	add.w	d0, d0
 loc_8C5C:
-	move.w	(Camera_Y_pos).w, d1
+	move.w	(Camera_Y_pos_FG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	bcs.s	loc_8C72
@@ -13711,7 +13711,7 @@ loc_8C72:
 loc_8C7C:
 	andi.w	#$FF, d1
 loc_8C80:
-	move.w	d1, (Camera_Y_pos).w
+	move.w	d1, (Camera_Y_pos_FG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8C92
@@ -13724,7 +13724,7 @@ loc_8C94:
 	beq.s	loc_8CA0
 	subi.w	#$E0, d2
 loc_8CA0:
-	move.w	(Camera_Y_pos_copy).w, d1
+	move.w	(Camera_Y_pos_BG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	sub.w	d2, d1
@@ -13739,7 +13739,7 @@ loc_8CB4:
 	beq.s	loc_8CBA
 	move.w	d2, d1
 loc_8CBA:
-	move.w	d1, (Camera_Y_pos_copy).w
+	move.w	d1, (Camera_Y_pos_BG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8CCC
@@ -13749,7 +13749,7 @@ loc_8CCC:
 	beq.s	loc_8CD4
 	add.w	d0, d0
 loc_8CD4:
-	move.w	(Camera_Y_pos).w, d1
+	move.w	(Camera_Y_pos_FG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	tst.w	(a1)
@@ -13772,7 +13772,7 @@ loc_8CF2:
 loc_8CFC:
 	andi.w	#$FF, d1
 loc_8D00:
-	move.w	d1, (Camera_Y_pos).w
+	move.w	d1, (Camera_Y_pos_FG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8D12
@@ -13781,7 +13781,7 @@ loc_8D12:
 	rts
 loc_8D14:
 	move.w	(Camera_max_X_pos).w, d2
-	move.w	(Camera_X_pos_copy).w, d1
+	move.w	(Camera_X_pos_BG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	bcs.s	loc_8D2E
@@ -13793,7 +13793,7 @@ loc_8D26:
 	beq.s	loc_8D2E
 	moveq	#0, d1
 loc_8D2E:
-	move.w	d1, (Camera_X_pos_copy).w
+	move.w	d1, (Camera_X_pos_BG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8D40
@@ -13803,7 +13803,7 @@ loc_8D40:
 	beq.s	loc_8D48
 	add.w	d0, d0
 loc_8D48:
-	move.w	(Camera_X_pos).w, d1
+	move.w	(Camera_X_pos_FG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	bcs.s	loc_8D5E
@@ -13822,7 +13822,7 @@ loc_8D5E:
 loc_8D68:
 	andi.w	#$1FF, d1
 loc_8D6C:
-	move.w	d1, (Camera_X_pos).w
+	move.w	d1, (Camera_X_pos_FG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8D7E
@@ -13835,7 +13835,7 @@ loc_8D80:
 	beq.s	loc_8D8C
 	subi.w	#$140, d2
 loc_8D8C:
-	move.w	(Camera_X_pos_copy).w, d1
+	move.w	(Camera_X_pos_BG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	sub.w	d2, d1
@@ -13850,7 +13850,7 @@ loc_8DA0:
 	beq.s	loc_8DA6
 	move.w	d2, d1
 loc_8DA6:
-	move.w	d1, (Camera_X_pos_copy).w
+	move.w	d1, (Camera_X_pos_BG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8DB8
@@ -13860,7 +13860,7 @@ loc_8DB8:
 	beq.s	loc_8DC0
 	add.w	d0, d0
 loc_8DC0:
-	move.w	(Camera_X_pos).w, d1
+	move.w	(Camera_X_pos_FG).w, d1
 	move.w	d1, d3
 	add.w	d0, d1
 	tst.w	(a1)
@@ -13883,7 +13883,7 @@ loc_8DDE:
 loc_8DE8:
 	andi.w	#$1FF, d1
 loc_8DEC:
-	move.w	d1, (Camera_X_pos).w
+	move.w	d1, (Camera_X_pos_FG).w
 	eor.w	d3, d1
 	andi.w	#$20, d1
 	beq.s	loc_8DFE
@@ -13895,7 +13895,7 @@ loc_8E00:
 	tst.w	($FFFFF712).w
 	bmi.s	loc_8E18
 	lea	($FFFFF728).w, a6
-	lea	(Camera_Y_pos).w, a5
+	lea	(Camera_Y_pos_FG).w, a5
 	lea	(Map_layout_FG).w, a4
 	move.w	#$4000, d2
 	bsr.s	loc_8E30
@@ -13903,7 +13903,7 @@ loc_8E18:
 	btst	#6, ($FFFFF712).w
 	bne.s	loc_8E58
 	lea	($FFFFF72A).w, a6
-	lea	(Camera_Y_pos_copy).w, a5
+	lea	(Camera_Y_pos_BG).w, a5
 	lea	(Map_layout_BG).w, a4
 	move.w	#$6000, d2
 loc_8E30:
@@ -14095,11 +14095,11 @@ loc_8FEA:
 	rts
 
 loc_9002:
-	lea	(Camera_Y_pos).w, a5
+	lea	(Camera_Y_pos_FG).w, a5
 	lea	(Map_layout_FG).w, a4
 	move.w	#$4000, d2
 	bsr.s	loc_902A
-	lea	(Camera_Y_pos_copy).w, a5
+	lea	(Camera_Y_pos_BG).w, a5
 	btst	#6, ($FFFFF712).w
 	beq.s	loc_9022
 	lea	(loc_9060).l, a5
@@ -14244,8 +14244,8 @@ loc_919A:
 	beq.s	loc_91AA
 	move.w	d1, d0
 loc_91AA:
-	move.w	d0, (Camera_X_pos_copy).w
-	move.w	d0, (Camera_X_pos).w
+	move.w	d0, (Camera_X_pos_BG).w
+	move.w	d0, (Camera_X_pos_FG).w
 	move.w	(Map_Y_pos).w, d0
 	move.w	(Camera_max_Y_pos).w, d1
 	subi.w	#$80, d0
@@ -14262,13 +14262,13 @@ loc_91CA:
 	beq.s	loc_91DA
 	move.w	d1, d0
 loc_91DA:
-	move.w	d0, (Camera_Y_pos_copy).w
-	move.w	d0, (Camera_Y_pos).w
+	move.w	d0, (Camera_Y_pos_BG).w
+	move.w	d0, (Camera_Y_pos_FG).w
 	moveq	#0, d0
 	tst.w	($FFFFF712).w
 	bpl.s	loc_91F2
-	move.w	d0, (Camera_X_pos).w
-	move.w	d0, (Camera_Y_pos).w
+	move.w	d0, (Camera_X_pos_FG).w
+	move.w	d0, (Camera_Y_pos_FG).w
 loc_91F2:
 	bsr.w	loc_8BEE
 	moveq	#0, d0
@@ -14415,17 +14415,17 @@ DrawWindows:
 	lea	(WindowArtLayoutPtrs-8).l, a1
 	lsl.w	#3, d0
 	adda.w	d0, a1
-	move.w	(Camera_Y_pos_copy).w, d0
+	move.w	(Camera_Y_pos_BG).w, d0
 	andi.w	#$F, d0
 	bne.w	loc_9478
-	move.w	(Camera_X_pos_copy).w, d0
+	move.w	(Camera_X_pos_BG).w, d0
 	andi.w	#$F, d0
 	bne.w	loc_9478
 	lea	($FFFFDF00).w, a0
 	move.w	(Current_active_objects_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	lea	(Camera_Y_pos).w, a5
+	lea	(Camera_Y_pos_FG).w, a5
 	move.w	(a5)+, d4
 	move.w	(a5), d5
 	andi.w	#$F8, d4
