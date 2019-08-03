@@ -286,7 +286,74 @@ loc_3E4:
 
 +
 	move.w	d0, $E(a0)
-	move.w	$A(a0), d0
+
+; Improve sprite render logic
+	if 1=0
+	move.w	x_pos(a0), d0
+	btst	#4, render_flags(a0)
+	bne.s	++
+	move.w	d0, d2
+	addi.w	#$80, d0
+	move.w	(Camera_X_pos_BG).w, d1
+	cmp.w	d1, d2
+	bge.s	+
+	move.w	d1, d3
+	lsr.w	#1, d3
+	cmp.w	d2, d3
+	bgt.s	+++
++
+	sub.w	d1, d0
++
+	cmpi.w	#$40, d0
+	bls.w	RunObjectEnd
+	cmpi.w	#$1E0, d0
+	bcc.w	RunObjectEnd
+	move.w	d0, sprite_x_pos(a0)
+	bra.s	SpriteRender_YPos
++
+	move.w	(Camera_max_X_pos).w, d2
+	sub.w	d2, d1
+	sub.w	d1, d0
+	cmpi.w	#$40, d0
+	bls.w	RunObjectEnd
+	cmpi.w	#$1E0, d0
+	bcc.w	RunObjectEnd
+	move.w	d0, sprite_x_pos(a0)
+
+SpriteRender_YPos:
+	move.w	y_pos(a0), d0
+	btst	#4, render_flags(a0)
+	bne.s	++
+	move.w	d0, d2
+	addi.w	#$80, d0
+	move.w	(Camera_Y_pos_BG).w, d1
+	cmp.w	d1, d2
+	bge.s	+
+	move.w	d1, d3
+	lsr.w	#1, d3
+	cmp.w	d2, d3
+	bgt.s	+++
++
+	sub.w	d1, d0
++
+	cmpi.w	#$40, d0
+	bls.w	RunObjectEnd
+	cmpi.w	#$180, d0
+	bcc.w	RunObjectEnd
+	move.w	d0, sprite_y_pos(a0)
+	bra.s	Obj_SpriteTable
++
+	move.w	(Camera_max_Y_pos).w, d2
+	sub.w	d2, d1
+	sub.w	d1, d0
+	cmpi.w	#$40, d0
+	bls.w	RunObjectEnd
+	cmpi.w	#$180, d0
+	bcc.w	RunObjectEnd
+	move.w	d0, sprite_y_pos(a0)
+
+	else
+	move.w	x_pos(a0), d0
 	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	(Camera_X_pos_BG).w, d0
@@ -300,8 +367,9 @@ loc_3E4:
 	bls.w	RunObjectEnd
 	cmpi.w	#$1E0, d0
 	bcc.w	RunObjectEnd
-	move.w	d0, $20(a0)
-	move.w	$E(a0), d0
+	move.w	d0, sprite_x_pos(a0)
+
+	move.w	y_pos(a0), d0
 	btst	#4, render_flags(a0)
 	bne.s	++
 	sub.w	(Camera_Y_pos_BG).w, d0
@@ -316,7 +384,10 @@ loc_3E4:
 	bmi.w	RunObjectEnd
 	cmpi.w	#$180, d0
 	bcc.w	RunObjectEnd
-	move.w	d0, $1E(a0)
+	move.w	d0, sprite_y_pos(a0)
+	endif
+
+Obj_SpriteTable:
 	btst	#1, render_flags(a0)
 	bne.s	+++	; rts
 	lea	(Sprite_table_input).w, a1
