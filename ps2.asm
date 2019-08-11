@@ -11033,7 +11033,7 @@ loc_6DB2:
 loc_6DC4:
 	addq.w	#4, d1
 	btst	d1, (a1)
-	bne.w	loc_6E4E
+	bne.w	RunMapTransition
 loc_6DCC:
 	moveq	#-1, d2
 	rts
@@ -11049,7 +11049,7 @@ JetScooter_ChkCanMove:
 loc_6DDE:
 	addq.w	#4, d1
 	btst	d1, (a1)
-	bne.s	loc_6E4E
+	bne.s	RunMapTransition
 	moveq	#-1, d2
 	rts
 
@@ -11097,7 +11097,13 @@ loc_6E14:
 	andi.w	#1, d2
 	add.w	d2, d1
 	rts
-loc_6E4E:
+
+
+; -----------------------------------------------------------------
+; d4 = Y position
+; d5 = X position
+; -----------------------------------------------------------------
+RunMapTransition:
 	moveq	#2, d1
 	lsr.w	#4, d4
 	move.w	d4, d2
@@ -11105,49 +11111,50 @@ loc_6E4E:
 	lsr.w	#4, d5
 	move.w	d5, d3
 	add.w	d1, d3
-	movea.l	($FFFFF736).w, a1
-loc_6E60:
+	movea.l	(Map_transition_addr).w, a1
+.loop:
 	cmpi.b	#$FF, (a1)
-	beq.s	loc_6E7E
-	move.b	(a1)+, d0
-	move.b	(a1)+, d1
+	beq.s	.cont
+	move.b	(a1)+, d0	; d0 = Y position
+	move.b	(a1)+, d1	; d1 = X position
 	cmp.b	d0, d4
-	bhi.s	loc_6E7A
+	bhi.s	.next
 	cmp.b	d0, d2
-	bcs.s	loc_6E7A
+	bcs.s	.next
 	cmp.b	d1, d5
-	bhi.s	loc_6E7A
+	bhi.s	.next
 	cmp.b	d1, d3
-	bcc.s	loc_6EA6
-loc_6E7A:
+	bcc.s	.found
+.next:
 	addq.w	#4, a1
-	bra.s	loc_6E60
-loc_6E7E:
+	bra.s	.loop
+
+.cont:
 	move.w	(Map_index).w, d0
 	cmpi.w	#MapID_EsperMansionB1, d0
-	bcs.s	loc_6EA2
+	bcs.s	.none
 	subq.w	#4, d0
 	move.w	d0, d1
 	add.w	d0, d0
 	add.w	d1, d0
-	lea	(loc_28546).l, a1
+	lea	(OverworldTransitionData).l, a1
 	adda.w	d0, a1
 	move.b	#SFXID_MapChanged, (Sound_queue).w
 	bra.w	loc_6FA6
-loc_6EA2:
+.none:
 	moveq	#-1, d4
 	rts
 
-loc_6EA6:
+.found:
 	moveq	#0, d0
-	move.b	(a1)+, d0
-	beq.w	loc_6F1C
+	move.b	(a1)+, d0	; get type
+	beq.w	loc_6F1C	; if 0, branch
 	cmpi.w	#1, d0
 	bne.s	loc_6EE6
-	cmpi.b	#$37, (a1)
-	bne.s	loc_6ED6
-	tst.w	(Character_stats+curr_hp).w
-	bne.s	loc_6ED6
+	cmpi.b	#$37, (a1)	; is it Rolf house?
+	bne.s	loc_6ED6	; if not, branch
+	tst.w	(Rolf_stats+curr_hp).w
+	bne.s	loc_6ED6	; if Rolf is alive, branch
 	move.w	#1, ($FFFFDE70).w
 	move.w	#0, ($FFFFDE72).w
 	move.w	#$303, (Interaction_type).w
@@ -11178,12 +11185,14 @@ loc_6EE6:
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_X_pos).w
 	rts
+
+
 loc_6F1C:
 	move.w	(Map_index).w, d0
 	cmpi.w	#MapID_EsperMansionB1, d0
-	bcc.s	loc_6F4E
-	cmpi.b	#$10, (a1)
-	bcs.s	loc_6F4E
+	bcc.s	+
+	cmpi.b	#MapID_EsperMansionB1, (a1)
+	bcs.s	+
 	move.w	d0, ($FFFFC64C).w
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
@@ -11192,7 +11201,7 @@ loc_6F1C:
 	andi.w	#$FFF0, d0
 	move.w	d0, ($FFFFC650).w
 	move.w	#0, (Encounter_rate_decreased_flag).w
-loc_6F4E:
++
 	move.b	#SFXID_MapChanged, (Sound_queue).w
 	bra.s	loc_6FA6
 
@@ -11224,9 +11233,10 @@ loc_6F90:
 	move.w	d0, d1				; multiply d0 by 3
 	add.w	d0, d0
 	add.w	d1, d0
-	lea	(loc_28546).l, a1
+	lea	(OverworldTransitionData).l, a1
 	adda.w	d0, a1
 	move.b	#SFXID_MapChanged, (Sound_queue).w
+
 loc_6FA6:
 	moveq	#0, d0
 	move.b	(a1)+, d0
@@ -11336,7 +11346,7 @@ loc_70D6:
 loc_7102:
 	rts
 loc_7104:
-	bra.w	loc_6E4E
+	bra.w	RunMapTransition
 loc_7108:
 	tst.w	$30(a0)
 	beq.w	loc_7188
@@ -11693,7 +11703,7 @@ MoveToGameMode_Intro:
 MoveToOpeningScreen:
 	move.w	#1, (Opening_ending_flag).w
 	move.b	#GameModeID_Map, (Game_mode_index).w
-	move.w	#MapID_MotaviaOutside, (Map_index).w
+	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$520, (Map_Y_pos).w
 	move.w	#$5B0, (Map_X_pos).w
 	move.w	#$1007, (Map_event_load).w
@@ -12481,7 +12491,7 @@ EventLoad_ClimatrolOverflow:
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$28, (Interaction_type).w	; => Event_ClimatrolOverflow
 	move.w	#$403, (Map_event_load).w
-	move.w	#MapID_MotaviaOutside, (Map_index).w
+	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
 	move.b	#$82, ($FFFFF640).w
@@ -12508,7 +12518,7 @@ loc_7F44:
 	move.w	#$29, (Interaction_type).w
 	move.w	#$12C, (Demo_timer).w
 	move.w	#$602, (Map_event_load).w
-	move.w	#MapID_MotaviaOutside, (Map_index).w
+	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
 	move.b	#1, ($FFFFC735).w
@@ -14266,7 +14276,7 @@ loc_9120:
 	move.l	(a1)+, (Map_collision_data_addr).w
 	moveq	#0, d1
 	move.b	(a1), d1
-	move.l	(a1)+, ($FFFFF736).w
+	move.l	(a1)+, (Map_transition_addr).w
 	moveq	#0, d2
 	move.b	(a1)+, d2
 	move.b	(a1), d0
@@ -15389,7 +15399,7 @@ loc_9CD6:
 	move.w	#MapID_UnderwaterPassage, (Map_index).w
 	move.w	#$170, (Map_Y_pos).w
 	move.w	#$700, (Map_X_pos).w
-	move.w	#MapID_MotaviaOutside, ($FFFFC64C).w
+	move.w	#MapID_MotaOverworld, ($FFFFC64C).w
 	move.w	($FFFFE80E).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, ($FFFFC64E).w
@@ -27377,7 +27387,7 @@ Shir_BattleTechs:
 StoreEquipItemArray:
 
 ; ---------------------------------------------
-; Paseo Item Store
+; 0 - Paseo Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Antidote
@@ -27387,7 +27397,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Paseo Armor Store
+; 1 - Paseo Armor Store
 	dc.b	ItemID_Headgear
 	dc.b	ItemID_CarbonSuit
 	dc.b	ItemID_CarbonVest
@@ -27397,7 +27407,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Paseo Weapon Store
+; 2 - Paseo Weapon Store
 	dc.b	ItemID_Knife
 	dc.b	ItemID_Dagger
 	dc.b	ItemID_Scalpel
@@ -27407,7 +27417,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Arima Weapon Store
+; 3 - Arima Weapon Store
 	dc.b	ItemID_Dagger
 	dc.b	ItemID_SteelBar
 	dc.b	ItemID_Sword
@@ -27417,7 +27427,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Oputa Item Store
+; 4 - Oputa Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Antidote
@@ -27427,7 +27437,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Oputa Armor Store
+; 5 - Oputa Armor Store
 	dc.b	ItemID_Fibergear
 	dc.b	ItemID_SilRibbon
 	dc.b	ItemID_FiberCoat
@@ -27437,7 +27447,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Oputa Weapon Store
+; 6 - Oputa Weapon Store
 	dc.b	ItemID_Scalpel
 	dc.b	ItemID_CeramBar
 	dc.b	ItemID_Sword
@@ -27447,7 +27457,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zema Item Store
+; 7 - Zema Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Antidote
@@ -27457,7 +27467,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zema Armor Store
+; 8 - Zema Armor Store
 	dc.b	ItemID_Titanigear
 	dc.b	ItemID_Titanimet
 	dc.b	ItemID_Shoes
@@ -27467,7 +27477,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zema Weapon Store
+; 9 - Zema Weapon Store
 	dc.b	ItemID_Whip
 	dc.b	ItemID_CrmcSword
 	dc.b	ItemID_Slasher
@@ -27477,7 +27487,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Kueri Item Store
+; $A - Kueri Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Trimate
@@ -27487,7 +27497,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Kueri Armor Store
+; $B - Kueri Armor Store
 	dc.b	ItemID_TtnmArmor
 	dc.b	ItemID_TtnmCape
 	dc.b	ItemID_TtnmChest
@@ -27497,7 +27507,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Kueri Weapon Store
+; $C - Kueri Weapon Store
 	dc.b	ItemID_Boomerang
 	dc.b	ItemID_LasrSlshr
 	dc.b	ItemID_LaserBar
@@ -27507,7 +27517,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Piata Item Store
+; $D - Piata Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Trimate
@@ -27517,7 +27527,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Piata Armor Store
+; $E - Piata Armor Store
 	dc.b	ItemID_SilCrown
 	dc.b	ItemID_JwlRibbon
 	dc.b	ItemID_CrmcArmor
@@ -27527,7 +27537,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Piata Weapon Store
+; $F - Piata Weapon Store
 	dc.b	ItemID_LasrSword
 	dc.b	ItemID_LaserBar
 	dc.b	ItemID_AcidShot
@@ -27537,7 +27547,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Aukba Item Store
+; $10 - Aukba Item Store
 	dc.b	ItemID_Monomate
 	dc.b	ItemID_Telepipe
 	dc.b	ItemID_None
@@ -27547,7 +27557,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Aukba Armor Store
+; $11 - Aukba Armor Store
 	dc.b	ItemID_Laconigear
 	dc.b	ItemID_LaconCape
 	dc.b	ItemID_Sandals
@@ -27557,7 +27567,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Aukba Weapon Store
+; $12 - Aukba Weapon Store
 	dc.b	ItemID_CrmcSword
 	dc.b	ItemID_LaserKnife
 	dc.b	ItemID_LacnMace
@@ -27567,7 +27577,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zosa Item Store
+; $13 - Zosa Item Store
 	dc.b	ItemID_Dimate
 	dc.b	ItemID_Hidapipe
 	dc.b	ItemID_None
@@ -27577,7 +27587,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zosa Armor Store
+; $14 - Zosa Armor Store
 	dc.b	ItemID_Laconimet
 	dc.b	ItemID_Laconinish
 	dc.b	ItemID_LaconCape
@@ -27587,7 +27597,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Zosa Weapon Store
+; $15 - Zosa Weapon Store
 	dc.b	ItemID_Boomerang
 	dc.b	ItemID_CrmcSword
 	dc.b	ItemID_LacnMace
@@ -27597,7 +27607,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Ryuon Item Store
+; $16 - Ryuon Item Store
 	dc.b	ItemID_Trimate
 	dc.b	ItemID_Escapipe
 	dc.b	ItemID_None
@@ -27607,7 +27617,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Ryuon Armor Store
+; $17 - Ryuon Armor Store
 	dc.b	ItemID_Ribbon
 	dc.b	ItemID_Laconinish
 	dc.b	ItemID_LaconChest
@@ -27617,7 +27627,7 @@ StoreEquipItemArray:
 ; ---------------------------------------------
 
 ; ---------------------------------------------
-; Ryuon Weapon Store
+; $18 - Ryuon Weapon Store
 	dc.b	ItemID_Knife
 	dc.b	ItemID_LasrSlshr
 	dc.b	ItemID_LacDagger
@@ -43978,12 +43988,12 @@ TechArt_Megid:
 
 MapData:
 
-Map_MotaviaOutside:
+Map_MotaOverworld:
 	dc.w	$8C
 	dc.l	loc_498E8
 	dc.l	loc_48AF0
 	dc.l	loc_29B64
-	dc.l	$03000000|loc_28664
+	dc.l	$03000000|MapTrans_MotaOverworld
 	dc.b	$A, MusicID_Restoration
 
 Map_SkureB2:
@@ -44944,18 +44954,18 @@ loc_2852C:
 	dc.b	$67, $00 ;0x0 (0x00028544-0x00028546, Entry count: 0x00000002) [Unknown data]
 
 
-; ==============================================================
-; 1st byte = Map ID
-; 2nd byte = y position later multiplied by 16
-; 3rd byte = x position later multiplied by 16
-; ==============================================================
-loc_28546:
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $34, $59
-	dc.b	MapID_MotaviaOutside, $2A, $39
-	dc.b	MapID_MotaviaOutside, $48, $37
-	dc.b	MapID_MotaviaOutside, $56, $25
-	dc.b	MapID_MotaviaOutside, $52, $5B
+; =================================================================
+; Byte 1 = Map ID
+; Byte 2 = Y position / 16
+; Byte 3 = X position / 16
+; =================================================================
+OverworldTransitionData:
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $34, $59
+	dc.b	MapID_MotaOverworld, $2A, $39
+	dc.b	MapID_MotaOverworld, $48, $37
+	dc.b	MapID_MotaOverworld, $56, $25
+	dc.b	MapID_MotaOverworld, $52, $5B
 	dc.b	MapID_DezolisSkure, $08, $3E
 	dc.b	MapID_DezolisSkure, $18, $76
 	dc.b	MapID_DezolisSkure, $74, $78
@@ -44964,55 +44974,55 @@ loc_28546:
 	dc.b	MapID_TubeLockedDoor, $74, $78
 	dc.b	MapID_DezolisSkure, $36, $08
 	dc.b	MapID_DezolisSkure, $36, $08
-	dc.b	MapID_MotaviaOutside, $61, $AE
-	dc.b	MapID_MotaviaOutside, $15, $85
+	dc.b	MapID_MotaOverworld, $61, $AE
+	dc.b	MapID_MotaOverworld, $15, $85
 	dc.b	MapID_DezolisSkure, $34, $15
 	dc.b	MapID_DezolisSkure, $34, $15
 	dc.b	MapID_DezolisSkure, $34, $15
-	dc.b	MapID_MotaviaOutside, $1A, $82
-	dc.b	MapID_MotaviaOutside, $1A, $82
-	dc.b	MapID_MotaviaOutside, $1A, $82
-	dc.b	MapID_MotaviaOutside, $1A, $82
-	dc.b	MapID_MotaviaOutside, $3C, $79
-	dc.b	MapID_MotaviaOutside, $3C, $79
-	dc.b	MapID_MotaviaOutside, $3C, $79
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $78, $5A
-	dc.b	MapID_MotaviaOutside, $43, $2A
-	dc.b	MapID_MotaviaOutside, $43, $2A
-	dc.b	MapID_MotaviaOutside, $43, $2A
-	dc.b	MapID_MotaviaOutside, $43, $2A
-	dc.b	MapID_MotaviaOutside, $52, $51
-	dc.b	MapID_MotaviaOutside, $52, $51
-	dc.b	MapID_MotaviaOutside, $52, $51
-	dc.b	MapID_MotaviaOutside, $43, $5C
-	dc.b	MapID_MotaviaOutside, $43, $5C
-	dc.b	MapID_MotaviaOutside, $43, $5C
-	dc.b	MapID_MotaviaOutside, $43, $5C
-	dc.b	MapID_MotaviaOutside, $43, $5C
-	dc.b	MapID_MotaviaOutside, $2C, $41
-	dc.b	MapID_MotaviaOutside, $2C, $41
-	dc.b	MapID_MotaviaOutside, $3C, $22
-	dc.b	MapID_MotaviaOutside, $3C, $22
-	dc.b	MapID_MotaviaOutside, $3C, $22
-	dc.b	MapID_MotaviaOutside, $3C, $22
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
+	dc.b	MapID_MotaOverworld, $1A, $82
+	dc.b	MapID_MotaOverworld, $1A, $82
+	dc.b	MapID_MotaOverworld, $1A, $82
+	dc.b	MapID_MotaOverworld, $1A, $82
+	dc.b	MapID_MotaOverworld, $3C, $79
+	dc.b	MapID_MotaOverworld, $3C, $79
+	dc.b	MapID_MotaOverworld, $3C, $79
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $78, $5A
+	dc.b	MapID_MotaOverworld, $43, $2A
+	dc.b	MapID_MotaOverworld, $43, $2A
+	dc.b	MapID_MotaOverworld, $43, $2A
+	dc.b	MapID_MotaOverworld, $43, $2A
+	dc.b	MapID_MotaOverworld, $52, $51
+	dc.b	MapID_MotaOverworld, $52, $51
+	dc.b	MapID_MotaOverworld, $52, $51
+	dc.b	MapID_MotaOverworld, $43, $5C
+	dc.b	MapID_MotaOverworld, $43, $5C
+	dc.b	MapID_MotaOverworld, $43, $5C
+	dc.b	MapID_MotaOverworld, $43, $5C
+	dc.b	MapID_MotaOverworld, $43, $5C
+	dc.b	MapID_MotaOverworld, $2C, $41
+	dc.b	MapID_MotaOverworld, $2C, $41
+	dc.b	MapID_MotaOverworld, $3C, $22
+	dc.b	MapID_MotaOverworld, $3C, $22
+	dc.b	MapID_MotaOverworld, $3C, $22
+	dc.b	MapID_MotaOverworld, $3C, $22
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
 	dc.b	MapID_Piata, $18, $09
 	dc.b	MapID_Piata, $18, $09
-	dc.b	MapID_MotaviaOutside, $4B, $39
-	dc.b	MapID_MotaviaOutside, $3A, $49
-	dc.b	MapID_MotaviaOutside, $3A, $49
+	dc.b	MapID_MotaOverworld, $4B, $39
+	dc.b	MapID_MotaOverworld, $3A, $49
+	dc.b	MapID_MotaOverworld, $3A, $49
 	dc.b	MapID_DezolisSkure, $78, $21
 	dc.b	MapID_DezolisSkure, $78, $21
 	dc.b	MapID_DezolisSkure, $78, $21
@@ -45045,21 +45055,66 @@ loc_28546:
 	dc.b	MapID_DezolisSkure, $3E, $73
 	dc.b	MapID_DezolisSkure, $3E, $73
 	dc.b	MapID_DezolisSkure, $3E, $73
-; ==============================================================
+; =================================================================
 
 	even
 
 
-loc_28664:
-	dc.b	$39, $49, $00, $04, $09, $02, $33, $59, $00, $05, $09, $02, $29, $39, $00, $06
-	dc.b	$2D, $28, $47, $37, $00, $07, $09, $02, $55, $25, $00, $08, $02 ;0x100
-	dc.b	$09, $53, $5B, $00, $09, $19, $3D, $19, $83, $00, $17, $27, $31, $3B, $79, $00
-	dc.b	$1B, $37, $37, $2F, $49, $00, $0D, $06, $09, $34, $49, $00, $0D, $1B, $09, $4F
-	dc.b	$39, $00, $40, $06, $09, $51, $39, $00, $40, $1B, $09, $15, $3F, $00, $0E, $09
-	dc.b	$04, $15, $42, $00, $0E, $09, $1B, $41, $29, $00, $0F, $06, $09, $45, $29, $00
-	dc.b	$0F, $1B, $09, $41, $2D, $00, $24, $19, $0A, $51, $51, $00, $29, $19, $2F, $41
-	dc.b	$5B, $00, $2B, $1F, $36, $2F, $41, $00, $30, $11, $5D, $3B, $23, $00, $33, $4D ;0x160
-	dc.b	$30, $77, $5B, $00, $23, $02, $0F, $61, $AD, $00, $12, $5D, $87, $FF, $FF
+; =================================================================
+; Map transition data
+;
+; 6 bytes per spot; terminates with $FF
+;
+; Byte 1 = Y position / 16
+; Byte 2 = X position / 16
+; Byte 3 = Type;
+;			0   = new map index
+;			1   = Rolf House/Control Tower
+;			2   = Data Memory
+;			3   = Clone Lab
+;			4   = Hospital
+;			5   = Weapon Store
+;			6   = Armor Store
+;			7   = Item Store
+;			8   = Central Tower
+;			$C  = Ustvestia House
+;			$D  = Kueri Inventor
+;			$F  = Teleport Station
+; Byte 4 = value depends on Type; for changing maps it's the new map; for buildings
+;			such as Rolf House, Data Memory, it's the portrait index
+; Byte 5 = value depends on Type; for changing maps it's the new Y position / 16;
+;			for buildings, it depends on where you are, for example in a hospital
+;			it's the meseta multiplier; for shops it's the number of options
+; Byte 6 = value depends on Type; for changing maps it's the new X position / 16;
+;			for buildings, it depends on where you are, for example, in shops
+;			it's the index of the StoreEquipItemArray
+; =================================================================
+MapTrans_MotaOverworld:
+	dc.b	$39, $49, $00, MapID_Paseo, $09, $02
+	dc.b	$33, $59, $00, MapID_Arima, $09, $02
+	dc.b	$29, $39, $00, MapID_Oputa, $2D, $28
+	dc.b	$47, $37, $00, MapID_Zema, $09, $02
+	dc.b	$55, $25, $00, MapID_Kueri, $02, $09
+	dc.b	$53, $5B, $00, MapID_Piata, $19, $3D
+	dc.b	$19, $83, $00, MapID_ShureGroundF, $27, $31
+	dc.b	$3B, $79, $00, MapID_NidoGroundF, $37, $37
+	dc.b	$2F, $49, $00, MapID_TubeNearPaseo, $06, $09
+	dc.b	$34, $49, $00, MapID_TubeNearPaseo, $1B, $09
+	dc.b	$4F, $39, $00, MapID_TubeNearZema, $06, $09
+	dc.b	$51, $39, $00, MapID_TubeNearZema, $1B, $09
+	dc.b	$15, $3F, $00, MapID_DarumTube, $09, $04
+	dc.b	$15, $42, $00, MapID_DarumTube, $09, $1B
+	dc.b	$41, $29, $00, MapID_TubeLockedDoor, $06, $09
+	dc.b	$45, $29, $00, MapID_TubeLockedDoor, $1B, $09
+	dc.b	$41, $2D, $00, MapID_YellowDamGroundF, $19, $0A
+	dc.b	$51, $51, $00, MapID_RedDamF1, $19, $2F
+	dc.b	$41, $5B, $00, MapID_BlueDamGroundF, $1F, $36
+	dc.b	$2F, $41, $00, MapID_GreenDamGroundF, $11, $5D
+	dc.b	$3B, $23, $00, MapID_BiosystemsLabGroundF, $4D, $30
+	dc.b	$77, $5B, $00, MapID_RoronGroundF, $02, $0F
+	dc.b	$61, $AD, $00, MapID_Uzo, $5D, $87
+	dc.b	$FF, $FF
+; =================================================================
 
 loc_286F0:
 	dc.b	$0D, $3B, $00, $02, $0E, $3B, $0D, $4B, $00, $02, $0E, $4B, $1D, $17, $00, $02, $1E ;0x180
@@ -45093,11 +45148,21 @@ loc_287EA:
 	dc.b	$1F, $00, $16, $18, $5B, $2D, $13, $00, $16, $39, $24, $33, $15, $00, $16, $4D ;0x2E0
 	dc.b	$28, $FF, $FF
 
+
+; =================================================================
 loc_28864:
-	dc.b	$11, $2D, $01, $37, $00, $00, $07, $11, $02, $09, $00, $00, $15, $0F, $04, $0A
-	dc.b	$08, $00, $1B, $3A, $06, $0E, $05, $01, $05, $3A, $05, $0D, $05 ;0x300
-	dc.b	$02, $0F, $20, $08, $15, $00, $00, $11, $3A, $07, $0C, $04, $00, $1B, $07, $03
-	dc.b	$0B, $00, $00, $11, $07, $0F, $1E, $00, $00, $FF, $FF
+	dc.b	$11, $2D, $01, $37, $00, $00
+	dc.b	$07, $11, $02, $09, $00, $00
+	dc.b	$15, $0F, $04, $0A, $08, $00
+	dc.b	$1B, $3A, $06, $0E, $05, $01
+	dc.b	$05, $3A, $05, $0D, $05, $02
+	dc.b	$0F, $20, $08, $15, $00, $00
+	dc.b	$11, $3A, $07, $0C, $04, $00
+	dc.b	$1B, $07, $03, $0B, $00, $00
+	dc.b	$11, $07, $0F, $1E, $00, $00
+	dc.b	$FF, $FF
+; =================================================================
+
 
 loc_2889C:
 	dc.b	$1B, $13, $0F, $1E, $00 ;0x320

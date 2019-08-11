@@ -236,7 +236,7 @@ offset	:=	MapData
 ptrsize	:=	20
 idstart	:=	0
 
-MapID_MotaviaOutside =  id(Map_MotaviaOutside)	; 0
+MapID_MotaOverworld =  id(Map_MotaOverworld)	; 0
 MapID_SkureB2 =  id(Map_SkureB2)	; 1
 MapID_SkureB1 =  id(Map_SkureB1)	; 2
 MapID_DezolisSkure =  id(Map_DezolisSkure)	; 3
@@ -1360,6 +1360,7 @@ Camera_X_step_counter =  ramaddr($FFFFF726)
 Map_collision_data_addr =  ramaddr($FFFFF72E)
 Collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
 Screen_changed_flag =  ramaddr($FFFFF734)
+Map_transition_addr =  ramaddr($FFFFF736)
 Character_pos_table_index = ramaddr($FFFFF740)
 Demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
 Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
