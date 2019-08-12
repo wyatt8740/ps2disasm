@@ -634,25 +634,25 @@ offset	:=	InteractionIndex
 ptrsize	:=	4
 idstart	:=	0
 
-InteractionID_RolfHouseStart =  id(PtrInteraction_RolfHouseStart)
-InteractionID_RolfHouse =  id(PtrInteraction_RolfHouse)
-InteractionID_DataMemory =  id(PtrInteraction_DataMemory)
-InteractionID_CloneLabs =  id(PtrInteraction_CloneLabs)
-InteractionID_Hospital =  id(PtrInteraction_Hospital)
-InteractionID_WeaponStore =  id(PtrInteraction_WeaponStore)
-InteractionID_ArmorStore =  id(PtrInteraction_ArmorStore)
-InteractionID_ItemStore =  id(PtrInteraction_ItemStore)
-InteractionID_CentralTowerOutside =  id(PtrInteraction_CentralTowerOutside)
-InteractionID_CentralTowerRoom =  id(PtrInteraction_CentralTowerRoom)
-InteractionID_Library =  id(PtrInteraction_Library)
-InteractionID_CentralTowerRoof =  id(PtrInteraction_CentralTowerRoof)
-InteractionID_UstvestiaHouse =  id(PtrInteraction_UstvestiaHouse)
-InteractionID_InventorHouse =  id(PtrInteraction_InventorHouse)
-InteractionID_CentralTowerGovernor =  id(PtrInteraction_CentralTowerGovernor)
-InteractionID_TeleportStation =  id(PtrInteraction_TeleportStation)
-InteractionID_GairaControlPanel =  id(PtrInteraction_GairaControlPanel)
-InteractionID_TylerSpaceship =  id(PtrInteraction_TylerSpaceship)
-InteractionID_EsperMansion =  id(PtrInteraction_EsperMansion)
+InteractionID_RolfHouseStart =  id(PtrInteraction_RolfHouseStart)	; 0
+InteractionID_RolfHouse =  id(PtrInteraction_RolfHouse)			; 1
+InteractionID_DataMemory =  id(PtrInteraction_DataMemory)		; 2
+InteractionID_CloneLabs =  id(PtrInteraction_CloneLabs)		; 3
+InteractionID_Hospital =  id(PtrInteraction_Hospital)		; 4
+InteractionID_WeaponStore =  id(PtrInteraction_WeaponStore)		; 5
+InteractionID_ArmorStore =  id(PtrInteraction_ArmorStore)		; 6
+InteractionID_ItemStore =  id(PtrInteraction_ItemStore)		; 7
+InteractionID_CentralTowerOutside =  id(PtrInteraction_CentralTowerOutside)		; 8
+InteractionID_CentralTowerRoom =  id(PtrInteraction_CentralTowerRoom)		; 9
+InteractionID_Library =  id(PtrInteraction_Library)		; $A
+InteractionID_CentralTowerRoof =  id(PtrInteraction_CentralTowerRoof)		; $B
+InteractionID_UstvestiaHouse =  id(PtrInteraction_UstvestiaHouse)		; $C
+InteractionID_InventorHouse =  id(PtrInteraction_InventorHouse)		; $D
+InteractionID_CentralTowerGovernor =  id(PtrInteraction_CentralTowerGovernor)		; $E
+InteractionID_TeleportStation =  id(PtrInteraction_TeleportStation)		; $F
+InteractionID_GairaControlPanel =  id(PtrInteraction_GairaControlPanel)		; $10
+InteractionID_TylerSpaceship =  id(PtrInteraction_TylerSpaceship)		; $11
+InteractionID_EsperMansion =  id(PtrInteraction_EsperMansion)		; $12
 
 ; Windows
 

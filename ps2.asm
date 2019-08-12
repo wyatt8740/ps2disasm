@@ -44001,7 +44001,7 @@ Map_SkureB2:
 	dc.l	$41000000|loc_4A370
 	dc.l	$3F000000|loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|loc_286F0
+	dc.l	$04000000|MapTrans_SkureB2
 	dc.b	$83, MusicID_SilentZone
 
 Map_SkureB1:
@@ -44009,7 +44009,7 @@ Map_SkureB1:
 	dc.l	$42000000|loc_4A632
 	dc.l	$3E000000|loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|loc_28758
+	dc.l	$04000000|MapTrans_SkureB1
 	dc.b	$83, MusicID_SilentZone
 
 Map_DezolisSkure:
@@ -44017,7 +44017,7 @@ Map_DezolisSkure:
 	dc.l	loc_4A944
 	dc.l	loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|loc_287EA
+	dc.l	$04000000|MapTrans_DezolisSkure
 	dc.b	$80, MusicID_SilentZone
 
 Map_Paseo:
@@ -44025,7 +44025,7 @@ Map_Paseo:
 	dc.l	loc_4B5E8
 	dc.l	loc_4B4FC
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_28864
+	dc.l	$05000000|MapTrans_Paseo
 	dc.b	$00, MusicID_Pleasure
 
 Map_Arima:
@@ -44033,7 +44033,7 @@ Map_Arima:
 	dc.l	loc_4B786
 	dc.l	loc_4B720
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_2889C
+	dc.l	$05000000|MapTrans_Arima
 	dc.b	$00, MusicID_Pleasure
 
 Map_Oputa:
@@ -44041,7 +44041,7 @@ Map_Oputa:
 	dc.l	loc_4B9BE
 	dc.l	loc_4B84E
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_288B6
+	dc.l	$05000000|MapTrans_Oputa
 	dc.b	$01, MusicID_Pleasure
 
 Map_Zema:
@@ -44049,7 +44049,7 @@ Map_Zema:
 	dc.l	loc_4BC08
 	dc.l	loc_4BB6C
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_288E8
+	dc.l	$05000000|MapTrans_Zema
 	dc.b	$00, MusicID_Pleasure
 
 Map_Kueri:
@@ -44057,7 +44057,7 @@ Map_Kueri:
 	dc.l	loc_4BDC0
 	dc.l	loc_4BCB0
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_28914
+	dc.l	$05000000|MapTrans_Kueri
 	dc.b	$01, MusicID_Pleasure
 
 Map_Piata:
@@ -44065,7 +44065,7 @@ Map_Piata:
 	dc.l	loc_4C060
 	dc.l	loc_4BEB8
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|loc_28946
+	dc.l	$05000000|MapTrans_Piata
 	dc.b	$01, MusicID_Pleasure
 
 Map_Aukba:
@@ -44073,7 +44073,7 @@ Map_Aukba:
 	dc.l	loc_4C2A8
 	dc.l	loc_4C226
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|loc_28978
+	dc.l	$4C000000|MapTrans_Aukba
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_Zosa:
@@ -44081,7 +44081,7 @@ Map_Zosa:
 	dc.l	loc_4C3F0
 	dc.l	loc_4C354
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|loc_289A4
+	dc.l	$4C000000|MapTrans_Zosa
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_Ryuon:
@@ -44089,7 +44089,7 @@ Map_Ryuon:
 	dc.l	loc_4C52A
 	dc.l	loc_4C492
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|loc_289D0
+	dc.l	$4C000000|MapTrans_Ryuon
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_TubeNearPaseo:
@@ -44097,7 +44097,7 @@ Map_TubeNearPaseo:
 	dc.l	loc_4C5AE
 	dc.l	$2B000000|loc_4C5AE
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|loc_289FC
+	dc.l	$09000000|MapTrans_TubeNearPaseo
 	dc.b	$04, MusicID_Restoration
 
 Map_DarumTube:
@@ -44105,7 +44105,7 @@ Map_DarumTube:
 	dc.l	loc_4C618
 	dc.l	$2B000000|loc_4C618
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|loc_28A0A
+	dc.l	$09000000|MapTrans_DarumTube
 	dc.b	$04, MusicID_Restoration
 
 Map_TubeLockedDoor:
@@ -44113,7 +44113,7 @@ Map_TubeLockedDoor:
 	dc.l	loc_4C650
 	dc.l	$2C000000|loc_4C650
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|loc_28A24
+	dc.l	$09000000|MapTrans_TubeLockedDoor
 	dc.b	$07, MusicID_Restoration
 
 Map_EsperMansionB1:
@@ -44121,7 +44121,7 @@ Map_EsperMansionB1:
 	dc.l	loc_4C6BA
 	dc.l	loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3D000000|loc_28A32
+	dc.l	$3D000000|MapTrans_EsperMansionB1
 	dc.b	$85, MusicID_Violation
 
 Map_EsperMansionF1:
@@ -44129,7 +44129,7 @@ Map_EsperMansionF1:
 	dc.l	loc_4C700
 	dc.l	loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3D000000|loc_28A3A
+	dc.l	$3D000000|MapTrans_EsperMansionF1
 	dc.b	$8B, MusicID_Violation
 
 Map_Uzo:
@@ -44137,7 +44137,7 @@ Map_Uzo:
 	dc.l	$1E000000|loc_4C7A6
 	dc.l	$2C000000|loc_5801A
 	dc.l	$19000000|loc_29D72
-	dc.l	$06000000|loc_28A42
+	dc.l	$06000000|MapTrans_Uzo
 	dc.b	$84, MusicID_SecretWays
 
 Map_UnderwaterPassage:
@@ -44145,7 +44145,7 @@ Map_UnderwaterPassage:
 	dc.l	$1F000000|loc_4D544
 	dc.l	loc_58070
 	dc.l	$19000000|loc_29D72
-	dc.l	$07000000|loc_28A92
+	dc.l	$07000000|MapTrans_UnderwaterPassage
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceB2:
@@ -44153,7 +44153,7 @@ Map_CreviceB2:
 	dc.l	loc_4D92A
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|loc_28AA0
+	dc.l	$37000000|MapTrans_CreviceB2
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceB1:
@@ -44161,7 +44161,7 @@ Map_CreviceB1:
 	dc.l	loc_4DA1A
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|loc_28AB4
+	dc.l	$37000000|MapTrans_CreviceB1
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceGroundF:
@@ -44169,7 +44169,7 @@ Map_CreviceGroundF:
 	dc.l	loc_4DD24
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|loc_28AE0
+	dc.l	$37000000|MapTrans_CreviceGroundF
 	dc.b	$80, MusicID_SecretWays
 
 Map_ShureGroundF:
@@ -44177,7 +44177,7 @@ Map_ShureGroundF:
 	dc.l	$10000000|loc_4E160
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28B12
+	dc.l	$0E000000|MapTrans_ShureGroundF
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF1:
@@ -44185,7 +44185,7 @@ Map_ShureF1:
 	dc.l	$11000000|loc_4E3E2
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28B32
+	dc.l	$0E000000|MapTrans_ShureF1
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF2:
@@ -44193,7 +44193,7 @@ Map_ShureF2:
 	dc.l	$12000000|loc_4E66A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28B6A
+	dc.l	$0E000000|MapTrans_ShureF2
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF3:
@@ -44201,7 +44201,7 @@ Map_ShureF3:
 	dc.l	$13000000|loc_4E92E
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28B8A
+	dc.l	$0E000000|MapTrans_ShureF3
 	dc.b	$87, MusicID_Advanced
 
 Map_NidoGroundF:
@@ -44209,7 +44209,7 @@ Map_NidoGroundF:
 	dc.l	$14000000|loc_4EBE0
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28B92
+	dc.l	$0E000000|MapTrans_NidoGroundF
 	dc.b	$88, MusicID_Advanced
 
 Map_NidoF1:
@@ -44217,7 +44217,7 @@ Map_NidoF1:
 	dc.l	$14000000|loc_4EF46
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28BBE
+	dc.l	$0E000000|MapTrans_NidoF1
 	dc.b	$88, MusicID_Advanced
 
 Map_NidoF2:
@@ -44225,7 +44225,7 @@ Map_NidoF2:
 	dc.l	$15000000|loc_4F2A6
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|loc_28BEA
+	dc.l	$0E000000|MapTrans_NidoF2
 	dc.b	$87, MusicID_Advanced
 
 Map_RoronB5:
@@ -44233,7 +44233,7 @@ Map_RoronB5:
 	dc.l	$1D000000|loc_4F5FE
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28BFE
+	dc.l	$10000000|MapTrans_RoronB5
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB4:
@@ -44241,7 +44241,7 @@ Map_RoronB4:
 	dc.l	$1D000000|loc_4F76E
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28C06
+	dc.l	$10000000|MapTrans_RoronB4
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB3:
@@ -44249,7 +44249,7 @@ Map_RoronB3:
 	dc.l	$1C000000|loc_4F818
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28C0E
+	dc.l	$10000000|MapTrans_RoronB3
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB2:
@@ -44257,7 +44257,7 @@ Map_RoronB2:
 	dc.l	$1C000000|loc_4F9E4
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28C28
+	dc.l	$10000000|MapTrans_RoronB2
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB1:
@@ -44265,7 +44265,7 @@ Map_RoronB1:
 	dc.l	$1B000000|loc_4FB5A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28C3C
+	dc.l	$10000000|MapTrans_RoronB1
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronGroundF:
@@ -44273,7 +44273,7 @@ Map_RoronGroundF:
 	dc.l	$1A000000|loc_4FEE6
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|loc_28C68
+	dc.l	$10000000|MapTrans_RoronGroundF
 	dc.b	$89, MusicID_Advanced
 
 Map_YellowDamGroundF:
@@ -44281,7 +44281,7 @@ Map_YellowDamGroundF:
 	dc.l	loc_4FF7E
 	dc.l	$35000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|loc_28C76
+	dc.l	$0B000000|MapTrans_YellowDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF1:
@@ -44289,7 +44289,7 @@ Map_YellowDamF1:
 	dc.l	loc_50198
 	dc.l	$35000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|loc_28CBA
+	dc.l	$0B000000|MapTrans_YellowDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF2:
@@ -44297,7 +44297,7 @@ Map_YellowDamF2:
 	dc.l	loc_503E8
 	dc.l	$36000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|loc_28D0A
+	dc.l	$0B000000|MapTrans_YellowDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF3:
@@ -44305,7 +44305,7 @@ Map_YellowDamF3:
 	dc.l	loc_50652
 	dc.l	$37000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|loc_28D4E
+	dc.l	$0B000000|MapTrans_YellowDamF3
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamGroundF:
@@ -44313,7 +44313,7 @@ Map_RedDamGroundF:
 	dc.l	loc_508AC
 	dc.l	$33000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|loc_28D74
+	dc.l	$0D000000|MapTrans_RedDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamF1:
@@ -44321,7 +44321,7 @@ Map_RedDamF1:
 	dc.l	loc_50A86
 	dc.l	$32000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|loc_28DA0
+	dc.l	$0D000000|MapTrans_RedDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamF2:
@@ -44329,7 +44329,7 @@ Map_RedDamF2:
 	dc.l	loc_50C7C
 	dc.l	$34000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|loc_28DFC
+	dc.l	$0D000000|MapTrans_RedDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamGroundF:
@@ -44337,7 +44337,7 @@ Map_BlueDamGroundF:
 	dc.l	loc_50E20
 	dc.l	$38000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|loc_28E1C
+	dc.l	$0A000000|MapTrans_BlueDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF1:
@@ -44345,7 +44345,7 @@ Map_BlueDamF1:
 	dc.l	loc_5103C
 	dc.l	$39000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|loc_28E48
+	dc.l	$0A000000|MapTrans_BlueDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF2:
@@ -44353,7 +44353,7 @@ Map_BlueDamF2:
 	dc.l	loc_51250
 	dc.l	$39000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|loc_28E80
+	dc.l	$0A000000|MapTrans_BlueDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF3:
@@ -44361,7 +44361,7 @@ Map_BlueDamF3:
 	dc.l	loc_51482
 	dc.l	$3A000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|loc_28EBE
+	dc.l	$0A000000|MapTrans_BlueDamF3
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF4:
@@ -44369,7 +44369,7 @@ Map_BlueDamF4:
 	dc.l	loc_516B8
 	dc.l	$3A000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|loc_28F08
+	dc.l	$0A000000|MapTrans_BlueDamF4
 	dc.b	$87, MusicID_Mystery
 
 Map_GreenDamGroundF:
@@ -44377,7 +44377,7 @@ Map_GreenDamGroundF:
 	dc.l	loc_518D0
 	dc.l	$3B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0C000000|loc_28F34
+	dc.l	$0C000000|MapTrans_GreenDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_GreenDamF1:
@@ -44385,7 +44385,7 @@ Map_GreenDamF1:
 	dc.l	loc_51DFA
 	dc.l	$3C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0C000000|loc_29020
+	dc.l	$0C000000|MapTrans_GreenDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_BiosystemsLabB1:
@@ -44393,7 +44393,7 @@ Map_BiosystemsLabB1:
 	dc.l	$16000000|loc_522DE
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|loc_290FA
+	dc.l	$33000000|MapTrans_BiosystemsLabB1
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabGroundF:
@@ -44401,7 +44401,7 @@ Map_BiosystemsLabGroundF:
 	dc.l	$17000000|loc_5271E
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|loc_29102
+	dc.l	$33000000|MapTrans_BiosystemsLabGroundF
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabF1:
@@ -44409,7 +44409,7 @@ Map_BiosystemsLabF1:
 	dc.l	$18000000|loc_52B52
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|loc_2913A
+	dc.l	$33000000|MapTrans_BiosystemsLabF1
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabF2:
@@ -44417,7 +44417,7 @@ Map_BiosystemsLabF2:
 	dc.l	$19000000|loc_52F8E
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|loc_29166
+	dc.l	$33000000|MapTrans_BiosystemsLabF2
 	dc.b	$88, MusicID_Advanced
 
 Map_ClimatrolGroundF:
@@ -44425,7 +44425,7 @@ Map_ClimatrolGroundF:
 	dc.l	$20000000|loc_533D6
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_2917A
+	dc.l	$0F000000|MapTrans_ClimatrolGroundF
 	dc.b	$83, MusicID_Advanced
 
 Map_ClimatrolF1:
@@ -44433,7 +44433,7 @@ Map_ClimatrolF1:
 	dc.l	$21000000|loc_5354E
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_29188
+	dc.l	$0F000000|MapTrans_ClimatrolF1
 	dc.b	$83, MusicID_Advanced
 
 Map_ClimatrolF2:
@@ -44441,7 +44441,7 @@ Map_ClimatrolF2:
 	dc.l	$21000000|loc_535C2
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_29196
+	dc.l	$0F000000|MapTrans_ClimatrolF2
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF3:
@@ -44449,7 +44449,7 @@ Map_ClimatrolF3:
 	dc.l	$21000000|loc_5364A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_291A4
+	dc.l	$0F000000|MapTrans_ClimatrolF3
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF4:
@@ -44457,7 +44457,7 @@ Map_ClimatrolF4:
 	dc.l	$22000000|loc_536D2
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_291B2
+	dc.l	$0F000000|MapTrans_ClimatrolF4
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF5:
@@ -44465,7 +44465,7 @@ Map_ClimatrolF5:
 	dc.l	$23000000|loc_5392C
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_291EA
+	dc.l	$0F000000|MapTrans_ClimatrolF5
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF6:
@@ -44473,7 +44473,7 @@ Map_ClimatrolF6:
 	dc.l	$24000000|loc_53BAA
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_29294
+	dc.l	$0F000000|MapTrans_ClimatrolF6
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF7:
@@ -44481,7 +44481,7 @@ Map_ClimatrolF7:
 	dc.l	$25000000|loc_53E04
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|loc_29344
+	dc.l	$0F000000|MapTrans_ClimatrolF7
 	dc.b	$86, MusicID_Advanced
 
 Map_ControlTowerGroundF:
@@ -44489,7 +44489,7 @@ Map_ControlTowerGroundF:
 	dc.l	$30000000|loc_54086
 	dc.l	$30000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$34000000|loc_2937C
+	dc.l	$34000000|MapTrans_ControlTowerGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_ControlTowerF1:
@@ -44497,7 +44497,7 @@ Map_ControlTowerF1:
 	dc.l	$31000000|loc_54300
 	dc.l	$31000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$34000000|loc_29522
+	dc.l	$34000000|MapTrans_ControlTowerF1
 	dc.b	$88, MusicID_Mystery
 
 Map_TubeNearZema:
@@ -44505,15 +44505,15 @@ Map_TubeNearZema:
 	dc.l	loc_4C5AE
 	dc.l	$2C000000|loc_4C5AE
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|loc_296C2
+	dc.l	$09000000|MapTrans_TubeNearZema
 	dc.b	$07, MusicID_Restoration
 
 Map_Gaira:
 	dc.w	$0534
 	dc.l	loc_580EE
-	dc.l	$3D000000+loc_5455E
-	dc.l	$05000000+loc_29CF2
-	dc.l	$38000000+loc_296D0
+	dc.l	$3D000000|loc_5455E
+	dc.l	$05000000|loc_29CF2
+	dc.l	$38000000|MapTrans_Gaira
 	dc.b	$0D, MusicID_Mystery
 
 
@@ -44522,7 +44522,7 @@ Map_Gaira_Copy:
 	dc.l	loc_580EE
 	dc.l	$3D000000|loc_5455E
 	dc.l	$05000000|loc_29CF2
-	dc.l	$38000000|loc_296D0
+	dc.l	$38000000|MapTrans_Gaira
 	dc.b	$0D, MusicID_Mystery
 
 Map_NavalGroundF:
@@ -44530,7 +44530,7 @@ Map_NavalGroundF:
 	dc.l	loc_54752
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|loc_296D0
+	dc.l	$3F000000|MapTrans_Gaira
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF1:
@@ -44538,7 +44538,7 @@ Map_NavalF1:
 	dc.l	loc_548DE
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|loc_296DE
+	dc.l	$3F000000|MapTrans_NavalF1
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF2:
@@ -44546,7 +44546,7 @@ Map_NavalF2:
 	dc.l	loc_54A72
 	dc.l	$47000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|loc_296F8
+	dc.l	$3F000000|MapTrans_NavalF2
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF3:
@@ -44554,7 +44554,7 @@ Map_NavalF3:
 	dc.l	loc_54C04
 	dc.l	$48000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|loc_29712
+	dc.l	$3F000000|MapTrans_NavalF3
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF4:
@@ -44562,7 +44562,7 @@ Map_NavalF4:
 	dc.l	loc_54D98
 	dc.l	$48000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|loc_2972C
+	dc.l	$3F000000|MapTrans_NavalF4
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeGroundF:
@@ -44570,7 +44570,7 @@ Map_MenobeGroundF:
 	dc.l	loc_54F24
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|loc_2973A
+	dc.l	$40000000|MapTrans_MenobeGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF1:
@@ -44578,7 +44578,7 @@ Map_MenobeF1:
 	dc.l	loc_552B2
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|loc_2977E
+	dc.l	$40000000|MapTrans_MenobeF1
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF2:
@@ -44586,7 +44586,7 @@ Map_MenobeF2:
 	dc.l	loc_5558E
 	dc.l	$49000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|loc_297E6
+	dc.l	$40000000|MapTrans_MenobeF2
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF3:
@@ -44594,7 +44594,7 @@ Map_MenobeF3:
 	dc.l	loc_5586A
 	dc.l	$4A000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|loc_29848
+	dc.l	$40000000|MapTrans_MenobeF3
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB6:
@@ -44602,7 +44602,7 @@ Map_IkutoB6:
 	dc.l	loc_55AD4
 	dc.l	$4D000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_29886
+	dc.l	$41000000|MapTrans_IkutoB6
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB5:
@@ -44610,7 +44610,7 @@ Map_IkutoB5:
 	dc.l	loc_55E84
 	dc.l	$4D000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_2988E
+	dc.l	$41000000|MapTrans_IkutoB5
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB4:
@@ -44618,7 +44618,7 @@ Map_IkutoB4:
 	dc.l	loc_56346
 	dc.l	$4C000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_2989C
+	dc.l	$41000000|MapTrans_IkutoB4
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB3:
@@ -44626,7 +44626,7 @@ Map_IkutoB3:
 	dc.l	loc_56818
 	dc.l	$4C000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_298AA
+	dc.l	$41000000|MapTrans_IkutoB3
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB2:
@@ -44634,7 +44634,7 @@ Map_IkutoB2:
 	dc.l	loc_56A5A
 	dc.l	$4B000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_298B8
+	dc.l	$41000000|MapTrans_IkutoB2
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB1:
@@ -44642,7 +44642,7 @@ Map_IkutoB1:
 	dc.l	loc_56B5C
 	dc.l	$4B000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_298C6
+	dc.l	$41000000|MapTrans_IkutoB1
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoGroundF:
@@ -44650,7 +44650,7 @@ Map_IkutoGroundF:
 	dc.l	loc_56BF4
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|loc_298D4
+	dc.l	$41000000|MapTrans_IkutoGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronGroundF:
@@ -44658,7 +44658,7 @@ Map_GuaronGroundF:
 	dc.l	loc_56C34
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_298DC
+	dc.l	$42000000|MapTrans_GuaronGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF1:
@@ -44666,7 +44666,7 @@ Map_GuaronF1:
 	dc.l	loc_56ED0
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_2990E
+	dc.l	$42000000|MapTrans_GuaronF1
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF2:
@@ -44674,7 +44674,7 @@ Map_GuaronF2:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_29946
+	dc.l	$42000000|MapTrans_GuaronF2
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF3:
@@ -44682,7 +44682,7 @@ Map_GuaronF3:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_29954
+	dc.l	$42000000|MapTrans_GuaronF3
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF4:
@@ -44690,7 +44690,7 @@ Map_GuaronF4:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_29962
+	dc.l	$42000000|MapTrans_GuaronF4
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF5:
@@ -44698,7 +44698,7 @@ Map_GuaronF5:
 	dc.l	loc_5711E
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_29970
+	dc.l	$42000000|MapTrans_GuaronF5
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF6:
@@ -44706,7 +44706,7 @@ Map_GuaronF6:
 	dc.l	loc_5711E
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_2997E
+	dc.l	$42000000|MapTrans_GuaronF6
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF7:
@@ -44714,7 +44714,7 @@ Map_GuaronF7:
 	dc.l	loc_571A8
 	dc.l	$4F000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_2998C
+	dc.l	$42000000|MapTrans_GuaronF7
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF8:
@@ -44722,7 +44722,7 @@ Map_GuaronF8:
 	dc.l	loc_57354
 	dc.l	$4F000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_2999A
+	dc.l	$42000000|MapTrans_GuaronF8
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF9:
@@ -44730,7 +44730,7 @@ Map_GuaronF9:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299A8
+	dc.l	$42000000|MapTrans_GuaronF9
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF10:
@@ -44738,7 +44738,7 @@ Map_GuaronF10:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299B6
+	dc.l	$42000000|MapTrans_GuaronF10
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF11:
@@ -44746,7 +44746,7 @@ Map_GuaronF11:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299C4
+	dc.l	$42000000|MapTrans_GuaronF11
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF12:
@@ -44754,7 +44754,7 @@ Map_GuaronF12:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299D2
+	dc.l	$42000000|MapTrans_GuaronF12
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF13:
@@ -44762,7 +44762,7 @@ Map_GuaronF13:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299E0
+	dc.l	$42000000|MapTrans_GuaronF13
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF14:
@@ -44770,7 +44770,7 @@ Map_GuaronF14:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299EE
+	dc.l	$42000000|MapTrans_GuaronF14
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF15:
@@ -44778,7 +44778,7 @@ Map_GuaronF15:
 	dc.l	loc_57544
 	dc.l	$51000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|loc_299FC
+	dc.l	$42000000|MapTrans_GuaronF15
 	dc.b	$86, MusicID_Violation
 
 Map_NoahGroundF:
@@ -44786,7 +44786,7 @@ Map_NoahGroundF:
 	dc.l	loc_5811C
 	dc.l	$52000000|loc_575BE
 	dc.l	$05000000|loc_29DD6
-	dc.l	$3E000000|loc_29A04
+	dc.l	$3E000000|MapTrans_NoahGroundF
 	dc.b	$C, MusicID_Under
 
 Map_NoahF1:
@@ -44794,7 +44794,7 @@ Map_NoahF1:
 	dc.l	loc_5811C
 	dc.l	$53000000|loc_57A52
 	dc.l	$05000000|loc_29DD6
-	dc.l	$3E000000|loc_29AB4
+	dc.l	$3E000000|MapTrans_NoahF1
 	dc.b	$C, MusicID_Under
 
 ; =============================================
@@ -45077,6 +45077,7 @@ OverworldTransitionData:
 ;			6   = Armor Store
 ;			7   = Item Store
 ;			8   = Central Tower
+;			$B  = Spaceship
 ;			$C  = Ustvestia House
 ;			$D  = Kueri Inventor
 ;			$F  = Teleport Station
@@ -45116,233 +45117,388 @@ MapTrans_MotaOverworld:
 	dc.b	$FF, $FF
 ; =================================================================
 
-loc_286F0:
-	dc.b	$0D, $3B, $00, $02, $0E, $3B, $0D, $4B, $00, $02, $0E, $4B, $1D, $17, $00, $02, $1E ;0x180
-	dc.b	$17, $1F, $3B, $00, $02, $20, $3B, $1F, $45, $00, $02, $20, $45, $25, $1D, $00
-	dc.b	$02, $26, $1D, $25, $29, $00, $02, $26, $29, $29, $3B, $00, $02, $2A, $3B, $2D ;0x1A0
-	dc.b	$25, $00, $02, $2E, $25, $31, $09, $00, $02, $32, $09, $35, $49, $00, $02, $36
-	dc.b	$49, $37, $2F, $00, $02, $38, $2F, $39, $11, $00, $02, $3A, $11, $41, $25, $00
-	dc.b	$02, $42, $25, $41, $35, $00, $02, $42, $35, $49, $29, $00, $02, $4A, $29, $49
-	dc.b	$4F, $00, $02, $4A, $4D, $FF, $FF
-
-loc_28758:
-	dc.b	$0D, $2F, $00, $03, $2E, $2F, $0D, $5B, $00 ;0x1E0
-	dc.b	$03, $2E, $5B, $1D, $2F, $00, $03, $3E, $2F, $29, $11, $00, $03, $4A, $11, $37
-	dc.b	$25, $00, $03, $5A, $25, $3D, $41, $00, $03, $5E, $41, $49, $35, $00, $03, $6A ;0x200
-	dc.b	$35, $0D, $3B, $00, $01, $0E, $3B, $0D, $4B, $00, $01, $0E, $4B, $1D, $17, $00
-	dc.b	$01, $1E, $17, $1F, $3B, $00, $01, $20, $3B, $1F, $45, $00, $01, $20, $45, $25 ;0x220
-	dc.b	$1D, $00, $01, $26, $1D, $25, $29, $00, $01, $26, $29, $29, $3B, $00, $01, $2A
-	dc.b	$3B, $2D, $25, $00, $01, $2E, $25, $31, $09, $00, $01, $32, $09, $35, $49, $00 ;0x240
-	dc.b	$01, $36, $49, $37, $2F, $00, $01, $38, $2F, $39, $11, $00, $01, $3A, $11, $41
-	dc.b	$25, $00, $01, $42, $25, $41, $35, $00, $01, $42, $35, $49, $29, $00, $01, $4A ;0x260
-	dc.b	$29, $49, $4D, $00, $01, $4A, $4F, $FF, $FF
-
-loc_287EA:
-	dc.b	$4F, $3B, $0B, $18, $00, $00, $07, $3F, $00, $0A, $09, $02, $17, $77, $00, $0B
-	dc.b	$02, $19, $73, $79, $00, $0C, $0D ;0x280
-	dc.b	$1F, $3D, $73, $00, $53, $2D, $44, $35, $09, $00, $11, $1D, $0F, $07, $59, $00
-	dc.b	$52, $0D, $0F, $77, $21, $00, $43, $2B, $05, $05, $2D, $00, $48, $3D, $30, $2D ;0x2A0
-	dc.b	$2F, $00, $02, $0E, $2F, $2D, $5B, $00, $02, $0E, $5B, $49, $11, $00, $02, $2A
-	dc.b	$11, $69, $35, $00, $02, $4A, $35, $3D, $2F, $00, $02, $1E, $2F, $59, $25, $00 ;0x2C0
-	dc.b	$02, $38, $25, $5D, $41, $00, $02, $3E, $41, $1F, $0B, $00, $16, $1C, $03, $1F
-	dc.b	$1F, $00, $16, $18, $5B, $2D, $13, $00, $16, $39, $24, $33, $15, $00, $16, $4D ;0x2E0
-	dc.b	$28, $FF, $FF
-
 
 ; =================================================================
-loc_28864:
-	dc.b	$11, $2D, $01, $37, $00, $00
-	dc.b	$07, $11, $02, $09, $00, $00
-	dc.b	$15, $0F, $04, $0A, $08, $00
-	dc.b	$1B, $3A, $06, $0E, $05, $01
-	dc.b	$05, $3A, $05, $0D, $05, $02
-	dc.b	$0F, $20, $08, $15, $00, $00
-	dc.b	$11, $3A, $07, $0C, $04, $00
-	dc.b	$1B, $07, $03, $0B, $00, $00
-	dc.b	$11, $07, $0F, $1E, $00, $00
+MapTrans_SkureB2:
+	dc.b	$0D, $3B, $00, MapID_SkureB1, $0E, $3B
+	dc.b	$0D, $4B, $00, MapID_SkureB1, $0E, $4B
+	dc.b	$1D, $17, $00, MapID_SkureB1, $1E, $17
+	dc.b	$1F, $3B, $00, MapID_SkureB1, $20, $3B
+	dc.b	$1F, $45, $00, MapID_SkureB1, $20, $45
+	dc.b	$25, $1D, $00, MapID_SkureB1, $26, $1D
+	dc.b	$25, $29, $00, MapID_SkureB1, $26, $29
+	dc.b	$29, $3B, $00, MapID_SkureB1, $2A, $3B
+	dc.b	$2D, $25, $00, MapID_SkureB1, $2E, $25
+	dc.b	$31, $09, $00, MapID_SkureB1, $32, $09
+	dc.b	$35, $49, $00, MapID_SkureB1, $36, $49
+	dc.b	$37, $2F, $00, MapID_SkureB1, $38, $2F
+	dc.b	$39, $11, $00, MapID_SkureB1, $3A, $11
+	dc.b	$41, $25, $00, MapID_SkureB1, $42, $25
+	dc.b	$41, $35, $00, MapID_SkureB1, $42, $35
+	dc.b	$49, $29, $00, MapID_SkureB1, $4A, $29
+	dc.b	$49, $4F, $00, MapID_SkureB1, $4A, $4D
 	dc.b	$FF, $FF
 ; =================================================================
 
 
-loc_2889C:
-	dc.b	$1B, $13, $0F, $1E, $00 ;0x320
-	dc.b	$00, $05, $15, $04, $0A, $0A, $00, $07, $05, $03, $0B, $00, $00, $11, $05, $05
-	dc.b	$0D, $05, $03, $FF, $FF
+; =================================================================
+MapTrans_SkureB1:
+	dc.b	$0D, $2F, $00, MapID_DezolisSkure, $2E, $2F
+	dc.b	$0D, $5B, $00, MapID_DezolisSkure, $2E, $5B
+	dc.b	$1D, $2F, $00, MapID_DezolisSkure, $3E, $2F
+	dc.b	$29, $11, $00, MapID_DezolisSkure, $4A, $11
+	dc.b	$37, $25, $00, MapID_DezolisSkure, $5A, $25
+	dc.b	$3D, $41, $00, MapID_DezolisSkure, $5E, $41
+	dc.b	$49, $35, $00, MapID_DezolisSkure, $6A, $35
+	dc.b	$0D, $3B, $00, MapID_SkureB2, $0E, $3B
+	dc.b	$0D, $4B, $00, MapID_SkureB2, $0E, $4B
+	dc.b	$1D, $17, $00, MapID_SkureB2, $1E, $17
+	dc.b	$1F, $3B, $00, MapID_SkureB2, $20, $3B
+	dc.b	$1F, $45, $00, MapID_SkureB2, $20, $45
+	dc.b	$25, $1D, $00, MapID_SkureB2, $26, $1D
+	dc.b	$25, $29, $00, MapID_SkureB2, $26, $29
+	dc.b	$29, $3B, $00, MapID_SkureB2, $2A, $3B
+	dc.b	$2D, $25, $00, MapID_SkureB2, $2E, $25
+	dc.b	$31, $09, $00, MapID_SkureB2, $32, $09
+	dc.b	$35, $49, $00, MapID_SkureB2, $36, $49
+	dc.b	$37, $2F, $00, MapID_SkureB2, $38, $2F
+	dc.b	$39, $11, $00, MapID_SkureB2, $3A, $11
+	dc.b	$41, $25, $00, MapID_SkureB2, $42, $25
+	dc.b	$41, $35, $00, MapID_SkureB2, $42, $35
+	dc.b	$49, $29, $00, MapID_SkureB2, $4A, $29
+	dc.b	$49, $4D, $00, MapID_SkureB2, $4A, $4F
+	dc.b	$FF, $FF
+; =================================================================
 
-loc_288B6:
-	dc.b	$13, $27, $02, $09, $00, $00, $0B, $37, $04, $0A, $0F ;0x340
-	dc.b	$00, $0B, $27, $06, $0E, $05, $05, $05, $1D, $05, $0D, $05, $06, $07, $2D, $07
-	dc.b	$0C, $04, $04, $07, $39, $03, $0B, $00, $00, $07, $07, $0C, $0F, $00, $00, $13 ;0x360
-	dc.b	$39, $0F, $1E, $00, $00, $FF, $FF
 
-loc_288E8:
-	dc.b	$0B, $2D, $06, $0E, $05, $08, $05, $07, $07, $0C, $04, $07, $05, $31, $05, $0D
-	dc.b	$05, $09, $0B, $17, $02, $09, $00, $00, $07 ;0x380
-	dc.b	$13, $04, $0A, $14, $00, $0B, $13, $03, $0B, $00, $00, $07, $29, $0F, $1E, $00
-	dc.b	$00, $FF, $FF
+; =================================================================
+MapTrans_DezolisSkure:
+	dc.b	$4F, $3B, $0B, $18, $00, $00
+	dc.b	$07, $3F, $00, MapID_Aukba, $09, $02
+	dc.b	$17, $77, $00, MapID_Zosa, $02, $19
+	dc.b	$73, $79, $00, MapID_Ryuon, $0D, $1F
+	dc.b	$3D, $73, $00, MapID_GuaronGroundF, $2D, $44
+	dc.b	$35, $09, $00, MapID_EsperMansionF1, $1D, $0F
+	dc.b	$07, $59, $00, MapID_IkutoGroundF, $0D, $0F
+	dc.b	$77, $21, $00, MapID_NavalGroundF, $2B, $05
+	dc.b	$05, $2D, $00, MapID_MenobeGroundF, $3D, $30
+	dc.b	$2D, $2F, $00, MapID_SkureB1, $0E, $2F
+	dc.b	$2D, $5B, $00, MapID_SkureB1, $0E, $5B
+	dc.b	$49, $11, $00, MapID_SkureB1, $2A, $11
+	dc.b	$69, $35, $00, MapID_SkureB1, $4A, $35
+	dc.b	$3D, $2F, $00, MapID_SkureB1, $1E, $2F
+	dc.b	$59, $25, $00, MapID_SkureB1, $38, $25
+	dc.b	$5D, $41, $00, MapID_SkureB1, $3E, $41
+	dc.b	$1F, $0B, $00, MapID_CreviceGroundF, $1C, $03
+	dc.b	$1F, $1F, $00, MapID_CreviceGroundF, $18, $5B
+	dc.b	$2D, $13, $00, MapID_CreviceGroundF, $39, $24
+	dc.b	$33, $15, $00, MapID_CreviceGroundF, $4D, $28
+	dc.b	$FF, $FF
+; =================================================================
 
-loc_28914:
-	dc.b	$25, $05, $03, $0B, $00, $00, $11, $1B, $02, $09, $00, $00, $1D ;0x3A0
-	dc.b	$05, $07, $0C, $05, $0A, $1D, $1B, $04, $0A, $1E, $00, $11, $05, $06, $0E, $05
-	dc.b	$0B, $15, $1B, $05, $0D, $05, $0C, $27, $0F, $0D, $0C, $00, $00, $15, $05, $0F ;0x3C0
-	dc.b	$1E, $00, $00, $FF, $FF
 
-loc_28946:
-	dc.b	$19, $35, $02, $09, $00, $00, $25, $39, $07, $0C, $05, $0D, $15, $29, $04, $0A
-	dc.b	$2D, $00, $29, $31, $05, $0D, $05, $0F, $25, $29, $03 ;0x3E0
-	dc.b	$0B, $00, $00, $21, $29, $06, $0E, $05, $0E, $19, $27, $0F, $1E, $00, $00, $17
-	dc.b	$09, $01, $3E, $29, $2E, $FF, $FF
+; =================================================================
+MapTrans_Paseo:
+	dc.b	$11, $2D, InteractionID_RolfHouse, $37, $00, $00
+	dc.b	$07, $11, InteractionID_DataMemory, $09, $00, $00
+	dc.b	$15, $0F, InteractionID_Hospital, $0A, $08, $00
+	dc.b	$1B, $3A, InteractionID_ArmorStore, $0E, $05, $01
+	dc.b	$05, $3A, InteractionID_WeaponStore, $0D, $05, $02
+	dc.b	$0F, $20, InteractionID_CentralTowerOutside, $15, $00, $00
+	dc.b	$11, $3A, InteractionID_ItemStore, $0C, $04, $00
+	dc.b	$1B, $07, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $07, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$FF, $FF
+; =================================================================
 
-loc_28978:
+
+; =================================================================
+MapTrans_Arima:
+	dc.b	$1B, $13, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$05, $15, InteractionID_Hospital, $0A, $0A, $00
+	dc.b	$07, $05, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $05, InteractionID_WeaponStore, $0D, $05, $03
+	dc.b	$FF, $FF
+; =================================================================
+
+
+; =================================================================
+MapTrans_Oputa:
+	dc.b	$13, $27, InteractionID_DataMemory, $09, $00, $00
+	dc.b	$0B, $37, InteractionID_Hospital, $0A, $0F, $00
+	dc.b	$0B, $27, InteractionID_ArmorStore, $0E, $05, $05
+	dc.b	$05, $1D, InteractionID_WeaponStore, $0D, $05, $06
+	dc.b	$07, $2D, InteractionID_ItemStore, $0C, $04, $04
+	dc.b	$07, $39, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$07, $07, InteractionID_UstvestiaHouse, $0F, $00, $00
+	dc.b	$13, $39, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$FF, $FF
+; =================================================================
+
+
+; =================================================================
+MapTrans_Zema:
+	dc.b	$0B, $2D, InteractionID_ArmorStore, $0E, $05, $08
+	dc.b	$05, $07, InteractionID_ItemStore, $0C, $04, $07
+	dc.b	$05, $31, InteractionID_WeaponStore, $0D, $05, $09
+	dc.b	$0B, $17, InteractionID_DataMemory, $09, $00, $00
+	dc.b	$07, $13, InteractionID_Hospital, $0A, $14, $00
+	dc.b	$0B, $13, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$07, $29, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$FF, $FF
+; =================================================================
+
+
+; =================================================================
+MapTrans_Kueri:
+	dc.b	$25, $05, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $1B, InteractionID_DataMemory, $09, $00, $00
+	dc.b	$1D, $05, InteractionID_ItemStore, $0C, $05, $0A
+	dc.b	$1D, $1B, InteractionID_Hospital, $0A, $1E, $00
+	dc.b	$11, $05, InteractionID_ArmorStore, $0E, $05, $0B
+	dc.b	$15, $1B, InteractionID_WeaponStore, $0D, $05, $0C
+	dc.b	$27, $0F, InteractionID_InventorHouse, $0C, $00, $00
+	dc.b	$15, $05, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$FF, $FF
+; =================================================================
+
+
+; =================================================================
+MapTrans_Piata:
+	dc.b	$19, $35, InteractionID_DataMemory, $09, $00, $00
+	dc.b	$25, $39, InteractionID_ItemStore, $0C, $05, $0D
+	dc.b	$15, $29, InteractionID_Hospital, $0A, $2D, $00
+	dc.b	$29, $31, InteractionID_WeaponStore, $0D, $05, $0F
+	dc.b	$25, $29, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$21, $29, InteractionID_ArmorStore, $0E, $05, $0E
+	dc.b	$19, $27, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$17, $09, $01, MapID_ControlTowerGroundF, $29, $2E
+	dc.b	$FF, $FF
+; =================================================================
+
+
+; =================================================================
+MapTrans_Aukba:
 	dc.b	$05, $07, $02, $10, $00, $00, $11, $0D, $04 ;0x400
 	dc.b	$11, $32, $00, $11, $19, $07, $13, $01, $10, $19, $09, $03, $0B, $00, $00, $0B
 	dc.b	$1B, $06, $10, $05, $11, $17, $05, $05, $11, $05, $12, $19, $19, $0F, $13, $01 ;0x420
 	dc.b	$00, $FF, $FF
+; =================================================================
 
-loc_289A4:
+
+; =================================================================
+MapTrans_Zosa:
 	dc.b	$17, $0B, $06, $11, $05, $14, $07, $09, $05, $13, $05, $15, $05, $15, $02, $10
 	dc.b	$00, $00, $0F, $13, $07, $12, $01, $13, $11, $07, $04, $11, $32 ;0x440
 	dc.b	$00, $19, $13, $03, $0B, $00, $00, $13, $13, $0F, $13, $01, $00, $FF, $FF
+; =================================================================
 
-loc_289D0:
+; =================================================================
+MapTrans_Ryuon:
 	dc.b	$07, $1F, $02, $10, $00, $00, $0B, $2D, $04, $10, $32, $00, $05, $33, $03, $0B, $00 ;0x460
 	dc.b	$00, $05, $09, $06, $12, $05, $17, $09, $0D, $05, $13, $05, $18, $0B, $29, $07
 	dc.b	$10, $01, $16, $05, $0F, $0F, $13, $01, $00, $FF, $FF
+; =================================================================
 
-loc_289FC:
+; =================================================================
+MapTrans_TubeNearPaseo:
 	dc.b	$07, $09, $00, $00, $2D, $49, $1E, $09, $00, $00, $35, $49, $FF, $FF
+; =================================================================
 
-loc_28A0A:
+; =================================================================
+MapTrans_DarumTube:
 	dc.b	$09, $03, $00, $00, $15, $3E, $0B, $03, $00, $00, $15, $3E, $09, $1C, $00, $00
 	dc.b	$15, $43, $0B, $1C, $00, $00, $15 ;0x4A0
 	dc.b	$43, $FF, $FF
+; =================================================================
 
-loc_28A24:
+; =================================================================
+MapTrans_TubeLockedDoor:
 	dc.b	$07, $09, $00, $00, $3F, $29, $1E, $09, $00, $00, $45, $29, $FF, $FF
+; =================================================================
 
-loc_28A32:
+; =================================================================
+MapTrans_EsperMansionB1:
 	dc.b	$0D, $0F, $00, $11, $0E, $0F, $FF, $FF
+; =================================================================
 
-loc_28A3A:
+; =================================================================
+MapTrans_EsperMansionF1:
 	dc.b	$0D, $0F, $00, $10, $0E, $10, $FF, $FF
+; =================================================================
 
-loc_28A42:
+; =================================================================
+MapTrans_Uzo:
 	dc.b	$5F, $87, $00, $00, $61, $AE, $17, $55, $00, $12, $22, $50, $19, $6D, $00, $12
 	dc.b	$24, $74, $1B, $97, $00, $12, $34, $90, $21, $51, $00, $12, $18, $54, $23 ;0x4E0
 	dc.b	$75, $00, $12, $1A, $6C, $31, $37, $00, $12, $32, $A6, $31, $A7, $00, $12, $32
 	dc.b	$36, $33, $91, $00, $12, $1C, $96, $39, $3B, $00, $12, $4C, $68, $4B, $69, $00 ;0x500
 	dc.b	$12, $3A, $3A, $4D, $15, $00, $12, $56, $AC, $55, $AD, $00, $12, $4E, $14, $FF, $FF
+; =================================================================
 
-loc_28A92:
+
+; =================================================================
+MapTrans_UnderwaterPassage:
 	dc.b	$17, $6F, $00, $00, $0F, $9F, $1D, $03, $00, $36, $08, $52, $FF, $FF
+; =================================================================
 
-loc_28AA0:
+
+; =================================================================
+MapTrans_CreviceB2:
 	dc.b	$0B ;0x520
 	dc.b	$0B, $00, $15, $1B, $2E, $0F, $1B, $00, $15, $1F, $3C, $1B, $13, $00, $15, $2E
 	dc.b	$33, $FF, $FF
+; =================================================================
 
-loc_28AB4:
+; =================================================================
+MapTrans_CreviceB1:
 	dc.b	$09, $2F, $00, $16, $0A, $2F, $23, $35, $00, $16, $23, $36, $25 ;0x540
 	dc.b	$13, $00, $16, $26, $13, $3D, $33, $00, $16, $4D, $34, $1B, $2D, $00, $14, $0B
 	dc.b	$0C, $1F, $3B, $00, $14, $10, $1B, $2D, $33, $00, $14, $1B, $14, $FF, $FF
+; =================================================================
 
-loc_28AE0:
+; =================================================================
+MapTrans_CreviceGroundF:
 	dc.b	$17 ;0x560
 	dc.b	$5B, $00, $03, $1F, $20, $1B, $03, $00, $03, $1F, $09, $39, $23, $00, $03, $2D
 	dc.b	$11, $4D, $27, $00, $03, $34, $14, $09, $2F, $00, $15, $0A, $2E, $23, $35, $00 ;0x580
 	dc.b	$15, $23, $36, $25, $13, $00, $15, $26, $13, $4D, $33, $00, $15, $3D, $34, $FF, $FF
+; =================================================================
 
-loc_28B12:
+; =================================================================
+MapTrans_ShureGroundF:
 	dc.b	$0F, $17, $00, $18, $0F, $15, $13, $4B, $00, $18, $14, $4A, $19, $31, $00 ;0x5A0
 	dc.b	$18, $1A, $30, $23, $17, $00, $18, $23, $17, $25, $4B, $00, $18, $25, $49, $FF, $FF
+; =================================================================
 
-loc_28B32:
+; =================================================================
+MapTrans_ShureF1:
 	dc.b	$0F, $17, $00, $17, $10, $16, $13, $4B, $00, $17, $13, $49, $19, $31, $00 ;0x5C0
 	dc.b	$17, $1A, $30, $23, $19, $00, $17, $23, $15, $25, $4B, $00, $17, $25, $49, $11
 	dc.b	$13, $00, $19, $11, $11, $0B, $4B, $00, $19, $0C, $4A, $1D, $11, $00, $19, $1E ;0x5E0
 	dc.b	$10, $23, $4F, $00, $19, $24, $4E, $FF, $FF
+; =================================================================
 
-loc_28B6A:
+
+; =================================================================
+MapTrans_ShureF2:
 	dc.b	$11, $13, $00, $18, $11, $11, $0B, $4B, $00, $18, $0C, $4A, $1D, $11, $00, $18
 	dc.b	$1E, $10, $23, $4F, $00, $18, $24 ;0x600
 	dc.b	$4E, $1F, $45, $00, $1A, $1F, $43, $FF, $FF
+; =================================================================
 
-loc_28B8A:
+; =================================================================
+MapTrans_ShureF3:
 	dc.b	$1F, $45, $00, $19, $1F, $43, $FF, $FF
+; =================================================================
 
-loc_28B92:
+
+; =================================================================
+MapTrans_NidoGroundF:
 	dc.b	$2D, $34, $00, $1B, $2B, $34, $2D, $36, $00, $1B, $2B, $35, $2D, $37, $00 ;0x620
 	dc.b	$1B, $2E, $37, $09, $43, $00, $1C, $0A, $42, $17, $09, $00, $1C, $17, $07, $1D
 	dc.b	$49, $00, $1C, $1D, $47, $21, $21, $00, $1C, $22, $20, $FF, $FF
+; =================================================================
 
-loc_28BBE:
+; =================================================================
+MapTrans_NidoF1:
 	dc.b	$09, $43, $00 ;0x640
 	dc.b	$1B, $0A, $42, $17, $09, $00, $1B, $18, $08, $1D, $49, $00, $1B, $1D, $47, $21
 	dc.b	$21, $00, $1B, $22, $20, $17, $15, $00, $1D, $17, $13, $23, $59, $00, $1D, $24 ;0x660
 	dc.b	$58, $2F, $09, $00, $1D, $2F, $07, $FF, $FF
+; =================================================================
 
-loc_28BEA:
+; =================================================================
+MapTrans_NidoF2:
 	dc.b	$17, $15, $00, $1C, $17, $13, $23, $59, $00, $1C, $24, $58, $2F, $09, $00, $1C
 	dc.b	$2F, $07, $FF, $FF
+; =================================================================
 
-loc_28BFE:
+
+; =================================================================
+MapTrans_RoronB5:
 	dc.b	$05, $07, $00, $20, $16, $06, $FF, $FF
+; =================================================================
 
-loc_28C06:
+
+; =================================================================
+MapTrans_RoronB4:
 	dc.b	$09, $19, $00, $21, $0A, $58, $FF, $FF
+; =================================================================
 
-loc_28C0E:
+
+; =================================================================
+MapTrans_RoronB3:
 	dc.b	$07, $27, $00, $22, $25, $06, $05, $3B, $00, $22, $25, $19, $1B, $27, $00, $22
 	dc.b	$3B, $08, $15 ;0x6A0
 	dc.b	$07, $00, $1E, $06, $06, $FF, $FF
+; =================================================================
 
-loc_28C28:
+; =================================================================
+MapTrans_RoronB2:
 	dc.b	$15, $19, $00, $22, $16, $56, $19, $07, $00, $22, $1A, $46, $09, $59, $00, $1F
 	dc.b	$09, $17, $FF, $FF
+; =================================================================
 
-loc_28C3C:
+; =================================================================
+MapTrans_RoronB1:
 	dc.b	$29, $2D, $00, $23, $0A ;0x6C0
 	dc.b	$0C, $37, $33, $00, $23, $18, $12, $15, $57, $00, $21, $16, $1A, $19, $47, $00
 	dc.b	$21, $1A, $06, $27, $07, $00, $20, $07, $25, $25, $1B, $00, $20, $05, $39, $3B ;0x6E0
 	dc.b	$07, $00, $20, $1B, $28, $FF, $FF
+; =================================================================
 
-loc_28C68:
+; =================================================================
+MapTrans_RoronGroundF:
 	dc.b	$09, $0D, $00, $22, $2A, $2C, $17, $13, $00, $22, $38, $32, $FF, $FF
+; =================================================================
 
-loc_28C76:
+; =================================================================
+MapTrans_YellowDamGroundF:
 	dc.b	$19, $09, $00, $00, $41, $2C, $1B, $10, $00, $24, $19 ;0x700
 	dc.b	$10, $1B, $12, $00, $24, $1C, $11, $09, $0B, $00, $25, $0A, $0B, $15, $19, $00
 	dc.b	$25, $15, $17, $15, $57, $00, $25, $15, $55, $19, $31, $00, $25, $19, $2F, $19 ;0x720
 	dc.b	$43, $00, $25, $1A, $43, $1B, $19, $00, $25, $1C, $19, $1B, $57, $00, $25, $1C
 	dc.b	$57, $27, $0B, $00, $25, $28, $0B, $FF, $FF
+; =================================================================
 
-loc_28CBA:
+; =================================================================
+MapTrans_YellowDamF1:
 	dc.b	$09, $0B, $00, $24, $0A, $0B, $15 ;0x740
 	dc.b	$19, $00, $24, $16, $19, $15, $57, $00, $24, $16, $57, $19, $31, $00, $24, $19
 	dc.b	$33, $19, $43, $00, $24, $1A, $43, $1B, $19, $00, $24, $1C, $19, $1B, $57, $00 ;0x760
 	dc.b	$24, $1C, $57, $27, $0B, $00, $24, $28, $0B, $09, $5B, $00, $26, $0A, $5B, $0B
 	dc.b	$1B, $00, $26, $0C, $1B, $0B, $3B, $00, $26, $0B, $3C, $0D, $2D, $00, $26, $0D ;0x780
 	dc.b	$2B, $15, $09, $00, $26, $16, $09, $FF, $FF
+; =================================================================
 
-loc_28D0A:
+; =================================================================
+MapTrans_YellowDamF2:
 	dc.b	$09, $5B, $00, $25, $09, $59, $0B, $1B, $00, $25, $0C, $1B, $0B, $3B, $00, $25
 	dc.b	$0C, $3B, $0D, $2D, $00, $25, $0E ;0x7A0
 	dc.b	$2D, $15, $09, $00, $25, $16, $09, $19, $1B, $00, $27, $1A, $18, $19, $2D, $00
 	dc.b	$27, $1A, $2D, $19, $47, $00, $27, $1A, $47, $25, $21, $00, $27, $23, $21, $25 ;0x7C0
 	dc.b	$3B, $00, $27, $23, $3B, $29, $51, $00, $27, $27, $51, $FF, $FF
+; =================================================================
 
-loc_28D4E:
+
+; =================================================================
+MapTrans_YellowDamF3:
 	dc.b	$19, $1B, $00, $26, $1A, $1B, $19, $2D, $00, $26, $1A, $2D, $19, $47, $00, $26
 	dc.b	$1A, $47, $25 ;0x7E0
 	dc.b	$21, $00, $26, $23, $21, $25, $3B, $00, $26, $23, $3B, $29, $51, $00, $26, $27
 	dc.b	$51, $FF, $FF
+; =================================================================
 
-loc_28D74:
+; =================================================================
+MapTrans_RedDamGroundF:
 	dc.b	$05, $25, $00, $29, $05, $26, $05, $3B, $00, $29, $05, $39, $05 ;0x800
 	dc.b	$5B, $00, $29, $05, $59, $09, $17, $00, $29, $0A, $17, $11, $17, $00, $29, $12
 	dc.b	$17, $1B, $05, $00, $29, $1B, $06, $1B, $5B, $00, $29, $1B, $59, $FF, $FF
+; =================================================================
 
-loc_28DA0:
+; =================================================================
+MapTrans_RedDamF1:
 	dc.b	$1B
 	dc.b	$2F, $00, $00, $52, $51, $11, $30, $00, $29, $0F, $30, $11, $32, $00, $29, $12
 	dc.b	$31, $05, $25, $00, $28, $06, $25, $05, $3B, $00, $28, $06, $3B, $05, $5B, $00 ;0x840
@@ -45350,46 +45506,65 @@ loc_28DA0:
 	dc.b	$05, $00, $28, $1B, $06, $1B, $5B, $00, $28, $1B, $59, $05, $05, $00, $2A, $05 ;0x860
 	dc.b	$06, $0F, $57, $00, $2A, $0D, $57, $13, $49, $00, $2A, $14, $49, $15, $27, $00
 	dc.b	$2A, $16, $27, $1B, $1B, $00, $2A, $1B, $19, $FF, $FF
+; =================================================================
 
-loc_28DFC:
+
+; =================================================================
+MapTrans_RedDamF2:
 	dc.b	$05, $05, $00, $29, $05 ;0x880
 	dc.b	$06, $0F, $57, $00, $29, $10, $57, $13, $49, $00, $29, $14, $49, $15, $27, $00
 	dc.b	$29, $16, $27, $1B, $1B, $00, $29, $1B, $19, $FF, $FF
+; =================================================================
 
-loc_28E1C:
+; =================================================================
+MapTrans_BlueDamGroundF:
 	dc.b	$21, $37, $00, $00, $41 ;0x8A0
 	dc.b	$5C, $1B, $36, $00, $2B, $19, $36, $1B, $38, $00, $2B, $1C, $37, $0D, $17, $00
 	dc.b	$2C, $0D, $15, $27, $11, $00, $2C, $27, $0F, $2B, $37, $00, $2C, $2B, $35, $3B ;0x8C0
 	dc.b	$17, $00, $2C, $39, $16, $FF, $FF
+; =================================================================
 
-loc_28E48:
+
+; =================================================================
+MapTrans_BlueDamF1:
 	dc.b	$0D, $17, $00, $2B, $0D, $15, $27, $11, $00, $2B, $27, $0F, $2B, $37, $00, $2B
 	dc.b	$2B, $35, $3B, $17, $00, $2B, $39, $16, $05 ;0x8E0
 	dc.b	$1B, $00, $2D, $05, $19, $19, $2F, $00, $2D, $19, $2D, $29, $07, $00, $2D, $2A
 	dc.b	$06, $2B, $2F, $00, $2D, $2B, $2D, $33, $1B, $00, $2D, $31, $19, $FF, $FF
+; =================================================================
 
-loc_28E80:
+; =================================================================
+MapTrans_BlueDamF2:
 	dc.b	$05 ;0x900
 	dc.b	$1B, $00, $2C, $05, $19, $19, $2F, $00, $2C, $19, $2D, $29, $07, $00, $2C, $2A
 	dc.b	$06, $2B, $2F, $00, $2C, $2B, $2D, $33, $1B, $00, $2C, $33, $19, $05, $05, $00 ;0x920
 	dc.b	$2E, $06, $04, $0F, $0D, $00, $2E, $0F, $0B, $17, $23, $00, $2E, $17, $21, $23
 	dc.b	$1D, $00, $2E, $21, $1B, $3B, $19, $00, $2E, $3B, $17, $FF, $FF
+; =================================================================
 
-loc_28EBE:
+
+; =================================================================
+MapTrans_BlueDamF3:
 	dc.b	$05, $05, $00 ;0x940
 	dc.b	$2D, $06, $04, $0F, $0D, $00, $2D, $0F, $0B, $17, $23, $00, $2D, $17, $21, $23
 	dc.b	$1D, $00, $2D, $21, $1B, $3B, $19, $00, $2D, $3B, $17, $05, $17, $00, $2F, $06 ;0x960
 	dc.b	$16, $0F, $19, $00, $2F, $0F, $17, $15, $31, $00, $2F, $15, $2F, $21, $21, $00
 	dc.b	$2F, $1F, $20, $25, $31, $00, $2F, $26, $30, $31, $19, $00, $2F, $31, $17, $3B ;0x980
 	dc.b	$09, $00, $2F, $3B, $07, $FF, $FF
+; =================================================================
 
-loc_28F08:
+
+; =================================================================
+MapTrans_BlueDamF4:
 	dc.b	$05, $17, $00, $2E, $06, $16, $0F, $19, $00, $2E, $0F, $17, $15, $31, $00, $2E
 	dc.b	$15, $2F, $21, $21, $00, $2E, $1F, $20, $25 ;0x9A0
 	dc.b	$31, $00, $2E, $26, $30, $31, $19, $00, $2E, $31, $17, $3B, $09, $00, $2E, $3B
 	dc.b	$07, $FF, $FF
+; =================================================================
 
-loc_28F34:
+
+; =================================================================
+MapTrans_GreenDamGroundF:
 	dc.b	$11, $5F, $00, $00, $2C, $41, $19, $5E, $00, $30, $1A, $5E, $19 ;0x9C0
 	dc.b	$60, $00, $30, $17, $5F, $07, $11, $00, $31, $07, $0F, $07, $37, $00, $31, $07
 	dc.b	$35, $07, $89, $00, $31, $08, $88, $09, $15, $00, $31, $0A, $14, $09, $23, $00 ;0x9E0
@@ -45405,8 +45580,10 @@ loc_28F34:
 	dc.b	$31, $25, $57, $25, $67, $00, $31, $23, $67, $27, $23, $00, $31, $27, $21, $27 ;0xA80
 	dc.b	$89, $00, $31, $25, $88, $27, $99, $00, $31, $25, $97, $29, $35, $00, $31, $27
 	dc.b	$34, $29, $95, $00, $31, $27, $94, $2B, $0F, $00, $31, $2B, $0D, $FF, $FF
+; =================================================================
 
-loc_29020:
+; =================================================================
+MapTrans_GreenDamF1:
 	dc.b	$07 ;0xAA0
 	dc.b	$11, $00, $30, $07, $0F, $07, $37, $00, $30, $07, $35, $07, $89, $00, $30, $08
 	dc.b	$88, $09, $15, $00, $30, $09, $13, $09, $23, $00, $30, $0A, $23, $0B, $4B, $00 ;0xAC0
@@ -45422,46 +45599,66 @@ loc_29020:
 	dc.b	$30, $25, $68, $27, $23, $00, $30, $25, $22, $27, $89, $00, $30, $28, $88, $27 ;0xB60
 	dc.b	$99, $00, $30, $25, $98, $29, $35, $00, $30, $29, $33, $29, $95, $00, $30, $27
 	dc.b	$94, $2B, $0F, $00, $30, $29, $0E, $FF, $FF
+; =================================================================
 
-loc_290FA:
+; =================================================================
+MapTrans_BiosystemsLabB1:
 	dc.b	$3B, $09, $00, $33, $39, $09, $FF, $FF
+; =================================================================
 
-loc_29102:
+; =================================================================
+MapTrans_BiosystemsLabGroundF:
 	dc.b	$49, $2F, $00, $33, $47, $2F, $49, $31, $00, $33, $4B, $30, $3B, $09, $00, $32
 	dc.b	$3C, $09, $05, $29, $00, $34, $06, $29, $15, $31, $00, $34, $13, $31, $19 ;0xBA0
 	dc.b	$39, $00, $34, $17, $39, $2B, $17, $00, $34, $29, $17, $2F, $45, $00, $34, $30
 	dc.b	$45, $35, $37, $00, $34, $35, $35, $FF, $FF
+; =================================================================
 
-loc_2913A:
+; =================================================================
+MapTrans_BiosystemsLabF1:
 	dc.b	$05, $29, $00, $33, $06, $29, $15 ;0xBC0
 	dc.b	$31, $00, $33, $15, $2F, $19, $39, $00, $33, $17, $39, $2B, $17, $00, $33, $29
 	dc.b	$17, $2F, $45, $00, $33, $30, $45, $35, $37, $00, $33, $35, $35, $1B, $4F, $00 ;0xBE0
 	dc.b	$35, $1C, $4F, $FF, $FF
+; =================================================================
 
-loc_29166:
+; =================================================================
+MapTrans_BiosystemsLabF2:
 	dc.b	$2F, $2F, $00, $35, $2D, $2F, $2F, $31, $00, $35, $30, $30, $1B, $4F, $00, $34
 	dc.b	$1C, $4F, $FF, $FF
+; =================================================================
 
-loc_2917A:
+; =================================================================
+MapTrans_ClimatrolGroundF:
 	dc.b	$07, $53, $00, $13, $1D, $04, $25 ;0xC00
 	dc.b	$05, $00, $37, $16, $06, $FF, $FF
+; =================================================================
 
-loc_29188:
+; =================================================================
+MapTrans_ClimatrolF1:
 	dc.b	$15, $07, $00, $36, $26, $04, $11, $19, $00, $38, $11, $17, $FF, $FF
+; =================================================================
 
-loc_29196:
+; =================================================================
+MapTrans_ClimatrolF2:
 	dc.b	$11, $19, $00, $37, $11, $17, $07, $0F, $00, $39, $07, $0D, $FF, $FF
+; =================================================================
 
-loc_291A4:
+; =================================================================
+MapTrans_ClimatrolF3:
 	dc.b	$07, $0F, $00, $38, $07, $0D, $19, $11, $00, $3A, $19, $2F, $FF, $FF
+; =================================================================
 
-loc_291B2:
+; =================================================================
+MapTrans_ClimatrolF4:
 	dc.b	$19, $31, $00, $39, $19, $0F, $05, $03, $00, $3B, $06, $02, $05, $19, $00 ;0xC40
 	dc.b	$3B, $06, $18, $05, $4B, $00, $3B, $05, $4A, $05, $5D, $00, $3B, $06, $5C, $2B
 	dc.b	$03, $00, $3B, $2C, $02, $2B, $19, $00, $3B, $2C, $18, $2B, $4B, $00, $3B, $2C ;0xC60
 	dc.b	$4A, $2B, $5D, $00, $3B, $2C, $5C, $FF, $FF
+; =================================================================
 
-loc_291EA:
+; =================================================================
+MapTrans_ClimatrolF5:
 	dc.b	$05, $03, $00, $3A, $06, $02, $05, $19, $00, $3A, $06, $18, $05, $4B, $00, $3A
 	dc.b	$06, $4A, $05, $5D, $00, $3A, $06 ;0xC80
 	dc.b	$5C, $2B, $03, $00, $3A, $2C, $02, $2B, $19, $00, $3A, $2C, $18, $2B, $4B, $00
@@ -45473,8 +45670,10 @@ loc_291EA:
 	dc.b	$3B, $21, $03, $00, $3C, $1F, $02, $21, $57, $00, $3C, $21, $55, $21, $5D, $00
 	dc.b	$3C, $22, $5C, $23, $19, $00, $3C, $24, $18, $25, $2B, $00, $3C, $25, $29, $27 ;0xD00
 	dc.b	$33, $00, $3C, $27, $34, $27, $5D, $00, $3C, $28, $5C, $2B, $2F, $00, $3C, $2B, $2D, $FF, $FF
+; =================================================================
 
-loc_29294:
+; =================================================================
+MapTrans_ClimatrolF6:
 	dc.b	$05, $1D, $00, $3B, $06, $1C, $05, $2F, $00, $3B, $06, $2E, $07 ;0xD20
 	dc.b	$0B, $00, $3B, $08, $0A, $0F, $41, $00, $3B, $0F, $42, $11, $53, $00, $3B, $12
 	dc.b	$52, $13, $33, $00, $3B, $13, $34, $17, $21, $00, $3B, $18, $20, $17, $3B, $00 ;0xD40
@@ -45487,14 +45686,18 @@ loc_29294:
 	dc.b	$3D, $0E, $4C, $13, $39, $00, $3D, $13, $3A, $27, $41, $00, $3D, $25, $41, $27
 	dc.b	$53, $00, $3D, $27, $51, $2B, $03, $00, $3D, $29, $03, $2B, $43, $00, $3D, $2B ;0xDC0
 	dc.b	$44, $FF, $FF
+; =================================================================
 
-loc_29344:
+; =================================================================
+MapTrans_ClimatrolF7:
 	dc.b	$05, $03, $00, $3C, $05, $04, $07, $25, $00, $3C, $08, $24, $0B, $59, $00, $3C
 	dc.b	$0C, $58, $0D, $4D, $00, $3C, $0E, $4C, $13, $39, $00, $3C, $13 ;0xDE0
 	dc.b	$37, $27, $41, $00, $3C, $27, $3F, $27, $53, $00, $3C, $27, $51, $2B, $03, $00
 	dc.b	$3C, $29, $03, $2B, $43, $00, $3C, $2B, $41, $FF, $FF
+; =================================================================
 
-loc_2937C:
+; =================================================================
+MapTrans_ControlTowerGroundF:
 	dc.b	$2B, $2F, $00, $09, $18 ;0xE00
 	dc.b	$09, $05, $03, $00, $3F, $06, $03, $05, $07, $00, $3F, $06, $07, $05, $0B, $00
 	dc.b	$3F, $06, $0B, $05, $0F, $00, $3F, $06, $0F, $05, $13, $00, $3F, $06, $13, $05 ;0xE20
@@ -45523,8 +45726,10 @@ loc_2937C:
 	dc.b	$46, $2B, $49, $00, $3F, $2B, $47, $2B, $4D, $00, $3F, $2B, $4E, $2B, $51, $00
 	dc.b	$3F, $2B, $4F, $2B, $55, $00, $3F, $2B, $56, $2B, $59, $00, $3F, $2B, $57, $FF ;0xFA0
 	dc.b	$FF
+; =================================================================
 
-loc_29522:
+; =================================================================
+MapTrans_ControlTowerF1:
 	dc.b	$05, $03, $00, $3E, $06, $03, $05, $07, $00, $3E, $06, $07, $05, $0B, $00, $3E
 	dc.b	$06, $0B, $05, $0F, $00, $3E, $06, $0F, $05, $13, $00, $3E, $06, $13, $05 ;0xFC0
 	dc.b	$17, $00, $3E, $06, $17, $05, $1B, $00, $3E, $06, $1B, $05, $1F, $00, $3E, $06
@@ -45552,37 +45757,53 @@ loc_29522:
 	dc.b	$45, $2B, $49, $00, $3E, $29, $49, $2B, $4D, $00, $3E, $29, $4D, $2B, $51, $00
 	dc.b	$3E, $29, $51, $2B, $55, $00, $3E, $29, $55, $2B, $59, $00, $3E, $29, $59, $FF ;0x1140
 	dc.b	$FF
+; =================================================================
 
-loc_296C2:
+; =================================================================
+MapTrans_TubeNearZema:
 	dc.b	$07, $09, $00, $00, $4D, $39, $1E, $09, $00, $00, $51, $39, $FF, $FF
+; =================================================================
 
-loc_296D0:
+; =================================================================
+MapTrans_Gaira:
 	dc.b	$05, $19, $00, $44, $05, $17, $29, $2D, $00, $44, $29, $2E, $FF, $FF
+; =================================================================
 
-loc_296DE:
+; =================================================================
+MapTrans_NavalF1:
 	dc.b	$05, $19, $00 ;0x1160
 	dc.b	$43, $06, $19, $29, $2D, $00, $43, $27, $2D, $05, $1D, $00, $45, $05, $1B, $29
 	dc.b	$29, $00, $45, $29, $2A, $FF, $FF
+; =================================================================
 
-loc_296F8:
+; =================================================================
+MapTrans_NavalF2:
 	dc.b	$05, $1D, $00, $44, $03, $1D, $29, $29, $00 ;0x1180
 	dc.b	$44, $29, $27, $05, $21, $00, $46, $05, $1F, $29, $25, $00, $46, $29, $26, $FF, $FF
+; =================================================================
 
-loc_29712:
+; =================================================================
+MapTrans_NavalF3:
 	dc.b	$05, $21, $00, $45, $03, $21, $29, $25, $00, $45, $29, $23, $05, $25, $00 ;0x11A0
 	dc.b	$47, $05, $26, $29, $21, $00, $47, $29, $22, $FF, $FF
+; =================================================================
 
-loc_2972C:
+; =================================================================
+MapTrans_NavalF4:
 	dc.b	$05, $25, $00, $46, $03, $25, $29, $21, $00, $46, $29, $1F, $FF, $FF
+; =================================================================
 
-loc_2973A:
+; =================================================================
+MapTrans_MenobeGroundF:
 	dc.b	$13, $29, $00, $49, $14, $29, $13 ;0x11C0
 	dc.b	$39, $00, $49, $14, $39, $15, $31, $00, $49, $13, $31, $1B, $41, $00, $49, $1C
 	dc.b	$41, $1F, $13, $00, $49, $20, $13, $23, $49, $00, $49, $21, $49, $25, $1F, $00 ;0x11E0
 	dc.b	$49, $26, $1F, $2D, $47, $00, $49, $2D, $45, $2F, $25, $00, $49, $30, $25, $35
 	dc.b	$21, $00, $49, $35, $1F, $39, $37, $00, $49, $3A, $37, $FF, $FF
+; =================================================================
 
-loc_2977E:
+; =================================================================
+MapTrans_MenobeF1:
 	dc.b	$13, $29, $00 ;0x1200
 	dc.b	$48, $14, $29, $13, $39, $00, $48, $14, $39, $15, $31, $00, $48, $13, $31, $1B
 	dc.b	$41, $00, $48, $1C, $41, $1F, $13, $00, $48, $1D, $13, $23, $49, $00, $48, $24 ;0x1220
@@ -45591,8 +45812,10 @@ loc_2977E:
 	dc.b	$19, $00, $4A, $17, $19, $19, $4F, $00, $4A, $19, $50, $25, $41, $00, $4A, $25
 	dc.b	$42, $29, $1B, $00, $4A, $2A, $1B, $2F, $41, $00, $4A, $30, $41, $31, $49, $00 ;0x1260
 	dc.b	$4A, $32, $49, $FF, $FF
+; =================================================================
 
-loc_297E6:
+; =================================================================
+MapTrans_MenobeF2:
 	dc.b	$19, $19, $00, $49, $1A, $19, $19, $4F, $00, $49, $1A, $4F, $25, $41, $00, $49
 	dc.b	$26, $41, $29, $1B, $00, $49, $29, $19, $2F, $41, $00 ;0x1280
 	dc.b	$49, $30, $41, $31, $49, $00, $49, $32, $49, $13, $29, $00, $4B, $11, $29, $13
@@ -45600,91 +45823,141 @@ loc_297E6:
 	dc.b	$49, $19, $53, $00, $4B, $1A, $53, $1D, $51, $00, $4B, $1E, $51, $1F, $27, $00
 	dc.b	$4B, $20, $27, $25, $49, $00, $4B, $25, $47, $29, $15, $00, $4B, $2A, $15, $35 ;0x12C0
 	dc.b	$29, $00, $4B, $33, $29, $FF, $FF
+; =================================================================
 
-loc_29848:
+; =================================================================
+MapTrans_MenobeF3:
 	dc.b	$13, $29, $00, $4A, $13, $2A, $13, $39, $00, $4A, $13, $3A, $19, $0F, $00, $4A
 	dc.b	$1A, $0F, $19, $49, $00, $4A, $1A, $49, $19 ;0x12E0
 	dc.b	$53, $00, $4A, $19, $51, $1D, $51, $00, $4A, $1E, $51, $1F, $27, $00, $4A, $20
 	dc.b	$27, $25, $49, $00, $4A, $26, $49, $29, $15, $00, $4A, $29, $16, $35, $29, $00 ;0x1300
 	dc.b	$4A, $33, $29, $FF, $FF
+; =================================================================
 
-loc_29886:
+; =================================================================
+MapTrans_IkutoB6:
 	dc.b	$27, $53, $00, $4D, $27, $54, $FF, $FF
+; =================================================================
 
-loc_2988E:
+; =================================================================
+MapTrans_IkutoB5:
 	dc.b	$27, $53, $00, $4C, $27, $51, $27, $59, $00, $4E, $27, $57, $FF, $FF
+; =================================================================
 
-loc_2989C:
+; =================================================================
+MapTrans_IkutoB4:
 	dc.b	$27, $53, $00, $4F, $0F, $54, $27, $59, $00, $4D, $27, $57, $FF, $FF
+; =================================================================
 
-loc_298AA:
+; =================================================================
+MapTrans_IkutoB3:
 	dc.b	$0F, $53, $00, $4E, $27, $54, $0F, $59, $00, $50, $0F, $37, $FF, $FF
+; =================================================================
 
-loc_298B8:
+; =================================================================
+MapTrans_IkutoB2:
 	dc.b	$0F, $33, $00, $51, $0F, $1D, $0F, $39, $00, $4F, $0F, $57, $FF, $FF
+; =================================================================
 
-loc_298C6:
+; =================================================================
+MapTrans_IkutoB1:
 	dc.b	$11, $1D, $00, $50, $0F, $34, $0D, $1D, $00, $52, $06, $1D, $FF, $FF
+; =================================================================
 
-loc_298D4:
+; =================================================================
+MapTrans_IkutoGroundF:
 	dc.b	$05, $1D, $00, $51, $0E, $1D, $FF, $FF
+; =================================================================
 
-loc_298DC:
+; =================================================================
+MapTrans_GuaronGroundF:
 	dc.b	$07, $4F, $00, $54, $05 ;0x1360
 	dc.b	$51, $19, $03, $00, $54, $04, $09, $19, $0D, $00, $54, $04, $12, $19, $4D, $00
 	dc.b	$54, $15, $50, $1B, $25, $00, $54, $1A, $27, $1B, $39, $00, $54, $19, $3B, $23 ;0x1380
 	dc.b	$03, $00, $54, $0B, $09, $23, $0D, $00, $54, $0B, $13, $FF, $FF
+; =================================================================
 
-loc_2990E:
+; =================================================================
+MapTrans_GuaronF1:
 	dc.b	$03, $09, $00, $53, $1A, $03, $03, $13, $00, $53, $1A, $0C, $05, $53, $00, $53
 	dc.b	$08, $4D, $0D ;0x13A0
 	dc.b	$09, $00, $53, $21, $04, $0D, $13, $00, $53, $23, $0B, $17, $51, $00, $53, $1A
 	dc.b	$4C, $19, $29, $00, $53, $1C, $24, $19, $3D, $00, $53, $19, $39, $11, $29, $00 ;0x13C0
 	dc.b	$55, $0B, $0D, $FF, $FF
+; =================================================================
 
-loc_29946:
+; =================================================================
+MapTrans_GuaronF2:
 	dc.b	$0B, $0F, $00, $54, $11, $27, $13, $0F, $00, $58, $13, $10, $FF, $FF
+; =================================================================
 
-loc_29954:
+; =================================================================
+MapTrans_GuaronF3:
 	dc.b	$0B, $0F, $00, $58, $0B, $0D, $13, $0F, $00, $59, $13, $10, $FF, $FF
+; =================================================================
 
-loc_29962:
+; =================================================================
+MapTrans_GuaronF4:
 	dc.b	$0B, $0F, $00, $59, $0B, $0D, $13, $0F, $00, $5A, $13, $2A, $FF, $FF
+; =================================================================
 
-loc_29970:
+; =================================================================
+MapTrans_GuaronF5:
 	dc.b	$0B, $0F, $00, $56, $0B, $10, $13, $0F, $00, $55, $13, $0D, $FF, $FF
+; =================================================================
 
-loc_2997E:
+; =================================================================
+MapTrans_GuaronF6:
 	dc.b	$0B, $0F, $00, $57, $0B, $10, $13, $0F, $00, $56, $13, $0D, $FF, $FF
+; =================================================================
 
-loc_2998C:
+; =================================================================
+MapTrans_GuaronF7:
 	dc.b	$0B, $29, $00, $5B, $0F, $0A, $13, $29, $00, $57, $13, $0D, $FF, $FF
+; =================================================================
 
-loc_2999A:
+; =================================================================
+MapTrans_GuaronF8:
 	dc.b	$0F, $09, $00, $5A, $0B, $27, $17, $09, $00, $5C, $11, $10, $FF, $FF
+; =================================================================
 
-loc_299A8:
+; =================================================================
+MapTrans_GuaronF9:
 	dc.b	$09, $0F, $00, $5F, $09, $10, $11, $0F, $00, $5B, $17, $07, $FF, $FF
+; =================================================================
 
-loc_299B6:
+; =================================================================
+MapTrans_GuaronF10:
 	dc.b	$09, $0F, $00, $60, $09, $10, $11, $0F, $00, $5F, $11, $0D, $FF, $FF
+; =================================================================
 
-loc_299C4:
+; =================================================================
+MapTrans_GuaronF11:
 	dc.b	$09, $0F, $00, $61, $09, $10, $11, $0F, $00, $60, $11, $0D, $FF, $FF
+; =================================================================
 
-loc_299D2:
+; =================================================================
+MapTrans_GuaronF12:
 	dc.b	$09, $0F, $00, $5C, $09, $0D, $11, $0F, $00, $5D, $11, $10, $FF, $FF
+; =================================================================
 
-loc_299E0:
+; =================================================================
+MapTrans_GuaronF13:
 	dc.b	$09, $0F, $00, $5D, $09, $0D, $11, $0F, $00, $5E, $11, $10, $FF, $FF
+; =================================================================
 
-loc_299EE:
+; =================================================================
+MapTrans_GuaronF14:
 	dc.b	$09, $0F, $00, $5E, $09, $0D, $11, $0F, $00, $62, $15, $10, $FF, $FF
+; =================================================================
 
-loc_299FC:
+; =================================================================
+MapTrans_GuaronF15:
 	dc.b	$15, $0F, $00, $61, $11, $10, $FF, $FF
+; =================================================================
 
-loc_29A04:
+; =================================================================
+MapTrans_NoahGroundF:
 	dc.b	$03, $0D, $00, $64, $24, $0D, $03, $35, $00, $64, $24, $35, $0F, $17, $00, $64
 	dc.b	$2F, $15, $0F, $2B, $00, $64, $30, $2B, $17, $0F, $00, $64, $38 ;0x14A0
 	dc.b	$0F, $17, $19, $00, $64, $38, $19, $17, $29, $00, $64, $38, $29, $17, $33, $00
@@ -45697,8 +45970,10 @@ loc_29A04:
 	dc.b	$64, $7E, $0F, $5D, $33, $00, $64, $7E, $33, $5D, $3B, $00, $64, $7D, $39, $67 ;0x1520
 	dc.b	$0F, $00, $64, $87, $10, $67, $33, $00, $64, $87, $31, $69, $07, $00, $64, $87
 	dc.b	$07, $FF, $FF
+; =================================================================
 
-loc_29AB4:
+; =================================================================
+MapTrans_NoahF1:
 	dc.b	$23, $0D, $00, $63, $04, $0D, $23, $35, $00, $63, $04, $35, $2F ;0x1540
 	dc.b	$17, $00, $63, $10, $17, $2F, $2B, $00, $63, $10, $2A, $59, $3B, $00, $63, $39
 	dc.b	$39, $61, $21, $00, $63, $41, $1F, $37, $0F, $00, $63, $18, $0F, $37, $19, $00 ;0x1560
@@ -45711,6 +45986,8 @@ loc_29AB4:
 	dc.b	$63, $5E, $0F, $7D, $33, $00, $63, $5E, $33, $7D, $3B, $00, $63, $5E, $3B, $87
 	dc.b	$0F, $00, $63, $65, $0F, $87, $33, $00, $63, $65, $33, $89, $07, $00, $63, $67 ;0x15E0
 	dc.b	$06, $FF, $FF ;0x1600
+; =================================================================
+
 
 loc_29B64:
 	dc.b	$00 ;0x0 (0x00029B64-0x00029B65, Entry count: 0x00000001) [Unknown data]
