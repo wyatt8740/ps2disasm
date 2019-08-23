@@ -45279,25 +45279,39 @@ MapTrans_Piata:
 
 ; =================================================================
 MapTrans_Aukba:
-	dc.b	$05, $07, $02, $10, $00, $00, $11, $0D, $04 ;0x400
-	dc.b	$11, $32, $00, $11, $19, $07, $13, $01, $10, $19, $09, $03, $0B, $00, $00, $0B
-	dc.b	$1B, $06, $10, $05, $11, $17, $05, $05, $11, $05, $12, $19, $19, $0F, $13, $01 ;0x420
-	dc.b	$00, $FF, $FF
+	dc.b	$05, $07, InteractionID_DataMemory, $10, $00, $00
+	dc.b	$11, $0D, InteractionID_Hospital, $11, $32, $00
+	dc.b	$11, $19, InteractionID_ItemStore, $13, $01, $10
+	dc.b	$19, $09, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$0B, $1B, InteractionID_ArmorStore, $10, $05, $11
+	dc.b	$17, $05, InteractionID_WeaponStore, $11, $05, $12
+	dc.b	$19, $19, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Zosa:
-	dc.b	$17, $0B, $06, $11, $05, $14, $07, $09, $05, $13, $05, $15, $05, $15, $02, $10
-	dc.b	$00, $00, $0F, $13, $07, $12, $01, $13, $11, $07, $04, $11, $32 ;0x440
-	dc.b	$00, $19, $13, $03, $0B, $00, $00, $13, $13, $0F, $13, $01, $00, $FF, $FF
+	dc.b	$17, $0B, InteractionID_ArmorStore, $11, $05, $14
+	dc.b	$07, $09, InteractionID_WeaponStore, $13, $05, $15
+	dc.b	$05, $15, InteractionID_DataMemory, $10, $00, $00
+	dc.b	$0F, $13, InteractionID_ItemStore, $12, $01, $13
+	dc.b	$11, $07, InteractionID_Hospital, $11, $32, $00
+	dc.b	$19, $13, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$13, $13, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$FF, $FF
 ; =================================================================
 
 ; =================================================================
 MapTrans_Ryuon:
-	dc.b	$07, $1F, $02, $10, $00, $00, $0B, $2D, $04, $10, $32, $00, $05, $33, $03, $0B, $00 ;0x460
-	dc.b	$00, $05, $09, $06, $12, $05, $17, $09, $0D, $05, $13, $05, $18, $0B, $29, $07
-	dc.b	$10, $01, $16, $05, $0F, $0F, $13, $01, $00, $FF, $FF
+	dc.b	$07, $1F, InteractionID_DataMemory, $10, $00, $00
+	dc.b	$0B, $2D, InteractionID_Hospital, $10, $32, $00
+	dc.b	$05, $33, InteractionID_CloneLabs, $0B, $00, $00
+	dc.b	$05, $09, InteractionID_ArmorStore, $12, $05, $17
+	dc.b	$09, $0D, InteractionID_WeaponStore, $13, $05, $18
+	dc.b	$0B, $29, InteractionID_ItemStore, $10, $01, $16
+	dc.b	$05, $0F, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$FF, $FF
 ; =================================================================
 
 ; =================================================================
