@@ -1287,7 +1287,7 @@ Special_SFX_tracks = $FFD1E0
 
 Character_pos_table = ramaddr($FFFFDD00)
 
-Current_active_objects_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
+Windows_opened_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
 
 Window_index =  ramaddr($FFFFDE10)		; type of window to open
 

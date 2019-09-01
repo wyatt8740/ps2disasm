@@ -2653,7 +2653,7 @@ RedCursor_Main:
 	beq.s	Obj01_ShowCursor
 	tst.w	(Fight_active_flag).w
 	bne.s	Obj01_ShowCursor
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
@@ -2754,7 +2754,7 @@ InputWindowCursor_Main:
 	bne.s	loc_163E
 	move.w	(Window_index_saved).w, d0
 	beq.s	loc_163E
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
@@ -2940,7 +2940,7 @@ NameDestinationTile_Main:
 	bne.s	+
 	move.w	(Window_index_saved).w, d0
 	beq.s	+
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
 	cmpa.w	d0, a0
@@ -3033,7 +3033,7 @@ CharSelectCursor_Init:
 	move.w	#1, $22(a0)
 ; -------------------------------------------------------------------
 CharSelectCursor_Main:
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	addq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
@@ -3154,7 +3154,7 @@ CommandSelectCursor_Main:
 	bne.s	loc_19CA
 	move.w	(Window_index_saved).w, d0
 	beq.s	loc_19CA
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
@@ -6003,7 +6003,7 @@ loc_3786:
 	bne.w	loc_39D0
 	tst.w	(Window_index).w
 	bne.w	loc_39D0
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.w	loc_39D0
 
 	move.w	(Demo_flag).w, d0
@@ -7684,7 +7684,7 @@ ObjJetSctr_Main:
 loc_4978:
 	tst.w	(Window_index).w
 	bne.w	loc_4B18
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.w	loc_4B18
 	move.w	#0, $14(a0)
 	move.w	#0, $18(a0)
@@ -12696,7 +12696,7 @@ loc_8130:
 	bne.s	loc_815C
 	tst.w	(Window_index).w
 	bne.w	loc_815A
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.w	loc_815A
 	move.w	($FFFFC64C).w, (Map_index).w
 	move.w	($FFFFC64E).w, (Map_Y_pos).w
@@ -12713,7 +12713,7 @@ loc_815C:
 	bne.s	loc_817C
 	tst.w	(Window_index).w
 	bne.s	loc_817C
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.s	loc_817C
 	tst.w	(Demo_timer).w
 	beq.s	loc_817E
@@ -12768,7 +12768,7 @@ loc_81E6:
 	bne.s	loc_8224
 	tst.w	(Window_index).w
 	bne.w	loc_8224
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.w	loc_8224
 	move.w	#$101, d0
 	lea	($FFFFC72C).w, a1
@@ -14503,7 +14503,7 @@ DrawWindows:
 	andi.w	#$F, d0
 	bne.w	loc_9478
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	lea	(Camera_Y_pos_FG).w, a5
@@ -14555,7 +14555,7 @@ loc_9432:
 	btst	#2, (Window_index).w
 	bne.s	loc_9470
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	move.w	(a0)+, d0
@@ -14576,7 +14576,7 @@ loc_947A:
 	move.w	(Window_index).w, d0
 	bmi.w	loc_954C
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	move.w	(a0)+, d0
@@ -14593,8 +14593,8 @@ loc_947A:
 	bne.s	loc_94EC
 	btst	#2, (Window_index).w
 	bne.s	loc_94CC
-	addq.w	#1, (Current_active_objects_num).w
-	andi.w	#$F, (Current_active_objects_num).w
+	addq.w	#1, (Windows_opened_num).w
+	andi.w	#$F, (Windows_opened_num).w
 	bne.s	loc_94CC
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, ($FFFFDE00).w
@@ -14610,12 +14610,12 @@ loc_94CC:
 loc_94EC:
 	rts
 loc_94EE:
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	beq.s	loc_94CC
-	subq.w	#1, (Current_active_objects_num).w
-	andi.w	#$F, (Current_active_objects_num).w
+	subq.w	#1, (Windows_opened_num).w
+	andi.w	#$F, (Windows_opened_num).w
 	lea	($FFFFDF0A).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	move.w	(a0)+, d0
@@ -14632,7 +14632,7 @@ loc_9530:
 	btst	#2, (Window_index).w
 	bne.s	loc_954A
 	lea	(Object_RAM).w, a1
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#6, d0
 	adda.w	d0, a1
 	moveq	#0, d1
@@ -14641,7 +14641,7 @@ loc_954A:
 	rts
 loc_954C:
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	move.w	(a0)+, d0
@@ -22858,7 +22858,7 @@ loc_EB78:
 
 +
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	addq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -22879,7 +22879,7 @@ loc_EBBC:
 	bne.s	loc_EBF8
 	subq.w	#2, (Event_routine).w
 	lea	(Object_RAM).w, a1
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	addq.w	#1, d0
 	lsl.w	#6, d0
 	adda.w	d0, a1
@@ -23065,7 +23065,7 @@ loc_EDC4:
 	rts
 loc_EDD0:
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	addq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -23105,7 +23105,7 @@ loc_EE36:
 	addq.w	#1, (Event_routine_3).w
 loc_EE4C:
 	lea	(Object_RAM).w, a1
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	addq.w	#1, d0
 	lsl.w	#6, d0
 	adda.w	d0, a1
@@ -23172,7 +23172,7 @@ loc_EEF6:
 
 CommandAction_ItemSelectCharacter:
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	addq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -23214,7 +23214,7 @@ loc_EF68:
 	addq.w	#1, (Event_routine_3).w
 loc_EF84:
 	lea	(Object_RAM).w, a1
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	addq.w	#1, d0
 	lsl.w	#6, d0
 	adda.w	d0, a1
@@ -24225,7 +24225,7 @@ loc_F9D4:
 	bne.s	loc_F9F2
 	move.w	#$8001, (Window_index).w
 	lea	($FFFFDEEE).w, a1
-	move.w	(Current_active_objects_num).w, d1
+	move.w	(Windows_opened_num).w, d1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 	move.w	(a1), (Window_index_saved).w
@@ -24346,7 +24346,7 @@ loc_FB00:
 	subq.w	#1, d1
 	bne.s	loc_FB4E
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
@@ -24815,7 +24815,7 @@ loc_FF9A:
 	bne.s	loc_FFB8
 	move.w	#$8001, (Window_index).w
 	lea	($FFFFDEEE).w, a1
-	move.w	(Current_active_objects_num).w, d1
+	move.w	(Windows_opened_num).w, d1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 	move.w	(a1), (Window_index_saved).w
@@ -25082,7 +25082,7 @@ loc_10242:
 	bne.s	loc_10260
 	move.w	#$8001, (Window_index).w
 	lea	($FFFFDEEE).w, a1
-	move.w	(Current_active_objects_num).w, d1
+	move.w	(Windows_opened_num).w, d1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 	move.w	(a1), (Window_index_saved).w
@@ -25110,7 +25110,7 @@ loc_1028C:
 	subq.w	#1, d1
 	bne.s	loc_102DA
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
@@ -25226,7 +25226,7 @@ loc_103AE:
 	subq.w	#1, d1
 	bne.s	loc_103EE
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	subq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -25882,7 +25882,7 @@ loc_109D8:
 	subq.w	#1, d1
 	bne.s	loc_10A06
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
 	move.w	#ObjID_BattleCursor, (a0)
@@ -25915,7 +25915,7 @@ loc_10A2E:
 	subq.w	#1, d1
 	bne.s	loc_10A5C
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
 	move.w	#ObjID_BattleCursor, (a0)
@@ -25964,7 +25964,7 @@ loc_10AB2:
 	subq.w	#1, d1
 	bne.s	loc_10AE2
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	subq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -26028,7 +26028,7 @@ loc_10B56:
 	subq.w	#1, d1
 	bne.s	loc_10BA4
 	lea	($FFFFDF00).w, a0
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
@@ -26551,7 +26551,7 @@ CloseCurrentWindow:
 	andi.w	#7, d1
 	lsl.w	#4, d1
 	suba.w	d1, a1
-	move.w	(Current_active_objects_num).w, d1
+	move.w	(Windows_opened_num).w, d1
 	lsl.w	#4, d1
 	adda.w	d1, a1
 	move.w	(a1), (Window_index_saved).w
@@ -26578,7 +26578,7 @@ CloseAllWindows:
 	move.w	d0, (Interaction_type).w
 	move.w	d0, ($FFFFDE70).w
 	move.w	d0, ($FFFFDE72).w
-	move.w	(Current_active_objects_num).w, d0
+	move.w	(Windows_opened_num).w, d0
 	ori.w	#$8000, d0
 	move.w	d0, (Window_index).w
 	rts
@@ -26826,7 +26826,7 @@ loc_112FC:
 
 LoadCursorInWindows:
 	lea	(Object_RAM).w, a0
-	move.w	(Current_active_objects_num).w, d3
+	move.w	(Windows_opened_num).w, d3
 	subq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
@@ -27656,7 +27656,7 @@ ProcessRandomBattle:
 	bne.s	loc_116FE
 	tst.w	(Window_index).w
 	bne.s	loc_116FE
-	tst.w	(Current_active_objects_num).w
+	tst.w	(Windows_opened_num).w
 	bne.s	loc_116FE
 	tst.w	(Encounter_step_flag).w
 	beq.s	loc_116FE
