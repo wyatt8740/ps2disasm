@@ -14823,7 +14823,7 @@ loc_9730:
 	beq.s	loc_9746
 	subi.w	#$80, d0
 loc_9746:
-	lea	(DecimalConverReferArray+$14).l, a1
+	lea	(DecimalDigitNumbers+$14).l, a1
 	moveq	#2, d1
 	moveq	#0, d4
 loc_9750:
@@ -25450,7 +25450,7 @@ loc_105DC:
 	adda.w	d0, a2
 	move.w	(a2), d0
 	bsr.w	CheckIfDoublePrice
-	lea	(DecimalConverReferArray+8).l, a2
+	lea	(DecimalDigitNumbers+8).l, a2
 	moveq	#5, d1	; six digits
 	bsr.w	StartDecimalConversion2
 	addq.w	#2, a1
@@ -26682,7 +26682,7 @@ LoadScript_ChkMesetaValue:
 	cmpi.b	#$C0, d0
 	bne.w	loc_11232
 	move.l	(Meseta_value).w, d0
-	lea	(DecimalConverReferArray+8).l, a3
+	lea	(DecimalDigitNumbers+8).l, a3
 	moveq	#5, d1
 	moveq	#0, d4		; unset flag for digit start place
 LoadDigitInRAMLoop:
@@ -26838,15 +26838,15 @@ LoadCursorInWindows:
 	rts
 
 loc_11350:
-	lea	(DecimalConverReferArray+$10).l, a2
+	lea	(DecimalDigitNumbers+$10).l, a2
 	moveq	#3, d1	; 4 digits
 	bra.s	StartDecimalConversion
 loc_1135A:
-	lea	(DecimalConverReferArray+$14).l, a2
+	lea	(DecimalDigitNumbers+$14).l, a2
 	moveq	#2, d1		; 3 digits
 	bra.s	StartDecimalConversion
 loc_11364:
-	lea	(DecimalConverReferArray+$18).l, a2
+	lea	(DecimalDigitNumbers+$18).l, a2
 	moveq	#1, d1		; 2 digits
 
 StartDecimalConversion:
@@ -26883,12 +26883,12 @@ loc_1139C:
 
 
 Meseta_ConvertToDecimal:
-	lea	(DecimalConverReferArray).l, a2
+	lea	(DecimalDigitNumbers).l, a2
 	moveq	#7, d1		; eight digits
 	bra.s	StartDecimalConversion2
 
 Exp_ConvertToDecimal:
-	lea	(DecimalConverReferArray+4).l, a2
+	lea	(DecimalDigitNumbers+4).l, a2
 	moveq	#6, d1		;  seven digits
 
 ; seems to be a copy of the above - I think just the code above would've been enough, but anyway...
@@ -26928,15 +26928,15 @@ loc_113E8:
 	rts
 
 ; ====================================
-DecimalConverReferArray:
-	dc.l	$989680 ; 10000000
-	dc.l	$F4240 	; 1000000
-	dc.l	$186A0	; 100000
-	dc.l	$2710 	; 10000
-	dc.l	$3E8 	; 1000
-	dc.l	$64		; 100
-	dc.l	$A		; 10
-	dc.l	1 		; 1
+DecimalDigitNumbers:
+	dc.l	10000000
+	dc.l	1000000
+	dc.l	100000
+	dc.l	10000
+	dc.l	1000
+	dc.l	100
+	dc.l	10
+	dc.l	1
 ; ====================================
 
 	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
