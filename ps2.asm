@@ -29511,13 +29511,14 @@ Item_LacDagger:
 	dc.w	$47E0
 	dc.b	$A2
 	dc.b	CharID_Shir_Mask
-; Fix: Laconia Dagger attack power
+; Fix: Laconia Dagger attack and defense boost
 	if bugfixes=1
 	dc.b	$2D
+	dc.b	$07
 	else
 	dc.b	$04
-	endif
 	dc.b	$16
+	endif
 
 Item_ACSlasher:
 	nametxt	"AC SLASHR "
