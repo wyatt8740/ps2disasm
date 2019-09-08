@@ -26812,7 +26812,7 @@ loc_112FC:
 	btst	#7, (a0)
 	beq.s	+
 	movea.l	a1, a3
-	move.b	#$33, -(a3)
+	move.b	#TechID_Musik, -(a3)
 +
 	moveq	#$F, d1
 	sub.w	d0, d1
