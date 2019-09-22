@@ -95936,7 +95936,9 @@ PCMDrums:
 	org (PCMDrums+PCMDrumsEnd-PCMDrumsStart)		; PC must be set to the correct value, so it's the whole code up until the PCMDrums label + the whole z80 code
 
 
-	padROM	$FF			; padding for real hardware
+	while (*) < $C0000
+		dc.b	$FF
+	endm
 
 EndOfRom:
 	END

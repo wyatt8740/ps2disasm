@@ -198,20 +198,3 @@ _tst	macro
 	endm
 
     endif
-
-; Pad to next multiple of 256kb
-padROM macro valueFill
-
-PadValueConstant	:=	$40000
-QuotientPadValue	:=	(*)/PadValueConstant
-	if QuotientPadValue >= 1
-PadTargetValue	:=	PadValueConstant*(QuotientPadValue+1)
-	else
-PadTargetValue	:=	PadValueConstant
-	endif
-
-	while (*)-PadTargetValue <> 0
-		dc.b	valueFill
-	endm
-
-	endm
