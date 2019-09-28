@@ -26684,10 +26684,10 @@ LoadScript_ChkMesetaValue:
 	move.l	(Meseta_value).w, d0
 	lea	(DecimalDigitNumbers+8).l, a3
 	moveq	#5, d1
-	moveq	#0, d4		; unset flag for digit start place
+	moveq	#0, d4		; unset flag
 LoadDigitInRAMLoop:
-	tst.b	d1			; if we get here, we are at the last iteration of the loop, thus placing the unit digit. We need to display at least the unit digit,
-	bne.s	+			; branch if we are not in the one's place yet
+	tst.b	d1
+	bne.s	+			; branch if this is not the units digit
 	move.b	#1, d4
 						; so set the flag no matter what.
 +
@@ -26699,9 +26699,9 @@ LoadDigitInRAMLoop:
 	addq.b	#1, d2		; advance digit counter in the text buffer
 	bra.s	-			; subtract again
 +
-	add.l	d3, d0		; re-add money to make it positive so we can process it with lower place value
+	add.l	d3, d0		; re-add money to make it positive so we can process it with lower column
 	tst.b	d4
-	bne.s	+			; branch if we've already drawn at least one digit or if we are at the one's place
+	bne.s	+			; branch if we've already drawn at least one digit or if we are at the units column
 	tst.w	d2
 	beq.s	++			; if we have no digits, put space character
 	move.b	#1, d4		; set flag because we don't want to put a space between digits; we only put spaces before the first digit we loaded in RAM
@@ -26709,7 +26709,7 @@ LoadDigitInRAMLoop:
 	addq.b	#1, d2
 	move.b	d2, (a2)+
 +
-	dbf	d1, LoadDigitInRAMLoop	; next place value
+	dbf	d1, LoadDigitInRAMLoop	; next column
 
 	bra.w	LoadScript_ChkCharName
 
