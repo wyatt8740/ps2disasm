@@ -24,6 +24,9 @@
 zeroOffsetOptimization = 0
 
 bugfixes = 0			; if 1, include bug fixes
+walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
+dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
+checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 
 	cpu 68000
 	include "ps2.macrosetup.asm"
@@ -96,7 +99,11 @@ EntryPoint:
 
 SkipSecurity:
 	btst	#6, (HW_expansion_control).l
+	if checksum_remove=1
+	beq.s	ChecksumGood
+	else
 	beq.s	ChecksumTest
+	endif
 	cmpi.l	#'init', (Checksum_four_CC).w
 	beq.w	GameInit	; branch if checksum routine has already run
 
@@ -114,7 +121,7 @@ ChecksumLoop:
 	cmp.w	(a1), d1			; compare correct checksum to the one in ROM
 	bne.w	ChecksumError   ; if they don't match, branch
 
-; Checksum good
+ChecksumGood:
 	lea	($FFFFFE00).w, a6
 	moveq	#0, d7
 
@@ -6076,7 +6083,13 @@ loc_382A:
 	moveq	#0, d6
 	bsr.w	Obj_Move
 	bne.s	MapChar_ChkMoveDown
+	if walk_speed=0
 	move.w	#-1, y_move_steps(a0)
+	elseif walk_speed=1
+	move.w	#-2, y_move_steps(a0)
+	elseif walk_speed=2
+	move.w	#-4, y_move_steps(a0)
+	endif
 	bra.w	loc_38FC
 
 
@@ -6089,7 +6102,13 @@ MapChar_ChkMoveDown:
 	moveq	#1, d6
 	bsr.w	Obj_Move
 	bne.s	MapChar_ChkMoveLeft
+	if walk_speed=0
 	move.w	#1, y_move_steps(a0)
+	elseif walk_speed=1
+	move.w	#2, y_move_steps(a0)
+	elseif walk_speed=2
+	move.w	#4, y_move_steps(a0)
+	endif
 	bra.s	loc_38FC
 
 
@@ -6109,7 +6128,13 @@ MapChar_ChkMoveLeft:
 	move.w	#$40, (Joypad_held).w
 	bra.s	loc_38F4
 loc_38C6:
+	if walk_speed=0
 	move.w	#-1, x_move_steps(a0)
+	elseif walk_speed=1
+	move.w	#-2, x_move_steps(a0)
+	elseif walk_speed=2
+	move.w	#-4, x_move_steps(a0)
+	endif
 	bra.w	loc_38FC
 
 MapChar_ChkMoveRight:
@@ -6121,14 +6146,26 @@ MapChar_ChkMoveRight:
 	moveq	#3, d6
 	bsr.w	Obj_Move
 	bne.s	loc_38F4
+	if walk_speed=0
 	move.w	#1, x_move_steps(a0)
+	elseif walk_speed=1
+	move.w	#2, x_move_steps(a0)
+	elseif walk_speed=2
+	move.w	#4, x_move_steps(a0)
+	endif
 	bra.s	loc_38FC
 loc_38F4:
 	move.w	facing_dir(a0), mapping_frame(a0)
 	rts
 
 loc_38FC:
-	move.w	#$F, step_duration(a0)		; update character's position for 15 frames
+	if walk_speed=0
+	move.w	#$F, step_duration(a0)		; update character's position for 16 frames
+	elseif walk_speed=1
+	move.w	#7, step_duration(a0)		; update character's position for 8 frames
+	elseif walk_speed=2
+	move.w	#3, step_duration(a0)		; update character's position for 4 frames
+	endif
 	move.w	#1, (Encounter_step_flag).w
 	move.w	#1, $30(a0)
 
@@ -6161,13 +6198,25 @@ loc_3956:
 	cmpi.w	#0, facing_dir(a0)
 	bne.s	loc_3980
 loc_397A:
+	if walk_speed=0
 	move.w	#-1, (Camera_Y_step_counter).w
+	elseif walk_speed=1
+	move.w	#-2, (Camera_Y_step_counter).w
+	elseif walk_speed=2
+	move.w	#-4, (Camera_Y_step_counter).w
+	endif
 loc_3980:
 	cmpi.w	#$118, sprite_y_pos(a0)
 	bcs.s	loc_3996
 	cmpi.w	#3, facing_dir(a0)
 	bne.s	loc_3996
+	if walk_speed=0
 	move.w	#1, (Camera_Y_step_counter).w
+	elseif walk_speed=1
+	move.w	#2, (Camera_Y_step_counter).w
+	elseif walk_speed=2
+	move.w	#4, (Camera_Y_step_counter).w
+	endif
 loc_3996:
 	btst	#6, (Joypad_demo).w
 	bne.s	loc_39AE
@@ -6176,13 +6225,25 @@ loc_3996:
 	cmpi.w	#6, facing_dir(a0)
 	bne.s	loc_39B4
 loc_39AE:
+	if walk_speed=0
 	move.w	#-1, (Camera_X_step_counter).w
+	elseif walk_speed=1
+	move.w	#-2, (Camera_X_step_counter).w
+	elseif walk_speed=2
+	move.w	#-4, (Camera_X_step_counter).w
+	endif
 loc_39B4:
 	cmpi.w	#$168, sprite_x_pos(a0)
 	bcs.s	loc_39CA
 	cmpi.w	#9, facing_dir(a0)
 	bne.s	loc_39CA
+	if walk_speed=0
 	move.w	#1, (Camera_X_step_counter).w
+	elseif walk_speed=1
+	move.w	#2, (Camera_X_step_counter).w
+	elseif walk_speed=2
+	move.w	#4, (Camera_X_step_counter).w
+	endif
 loc_39CA:
 	bsr.w	loc_8BBA
 	rts
@@ -6512,16 +6573,62 @@ FollowingCharacter_Init:
 ; --------------------------------------------------------------
 FollowingCharacter_Main:
 	move.l	-$3C(a0), 4(a0)		; get same sprite mappings as leading character
+	if walk_speed>0
+	lea	(Character_pos_table).w, a2
+	move.w	(Character_pos_table_index).w, d0
+	moveq	#0, d1
+	move.w	a0, d1
+	subi.w	#$E400, d1
+	if walk_speed=1
+	lsr.w	#1,d1
+	else
+	lsr.w	#2,d1
+	endif
+	sub.w	d1, d0
+	else
 	move.l	(Characters_RAM).w, d1
 	sub.l	a0, d1
 	lea	(Character_pos_table).w, a2
 	move.w	(Character_pos_table_index).w, d0
 	add.w	d1, d0
+	endif
 	andi.w	#$FF, d0
 	adda.w	d0, a2
 	move.w	(a2)+, d0
 	move.w	(a2), d1
 	moveq	#3, d2
+	; Fix: If not moving, don't animate
+	if bugfixes=1
+	moveq	#0, d3
+	cmp.w	$E(a0), d1
+	beq.s	loc_3B56
+	bhi.s	loc_3B64
+	move.w	#0, d2
+	bra.s	loc_3B64
+loc_3B56:
+	moveq	#9, d2
+	cmp.w	$A(a0), d0
+	beq.s	loc_3B68
+	bhi.s	loc_3B64
+	move.w	#6, d2
+loc_3B64:
+	moveq	#1, d3
+	move.w	d2, $2A(a0)
+loc_3B68:
+	move.w	d0, $A(a0)
+	move.w	d1, $E(a0)
+	tst.w	($FFFFE414).w
+	bne.s	loc_3B7C
+	tst.w	($FFFFE418).w
+	beq.s	loc_3BB2
+loc_3B7C:
+	tst.w	($FFFFE428).w
+	beq.s	loc_3BB0
+	tst.w	d3
+	beq.s	loc_3BB0	; return if position didn't change
+	subq.w	#1, $26(a0)
+	bpl.s	loc_3BB0
+	else
 	cmp.w	$E(a0), d1
 	beq.s	loc_3B56
 	bhi.s	loc_3B64
@@ -6547,6 +6654,7 @@ loc_3B7C:
 	beq.s	loc_3BB0
 	subq.w	#1, $26(a0)
 	bpl.w	loc_3BB0
+	endif
 	move.w	#7, $26(a0)
 	move.w	$32(a0), d0
 	addq.w	#1, $32(a0)
@@ -6558,7 +6666,7 @@ loc_3B7C:
 	move.w	d0, $24(a0)
 loc_3BB0:
 	rts
-
+	
 loc_3BB2:
 	move.w	$2A(a0), $24(a0)
 ; --------------------------------------------------------------
@@ -20141,6 +20249,10 @@ loc_D064:
 	rts
 
 ProcessStealItem:
+	if dezo_steal_fix=1
+	tst.w	(planet_index).w
+	bne.s	+
+	endif
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d0
 -
@@ -20148,7 +20260,7 @@ ProcessStealItem:
 	beq.s	ProcessStealItem_Continue	; if Shir is in the party, continue with this routine
 	dbf	d0, -	; loop until we find Shir
 
--
+/
 	rts
 
 ProcessStealItem_Continue:
