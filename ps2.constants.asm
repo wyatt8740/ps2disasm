@@ -62,7 +62,7 @@ object_size = $40
 next_object = object_size
 
 obj_id = 0	; word
-render_flags = 2	; bitfield; bit 0 = if set, delete object
+render_flags = 2	; bitfield; bit 0 = if set, delete object; bit 4 = if set, use absolute screen coordinates; bit 5 = if set, object has top priority for Sprite_table_input (drawn above all other objects)
 mappings = 4	; longword
 art_tile = 8	; word
 x_pos = $A	; longword

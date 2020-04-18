@@ -2734,9 +2734,14 @@ loc_15CA:
 ; ----------------------------------------------------------------------------
 ; Object - Tiles used to cover letters in input window (blinking effect)
 ; ----------------------------------------------------------------------------
+input_win_held_timer = $28
+input_win_curr_pos = $32
 
+input_win_char_row = 18-1		; number of characters in a row (starts from 0)
+input_win_char_col = 4			; number of columns
+; ----------------------------------------------------------------------------
 Obj_InputWindowCursor:
-	move.w	$22(a0), d0
+	move.w	routine(a0), d0
 	asl.b	#2, d0
 	jsr	InputWindowCursorRoutines(pc,d0.w)
 	rts
@@ -2746,176 +2751,176 @@ InputWindowCursorRoutines:
 	bra.w	InputWindowCursor_Main
 ; ----------------------------------------------------------------------------
 InputWindowCursor_Init:
-	move.w	#$100, $A(a0)
-	move.w	#$B0, $E(a0)
-	move.b	#$30, 2(a0)
-	move.w	#$8526, 8(a0)
-	move.l	#Map_Cursors, 4(a0)
-	move.w	#7, $26(a0)
-	move.w	#0, $32(a0)
-	move.w	#1, $24(a0)
-	move.w	#1, $22(a0)
+	move.w	#$100, x_pos(a0)
+	move.w	#$B0, y_pos(a0)
+	move.b	#$30, render_flags(a0)
+	move.w	#$8526, art_tile(a0)
+	move.l	#Map_Cursors, mappings(a0)
+	move.w	#7, anim_frame_timer(a0)
+	move.w	#0, input_win_curr_pos(a0)
+	move.w	#1, mapping_frame(a0)
+	move.w	#1, routine(a0)	; => InputWindowCursor_Main
 ; ----------------------------------------------------------------------------
 InputWindowCursor_Main:
 	tst.w	(Window_index).w
-	bne.s	loc_163E
+	bne.s	.display
 	move.w	(Window_index_saved).w, d0
-	beq.s	loc_163E
+	beq.s	.display
 	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
 	cmpa.w	d0, a0
-	beq.s	loc_1646
-loc_163E:
-	move.b	#$30, 2(a0)
+	beq.s	.cont
+.display:
+	move.b	#$30, render_flags(a0)
 	rts
 
-loc_1646:
-	subq.w	#1, $26(a0)
-	bpl.s	loc_1658
-	move.w	#7, $26(a0)
-	bchg	#1, 2(a0)
-loc_1658:
+.cont:
+	subq.w	#1, anim_frame_timer(a0)
+	bpl.s	.checkC
+	move.w	#7, anim_frame_timer(a0)
+	bchg	#1, render_flags(a0)
+.checkC:
 	btst	#Button_C, (Joypad_held).w
-	beq.s	loc_1662
+	beq.s	.checkdir
 	rts
 
-loc_1662:
+.checkdir:
 	moveq	#0, d1
-	move.b	$32(a0), d1
+	move.b	input_win_curr_pos(a0), d1
 	move.l	d1, d2
-	divu.w	#$11, d2
+	divu.w	#input_win_char_row, d2
 	move.b	(Joypad_pressed).w, d0
 	lsr.b	#1, d0
-	bcc.s	loc_1682		; branch if up was not pressed
+	bcc.s	.checkdown		; branch if up was not pressed
 
 ; Up pressed
-loc_1676:
-	subi.b	#$11, d1
-	bpl.s	loc_16E6
-	addi.b	#$44, d1
-	bra.s	loc_16E6
+.up_pressed:
+	subi.b	#input_win_char_row, d1
+	bpl.s	.next_non_space
+	addi.b	#input_win_char_row*input_win_char_col, d1
+	bra.s	.next_non_space
 
-loc_1682:
+.checkdown:
 	lsr.b	#1, d0
-	bcc.s	loc_1696		; branch if down was not pressed
+	bcc.s	.checkleft		; branch if down was not pressed
 
 ; Down pressed
-loc_1686:
-	addi.b	#$11, d1
-	cmpi.b	#$44, d1
-	bcs.s	loc_16E6
-	subi.b	#$44, d1
-	bra.s	loc_16E6
+.down_pressed:
+	addi.b	#input_win_char_row, d1
+	cmpi.b	#input_win_char_row*input_win_char_col, d1
+	bcs.s	.next_non_space
+	subi.b	#input_win_char_row*input_win_char_col, d1
+	bra.s	.next_non_space
 
-loc_1696:
+.checkleft:
 	lsr.b	#1, d0
-	bcc.s	loc_16AC		; branch if left was not pressed
+	bcc.s	.checkright		; branch if left was not pressed
 
 ; Left pressed
-loc_169A:
+.left_pressed:
 	subq.b	#1, d1
 	move.l	d1, d3
-	divu.w	#$11, d3
+	divu.w	#input_win_char_row, d3
 	cmp.w	d2, d3
-	beq.s	loc_16E6
-	addi.b	#$11, d1
-	bra.s	loc_16E6
+	beq.s	.next_non_space
+	addi.b	#input_win_char_row, d1
+	bra.s	.next_non_space
 
-loc_16AC:
+.checkright:
 	lsr.b	#1, d0
-	bcc.w	loc_1744		; branch if right was not pressed
+	bcc.w	.heldinput		; branch if right was not pressed
 
 ; Right pressed
-loc_16B2:
+.right_pressed:
 	addq.b	#1, d1
-	cmpi.b	#$31, d1
-	bne.s	loc_16BE
-	subi.b	#$F, d1
-loc_16BE:
+	cmpi.b	#input_win_char_row*3-2, d1
+	bne.s	.s
+	subi.b	#input_win_char_row-2, d1
+.s:
 	move.l	d1, d3
-	divu.w	#$11, d3
+	divu.w	#input_win_char_row, d3
 	cmp.w	d2, d3
-	beq.s	loc_16CC
-	subi.b	#$11, d1
+	beq.s	.next_non_space_right
+	subi.b	#input_win_char_row, d1
 
-loc_16CC:
+.next_non_space_right:
 	lea	(InputCharacterMap).l, a1
 	adda.w	d1, a1
-loc_16D4:
+.l:
 	tst.b	(a1)
-	bne.s	loc_16F8
+	bne.s	.update
 	addq.w	#1, a1
 	addq.w	#1, d1
-	cmpi.b	#$44, d1
-	bcs.s	loc_16D4
-	moveq	#$33, d1
-	bra.s	loc_16F8
+	cmpi.b	#input_win_char_row*input_win_char_col, d1
+	bcs.s	.l
+	moveq	#input_win_char_row*3, d1
+	bra.s	.update
 
-loc_16E6:
+.next_non_space:
 	lea	(InputCharacterMap).l, a1
 	adda.w	d1, a1
-loc_16EE:
+.l2:
 	tst.b	(a1)
-	bne.s	loc_16F8
+	bne.s	.update
 	subq.w	#1, a1
 	subq.w	#1, d1
-	bra.s	loc_16EE
+	bra.s	.l2
 
-loc_16F8:
-	move.b	d1, $32(a0)
+.update:
+	move.b	d1, input_win_curr_pos(a0)
 	move.w	d1, ($FFFFDE50).w
 	move.w	d1, d0
-	divu.w	#$11, d1
+	divu.w	#input_win_char_row, d1
 	lsl.w	#3, d1
 	move.w	d1, d2
 	lsl.w	#1, d1
 	add.w	d2, d1
 	addi.w	#$B0, d1
-	move.w	d1, $E(a0)
+	move.w	d1, y_pos(a0)
 	swap	d1
 	lsl.w	#3, d1
 	addi.w	#$100, d1
-	move.w	d1, $A(a0)
+	move.w	d1, x_pos(a0)
 
 	lea	(InputCharacterMap).l, a1
 	adda.w	d0, a1
-	move.w	#1, $24(a0)
+	move.w	#1, mapping_frame(a0)
 	cmpi.b	#$A3, (a1)
-	bcs.s	loc_173C
-	move.w	#2, $24(a0)
-loc_173C:
-	move.w	#$F, $28(a0)
+	bcs.s	.resetheldtimer
+	move.w	#2, mapping_frame(a0)
+.resetheldtimer:
+	move.w	#$F, input_win_held_timer(a0)
 	rts
 
-loc_1744:
+.heldinput:
 	move.b	(Joypad_held).w, d0
 	lsr.b	#1, d0
-	bcc.s	loc_1756
-	subq.w	#1, $28(a0)
-	bmi.w	loc_1676
+	bcc.s	.down_held
+	subq.w	#1, input_win_held_timer(a0)
+	bmi.w	.up_pressed
 	rts
 
-loc_1756:
+.down_held:
 	lsr.b	#1, d0
-	bcc.s	loc_1764
-	subq.w	#1, $28(a0)
-	bmi.w	loc_1686
+	bcc.s	.left_held
+	subq.w	#1, input_win_held_timer(a0)
+	bmi.w	.down_pressed
 	rts
 
-loc_1764:
+.left_held:
 	lsr.b	#1, d0
-	bcc.s	loc_1772
-	subq.w	#1, $28(a0)
-	bmi.w	loc_169A
+	bcc.s	.right_held
+	subq.w	#1, input_win_held_timer(a0)
+	bmi.w	.left_pressed
 	rts
 
-loc_1772:
+.right_held:
 	lsr.b	#1, d0
-	bcc.s	loc_173C
-	subq.w	#1, $28(a0)
-	bmi.w	loc_16B2
+	bcc.s	.resetheldtimer
+	subq.w	#1, input_win_held_timer(a0)
+	bmi.w	.right_pressed
 	rts
 
 
