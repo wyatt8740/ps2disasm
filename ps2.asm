@@ -34879,12 +34879,10 @@ loc_17DA2:
 
 
 TylerPortraitTileInd:	binclude "data\art\portrait\tyler_tile_ind.bin"
-
 	even
 
 
 TylerSpcshp_MonitorTileInd:	binclude "data\art\tylr_spc_monitor_tile_ind.bin"
-
 	even
 
 
@@ -34988,7 +34986,6 @@ Map_PalmExplosion_4:
 	even
 
 LutzPortraitTileInd:	binclude "data\art\portrait\lutz_tile_ind.bin"
-
 	even
 
 
@@ -47222,72 +47219,79 @@ loc_2B1F0:
 	even
 
 LibrPortraitArt: binclude "data\art\portrait\librarian.bin"
-
 	even
 
 MotSaveEmplPortArt: binclude "data\art\portrait\mot_save_empl.bin"
-
 	even
 
 MotDoctorPortraitArt: binclude "data\art\portrait\mot_doctor.bin"
+	even
 
 CLGrandmaPortraitArt: binclude "data\art\portrait\cl_grandma.bin"
+	even
 
 MotItemSelPortArt: binclude "data\art\portrait\mot_item_sel.bin"
-
 	even
 
 MotWpnSelPortArt: binclude "data\art\portrait\mot_wpn_sel.bin"
+	even
 
 MotArmSelPortArt: binclude "data\art\portrait\mot_arm_sel.bin"
+	even
 
 UstvestiaPortraitArt: binclude "data\art\portrait\ustvestia.bin"
-
 	even
 
 DezolianPortraitArt: binclude "data\art\portrait\dezolian.bin"
+	even
 
 CentTowOutPortArt: binclude "data\art\portrait\cen_tow_out.bin"
+	even
 
 GovernorPortraitArt: binclude "data\art\portrait\governor.bin"
+	even
 
 ItemKeeperPortArt: binclude "data\art\portrait\item_keeper.bin"
-
 	even
 
 SpaceshipPortArt: binclude "data\art\portrait\cen_tow_roof.bin"
+	even
 
 TylerSpaceshipArt:	binclude "data\art\tyler_spaceship_art.bin"
+	even
 
 RolfPortraitArt: binclude "data\art\portrait\rolf.bin"
+	even
 
 NeiPortraitArt: binclude "data\art\portrait\nei.bin"
+	even
 
 RudoPortraitArt: binclude "data\art\portrait\rudo.bin"
+	even
 
 AmyPortraitArt: binclude "data\art\portrait\amy.bin"
+	even
 
 HughPortraitArt: binclude "data\art\portrait\hugh.bin"
+	even
 
 AnnaPortraitArt: binclude "data\art\portrait\anna.bin"
-
 	even
 
 KainPortraitArt: binclude "data\art\portrait\kain.bin"
-
 	even
 
 ShirPortraitArt: binclude "data\art\portrait\shir.bin"
-
 	even
 
 LibrGraphPortArt: binclude "data\art\portrait\graph.bin"
-
 	even
 
 RadarPortraitArt: binclude "data\art\portrait\radar.bin"
-
+	even
+	
 MotTeleEmplPortArt: binclude "data\art\mot_tele_empl.bin"
+	even
 
 LutzPortraitArt:
 	dc.b	$01, $DD, $FF, $FF, $FF, $FF, $02, $11, $77, $73, $11, $00, $DD, $00, $08, $8C
@@ -60747,6 +60751,7 @@ SakCastArt:
 	even
 
 KnifeArt:	binclude "data\art\knife_art.bin"
+	even
 
 SwordArt:
 	dc.b	$01, $00, $EE, $DD, $BB, $77, $0E, $E0, $0E, $E0, $0C, $C0, $0C, $C0, $01, $00
@@ -66237,18 +66242,19 @@ Map_FanbiAcidShot_8:
 	even
 
 TitleScrBGArt:	binclude "data\art\title_scr_bg_art.bin"
+	even
 
 TitleScrCopyrightArt:	binclude "data\art\tit_scr_copyright_art.bin"
+	even
 
 TitleScrWomenArt:	binclude "data\art\title_scr_women_art.bin"
-
 	even
 
 TitScrPhantasyStarLogoArt:	binclude "data\art\tit_scr_phan_star_logo_art.bin"
-
+	even
 
 TitleScrBGTileInd:	binclude "data\art\tit_scr_background_tile_ind.bin"
-
+	even
 
 loc_6C5DA:
 	dc.b	$20, $02, $20, $09, $20, $04, $20, $08, $20, $0A, $20, $0B, $20, $06, $00, $00
@@ -66394,7 +66400,7 @@ loc_6C5DA:
 
 
 TitleScrPlaneATileInd:	binclude "data\art\tit_scr_bg_tile_ind.bin"
-
+	even
 
 ; -----------------------------------------------------------------
 ; Mappings
@@ -67575,22 +67581,22 @@ loc_71E88:
 
 
 Battle_RolfArt:	binclude "data\art\battle_rolf_art.bin"
+	even
 
 Battle_NeiArt: binclude "data\art\battle_nei_art.bin"
+	even
 
 Battle_RudoArt: binclude "data\art\battle_rudo_art.bin"
-
 	even
 
 Battle_AmyShirArt: binclude "data\art\battle_amy_shir_art.bin"
-
 	even
 
 Battle_AnnaArt: binclude "data\art\battle_anna_art.bin"
-
 	even
 
 Battle_HughKainArt: binclude "data\art\battle_hugh_kain_art.bin"
+	even
 
 ; -----------------------------------------------------------------
 ; Rolf Sprite Mappings in battle
@@ -68277,37 +68283,36 @@ loc_762D8:
 
 
 Battle_AntArt:	binclude "data\art\battle_ant_art.bin"
+	even
 
 Battle_MosquitoArt:	binclude "data\art\battle_mosquito_art.bin"
-
 	even
 
 Battle_SpinnerArt:	binclude "data\art\battle_spinner_art.bin"
+	even
 
 Battle_BeeArt:	binclude "data\art\battle_bee_art.bin"
+	even
 
 Battle_PoisonerArt:	binclude "data\art\battle_poisoner_art.bin"
-
 	even
 
 Battle_HitTailArt:	binclude "data\art\battle_hittail_art.bin"
-
 	even
 
 Battle_FroggyArt:	binclude "data\art\battle_froggy_art.bin"
-
+	even
+	
 Battle_CarrierArt:	binclude "data\art\battle_carrier_act.bin"
+	even
 
 Battle_WhistleArt:	binclude "data\art\battle_whistle_art.bin"
-
 	even
 
 Battle_LocustArt:	binclude "data\art\battle_locust_art.bin"
-
 	even
 
 Battle_AmoebaArt:	binclude "data\art\battle_amoeba_art.bin"
-
 	even
 
 ; -----------------------------------------------------------------
@@ -70790,12 +70795,16 @@ loc_83116:
 	even
 
 Battle_PoleziArt:	binclude "data\art\battle_polezi_art.bin"
+	even
 
 Battle_LeecherArt:	binclude "data\art\battle_leecher_art.bin"
+	even
 
 Battle_PulserArt:	binclude "data\art\battle_pulser_art.bin"
+	even
 
 Battle_RotWoodArt:	binclude "data\art\battle_rotwood_art.bin"
+	even
 
 Battle_WolfangArt:
 	dc.b	$01, $00, $FF, $FF, $FE, $EE, $0B, $0C, $0D, $01, $00, $FF, $CC, $C8, $88, $B0
