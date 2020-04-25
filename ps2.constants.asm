@@ -1370,6 +1370,8 @@ Joypad_demo =  ramaddr($FFFFF756)
 Interaction_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)
 
+Decom_chunk_buffer =  ramaddr($FFFFF7A0)
+
 Sprite_table_buffer =  ramaddr($FFFFF800)
 
 Palette_table_buffer =  ramaddr($FFFFFB00)
