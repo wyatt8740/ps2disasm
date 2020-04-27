@@ -1370,7 +1370,12 @@ Joypad_demo =  ramaddr($FFFFF756)
 Interaction_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)
 
+Decom_queue_chunk_num =  ramaddr($FFFFF790)
+Decom_queue_next_flag =  ramaddr($FFFFF792)
+Decom_queue_unknown =  ramaddr($FFFFF794)
 Decom_chunk_buffer =  ramaddr($FFFFF7A0)
+Decom_queue =  ramaddr($FFFFF7C0)
+Decom_queue_destination =  ramaddr($FFFFF7C6)
 
 Sprite_table_buffer =  ramaddr($FFFFF800)
 

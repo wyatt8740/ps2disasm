@@ -3655,7 +3655,7 @@ SetWeaponProperties:
 	addq.w	#1, a6
 	move.b	(a6), d0
 	andi.w	#$7F, d0
-	bsr.w	loc_608A
+	bsr.w	LoadWeaponTechPLC
 	move.l	(a6)+, child_mappings(a0)
 	move.w	d5, child_enemy_group_start(a0)
 	moveq	#0, d0
@@ -4187,7 +4187,7 @@ loc_2540:
 	move.b	(a6)+, (Battle_saved_sound).w			; move sound value to RAM
 	move.b	(a6), d0
 	andi.w	#$7F, d0
-	bsr.w	loc_608A
+	bsr.w	LoadWeaponTechPLC
 	move.l	(a6)+, $44(a0)
 	move.w	d5, $76(a0)
 	moveq	#0, d0
@@ -9346,7 +9346,7 @@ VInt_Battle:
 	move.w	($FFFFF644).w, (a6)
 +
 	bsr.w	DrawWindows
-	bsr.w	loc_6018
+	bsr.w	FlushDecompressionQueue
 	rts
 
 
@@ -9665,11 +9665,11 @@ DecompressToRAM:
 	moveq	#0, d0
 	moveq	#0, d2
 	move.b	(a0)+, d2
-	beq.w	loc_5F4C
-	bmi.w	DecompressToRAMEnd
+	beq.w	.inline
+	bmi.w	.end
 	subq.w	#1, d2
 
--
+.reploop:
 	lea	(Decom_chunk_buffer).w, a2
 	movea.l	a2, a3
 	move.b	(a0)+, d3
@@ -9683,60 +9683,61 @@ DecompressToRAM:
 	or.l	d4, d0
 
 	moveq	#$1F, d7
--
+.copybyteloop:
 	lsl.l	#1, d4
-	bcc.w	+
+	bcc.w	.nextbyte
 	move.b	d3, (a2)
-+
+.nextbyte:
 	addq.l	#1, a2
-	dbf	d7, -
+	dbf	d7, .copybyteloop
 
-	dbf	d2, --
+	dbf	d2, .reploop
 
 	moveq	#-1, d1
 	eor.l	d0, d1
-	beq.w	loc_5F5C
+	beq.w	.write
 
-loc_5F4C:
+.inline:
 	moveq	#$1F, d7
--
+.inlineloop:
 	lsl.l	#1, d0
-	bcs.w	+
+	bcs.w	.nextinline
 	move.b	(a0)+, (a3)
-+
+.nextinline:
 	addq.l	#1, a3
-	dbf	d7, -
+	dbf	d7, .inlineloop
 
-loc_5F5C:
+.write:
 	lea	(Decom_chunk_buffer).w, a6
 	rept 8
 	move.l	(a6)+, (a4)+
 	endm
 	bra.s	DecompressToRAM
 
-DecompressToRAMEnd:
+.end:
 	rts
 ; -----------------------------------------------------------------
 
 
-loc_5F74:
-	tst.l	($FFFFF7C0).w
-	beq.w	loc_600E
-	move.b	($FFFFF794).w, d0
-	bne.w	loc_600E
+; -----------------------------------------------------------------
+RunDecompressionQueue:
+	tst.l	(Decom_queue).w
+	beq.w	.return
+	move.b	(Decom_queue_unknown).w, d0
+	bne.w	.return
 	lea	(Decom_buffer).w, a1
-	move.b	#0, ($FFFFF790).w
-	movea.l	($FFFFF7C0).w, a0
+	move.b	#0, (Decom_queue_chunk_num).w
+	movea.l	(Decom_queue).w, a0
 	move.w	#$F, d6
-loc_5F96:
+.chunkloop:
 	lea	(Decom_chunk_buffer).w, a3
 	moveq	#0, d0
 	moveq	#0, d2
 	move.b	(a0)+, d2
-	beq.w	loc_5FDE
-	bmi.w	loc_6010
+	beq.w	.inline
+	bmi.w	.nextflag
 	subq.w	#1, d2
-loc_5FAA:
+.reploop:
 	lea	(Decom_chunk_buffer).w, a2
 	movea.l	a2, a3
 	move.b	(a0)+, d3
@@ -9749,44 +9750,47 @@ loc_5FAA:
 	move.b	(a0)+, d4
 	or.l	d4, d0
 	moveq	#$1F, d7
-loc_5FC4:
+.copybyteloop:
 	lsl.l	#1, d4
-	bcc.w	loc_5FCC
+	bcc.w	.nextbyte
 	move.b	d3, (a2)
-loc_5FCC:
+.nextbyte:
 	addq.l	#1, a2
-	dbf	d7, loc_5FC4
-	dbf	d2, loc_5FAA
+	dbf	d7, .copybyteloop
+	dbf	d2, .reploop
 	moveq	#-1, d1
 	eor.l	d0, d1
-	beq.w	loc_5FEE
-loc_5FDE:
+	beq.w	.write
+.inline:
 	moveq	#$1F, d7
-loc_5FE0:
+.inlineloop:
 	lsl.l	#1, d0
-	bcs.w	loc_5FE8
+	bcs.w	.nextinline
 	move.b	(a0)+, (a3)
-loc_5FE8:
+.nextinline:
 	addq.l	#1, a3
-	dbf	d7, loc_5FE0
-loc_5FEE:
+	dbf	d7, .inlineloop
+.write:
 	lea	(Decom_chunk_buffer).w, a6
 	rept 8
 	move.l	(a6)+, (a1)+
 	endm
-	addq.b	#1, ($FFFFF790).w
-	dbf	d6, loc_5F96
-	move.l	a0, ($FFFFF7C0).w
-loc_600E:
+	addq.b	#1, (Decom_queue_chunk_num).w
+	dbf	d6, .chunkloop
+	move.l	a0, (Decom_queue).w
+.return:
 	rts
+.nextflag:
+	move.b	#1, (Decom_queue_next_flag).w
+	rts
+; -----------------------------------------------------------------
 
-loc_6010:
-	move.b	#1, ($FFFFF792).w
-	rts
-loc_6018:
-	move.b	($FFFFF790).w, d0
-	beq.w	loc_606E
-	move.w	($FFFFF7C6).w, d5
+
+; -----------------------------------------------------------------
+FlushDecompressionQueue:
+	move.b	(Decom_queue_chunk_num).w, d0
+	beq.w	.chknext
+	move.w	(Decom_queue_destination).w, d5
 	move.w	d5, d6
 	andi.w	#$3FFF, d5
 	ori.w	#$4000, d5
@@ -9796,39 +9800,40 @@ loc_6018:
 	move.w	d6, (VDP_control_port).l
 	lea	(Decom_buffer).w, a0
 	lea	(VDP_data_port).l, a1
-loc_604A:
-	move.b	($FFFFF790).w, d0
-	beq.w	loc_606E
+.loop:
+	move.b	(Decom_queue_chunk_num).w, d0
+	beq.w	.chknext
 	rept 8
 	move.l	(a0)+, (a1)
 	endm
-	addi.w	#$20, ($FFFFF7C6).w
-	subq.b	#1, ($FFFFF790).w
-	bra.s	loc_604A
-loc_606E:
-	move.b	($FFFFF792).w, d0
-	beq.w	loc_6088
-	move.b	#0, ($FFFFF792).w
-	lea	($FFFFF7C8).w, a0
-	lea	($FFFFF7C0).w, a1
+	addi.w	#$20, (Decom_queue_destination).w
+	subq.b	#1, (Decom_queue_chunk_num).w
+	bra.s	.loop
+.chknext:
+	move.b	(Decom_queue_next_flag).w, d0
+	beq.w	.return
+	move.b	#0, (Decom_queue_next_flag).w
+	lea	(Decom_queue+8).w, a0
+	lea	(Decom_queue).w, a1
 	bsr.w	FillMemBlock5
-loc_6088:
+.return:
 	rts
+; -----------------------------------------------------------------
 
 
 ; -----------------------------------------------------------------
-loc_608A:
-	lea	(WeaponTechArtPtrs).l, a1
+LoadWeaponTechPLC:
+	lea	(WeaponTechPLCPtrs).l, a1
 	add.w	d0, d0
 	add.w	d0, d0
 	movea.l	(a1,d0.w), a2
-	lea	($FFFFF7C0).w, a1
+	lea	(Decom_queue).w, a1
 	move.w	(a2)+, d1
 -
-	move.l	(a2)+, (a1)+
+	move.l	(a2)+, (a1)+	; store compressed graphics
 	moveq	#0, d0
 	move.w	(a2)+, d0
-	move.l	d0, (a1)+
+	move.l	d0, (a1)+		; store destination in VRAM
 	dbf	d1, -
 
 	rts
@@ -12508,7 +12513,7 @@ GameMode_MapLoop:
 +
 	bsr.w	Map_CheckInteractions
 	bsr.w	UpdateWindows
-	bsr.w	loc_5F74
+	bsr.w	RunDecompressionQueue
 	jsr	(RenderCharSprites).l
 	bsr.w	Map_EventRun
 	jsr	(ProcessRandomBattle).l
@@ -13343,7 +13348,7 @@ GameMode_BattleLoop:
 	jsr	(BuildSprites).l
 	bsr.w	Battle_CheckRoutines
 	bsr.w	UpdateWindows
-	bsr.w	loc_5F74
+	bsr.w	RunDecompressionQueue
 	bsr.w	loc_67B8
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#ButtonUp_Mask|ButtonDown_Mask|ButtonLeft_Mask|ButtonRight_Mask|Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
@@ -43451,7 +43456,7 @@ loc_276B6:
 ; byte 2 = range
 ; byte 3 = sound associated to weapon
 ; byte 4 = unused - probably to keep all pointers even
-; byte 5 = index of WeaponTechArtPtrs table
+; byte 5 = index of WeaponTechPLCPtrs table
 ; bytes 6-8 = first set of sprite mappings
 ; bytes 10-12 = second set of sprite mappings
 ; ==========================================================================
@@ -43650,7 +43655,7 @@ WeaponProp_Neishot:
 ;
 ; byte 1 = success rate
 ; byte 2 = sound associated to technique
-; byte 3 = index of WeaponTechArtPtrs table
+; byte 3 = index of WeaponTechPLCPtrs table
 ; bytes 4-6 = first set of sprite mappings (when cast)
 ; bytes 8-10 = second set of sprite mappings (when target is hit)
 ; ==========================================================================
@@ -43922,7 +43927,7 @@ TechProp_Megid:
 ; ==========================================================================
 ; Pointers for weapons art
 ; ==========================================================================
-WeaponTechArtPtrs:
+WeaponTechPLCPtrs:
 	dc.l	WpnArt_Knife			; 0
 	dc.l	WpnArt_Sword			; 1
 	dc.l	WpnArt_LaserSword		; 2
