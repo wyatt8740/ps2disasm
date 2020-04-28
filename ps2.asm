@@ -169,7 +169,7 @@ PtrGameMode_Ending:   jmp	(GameMode_Ending).l
 	nop
 PtrGameMode_Map:    jmp	(GameMode_Map).l
 	nop
-PtrGameMode_Interaction: jmp	(GameMode_Interaction).l
+PtrGameMode_Scene: jmp	(GameMode_Scene).l
 	nop
 PtrGameMode_Battle:   jmp	(GameMode_Battle).l
 	nop
@@ -6032,7 +6032,7 @@ loc_3786:
 	bpl.s	loc_381A
 	cmpi.b	#$FF, d0
 	bne.s	loc_37EC
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w
@@ -8147,9 +8147,9 @@ loc_4DBC:
 loc_4DBE:
 	subq.w	#1, $32(a0)
 	bpl.s	loc_4DD6
-	move.w	#InteractionID_EsperMansion, (Interaction_index).w
+	move.w	#SceneID_EsperMansion, (Scene_index).w
 	move.w	#$39, (Portrait_index).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 loc_4DD6:
 	rts
 ; --------------------------------------------------------------
@@ -9270,7 +9270,7 @@ VIntRoutines:
 	bra.w	VInt_SegaTitle		; 8
 	bra.w	VInt_Ending			; $C
 	bra.w	VInt_Map			; $10
-	bra.w	VInt_Interaction	; $14
+	bra.w	VInt_Scene	; $14
 	bra.w	VInt_Battle			; $18
 	bra.w	VInt_NormalUpdates		; $1C
 	bra.w	VInt_GamePause		; $20
@@ -9317,7 +9317,7 @@ loc_5B96:
 	bsr.w	DrawWindows
 	rts
 
-VInt_Interaction:
+VInt_Scene:
 	bsr.w	VInt_NormalUpdates
 	bsr.w	DrawWindows
 	rts
@@ -10538,8 +10538,8 @@ loc_66C0:
 
 
 loc_66F6:
-	move.w	(Interaction_index).w, d0
-	cmpi.w	#InteractionID_GairaControlPanel, d0
+	move.w	(Scene_index).w, d0
+	cmpi.w	#SceneID_GairaControlPanel, d0
 	bne.w	loc_6754
 	cmpi.w	#4, (Event_routine).w
 	bcc.s	loc_6752
@@ -11296,14 +11296,14 @@ loc_6ED6:
 	rts
 
 loc_6EE6:
-	move.w	d0, (Interaction_index).w
+	move.w	d0, (Scene_index).w
 	move.b	(a1)+, d0
 	move.w	d0, (Portrait_index).w
 	move.b	(a1)+, d0
 	move.w	d0, ($FFFFF764).w
 	move.b	(a1), d0
 	move.w	d0, ($FFFFF766).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w
@@ -11702,21 +11702,21 @@ GameMode_Title:
 	move.w	#$8F02, (a6)
 	move	#$2500, sr	; enable V Interrupt
 	move.l	#$40200000, (VDP_control_port).l
-	lea	(TitleScrBGArt).l, a0
+	lea	(Art_TitleBG).l, a0
 	bsr.w	DecompressToVDP
 	move.l	#$60000001, (VDP_control_port).l
-	lea	(TitleScrCopyrightArt).l, a0
+	lea	(Art_TitleCopyright).l, a0
 	bsr.w	DecompressToVDP
 	move.l	#$60000002, (VDP_control_port).l
 	lea	(FontsIconsArt).l, a0
 	bsr.w	DecompressToVDP
 
-	lea	(TitleScrBGTileInd).l, a1
+	lea	(PlaneMap_TitleBG).l, a1
 	move.l	#$60000003, d0
 	moveq	#$27, d1		; 40 cells wide
 	moveq	#$1B, d2		; 28 cells tall
 	bsr.w	PlaneMapToVRAM
-	lea	(TitleScrPlaneATileInd).l, a1
+	lea	(PlaneMap_TitleFG).l, a1
 	move.l	#$40000003, d0
 	moveq	#$27, d1
 	moveq	#$1B, d2
@@ -11742,7 +11742,7 @@ GameMode_Title:
 	dbf	d6, -
 
 	lea	(RAM_start&$FFFFFF).l, a4
-	lea	(TitleScrWomenArt).l, a0
+	lea	(Art_TitleWomen).l, a0
 	bsr.w	DecompressToRAM
 	move.w	(VDP_reg1_values).w, d0	; VDP reg #1 values
 	ori.b	#$40, d0				; enable display
@@ -11783,7 +11783,7 @@ GameMode_Title:
 	dbf	d5, --
 
 	lea	(RAM_start&$FFFFFF).l, a4
-	lea	(TitScrPhantasyStarLogoArt).l, a0
+	lea	(Art_TitlePSLogo).l, a0
 	bsr.w	DecompressToRAM
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
@@ -11822,7 +11822,7 @@ GameMode_TitleLoop:
 MoveToGameMode_Intro:
 	move.w	#0, (Opening_ending_flag).w
 	move.b	#GameModeID_Intro, (Game_mode_index).w
-	move.w	#InteractionID_RolfHouseStart, (Interaction_index).w
+	move.w	#SceneID_RolfHouseStart, (Scene_index).w
 	rts
 
 
@@ -12948,7 +12948,7 @@ loc_824C:
 ; ------------------------------------------------------------
 
 ; ------------------------------------------------------------
-GameMode_Interaction:
+GameMode_Scene:
 	bsr.w	PaletteFadeFrom
 	move	#$2700, sr
 	move.w	(VDP_reg1_values).w, d0
@@ -12977,23 +12977,23 @@ loc_829E:
 	moveq	#2, d0
 	bsr.w	PaletteLoad1
 	move.l	#$54000002, (VDP_control_port).l
-	cmpi.w	#InteractionID_Library, (Interaction_index).w
+	cmpi.w	#SceneID_Library, (Scene_index).w
 	beq.s	loc_8304				; branch if we are in the library
-	cmpi.w	#InteractionID_CentralTowerRoof, (Interaction_index).w
+	cmpi.w	#SceneID_CentralTowerRoof, (Scene_index).w
 	beq.s	loc_8318				; branch if we are on the roof
-	cmpi.w	#InteractionID_TylerSpaceship, (Interaction_index).w
+	cmpi.w	#SceneID_TylerSpaceship, (Scene_index).w
 	beq.s	loc_8326				; branch if we are on Tyler's spaceship
-	cmpi.w	#InteractionID_EsperMansion, (Interaction_index).w
+	cmpi.w	#SceneID_EsperMansion, (Scene_index).w
 	beq.s	loc_8364				; branch if we are in the Esper Mansion
 
-	lea	(RolfPortraitArt).l, a0
+	lea	(Art_SceneRolf).l, a0
 	bsr.w	DecompressToVDP
 	moveq	#pal_id_rolf_port, d0
 	bsr.w	PaletteLoad1
 	bra.w	loc_8396
 
 loc_8304:
-	lea	(LibrGraphPortArt).l, a0
+	lea	(Art_SceneGraph).l, a0
 	bsr.w	DecompressToVDP
 	moveq	#pal_id_graph_port, d0
 	bsr.w	PaletteLoad1
@@ -13028,7 +13028,7 @@ loc_8364:
 	lea	(LutzPortraitArt).l, a0
 	move.l	#$40200000, (VDP_control_port).l
 	bsr.w	DecompressToVDP
-	lea	(LutzPortraitTileInd).l, a1
+	lea	(PlaneMap_SceneLutz).l, a1
 	move.l	#$410A0003, d0
 	moveq	#$1D, d1
 	moveq	#$D, d2
@@ -13046,8 +13046,8 @@ loc_839A:
 	move.l	d0, (Camera_Y_pos_FG).w
 	move.l	d0, (Camera_Y_pos_BG).w
 
-	lea	(InteractionMusicPtrs).l, a1
-	adda.w	(Interaction_index).w, a1
+	lea	(SceneMusicPtrs).l, a1
+	adda.w	(Scene_index).w, a1
 	move.b	(a1), d0
 	bsr.w	UpdateSoundQueue
 	move.w	(VDP_reg1_values).w, d0
@@ -13057,19 +13057,19 @@ loc_839A:
 	bsr.w	PaletteFadeTo
 
 
-GameMode_InteractionLoop:
+GameMode_SceneLoop:
 	bsr.w	CheckGamePause
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
-	bsr.w	Interaction_CheckRoutine
+	bsr.w	Scene_CheckRoutine
 	bsr.w	UpdateWindows
 	bsr.w	loc_66F6
 	tst.w	(Screen_changed_flag).w
 	bne.s	loc_8406
-	cmpi.b	#GameModeID_Interaction, (Game_mode_index).w
-	beq.s	GameMode_InteractionLoop
+	cmpi.b	#GameModeID_Scene, (Game_mode_index).w
+	beq.s	GameMode_SceneLoop
 loc_8406:
 	rts
 
@@ -13096,43 +13096,43 @@ loc_843E:
 ; ===============================================================
 PortraitTable:
 
-PtrPortrait_Nei:	dc.l	(pal_id_nei_port<<$18)|NeiPortraitArt
-PtrPortrait_Rudo:	dc.l	(pal_id_rudo_port<<$18)|RudoPortraitArt
-PtrPortrait_Amy:	dc.l	(pal_id_amy_port<<$18)|AmyPortraitArt
-PtrPortrait_Hugh:	dc.l	(pal_id_hugh_port<<$18)|HughPortraitArt
-PtrPortrait_Anna:	dc.l	(pal_id_anna_port<<$18)|AnnaPortraitArt
-PtrPortrait_Kain:	dc.l	(pal_id_kain_port<<$18)|KainPortraitArt
-PtrPortrait_Shir:	dc.l	(pal_id_shir_port<<$18)|ShirPortraitArt
-PtrPortrait_Librarian:	dc.l	(pal_id_libr_port<<$18)|LibrPortraitArt			; Librarian portrait
-PtrPortrait_MotaSaveEmployer:	dc.l	(pal_id_mot_save_emp_port<<$18)|MotSaveEmplPortArt	; Motavia game save employer portrait
-PtrPortrait_MotaDoctor:	dc.l	(pal_id_mot_doc_port<<$18)|MotDoctorPortraitArt	; Motavia doctor portrait
-PtrPortrait_CloneLabGrandma:	dc.l	(pal_id_cl_grandma_port<<$18)|CLGrandmaPortraitArt	; Clone Labs Grandma portrait
-PtrPortrait_MotaItemSeller:	dc.l	(pal_id_mot_item_sell_port<<$18)|MotItemSelPortArt	; Motavia item seller portrait
-PtrPortrait_MotaWeaponSeller:	dc.l	(pal_id_mot_wpn_sell_port<<$18)|MotWpnSelPortArt	; Motavia weapon seller portrait
-PtrPortrait_MotaArmorSeller:	dc.l	(pal_id_mot_arm_sell_port<<$18)|MotArmSelPortArt	; Motavia armor seller portrait
-PtrPortrait_Ustvestia:	dc.l	(pal_id_ustves_port<<$18)|UstvestiaPortraitArt	; Ustvestia portrait
-PtrPortrait_Dezolian1:	dc.l	(pal_id_misc1_port<<$18)|DezolianPortraitArt	; Dezolis game save employer, armor seller (Aukba), item seller (Ryuon), doctor (Ryuon) portrait
-PtrPortrait_Dezolian2:	dc.l	(pal_id_misc2_port<<$18)|DezolianPortraitArt	; Doctor (Aukba, Zosa), weapon seller (Aukba), armor seller (Zosa) portrait
-PtrPortrait_Dezolian3:	dc.l	(pal_id_misc3_port<<$18)|DezolianPortraitArt	; Item seller (Zosa), armor seller (Ryuon) portrait
-PtrPortrait_Dezolian4:	dc.l	(pal_id_misc4_port<<$18)|DezolianPortraitArt	; Dezolis teleport service employer, item seller (Aukba), weapon seller (Zosa, Ryuon) portrait
-PtrPortrait_ItemKeeper:	dc.l	(pal_id_item_keeper_port<<$18)|ItemKeeperPortArt	; Room item keeper portrait
-PtrPortrait_CentralTowerOutside:	dc.l	(pal_id_cent_tow_out1_port<<$18)|CentTowOutPortArt	; Central Tower outside portrait
-PtrPortrait_CentralTowerOutside_Copy:	dc.l	(pal_id_cent_tow_out1_port<<$18)|CentTowOutPortArt	; Central Tower outside portrait
-PtrPortrait_Governor:	dc.l	(pal_id_governor_port<<$18)|GovernorPortraitArt	; Governor portrait
-PtrPortrait_Spaceship:	dc.l	(pal_id_cent_tow_roof_port<<$18)|SpaceshipPortArt	; Spaceship on Central Tower roof
-PtrPortrait_CentralTowerOutside2:	dc.l	(pal_id_cent_tow_out2_port<<$18)|CentTowOutPortArt	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_LibraryGraph:	dc.l	(pal_id_graph_port<<$18)|LibrGraphPortArt	; Graph showing up after turning Recorder in - seems to be never referenced in this table
-PtrPortrait_Radar:	dc.l	(pal_id_radar_port<<$18)|RadarPortraitArt	; Radar portrait (showing up in Gaira from control panel)
-PtrPortrait_CentralTowerOutside3:	dc.l	(pal_id_cent_tow_out3_port<<$18)|CentTowOutPortArt	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_CentralTowerOutside3_Copy:	dc.l	(pal_id_cent_tow_out3_port<<$18)|CentTowOutPortArt	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_MotaTeleportEmployer:	dc.l	(pal_id_tele_empl_port<<$18)|MotTeleEmplPortArt	; Motavia teleport service employer portrait
+PtrPortrait_Nei:	dc.l	(pal_id_nei_port<<$18)|Art_SceneNei
+PtrPortrait_Rudo:	dc.l	(pal_id_rudo_port<<$18)|Art_SceneRudo
+PtrPortrait_Amy:	dc.l	(pal_id_amy_port<<$18)|Art_SceneAmy
+PtrPortrait_Hugh:	dc.l	(pal_id_hugh_port<<$18)|Art_SceneHugh
+PtrPortrait_Anna:	dc.l	(pal_id_anna_port<<$18)|Art_SceneAnna
+PtrPortrait_Kain:	dc.l	(pal_id_kain_port<<$18)|Art_SceneKain
+PtrPortrait_Shir:	dc.l	(pal_id_shir_port<<$18)|Art_SceneShir
+PtrPortrait_Librarian:	dc.l	(pal_id_libr_port<<$18)|Art_SceneLibrarian			; Librarian portrait
+PtrPortrait_MotaSaveEmployer:	dc.l	(pal_id_mot_save_emp_port<<$18)|Art_SceneMotaSaveEmployee	; Motavia game save employer portrait
+PtrPortrait_MotaDoctor:	dc.l	(pal_id_mot_doc_port<<$18)|Art_SceneMotaDoctor	; Motavia doctor portrait
+PtrPortrait_CloneLabGrandma:	dc.l	(pal_id_cl_grandma_port<<$18)|Art_SceneCloneLabGrandma	; Clone Labs Grandma portrait
+PtrPortrait_MotaItemSeller:	dc.l	(pal_id_mot_item_sell_port<<$18)|Art_SceneMotaItemSeller	; Motavia item seller portrait
+PtrPortrait_MotaWeaponSeller:	dc.l	(pal_id_mot_wpn_sell_port<<$18)|Art_SceneMotaWeaponSeller	; Motavia weapon seller portrait
+PtrPortrait_MotaArmorSeller:	dc.l	(pal_id_mot_arm_sell_port<<$18)|Art_SceneMotaArmorSeller	; Motavia armor seller portrait
+PtrPortrait_Ustvestia:	dc.l	(pal_id_ustves_port<<$18)|Art_SceneUstvestia	; Ustvestia portrait
+PtrPortrait_Dezolian1:	dc.l	(pal_id_misc1_port<<$18)|Art_SceneDezolian	; Dezolis game save employer, armor seller (Aukba), item seller (Ryuon), doctor (Ryuon) portrait
+PtrPortrait_Dezolian2:	dc.l	(pal_id_misc2_port<<$18)|Art_SceneDezolian	; Doctor (Aukba, Zosa), weapon seller (Aukba), armor seller (Zosa) portrait
+PtrPortrait_Dezolian3:	dc.l	(pal_id_misc3_port<<$18)|Art_SceneDezolian	; Item seller (Zosa), armor seller (Ryuon) portrait
+PtrPortrait_Dezolian4:	dc.l	(pal_id_misc4_port<<$18)|Art_SceneDezolian	; Dezolis teleport service employer, item seller (Aukba), weapon seller (Zosa, Ryuon) portrait
+PtrPortrait_ItemKeeper:	dc.l	(pal_id_item_keeper_port<<$18)|Art_SceneItemKeeper	; Room item keeper portrait
+PtrPortrait_CentralTowerOutside:	dc.l	(pal_id_cent_tow_out1_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
+PtrPortrait_CentralTowerOutside_Copy:	dc.l	(pal_id_cent_tow_out1_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
+PtrPortrait_Governor:	dc.l	(pal_id_governor_port<<$18)|Art_SceneGovernor	; Governor portrait
+PtrPortrait_Spaceship:	dc.l	(pal_id_cent_tow_roof_port<<$18)|Art_SceneRoof	; Spaceship on Central Tower roof
+PtrPortrait_CentralTowerOutside2:	dc.l	(pal_id_cent_tow_out2_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_LibraryGraph:	dc.l	(pal_id_graph_port<<$18)|Art_SceneGraph	; Graph showing up after turning Recorder in - seems to be never referenced in this table
+PtrPortrait_Radar:	dc.l	(pal_id_radar_port<<$18)|Art_SceneRadar	; Radar portrait (showing up in Gaira from control panel)
+PtrPortrait_CentralTowerOutside3:	dc.l	(pal_id_cent_tow_out3_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_CentralTowerOutside3_Copy:	dc.l	(pal_id_cent_tow_out3_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_MotaTeleportEmployer:	dc.l	(pal_id_tele_empl_port<<$18)|Art_SceneMotaTeleportEmployee	; Motavia teleport service employer portrait
 ; ===============================================================
 
 
 ; ===========================================================
-; Music pointers for interaction places
+; Music pointers for Scenes
 ; ===========================================================
-InteractionMusicPtrs:
+SceneMusicPtrs:
 	dc.b	MusicID_MyHome
 	dc.b	MusicID_MyHome
 	dc.b	MusicID_StepUp
@@ -13391,7 +13391,7 @@ GameOverScreen:
 	move.w	#$82, ($FFFFF644).w
 	move.w	($FFFFF644).w, (a6)
 	move.l	#$40200000, (VDP_control_port).l
-	lea	(TitleScrBGArt).l, a0
+	lea	(Art_TitleBG).l, a0
 	bsr.w	DecompressToVDP
 	move	#$2700, sr
 	lea	(loc_6C5DA).l, a1
@@ -13479,7 +13479,7 @@ GameMode_Intro:
 	move.l	#$60000002, (VDP_control_port).l
 	lea	(FontsIconsArt).l, a0
 	bsr.w	DecompressToVDP
-	tst.w	(Interaction_index).w
+	tst.w	(Scene_index).w
 	bne.s	loc_8950		; branch to skip initialization (this happens when we return to the Intro Screen for various reasons, like soft reset, game over, etc.)
 	bsr.w	loc_89EE
 
@@ -16023,11 +16023,11 @@ Visiphone_ItemSelected:
 	rts
 
 +
-	move.w	#InteractionID_DataMemory, (Interaction_index).w
+	move.w	#SceneID_DataMemory, (Scene_index).w
 	move.w	#9, (Portrait_index).w
 	move.w	#0, ($FFFFF764).w
 	move.w	#1, ($FFFFF766).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	move.w	(Characters_RAM+y_pos).w, d0		; get characters' y position
 	andi.w	#$FFF0, d0
 	move.w	d0, (Map_Y_pos).w ; and save it
@@ -17243,7 +17243,7 @@ AddItemToInventory2:
 	rts
 
 
-Interaction_CheckRoutine:
+Scene_CheckRoutine:
 	tst.w	(Window_index).w
 	bne.s	loc_AF02
 	tst.w	(Window_index_saved).w
@@ -17266,36 +17266,36 @@ loc_AF04:
 	rts
 
 loc_AF1A:
-	move.w	(Interaction_index).w, d0
+	move.w	(Scene_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#$7C, d0
-	jmp	InteractionIndex(pc,d0.w)
+	jmp	SceneIndex(pc,d0.w)
 ;----------------------------------------------------
-InteractionIndex:
+SceneIndex:
 
-PtrInteraction_RolfHouseStart:			bra.w	Interaction_RolfHouseStart
-PtrInteraction_RolfHouse:				bra.w	Interaction_RolfHouse
-PtrInteraction_DataMemory:				bra.w	Interaction_DataMemory
-PtrInteraction_CloneLabs:				bra.w	Interaction_CloneLab
-PtrInteraction_Hospital:				bra.w	Interaction_Hospital
-PtrInteraction_WeaponStore:			bra.w	Interaction_WeaponStore
-PtrInteraction_ArmorStore:				bra.w	Interaction_ArmorStore
-PtrInteraction_ItemStore:				bra.w	Interaction_ItemStore
-PtrInteraction_CentralTowerOutside:	bra.w	Interaction_CentralTowerOutside
-PtrInteraction_CentralTowerRoom:		bra.w	Interaction_CentralTowerRoom
-PtrInteraction_Library:				bra.w	Interaction_Library
-PtrInteraction_CentralTowerRoof:		bra.w	Interaction_Roof
-PtrInteraction_UstvestiaHouse:			bra.w	Interaction_UstvestiaHouse
-PtrInteraction_InventorHouse:			bra.w	Interaction_InventorHouse
-PtrInteraction_CentralTowerGovernor:	bra.w	Interaction_CentralTowerGovernor
-PtrInteraction_TeleportStation:		bra.w	Interaction_TeleportStation
-PtrInteraction_GairaControlPanel:		bra.w	Interaction_GairaControlPanel
-PtrInteraction_TylerSpaceship:			bra.w	Interaction_TylerSpaceship
-PtrInteraction_EsperMansion:			bra.w	Interaction_EsperMansion
+PtrScene_RolfHouseStart:			bra.w	Scene_RolfHouseStart
+PtrScene_RolfHouse:				bra.w	Scene_RolfHouse
+PtrScene_DataMemory:				bra.w	Scene_DataMemory
+PtrScene_CloneLabs:				bra.w	Scene_CloneLab
+PtrScene_Hospital:				bra.w	Scene_Hospital
+PtrScene_WeaponStore:			bra.w	Scene_WeaponStore
+PtrScene_ArmorStore:				bra.w	Scene_ArmorStore
+PtrScene_ItemStore:				bra.w	Scene_ItemStore
+PtrScene_CentralTowerOutside:	bra.w	Scene_CentralTowerOutside
+PtrScene_CentralTowerRoom:		bra.w	Scene_CentralTowerRoom
+PtrScene_Library:				bra.w	Scene_Library
+PtrScene_CentralTowerRoof:		bra.w	Scene_Roof
+PtrScene_UstvestiaHouse:			bra.w	Scene_UstvestiaHouse
+PtrScene_InventorHouse:			bra.w	Scene_InventorHouse
+PtrScene_CentralTowerGovernor:	bra.w	Scene_CentralTowerGovernor
+PtrScene_TeleportStation:		bra.w	Scene_TeleportStation
+PtrScene_GairaControlPanel:		bra.w	Scene_GairaControlPanel
+PtrScene_TylerSpaceship:			bra.w	Scene_TylerSpaceship
+PtrScene_EsperMansion:			bra.w	Scene_EsperMansion
 ;----------------------------------------------------
 
 
-Interaction_RolfHouseStart:
+Scene_RolfHouseStart:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	RolfHouseSt_EventIndex-4(pc,d1.w)
@@ -17341,7 +17341,7 @@ loc_AFE6:
 	bra.w	CloseAllWindows
 ; ------------------------------------------
 
-Interaction_RolfHouse:
+Scene_RolfHouse:
 	lsl.w	#2, d1
 	andi.w	#$3C, d1
 	jmp	RolfHouse_EventIndex-4(pc,d1.w)
@@ -17695,7 +17695,7 @@ SetCharNames:
 	rts
 
 
-Interaction_DataMemory:
+Scene_DataMemory:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B3FC
 	lsl.w	#2, d1
@@ -17916,7 +17916,7 @@ loc_B654:
 	jmp	(EntryPoint).l
 ; ------------------------------------------
 
-Interaction_CloneLab:
+Scene_CloneLab:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B678
 	lsl.w	#2, d1
@@ -18016,7 +18016,7 @@ loc_B750:
 	addq.w	#1, (Event_routine_2).w
 	rts
 loc_B78A:
-	move.w	#InteractionID_CentralTowerOutside, (Interaction_index).w
+	move.w	#SceneID_CentralTowerOutside, (Scene_index).w
 	move.w	#$15, (Portrait_index).w
 	move.w	#7, (Demo_index).w
 	move.w	#0, (Demo_input_frame).w
@@ -18071,7 +18071,7 @@ loc_B81C:
 	rts
 ; ------------------------------------------
 
-Interaction_Hospital:
+Scene_Hospital:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_B83A
 	lsl.w	#2, d1
@@ -18279,7 +18279,7 @@ loc_BA48:
 	rts
 ; ------------------------------------------
 
-Interaction_WeaponStore:
+Scene_WeaponStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BA66
 	lsl.w	#2, d1
@@ -18422,7 +18422,7 @@ loc_BBD8:
 	rts
 ; ------------------------------------------
 
-Interaction_ArmorStore:
+Scene_ArmorStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BBFC
 	lsl.w	#2, d1
@@ -18565,7 +18565,7 @@ loc_BD6E:
 	rts
 ; ------------------------------------------
 
-Interaction_ItemStore:
+Scene_ItemStore:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_BD92
 	lsl.w	#2, d1
@@ -18800,7 +18800,7 @@ loc_C026:
 	rts
 
 
-Interaction_CentralTowerOutside:
+Scene_CentralTowerOutside:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	CentralTowOutEventIndex-4(pc,d1.w)
@@ -18865,7 +18865,7 @@ loc_C0EA:
 	rts
 loc_C0F6:
 	addi.w	#9, d1
-	move.w	d1, (Interaction_index).w
+	move.w	d1, (Scene_index).w
 	move.w	d2, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
@@ -18878,13 +18878,13 @@ loc_C116:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C122:
-	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
+	move.w	#SceneID_CentralTowerGovernor, (Scene_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
 
 
-Interaction_CentralTowerRoom:
+Scene_CentralTowerRoom:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C148
 	lsl.w	#2, d1
@@ -19085,7 +19085,7 @@ loc_C382:
 	rts
 
 
-Interaction_Library:
+Scene_Library:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C3A8
 	lsl.w	#2, d1
@@ -19208,7 +19208,7 @@ LibraryTextIndArray:
 	even
 
 
-Interaction_Roof:
+Scene_Roof:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C500
 	lsl.w	#2, d1
@@ -19304,7 +19304,7 @@ SpaceShipLoop:
 	rts
 
 
-Interaction_UstvestiaHouse:
+Scene_UstvestiaHouse:
 	tst.w	(Event_routine_2).w
 	bne.w	loc_C652
 	lsl.w	#2, d1
@@ -19532,7 +19532,7 @@ Ustvestia_MusicPointers:
 
 	even
 
-Interaction_InventorHouse:
+Scene_InventorHouse:
 	tst.w	(Event_routine_2).w
 	bne.w	CloseAllWindows
 	lsl.w	#2, d1
@@ -19615,7 +19615,7 @@ loc_C948:
 	rts
 
 
-Interaction_CentralTowerGovernor:
+Scene_CentralTowerGovernor:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	ContTowGoverEventIndex-4(pc,d1.w)
@@ -19662,14 +19662,14 @@ loc_C9F4:
 	addq.w	#3, (Event_routine).w
 	rts
 loc_CA00:
-	move.w	#InteractionID_RolfHouseStart, (Interaction_index).w
+	move.w	#SceneID_RolfHouseStart, (Scene_index).w
 	move.w	#$37, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#1, (Demo_index).w
 	move.w	#0, (Demo_input_frame).w
 	bra.w	CloseAllWindows
 loc_CA22:
-	move.w	#InteractionID_Library, (Interaction_index).w
+	move.w	#SceneID_Library, (Scene_index).w
 	move.w	#8, (Portrait_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
@@ -19691,7 +19691,7 @@ loc_CA64:
 
 ; ==============================================
 ; Events at the Teleport Station
-Interaction_TeleportStation:
+Scene_TeleportStation:
 	move.w	(Event_routine_2).w, d0
 	bne.w	loc_CA80
 	lsl.w	#2, d1
@@ -19837,7 +19837,7 @@ TeleportLocCoord:
 
 ; ==============================================
 
-Interaction_GairaControlPanel:
+Scene_GairaControlPanel:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
 	jmp	GairaConPanEventIndex-4(pc,d1.w)
@@ -19871,7 +19871,7 @@ loc_CC10:
 loc_CC26:
 	bsr.s	loc_CC3E
 	bne.s	loc_CC3C
-	move.w	#InteractionID_TylerSpaceship, (Interaction_index).w
+	move.w	#SceneID_TylerSpaceship, (Scene_index).w
 	move.w	#$1C, (Portrait_index).w
 	move.w	#-1, (Screen_changed_flag).w
 loc_CC3C:
@@ -19884,7 +19884,7 @@ loc_CC48:
 	rts
 
 
-Interaction_TylerSpaceship:
+Scene_TylerSpaceship:
 	lsl.w	#2, d1
 	andi.w	#$3C, d1
 	jmp	TylerSpcshipEventIndex-4(pc,d1.w)
@@ -19987,7 +19987,7 @@ loc_CD8A:
 	bsr.s	loc_CDDE
 
 	lea	(RAM_start&$FFFFFF).l, a4
-	lea	(TylerSpaceshipArt).l, a0
+	lea	(Art_SceneTylerSpaceship).l, a0
 	bsr.w	DecompressToRAM
 	move.l	#$40200000, d0
 	move.w	#$B3, d7
@@ -20000,7 +20000,7 @@ loc_CDDC:
 	rts
 
 loc_CDDE:
-	lea	(TylerSpcshp_MonitorTileInd).l, a1
+	lea	(PlaneMap_TylerMonitor).l, a1
 	mulu.w	#$168, d0
 	adda.w	d0, a1
 	move.l	#$41A60003, d0
@@ -20102,14 +20102,14 @@ loc_CE6E:
 	move.w	#$3D0, (Map_X_pos).w
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	move.w	#0, (Jet_Scooter_flag).w
-	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
+	move.w	#SceneID_CentralTowerGovernor, (Scene_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#8, (Demo_index).w
 	move.w	#0, (Demo_input_frame).w
 	rts
 
-Interaction_EsperMansion:
+Scene_EsperMansion:
 	tst.w	(Event_routine_2).w
 	bne.w	CloseAllWindows
 	lsl.w	#2, d1
@@ -20403,7 +20403,7 @@ loc_D158:
 	rts
 
 Intro_RunRoutine:
-	move.w	(Interaction_index).w, d0
+	move.w	(Scene_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#4, d0
 	jmp	IntroScr_EventIndex(pc,d0.w)
@@ -20593,7 +20593,7 @@ loc_D36E:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_D384:
-	move.w	#InteractionID_RolfHouse, (Interaction_index).w
+	move.w	#SceneID_RolfHouse, (Scene_index).w
 	move.w	#1, (Screen_changed_flag).w
 	rts
 loc_D392:
@@ -20622,7 +20622,7 @@ loc_D3B6:
 	beq.s	loc_D412
 	move.w	($FFFFDEBC).w, d0
 	bsr.w	LoadSavedData
-	move.w	#InteractionID_DataMemory, (Interaction_index).w
+	move.w	#SceneID_DataMemory, (Scene_index).w
 	move.w	#9, (Portrait_index).w
 	move.w	($FFFFC65C).w, ($FFFFF766).w
 	tst.w	($FFFFF766).w
@@ -20632,7 +20632,7 @@ loc_D3B6:
 	move.w	#$10, (Portrait_index).w
 +
 	move.w	#1, ($FFFFF764).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	rts
 loc_D412:
 	move.w	#$130A, (Script_ID).w		; "There is no data for that number. Enter a different number."
@@ -20773,7 +20773,7 @@ loc_D59C:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_D5EA:
-	move.w	#InteractionID_CentralTowerGovernor, (Interaction_index).w
+	move.w	#SceneID_CentralTowerGovernor, (Scene_index).w
 	move.w	#$17, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#0, (Demo_index).w
@@ -21636,7 +21636,7 @@ loc_DEE2:
 	move.w	#$20, (Map_X_pos).w
 	move.w	#-1, (Screen_changed_flag).w
 	move.w	#0, (Jet_Scooter_flag).w
-	move.w	#InteractionID_CloneLabs, (Interaction_index).w
+	move.w	#SceneID_CloneLabs, (Scene_index).w
 	move.w	#$B, (Portrait_index).w
 	move.w	#1, (Demo_flag).w
 	move.w	#6, (Demo_index).w
@@ -21713,9 +21713,9 @@ loc_DFD0:
 
 Event_GairaControlPanel:
 	move.b	#1, (a0)
-	move.w	#InteractionID_GairaControlPanel, (Interaction_index).w
+	move.w	#SceneID_GairaControlPanel, (Scene_index).w
 	move.w	#$1B, (Portrait_index).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	rts
 
 Event_CharacterDead:
@@ -21778,9 +21778,9 @@ loc_E0A2:
 	addq.b	#1, ($FFFFC743).w
 	bra.w	CloseAllWindows
 Event_Lutz:
-	move.w	#InteractionID_EsperMansion, (Interaction_index).w
+	move.w	#SceneID_EsperMansion, (Scene_index).w
 	move.w	#$39, (Portrait_index).w
-	move.b	#GameModeID_Interaction, (Game_mode_index).w
+	move.b	#GameModeID_Scene, (Game_mode_index).w
 	bra.s	loc_E0D8
 Event_DarkForce:
 	tst.w	d2
@@ -34883,11 +34883,11 @@ loc_17DA2:
 	even
 
 
-TylerPortraitTileInd:	binclude "data\art\portrait\tyler_tile_ind.bin"
+TylerPortraitTileInd:	binclude "scene/mappings/tyler.bin"
 	even
 
 
-TylerSpcshp_MonitorTileInd:	binclude "data\art\tylr_spc_monitor_tile_ind.bin"
+PlaneMap_TylerMonitor:	binclude "scene/mappings/tyler_monitor.bin"
 	even
 
 
@@ -34990,7 +34990,7 @@ Map_PalmExplosion_4:
 
 	even
 
-LutzPortraitTileInd:	binclude "data\art\portrait\lutz_tile_ind.bin"
+PlaneMap_SceneLutz:	binclude "scene/mappings/lutz.bin"
 	even
 
 
@@ -35061,7 +35061,7 @@ SoundtrackCharArray:
 
 ; ===============================
 ; Inclusion of all(?) the text dialogs in the game.
-    include "data\script.asm"
+    include "script/script.asm"
 ;================================
 
 	even
@@ -45327,79 +45327,79 @@ MapTrans_DezolisSkure:
 
 ; =================================================================
 MapTrans_Paseo:
-	dc.b	$11, $2D, InteractionID_RolfHouse, $37, $00, $00
-	dc.b	$07, $11, InteractionID_DataMemory, $09, $00, $00
-	dc.b	$15, $0F, InteractionID_Hospital, $0A, $08, $00
-	dc.b	$1B, $3A, InteractionID_ArmorStore, $0E, $05, $01
-	dc.b	$05, $3A, InteractionID_WeaponStore, $0D, $05, $02
-	dc.b	$0F, $20, InteractionID_CentralTowerOutside, $15, $00, $00
-	dc.b	$11, $3A, InteractionID_ItemStore, $0C, $04, $00
-	dc.b	$1B, $07, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$11, $07, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$11, $2D, SceneID_RolfHouse, $37, $00, $00
+	dc.b	$07, $11, SceneID_DataMemory, $09, $00, $00
+	dc.b	$15, $0F, SceneID_Hospital, $0A, $08, $00
+	dc.b	$1B, $3A, SceneID_ArmorStore, $0E, $05, $01
+	dc.b	$05, $3A, SceneID_WeaponStore, $0D, $05, $02
+	dc.b	$0F, $20, SceneID_CentralTowerOutside, $15, $00, $00
+	dc.b	$11, $3A, SceneID_ItemStore, $0C, $04, $00
+	dc.b	$1B, $07, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $07, SceneID_TeleportStation, $1E, $00, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Arima:
-	dc.b	$1B, $13, InteractionID_TeleportStation, $1E, $00, $00
-	dc.b	$05, $15, InteractionID_Hospital, $0A, $0A, $00
-	dc.b	$07, $05, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$11, $05, InteractionID_WeaponStore, $0D, $05, $03
+	dc.b	$1B, $13, SceneID_TeleportStation, $1E, $00, $00
+	dc.b	$05, $15, SceneID_Hospital, $0A, $0A, $00
+	dc.b	$07, $05, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $05, SceneID_WeaponStore, $0D, $05, $03
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Oputa:
-	dc.b	$13, $27, InteractionID_DataMemory, $09, $00, $00
-	dc.b	$0B, $37, InteractionID_Hospital, $0A, $0F, $00
-	dc.b	$0B, $27, InteractionID_ArmorStore, $0E, $05, $05
-	dc.b	$05, $1D, InteractionID_WeaponStore, $0D, $05, $06
-	dc.b	$07, $2D, InteractionID_ItemStore, $0C, $04, $04
-	dc.b	$07, $39, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$07, $07, InteractionID_UstvestiaHouse, $0F, $00, $00
-	dc.b	$13, $39, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$13, $27, SceneID_DataMemory, $09, $00, $00
+	dc.b	$0B, $37, SceneID_Hospital, $0A, $0F, $00
+	dc.b	$0B, $27, SceneID_ArmorStore, $0E, $05, $05
+	dc.b	$05, $1D, SceneID_WeaponStore, $0D, $05, $06
+	dc.b	$07, $2D, SceneID_ItemStore, $0C, $04, $04
+	dc.b	$07, $39, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$07, $07, SceneID_UstvestiaHouse, $0F, $00, $00
+	dc.b	$13, $39, SceneID_TeleportStation, $1E, $00, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Zema:
-	dc.b	$0B, $2D, InteractionID_ArmorStore, $0E, $05, $08
-	dc.b	$05, $07, InteractionID_ItemStore, $0C, $04, $07
-	dc.b	$05, $31, InteractionID_WeaponStore, $0D, $05, $09
-	dc.b	$0B, $17, InteractionID_DataMemory, $09, $00, $00
-	dc.b	$07, $13, InteractionID_Hospital, $0A, $14, $00
-	dc.b	$0B, $13, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$07, $29, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$0B, $2D, SceneID_ArmorStore, $0E, $05, $08
+	dc.b	$05, $07, SceneID_ItemStore, $0C, $04, $07
+	dc.b	$05, $31, SceneID_WeaponStore, $0D, $05, $09
+	dc.b	$0B, $17, SceneID_DataMemory, $09, $00, $00
+	dc.b	$07, $13, SceneID_Hospital, $0A, $14, $00
+	dc.b	$0B, $13, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$07, $29, SceneID_TeleportStation, $1E, $00, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Kueri:
-	dc.b	$25, $05, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$11, $1B, InteractionID_DataMemory, $09, $00, $00
-	dc.b	$1D, $05, InteractionID_ItemStore, $0C, $05, $0A
-	dc.b	$1D, $1B, InteractionID_Hospital, $0A, $1E, $00
-	dc.b	$11, $05, InteractionID_ArmorStore, $0E, $05, $0B
-	dc.b	$15, $1B, InteractionID_WeaponStore, $0D, $05, $0C
-	dc.b	$27, $0F, InteractionID_InventorHouse, $0C, $00, $00
-	dc.b	$15, $05, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$25, $05, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$11, $1B, SceneID_DataMemory, $09, $00, $00
+	dc.b	$1D, $05, SceneID_ItemStore, $0C, $05, $0A
+	dc.b	$1D, $1B, SceneID_Hospital, $0A, $1E, $00
+	dc.b	$11, $05, SceneID_ArmorStore, $0E, $05, $0B
+	dc.b	$15, $1B, SceneID_WeaponStore, $0D, $05, $0C
+	dc.b	$27, $0F, SceneID_InventorHouse, $0C, $00, $00
+	dc.b	$15, $05, SceneID_TeleportStation, $1E, $00, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Piata:
-	dc.b	$19, $35, InteractionID_DataMemory, $09, $00, $00
-	dc.b	$25, $39, InteractionID_ItemStore, $0C, $05, $0D
-	dc.b	$15, $29, InteractionID_Hospital, $0A, $2D, $00
-	dc.b	$29, $31, InteractionID_WeaponStore, $0D, $05, $0F
-	dc.b	$25, $29, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$21, $29, InteractionID_ArmorStore, $0E, $05, $0E
-	dc.b	$19, $27, InteractionID_TeleportStation, $1E, $00, $00
+	dc.b	$19, $35, SceneID_DataMemory, $09, $00, $00
+	dc.b	$25, $39, SceneID_ItemStore, $0C, $05, $0D
+	dc.b	$15, $29, SceneID_Hospital, $0A, $2D, $00
+	dc.b	$29, $31, SceneID_WeaponStore, $0D, $05, $0F
+	dc.b	$25, $29, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$21, $29, SceneID_ArmorStore, $0E, $05, $0E
+	dc.b	$19, $27, SceneID_TeleportStation, $1E, $00, $00
 	dc.b	$17, $09, $01, MapID_ControlTowerGroundF, $29, $2E
 	dc.b	$FF, $FF
 ; =================================================================
@@ -45407,38 +45407,38 @@ MapTrans_Piata:
 
 ; =================================================================
 MapTrans_Aukba:
-	dc.b	$05, $07, InteractionID_DataMemory, $10, $00, $00
-	dc.b	$11, $0D, InteractionID_Hospital, $11, $32, $00
-	dc.b	$11, $19, InteractionID_ItemStore, $13, $01, $10
-	dc.b	$19, $09, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$0B, $1B, InteractionID_ArmorStore, $10, $05, $11
-	dc.b	$17, $05, InteractionID_WeaponStore, $11, $05, $12
-	dc.b	$19, $19, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$05, $07, SceneID_DataMemory, $10, $00, $00
+	dc.b	$11, $0D, SceneID_Hospital, $11, $32, $00
+	dc.b	$11, $19, SceneID_ItemStore, $13, $01, $10
+	dc.b	$19, $09, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$0B, $1B, SceneID_ArmorStore, $10, $05, $11
+	dc.b	$17, $05, SceneID_WeaponStore, $11, $05, $12
+	dc.b	$19, $19, SceneID_TeleportStation, $13, $01, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 
 ; =================================================================
 MapTrans_Zosa:
-	dc.b	$17, $0B, InteractionID_ArmorStore, $11, $05, $14
-	dc.b	$07, $09, InteractionID_WeaponStore, $13, $05, $15
-	dc.b	$05, $15, InteractionID_DataMemory, $10, $00, $00
-	dc.b	$0F, $13, InteractionID_ItemStore, $12, $01, $13
-	dc.b	$11, $07, InteractionID_Hospital, $11, $32, $00
-	dc.b	$19, $13, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$13, $13, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$17, $0B, SceneID_ArmorStore, $11, $05, $14
+	dc.b	$07, $09, SceneID_WeaponStore, $13, $05, $15
+	dc.b	$05, $15, SceneID_DataMemory, $10, $00, $00
+	dc.b	$0F, $13, SceneID_ItemStore, $12, $01, $13
+	dc.b	$11, $07, SceneID_Hospital, $11, $32, $00
+	dc.b	$19, $13, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$13, $13, SceneID_TeleportStation, $13, $01, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
 ; =================================================================
 MapTrans_Ryuon:
-	dc.b	$07, $1F, InteractionID_DataMemory, $10, $00, $00
-	dc.b	$0B, $2D, InteractionID_Hospital, $10, $32, $00
-	dc.b	$05, $33, InteractionID_CloneLabs, $0B, $00, $00
-	dc.b	$05, $09, InteractionID_ArmorStore, $12, $05, $17
-	dc.b	$09, $0D, InteractionID_WeaponStore, $13, $05, $18
-	dc.b	$0B, $29, InteractionID_ItemStore, $10, $01, $16
-	dc.b	$05, $0F, InteractionID_TeleportStation, $13, $01, $00
+	dc.b	$07, $1F, SceneID_DataMemory, $10, $00, $00
+	dc.b	$0B, $2D, SceneID_Hospital, $10, $32, $00
+	dc.b	$05, $33, SceneID_CloneLabs, $0B, $00, $00
+	dc.b	$05, $09, SceneID_ArmorStore, $12, $05, $17
+	dc.b	$09, $0D, SceneID_WeaponStore, $13, $05, $18
+	dc.b	$0B, $29, SceneID_ItemStore, $10, $01, $16
+	dc.b	$05, $0F, SceneID_TeleportStation, $13, $01, $00
 	dc.b	$FF, $FF
 ; =================================================================
 
@@ -47223,79 +47223,79 @@ loc_2B1F0:
 
 	even
 
-LibrPortraitArt: binclude "data\art\portrait\librarian.bin"
+Art_SceneLibrarian: binclude "scene/art/librarian.bin"
 	even
 
-MotSaveEmplPortArt: binclude "data\art\portrait\mot_save_empl.bin"
+Art_SceneMotaSaveEmployee: binclude "scene/art/mota_save_employee.bin"
 	even
 
-MotDoctorPortraitArt: binclude "data\art\portrait\mot_doctor.bin"
+Art_SceneMotaDoctor: binclude "scene/art/mota_doctor.bin"
 	even
 
-CLGrandmaPortraitArt: binclude "data\art\portrait\cl_grandma.bin"
+Art_SceneCloneLabGrandma: binclude "scene/art/clone_lab_grandma.bin"
 	even
 
-MotItemSelPortArt: binclude "data\art\portrait\mot_item_sel.bin"
+Art_SceneMotaItemSeller: binclude "scene/art/mota_item_seller.bin"
 	even
 
-MotWpnSelPortArt: binclude "data\art\portrait\mot_wpn_sel.bin"
+Art_SceneMotaWeaponSeller: binclude "scene/art/mota_weapon_seller.bin"
 	even
 
-MotArmSelPortArt: binclude "data\art\portrait\mot_arm_sel.bin"
+Art_SceneMotaArmorSeller: binclude "scene/art/mota_armor_seller.bin"
 	even
 
-UstvestiaPortraitArt: binclude "data\art\portrait\ustvestia.bin"
+Art_SceneUstvestia: binclude "scene/art/ustvestia.bin"
 	even
 
-DezolianPortraitArt: binclude "data\art\portrait\dezolian.bin"
+Art_SceneDezolian: binclude "scene/art/dezolian.bin"
 	even
 
-CentTowOutPortArt: binclude "data\art\portrait\cen_tow_out.bin"
+Art_SceneCentralTowerOutside: binclude "scene/art/central_tower_outside.bin"
 	even
 
-GovernorPortraitArt: binclude "data\art\portrait\governor.bin"
+Art_SceneGovernor: binclude "scene/art/governor.bin"
 	even
 
-ItemKeeperPortArt: binclude "data\art\portrait\item_keeper.bin"
+Art_SceneItemKeeper: binclude "scene/art/item_keeper.bin"
 	even
 
-SpaceshipPortArt: binclude "data\art\portrait\cen_tow_roof.bin"
+Art_SceneRoof: binclude "scene/art/central_tower_roof.bin"
 	even
 
-TylerSpaceshipArt:	binclude "data\art\tyler_spaceship_art.bin"
+Art_SceneTylerSpaceship:	binclude "scene/art/tyler_spaceship_art.bin"
 	even
 
-RolfPortraitArt: binclude "data\art\portrait\rolf.bin"
+Art_SceneRolf: binclude "scene/art/rolf.bin"
 	even
 
-NeiPortraitArt: binclude "data\art\portrait\nei.bin"
+Art_SceneNei: binclude "scene/art/nei.bin"
 	even
 
-RudoPortraitArt: binclude "data\art\portrait\rudo.bin"
+Art_SceneRudo: binclude "scene/art/rudo.bin"
 	even
 
-AmyPortraitArt: binclude "data\art\portrait\amy.bin"
+Art_SceneAmy: binclude "scene/art/amy.bin"
 	even
 
-HughPortraitArt: binclude "data\art\portrait\hugh.bin"
+Art_SceneHugh: binclude "scene/art/hugh.bin"
 	even
 
-AnnaPortraitArt: binclude "data\art\portrait\anna.bin"
+Art_SceneAnna: binclude "scene/art/anna.bin"
 	even
 
-KainPortraitArt: binclude "data\art\portrait\kain.bin"
+Art_SceneKain: binclude "scene/art/kain.bin"
 	even
 
-ShirPortraitArt: binclude "data\art\portrait\shir.bin"
+Art_SceneShir: binclude "scene/art/shir.bin"
 	even
 
-LibrGraphPortArt: binclude "data\art\portrait\graph.bin"
+Art_SceneGraph: binclude "scene/art/graph.bin"
 	even
 
-RadarPortraitArt: binclude "data\art\portrait\radar.bin"
+Art_SceneRadar: binclude "scene/art/radar.bin"
 	even
 	
-MotTeleEmplPortArt: binclude "data\art\mot_tele_empl.bin"
+Art_SceneMotaTeleportEmployee: binclude "scene/art/mota_teleport_employee.bin"
 	even
 
 LutzPortraitArt:
@@ -60755,7 +60755,7 @@ SakCastArt:
 
 	even
 
-KnifeArt:	binclude "data\art\knife_art.bin"
+KnifeArt:	binclude "battle/art/knife.bin"
 	even
 
 SwordArt:
@@ -66246,19 +66246,19 @@ Map_FanbiAcidShot_8:
 
 	even
 
-TitleScrBGArt:	binclude "data\art\title_scr_bg_art.bin"
+Art_TitleBG:	binclude "title/art/background_tiles.bin"
 	even
 
-TitleScrCopyrightArt:	binclude "data\art\tit_scr_copyright_art.bin"
+Art_TitleCopyright:	binclude "title/art/copyright.bin"
 	even
 
-TitleScrWomenArt:	binclude "data\art\title_scr_women_art.bin"
+Art_TitleWomen:	binclude "title/art/women.bin"
 	even
 
-TitScrPhantasyStarLogoArt:	binclude "data\art\tit_scr_phan_star_logo_art.bin"
+Art_TitlePSLogo:	binclude "title/art/phantasy_star_logo.bin"
 	even
 
-TitleScrBGTileInd:	binclude "data\art\tit_scr_background_tile_ind.bin"
+PlaneMap_TitleBG:	binclude "title/mappings/background_tiles.bin"
 	even
 
 loc_6C5DA:
@@ -66404,7 +66404,7 @@ loc_6C5DA:
 	dc.b	$20, $0C, $20, $13, $20, $08, $20, $0F, $20, $0C, $20, $08, $20, $03, $20, $01 ;0x8A0
 
 
-TitleScrPlaneATileInd:	binclude "data\art\tit_scr_bg_tile_ind.bin"
+PlaneMap_TitleFG:	binclude "title/mappings/foreground_tiles.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -67585,22 +67585,22 @@ loc_71E88:
 ; =================================================================
 
 
-Battle_RolfArt:	binclude "data\art\battle_rolf_art.bin"
+Battle_RolfArt:	binclude "battle/art/rolf.bin"
 	even
 
-Battle_NeiArt: binclude "data\art\battle_nei_art.bin"
+Battle_NeiArt: binclude "battle/art/nei.bin"
 	even
 
-Battle_RudoArt: binclude "data\art\battle_rudo_art.bin"
+Battle_RudoArt: binclude "battle/art/rudo.bin"
 	even
 
-Battle_AmyShirArt: binclude "data\art\battle_amy_shir_art.bin"
+Battle_AmyShirArt: binclude "battle/art/amy_shir.bin"
 	even
 
-Battle_AnnaArt: binclude "data\art\battle_anna_art.bin"
+Battle_AnnaArt: binclude "battle/art/anna.bin"
 	even
 
-Battle_HughKainArt: binclude "data\art\battle_hugh_kain_art.bin"
+Battle_HughKainArt: binclude "battle/art/hugh_kain.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -68287,37 +68287,37 @@ loc_762D8:
 
 
 
-Battle_AntArt:	binclude "data\art\battle_ant_art.bin"
+Battle_AntArt:	binclude "battle/art/ant.bin"
 	even
 
-Battle_MosquitoArt:	binclude "data\art\battle_mosquito_art.bin"
+Battle_MosquitoArt:	binclude "battle/art/mosquito.bin"
 	even
 
-Battle_SpinnerArt:	binclude "data\art\battle_spinner_art.bin"
+Battle_SpinnerArt:	binclude "battle/art/spinner.bin"
 	even
 
-Battle_BeeArt:	binclude "data\art\battle_bee_art.bin"
+Battle_BeeArt:	binclude "battle/art/bee.bin"
 	even
 
-Battle_PoisonerArt:	binclude "data\art\battle_poisoner_art.bin"
+Battle_PoisonerArt:	binclude "battle/art/poisoner.bin"
 	even
 
-Battle_HitTailArt:	binclude "data\art\battle_hittail_art.bin"
+Battle_HitTailArt:	binclude "battle/art/hittail.bin"
 	even
 
-Battle_FroggyArt:	binclude "data\art\battle_froggy_art.bin"
+Battle_FroggyArt:	binclude "battle/art/froggy.bin"
 	even
 	
-Battle_CarrierArt:	binclude "data\art\battle_carrier_act.bin"
+Battle_CarrierArt:	binclude "battle/art/carrier.bin"
 	even
 
-Battle_WhistleArt:	binclude "data\art\battle_whistle_art.bin"
+Battle_WhistleArt:	binclude "battle/art/whistle.bin"
 	even
 
-Battle_LocustArt:	binclude "data\art\battle_locust_art.bin"
+Battle_LocustArt:	binclude "battle/art/locust.bin"
 	even
 
-Battle_AmoebaArt:	binclude "data\art\battle_amoeba_art.bin"
+Battle_AmoebaArt:	binclude "battle/art/amoeba.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -70799,16 +70799,16 @@ loc_83116:
 
 	even
 
-Battle_PoleziArt:	binclude "data\art\battle_polezi_art.bin"
+Battle_PoleziArt:	binclude "battle/art/polezi.bin"
 	even
 
-Battle_LeecherArt:	binclude "data\art\battle_leecher_art.bin"
+Battle_LeecherArt:	binclude "battle/art/leecher.bin"
 	even
 
-Battle_PulserArt:	binclude "data\art\battle_pulser_art.bin"
+Battle_PulserArt:	binclude "battle/art/pulser.bin"
 	even
 
-Battle_RotWoodArt:	binclude "data\art\battle_rotwood_art.bin"
+Battle_RotWoodArt:	binclude "battle/art/rotwood.bin"
 	even
 
 Battle_WolfangArt:
@@ -96069,7 +96069,7 @@ loc_BDBF4:
 PCMDrums:
 	org 0		; we need to start from an address less than $10000 for Z80 otherwise the assembler throws an Address Overflow error; so we conveniently start from 0
 	save		; save 68000 CPU settings
-	include "data\sound\ps2.pcm_drums.asm"
+	include "sound/ps2.pcm_drums.asm"
 	restore		; restore 68000 CPU settings
 	padding off	; padding is not restored, so we need to set the flag again
 	org (PCMDrums+PCMDrumsEnd-PCMDrumsStart)		; PC must be set to the correct value, so it's the whole code up until the PCMDrums label + the whole z80 code

@@ -130,7 +130,7 @@ GameModeID_Sega =		id(PtrGameMode_Sega)		; 0
 GameModeID_Title = 	id(PtrGameMode_Title)		; 4
 GameModeID_Ending =	id(PtrGameMode_Ending)	; 8
 GameModeID_Map = 	id(PtrGameMode_Map)		; $C
-GameModeID_Interaction = id(PtrGameMode_Interaction)	; $10
+GameModeID_Scene = id(PtrGameMode_Scene)	; $10
 GameModeID_Battle = 	id(PtrGameMode_Battle)	; $14
 GameModeID_Intro = 	id(PtrGameMode_Intro)		; $18
 
@@ -628,31 +628,31 @@ TechID_Unknown1 =  id(Tech_Unknown1)	; $35
 
 TechNameLength =  5
 
-; Interaction
+; Scenes
 
-offset	:=	InteractionIndex
+offset	:=	SceneIndex
 ptrsize	:=	4
 idstart	:=	0
 
-InteractionID_RolfHouseStart =  id(PtrInteraction_RolfHouseStart)	; 0
-InteractionID_RolfHouse =  id(PtrInteraction_RolfHouse)			; 1
-InteractionID_DataMemory =  id(PtrInteraction_DataMemory)		; 2
-InteractionID_CloneLabs =  id(PtrInteraction_CloneLabs)		; 3
-InteractionID_Hospital =  id(PtrInteraction_Hospital)		; 4
-InteractionID_WeaponStore =  id(PtrInteraction_WeaponStore)		; 5
-InteractionID_ArmorStore =  id(PtrInteraction_ArmorStore)		; 6
-InteractionID_ItemStore =  id(PtrInteraction_ItemStore)		; 7
-InteractionID_CentralTowerOutside =  id(PtrInteraction_CentralTowerOutside)		; 8
-InteractionID_CentralTowerRoom =  id(PtrInteraction_CentralTowerRoom)		; 9
-InteractionID_Library =  id(PtrInteraction_Library)		; $A
-InteractionID_CentralTowerRoof =  id(PtrInteraction_CentralTowerRoof)		; $B
-InteractionID_UstvestiaHouse =  id(PtrInteraction_UstvestiaHouse)		; $C
-InteractionID_InventorHouse =  id(PtrInteraction_InventorHouse)		; $D
-InteractionID_CentralTowerGovernor =  id(PtrInteraction_CentralTowerGovernor)		; $E
-InteractionID_TeleportStation =  id(PtrInteraction_TeleportStation)		; $F
-InteractionID_GairaControlPanel =  id(PtrInteraction_GairaControlPanel)		; $10
-InteractionID_TylerSpaceship =  id(PtrInteraction_TylerSpaceship)		; $11
-InteractionID_EsperMansion =  id(PtrInteraction_EsperMansion)		; $12
+SceneID_RolfHouseStart =  id(PtrScene_RolfHouseStart)	; 0
+SceneID_RolfHouse =  id(PtrScene_RolfHouse)			; 1
+SceneID_DataMemory =  id(PtrScene_DataMemory)		; 2
+SceneID_CloneLabs =  id(PtrScene_CloneLabs)		; 3
+SceneID_Hospital =  id(PtrScene_Hospital)		; 4
+SceneID_WeaponStore =  id(PtrScene_WeaponStore)		; 5
+SceneID_ArmorStore =  id(PtrScene_ArmorStore)		; 6
+SceneID_ItemStore =  id(PtrScene_ItemStore)		; 7
+SceneID_CentralTowerOutside =  id(PtrScene_CentralTowerOutside)		; 8
+SceneID_CentralTowerRoom =  id(PtrScene_CentralTowerRoom)		; 9
+SceneID_Library =  id(PtrScene_Library)		; $A
+SceneID_CentralTowerRoof =  id(PtrScene_CentralTowerRoof)		; $B
+SceneID_UstvestiaHouse =  id(PtrScene_UstvestiaHouse)		; $C
+SceneID_InventorHouse =  id(PtrScene_InventorHouse)		; $D
+SceneID_CentralTowerGovernor =  id(PtrScene_CentralTowerGovernor)		; $E
+SceneID_TeleportStation =  id(PtrScene_TeleportStation)		; $F
+SceneID_GairaControlPanel =  id(PtrScene_GairaControlPanel)		; $10
+SceneID_TylerSpaceship =  id(PtrScene_TylerSpaceship)		; $11
+SceneID_EsperMansion =  id(PtrScene_EsperMansion)		; $12
 
 ; Windows
 
@@ -1367,7 +1367,7 @@ Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
 Demo_input_frame =  ramaddr($FFFFF754)		; determines what joypad command should be run
 Joypad_demo =  ramaddr($FFFFF756)
 
-Interaction_index =  ramaddr($FFFFF760)
+Scene_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)
 
 Decom_queue_chunk_num =  ramaddr($FFFFF790)
