@@ -1,0 +1,71 @@
+This is how compression in Phantasy Star II works:
+
+Source data is broken into chunks of 32 bytes. Then for each chunk, bytes of the same value are stored in a bitfield where each bit position
+corresponds to the byte position of the source chunk if the bit is set. This is done with the same bytes occurring at least 6 times because a lower number
+will result in more data compared to uncompressed data. After all repetitions are parsed, the remaining bytes, if any, are stored as is.
+To signal end of file, write $FF
+
+The format for each chunk is as follows:
+
+1) 1 byte which holds the number of repetitions
+
+2) 1 byte value which is copied a number of times determined by the next bitfield
+
+3) 4 bytes with each bit holding the position of the previous byte in the source chunk
+
+- 2) and 3) are repeated for a number of times determined by 1)
+
+- Lastly, the remaining bytes are stored as is in the same order found in the source chunk
+
+- To signal end of file, write $FF
+
+Here's an example:
+
+	22 22 23 31 20 22 31 15 31 22 23 34 23 22 22 22 22 23 23 12 31 22 22 22 23 23 22 22 23 22 22 22
+
+First of all, get the number of repetitions if the same bytes occur at least 6 times.
+
+	22 = 16 times
+	23 = 8 times
+	31 = 4 times
+	20 = 1 time
+	15 = 1 time
+	34 = 1 time
+	12 = 1 time
+	
+Since 22 and 23 occur 16 and 8 times respectively, we will print 02 in the compressed file:
+
+	02
+	
+Then write that byte and the bitfield holding the position in the source chunk:
+
+	02 22 C4 47 87 37
+	
+C4 47 87 37 is 11000100 01000111 10000111 00110111. Each 1 is the position byte 22 appears in the source chunk
+
+Next let's write the 23.
+
+	02 22 C4 47 87 37 23 20 28 60 C8
+	
+The other bytes are written as is in the compressed data.
+
+	02 22 C4 47 87 37 23 20 28 60 C8 31 20 31 15 31 34 12 31
+	
+Repeat the whole process until all source data is parsed. When all is done write $FF. This is the end result if the above is the only chunk of data.
+
+	02 22 C4 47 87 37 23 20 28 60 C8 31 20 31 15 31 34 12 31 FF
+	
+	
+How to compress/decompress
+--------------------------
+
+There are two tools in the compression folder. These were written in Pyhton 3.7, so I recommend you download that version at least. Higher version should
+be fine as well.
+
+If you want to decompress data, run the decompressor.py script. You will be asked to input the source file. To make it easier, you can place the data file in the same
+folder where the scripts are.
+
+To compress a file do, run the compressor.py script. Make sure the source file length is divisible by 32 or the compression may end up failing.
+
+Normally graphics are compressed in this game, so if you want to edit those, you will need these tools. Graphics data are found in the various 'art' folder
+of this project. At this time not all data were split into their own files, so those not found there will need to be extracted from the main disassembly.
