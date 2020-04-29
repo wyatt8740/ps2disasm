@@ -17,17 +17,17 @@ if __name__ == "__main__":
 			ibuffer = [x for x in data]
 			copyBuffer = []
 			repeatNum = 0
-			readBytes = [False] * chunkSize
+			totalBits = 0
 			inlineBits = 0
 			for i, d in enumerate(ibuffer):
-				if not readBytes[i]:
+				if not isBitSet(totalBits, chunkSize-i):
 					cnt = 0
 					bitCount = 0
 					for j in range(i, chunkSize):
 						if ibuffer[j] == ibuffer[i]:
 							cnt += 1
-							readBytes[j] = True
 							bitCount = setBit(bitCount, chunkSize-j)
+					totalBits |= bitCount
 					if cnt < 6:
 						inlineBits |= bitCount
 					else:
