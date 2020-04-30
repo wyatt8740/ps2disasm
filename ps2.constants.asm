@@ -922,7 +922,7 @@ EnemyID_Capeone  =  id(Enemy_Capeone)	; $7A
 EnemyID_Fiend  =  id(Enemy_Fiend)	; $7B
 EnemyID_Neifirst  =  id(Enemy_Neifirst)	; $7C
 EnemyID_DarkFrce  =  id(Enemy_DarkFrce)	; $7D
-EnemyID_Mombrain  =  id(Enemy_Mombrain)	; $7E
+EnemyID_MotherBrain  =  id(Enemy_MotherBrain)	; $7E
 
 EnemyNameLength =	10
 
