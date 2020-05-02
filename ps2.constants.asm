@@ -1344,7 +1344,9 @@ RNG_seed =  ramaddr($FFFFF636)
 
 Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
 
-Battle_saved_sound =  ramaddr($FFFFF642)      
+Battle_saved_sound =  ramaddr($FFFFF642)
+
+DMA_last_write =  ramaddr($FFFFF644)
 
 Chunk_table_addr =  ramaddr($FFFFF714)
 
