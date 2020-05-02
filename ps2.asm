@@ -997,9 +997,9 @@ Map_LoadObjects:
 	move.w	#1, ($FFFFDE70).w
 	move.w	#0, ($FFFFDE72).w
 	move.w	#$302, (Interaction_type).w
-	move.w	#1, (Demo_flag).w
-	move.w	#2, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#2, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	move.b	#$8F, d0			; "A Prologue" music
 	bra.w	UpdateSoundQueue
 
@@ -6018,15 +6018,15 @@ loc_3786:
 	tst.w	(Windows_opened_num).w
 	bne.w	loc_39D0
 
-	move.w	(Demo_flag).w, d0
+	move.w	(Cutscene_flag).w, d0
 	beq.w	loc_382A
 
-	lea	(DemoScriptPtrs).l, a1
-	move.w	(Demo_index).w, d0
+	lea	(CutscenePtrs).l, a1
+	move.w	(Cutscene_index).w, d0
 	lsl.w	#2, d0
 	adda.w	d0, a1
 	movea.l	(a1), a1
-	move.w	(Demo_input_frame).w, d0
+	move.w	(Cutscene_input_frame).w, d0
 	adda.w	d0, a1
 	move.b	(a1), d0
 	bpl.s	loc_381A
@@ -6046,14 +6046,14 @@ loc_37EC:
 	cmpi.b	#$FE, d0
 	bne.s	loc_37FE
 	addq.w	#1, ($FFFFDE70).w
-	move.w	#0, (Demo_flag).w
+	move.w	#0, (Cutscene_flag).w
 	rts
 loc_37FE:
 	cmpi.b	#$FD, d0
 	bne.s	loc_3818
 	move.b	#SFXID_DoorOpen, (Sound_queue).w
 	move.w	#2, ($FFFFE822).w
-	move.w	#0, (Demo_flag).w
+	move.w	#0, (Cutscene_flag).w
 	rts
 loc_3818:
 	rts
@@ -6068,10 +6068,10 @@ loc_381A:
 	move.w	d0, (Joypad_ctrl).w
 	andi.w	#$F00, (Joypad_ctrl).w
 	endif
-	addq.w	#1, (Demo_input_frame).w
+	addq.w	#1, (Cutscene_input_frame).w
 
 loc_382A:
-	move.w	d0, (Joypad_demo).w
+	move.w	d0, (Cutscene_joypad).w
 	bsr.w	loc_6F56
 	move.w	#0, x_move_steps(a0)
 	move.w	#0, y_move_steps(a0)
@@ -6196,7 +6196,7 @@ loc_390E:
 loc_3956:
 	move.w	#0, (Camera_X_step_counter).w
 	move.w	#0, (Camera_Y_step_counter).w
-	btst	#4, (Joypad_demo).w
+	btst	#4, (Cutscene_joypad).w
 	bne.s	loc_397A
 	cmpi.w	#$C8, sprite_y_pos(a0)
 	bhi.s	loc_3980
@@ -6223,7 +6223,7 @@ loc_3980:
 	move.w	#4, (Camera_Y_step_counter).w
 	endif
 loc_3996:
-	btst	#6, (Joypad_demo).w
+	btst	#6, (Cutscene_joypad).w
 	bne.s	loc_39AE
 	cmpi.w	#$D8, sprite_x_pos(a0)
 	bhi.s	loc_39B4
@@ -6259,299 +6259,318 @@ loc_39D0:
 	move.w	#0, y_move_steps(a0)
 	rts
 
-; =======================================
+; =================================================================
 ; Sprite mappings index in the map
 Map_SpriteMappingsArray:
 	dc.b	$00
 	dc.b	$01
 	dc.b	$00
 	dc.b	$02
-; =======================================
+; =================================================================
 
 
-; =======================================
-; Pointers for CPU joypad input
-DemoScriptPtrs:
-	dc.l	Demo_HouseToTower
-	dc.l	Demo_TowerToHouse
-	dc.l	Demo_TeimScene
-	dc.l	Demo_AfterTeimDeath
-	dc.l	Demo_DynamiteUsed
-	dc.l	Demo_KeyUsed
-	dc.l	Demo_ClimatrolToCloneLab
-	dc.l	Demo_CloneLabToTower
-	dc.l	Demo_TylerSpcToTower
-	dc.l	loc_3AC4
-	dc.l	loc_3AD8
-; =======================================
+; =================================================================
+; Pointers for cutscene joypad input
+CutscenePtrs:
+	dc.l	Cutscene_HouseToTower			; 0
+	dc.l	Cutscene_TowerToHouse			; 1
+	dc.l	Cutscene_TeimDarum				; 2
+	dc.l	Cutscene_TeimDarumDeath			; 3
+	dc.l	Cutscene_DynamiteUsed			; 4
+	dc.l	Cutscene_KeyUsed				; 5
+	dc.l	Cutscene_ClimatrolToCloneLab	; 6
+	dc.l	Cutscene_CloneLabToTower		; 7
+	dc.l	Cutscene_TylerSpcToTower		; 8
+	dc.l	Cutscene_MotherBrainDeath		; 9
+	dc.l	Cutscene_Earthmen				; $A
+; =================================================================
 
-; ---------------------------------------
-Demo_HouseToTower:
+
+; =================================================================
+Cutscene_HouseToTower:
 	dc.b	$00
-	dc.b	$02
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
 	dc.b	$00
 	dc.b	$FF
-; --------------------------------------
-
-
-Demo_TowerToHouse:
-	dc.b	$00
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$01
-	dc.b	$00
-	dc.b	$FF
-; --------------------------------------
-
-
-Demo_TeimScene:
-	dc.b	$00
-	dc.b	$04
-	dc.b	$44
-	dc.b	$44
-	dc.b	$44
-	dc.b	$44
-	dc.b	$44
-	dc.b	$44
-	dc.b	$00
-	dc.b	$FE
-; --------------------------------------
-
-
-Demo_AfterTeimDeath:
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$00
-	dc.b	$FE
-; --------------------------------------
-
-
-Demo_DynamiteUsed:
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$08
-	dc.b	$01
-	dc.b	$00
-	dc.b	$FD
-; --------------------------------------
-
-
-Demo_KeyUsed:
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$00
-	dc.b	$FD
-; --------------------------------------
-
-
-Demo_ClimatrolToCloneLab:
-	dc.b	$00
-	dc.b	$00
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$01
-	dc.b	$00
-	dc.b	$FF
-; --------------------------------------
-
-
-Demo_CloneLabToTower:
-	dc.b	$00
-	dc.b	$00
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$01
-	dc.b	$01
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$08
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$00
-	dc.b	$FF
-; --------------------------------------
+; =================================================================
 
 	even
 
-Demo_TylerSpcToTower:
+; =================================================================
+Cutscene_TowerToHouse:
 	dc.b	$00
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonUp_Mask
 	dc.b	$00
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$01
-	dc.b	$01
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$04
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
 	dc.b	$FF
-; --------------------------------------
+; =================================================================
 
 	even
 
-loc_3AC4:
+; =================================================================
+Cutscene_TeimDarum:
 	dc.b	$00
-	dc.b	$02
-	dc.b	$02
-	dc.b	$02
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	ButtonLeft_Mask|Button_A_Mask
+	dc.b	$00
+	dc.b	$FE
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_TeimDarumDeath:
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	$00
+	dc.b	$FE
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_DynamiteUsed:
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	$00
+	dc.b	$FD
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_KeyUsed:
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	$00
+	dc.b	$FD
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_ClimatrolToCloneLab:
+	dc.b	$00
+	dc.b	$00
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	$00
+	dc.b	$FF
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_CloneLabToTower:
+	dc.b	$00
+	dc.b	$00
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonRight_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	$00
+	dc.b	$FF
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_TylerSpcToTower:
+	dc.b	$00
+	dc.b	$00
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonLeft_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	$FF
+; =================================================================
+
+	even
+
+; =================================================================
+Cutscene_MotherBrainDeath:
+	dc.b	$00
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
+	dc.b	ButtonDown_Mask
 	dc.b	$00
 	dc.b	$FE
 	dc.b	$00
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
 	dc.b	$00
 	dc.b	$FE
-; --------------------------------------
+; =================================================================
 
+	even
 
-loc_3AD8:
+; =================================================================
+Cutscene_Earthmen:
 	dc.b	$00
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$11
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
-	dc.b	$01
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask|Button_B_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
+	dc.b	ButtonUp_Mask
 	dc.b	$00
 	dc.b	$00
 	dc.b	$00
 	dc.b	$FE
-; --------------------------------------
+; =================================================================
 
+	even
 
-
-; --------------------------------------------------------------
+; -----------------------------------------------------------------
 ; Object - Characters following the leading character
-; --------------------------------------------------------------
+; -----------------------------------------------------------------
 Obj_FollowingCharacter:
 	tst.w	(Map_index).w
 	bne.s	loc_3AFA
@@ -9280,9 +9299,9 @@ VIntRoutines:
 
 VInt_SegaTitle:
 	bsr.w	VInt_NormalUpdates
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.w	+		; don't decrease timer if already 0
-	subq.w	#1,(Demo_timer).w	; otherwise subtract 1 to timer
+	subq.w	#1,(General_timer).w	; otherwise subtract 1 to timer
 +
 	rts
 
@@ -11656,7 +11675,7 @@ GameMode_Sega:
 	moveq	#pal_id_sega, d0
 	bsr.w	PaletteLoad1
 	move.w	#$28,($FFFFF632).w		; set palette cycle timer
-	move.w	#$12C,(Demo_timer).w		; set timer
+	move.w	#$12C,(General_timer).w		; set timer
 	move.w	(VDP_reg1_values).w, d0		; VDP reg #1 values
 	ori.b	#$40, d0					; enable display
 	move.w	d0, (VDP_control_port).l
@@ -11666,7 +11685,7 @@ GameMode_Sega:
 	move.b	#4, (V_int_routine).w
 	bsr.w	WaitForVInt
 	bsr.w	PaletteCycle
-	tst.w	(Demo_timer).w	; check timer
+	tst.w	(General_timer).w	; check timer
 	beq.w	+	; if timer is 0 move to title screen
 	andi.b	#ButtonStart_Mask, (Joypad_pressed).w	; check start press
 	beq.s	-
@@ -11732,7 +11751,7 @@ GameMode_Title:
 	move.w	d0,(Window_active_flag).w
 	move.w	#$8006, (VDP_control_port).l
 	move.w	#$8B00, (VDP_control_port).l
-	move.w	#$B4,(Demo_timer).w		; set timer
+	move.w	#$B4,(General_timer).w		; set timer
 
 	lea	(Object_RAM).w, a6
 	moveq	#0, d7
@@ -11757,10 +11776,10 @@ GameMode_Title:
 	bne.w	MoveToGameMode_Intro		; if so, exit title screen
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	bne.s	-
 
-	move.w	#$6CC,(Demo_timer).w
+	move.w	#$6CC,(General_timer).w
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 
@@ -11814,7 +11833,7 @@ GameMode_TitleLoop:
 	bsr.w	WaitForVInt
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.s	MoveToOpeningScreen		; introduction screen on Motavia
 	andi.b	#ButtonStart_Mask, (Joypad_pressed).w
 	beq.s	GameMode_TitleLoop
@@ -11894,7 +11913,7 @@ loc_7660:
 	dbf	d1, loc_7660
 
 	move.w	d0, (Character_index).w
-	move.w	#$168, (Demo_timer).w
+	move.w	#$168, (General_timer).w
 	move.w	#1, (Opening_ending_flag).w
 	move.w	#$9011, (VDP_control_port).l
 	move.w	(VDP_reg1_values).w, d0
@@ -11977,7 +11996,7 @@ loc_77B2:
 	addq.w	#8, d3
 	dbf	d5, loc_77B2
 
-	move.w	#$168, (Demo_timer).w
+	move.w	#$168, (General_timer).w
 	bsr.w	loc_79D2
 	move.b	#$E0, d0
 	bsr.w	UpdateSoundQueue
@@ -12142,7 +12161,7 @@ loc_797C:
 	move.b	#$C, (V_int_routine).w
 	bsr.w	WaitForVInt
 	bsr.w	UpdateWindows
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	bne.s	loc_797C
 loc_799A:
 	lea	(VDP_control_port).l, a6
@@ -12158,17 +12177,17 @@ loc_79C0:
 	andi.w	#2, d7
 	bne.s	loc_79C0
 	move.w	#$8F02, (a6)
-	move.w	#$3C, (Demo_timer).w
+	move.w	#$3C, (General_timer).w
 loc_79D2:
 	move.b	#$C, (V_int_routine).w
 	bsr.w	WaitForVInt
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	bne.s	loc_79D2
-	move.w	#$168, (Demo_timer).w
+	move.w	#$168, (General_timer).w
 	rts
 
 loc_79EA:
-	move.w	#$78, (Demo_timer).w
+	move.w	#$78, (General_timer).w
 	bra.s	loc_79D2
 
 ; ======================================================
@@ -12628,7 +12647,7 @@ loc_7F14:
 	subq.b	#1, d1
 	bne.s	loc_7F44
 	move.w	#0, (Characters_RAM).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	move.w	#$501, (Map_event_load).w
 	move.w	#MapID_ClimatrolF7, (Map_index).w
 	move.w	#$1A0, (Map_Y_pos).w
@@ -12642,7 +12661,7 @@ loc_7F44:
 	bne.s	loc_7F80
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$29, (Interaction_type).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	move.w	#$602, (Map_event_load).w
 	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
@@ -12656,7 +12675,7 @@ loc_7F80:
 	subq.b	#1, d1
 	bne.s	loc_7FB0
 	move.w	#0, (Characters_RAM).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	move.w	#$704, (Map_event_load).w
 	move.w	#MapID_ClimatrolF7, ($FFFFF748).w
 	move.w	#$1A0, ($FFFFF74A).w
@@ -12841,9 +12860,9 @@ loc_815C:
 	bne.s	loc_817C
 	tst.w	(Windows_opened_num).w
 	bne.s	loc_817C
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.s	loc_817E
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 loc_817C:
 	rts
 loc_817E:
@@ -12930,9 +12949,9 @@ loc_8226:
 	rts
 
 loc_8240:
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.s	loc_824C
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	rts
 
 loc_824C:
@@ -13409,7 +13428,7 @@ GameOverScreen:
 	move.w	#4, (Text_max_line_num).w
 	move.w	#$1218, (Script_ID).w		; "ROLF and the others failed to restore peace to the planet Algo."
 	move.w	#CharID_Rolf, (Character_index).w
-	move.w	#$708, (Demo_timer).w
+	move.w	#$708, (General_timer).w
 	move.w	(VDP_reg1_values).w, d0
 	ori.b	#$40, d0
 	move.w	d0, (VDP_control_port).l
@@ -13422,7 +13441,7 @@ GameOverScreenLoop:
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	bsr.w	UpdateWindows
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	beq.s	loc_88B2
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask, d0
@@ -15228,7 +15247,7 @@ ProcessPlayerMenu:
 	bne.s	+	; rts
 	move.w	(Event_routine).w, d1
 	bne.s	loc_9A20
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	+	; rts
 	tst.b	(Map_event_load).w
 	bne.s	+	; rts
@@ -15482,9 +15501,9 @@ ItemAction_Dynamite:
 	bset	#0, (a1)
 	bne.s	.nouse
 	move.w	#1, (Script_ID).w		; "'Character' uses 'Item'...."
-	move.w	#1, (Demo_flag).w
-	move.w	#4, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#4, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	bra.w	RemoveItemFromInventory
 
 .nouse:
@@ -15504,9 +15523,9 @@ ItemAction_KeyTube:
 	bset	#0, (a1)
 	bne.s	.nouse
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
-	move.w	#1, (Demo_flag).w
-	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#5, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	bra.w	RemoveItemFromInventory
 
 .nouse:
@@ -15573,9 +15592,9 @@ ItemAction_Cards:
 	bset	#0, (a1)
 	bne.s	loc_9D70
 	move.w	#$18, (Script_ID).w		; "'Character' puts 'Item' inside."
-	move.w	#1, (Demo_flag).w
-	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#5, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 loc_9D6A:
 	addq.w	#1, (Event_routine_2).w
 	rts
@@ -16766,9 +16785,9 @@ TechEffect_Musik:
 	bne.s	-
 	bset	#0, (a1)
 	bne.s	+
-	move.w	#1, (Demo_flag).w
-	move.w	#5, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#5, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 +
 	rts
 loc_AA3E:
@@ -17339,9 +17358,9 @@ loc_AFC2:
 	rts
 ; ------------------------------------------
 loc_AFE6:
-	move.w	#0, (Demo_flag).w
-	move.w	#0, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#0, (Cutscene_flag).w
+	move.w	#0, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	move.w	#1, (Party_members_num).w
 	move.w	#1, (Party_members_joined).w
 	move.l	#CharID_Nei, (Party_member_ID).w
@@ -17951,8 +17970,8 @@ CloneLabEventIndex:
 loc_B6AE:
 	move.l	#((WinID_StoreMeseta<<$10)|WinID_ScriptMessage2), (Window_index).w
 	move.w	#$401, (Script_ID).w
-	tst.w	(Demo_flag).w
-	beq.s	loc_B6F4					; branch if not in demo mode (does not branch after Neifirst battle, when Nei is supposed to die)
+	tst.w	(Cutscene_flag).w
+	beq.s	loc_B6F4					; branch if cutscene is not going on (does not branch after Neifirst battle, when Nei is supposed to die)
 	move.w	#$408, (Script_ID).w		; if we get here, it means that Nei is dead and the dialogue about nei not being able to be revived and removing her from party takes place here
 	lea	(Party_member_ID).w, a0
 	move.w	(Party_members_num).w, d0
@@ -17974,7 +17993,7 @@ loc_B6F4:
 	rts
 ; ------------------------------------------
 loc_B6FA:
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_B70C
 	move.w	#WinID_StoreCharList, (Window_index).w
 	addq.w	#1, (Event_routine).w
@@ -18004,7 +18023,7 @@ loc_B74A:
 	rts
 ; ------------------------------------------
 loc_B750:
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_B78A
 	move.w	(Character_index).w, d1
 	lea	(Character_stats+curr_hp).w, a2
@@ -18026,8 +18045,8 @@ loc_B750:
 loc_B78A:
 	move.w	#SceneID_CentralTowerOutside, (Scene_index).w
 	move.w	#$15, (Portrait_index).w
-	move.w	#7, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#7, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	bra.w	CloseAllWindows
 ; ------------------------------------------
 loc_B7A6:
@@ -19291,7 +19310,7 @@ loc_C5EA:
 	bsr.w	PaletteLoad1
 	moveq	#$3C, d0
 	bsr.w	PaletteLoad1
-	move.w	#$78, (Demo_timer).w		; timer for spaceship travel
+	move.w	#$78, (General_timer).w		; timer for spaceship travel
 	move.w	(VDP_reg1_values).w, d0		; VDP reg #1 values
 	ori.b	#$40, d0					; enable display
 	move.w	d0, (VDP_control_port).l
@@ -19305,7 +19324,7 @@ SpaceShipLoop:
 	bsr.w	WaitForVInt
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	bne.s	SpaceShipLoop
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	move.b	#SFXID_SpaceshipLanded, (Sound_queue).w
@@ -19672,9 +19691,9 @@ loc_C9F4:
 loc_CA00:
 	move.w	#SceneID_RolfHouseStart, (Scene_index).w
 	move.w	#$37, (Portrait_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#1, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#1, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	bra.w	CloseAllWindows
 loc_CA22:
 	move.w	#SceneID_Library, (Scene_index).w
@@ -19694,7 +19713,7 @@ loc_CA58:
 	move.b	#1, ($FFFFC736).w
 	move.b	#1, ($FFFFC712).w
 loc_CA64:
-	move.w	#0, (Demo_flag).w
+	move.w	#0, (Cutscene_flag).w
 	bra.w	CloseAllWindows
 
 ; ==============================================
@@ -19861,7 +19880,7 @@ loc_CBE8:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	move.w	#$1901, (Script_ID).w
 	addq.w	#1, (Event_routine).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	rts
 loc_CC00:
 	bsr.s	loc_CC3E
@@ -19874,7 +19893,7 @@ loc_CC10:
 	bsr.w	PaletteFadeFrom
 	move.b	#$E0, (Sound_queue).w
 	addq.w	#1, (Event_routine).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	rts
 loc_CC26:
 	bsr.s	loc_CC3E
@@ -19885,9 +19904,9 @@ loc_CC26:
 loc_CC3C:
 	rts
 loc_CC3E:
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.s	loc_CC48
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 loc_CC48:
 	rts
 
@@ -19928,7 +19947,7 @@ loc_CC8E:
 	move.w	#$F9, d7
 	bsr.w	loc_6BBE
 	addq.w	#1, (Event_routine).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	rts
 loc_CCCC:
 	bsr.w	loc_CC3E
@@ -19953,7 +19972,7 @@ loc_CCE6:
 	bsr.w	loc_6BBE
 	move.w	#$1903, (Script_ID).w
 	addq.w	#1, (Event_routine).w
-	move.w	#$12C, (Demo_timer).w
+	move.w	#$12C, (General_timer).w
 	rts
 loc_CD2A:
 	bsr.w	loc_CC3E
@@ -19963,7 +19982,7 @@ loc_CD2A:
 	bsr.w	loc_6C54
 	move.w	#$1904, (Script_ID).w
 	addq.w	#1, (Event_routine).w
-	move.w	#$B4, (Demo_timer).w
+	move.w	#$B4, (General_timer).w
 loc_CD4E:
 	rts
 loc_CD50:
@@ -20112,9 +20131,9 @@ loc_CE6E:
 	move.w	#0, (Jet_Scooter_flag).w
 	move.w	#SceneID_CentralTowerGovernor, (Scene_index).w
 	move.w	#$17, (Portrait_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#8, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#8, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	rts
 
 Scene_EsperMansion:
@@ -20783,9 +20802,9 @@ loc_D59C:
 loc_D5EA:
 	move.w	#SceneID_CentralTowerGovernor, (Scene_index).w
 	move.w	#$17, (Portrait_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#0, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#0, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	move.w	#-1, (Screen_changed_flag).w
 	rts
 ; ------------------------------------------
@@ -20979,7 +20998,7 @@ Map_CheckInteractions:
 	bne.w	loc_D862
 	tst.w	(Opening_ending_flag).w
 	bne.s	loc_D7FA
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_D7FA
 	tst.b	(Map_event_load).w
 	bne.s	loc_D7FA
@@ -21646,9 +21665,9 @@ loc_DEE2:
 	move.w	#0, (Jet_Scooter_flag).w
 	move.w	#SceneID_CloneLabs, (Scene_index).w
 	move.w	#$B, (Portrait_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#6, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#6, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	rts
 Event_UzoEntrance:
 	move.w	#$171F, (Script_ID).w
@@ -21662,7 +21681,7 @@ loc_DF38:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	move.w	#$1839, (Script_ID).w
 	addq.w	#1, ($FFFFDE72).w
-	move.w	#$708, (Demo_timer).w
+	move.w	#$708, (General_timer).w
 	move.w	#6, (Map_event_load).w
 	lea	(Character_stats).w, a0
 	lea	($FFFFDA00).w, a1
@@ -21702,14 +21721,14 @@ loc_DFAE:
 	subq.w	#1, d2
 	bne.s	loc_DFC4
 	move.b	#SFXID_Explosion, (Sound_queue).w
-	move.w	#$78, (Demo_timer).w
+	move.w	#$78, (General_timer).w
 	addq.w	#1, ($FFFFDE70).w
 	rts
 
 loc_DFC4:
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	beq.s	loc_DFD0
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	rts
 
 loc_DFD0:
@@ -21932,12 +21951,12 @@ loc_E236:
 loc_E248:
 	subq.w	#1, d2
 	bne.s	loc_E26C
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_E26A
 	move.w	#$8001, (Window_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#9, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#9, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 loc_E26A:
 	rts
 loc_E26C:
@@ -21950,8 +21969,8 @@ loc_E26C:
 	rts
 loc_E288:
 	bsr.w	CloseAllWindows
-	move.w	#1, (Demo_flag).w
-	addq.w	#1, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	addq.w	#1, (Cutscene_input_frame).w
 	move.w	#$39, (Interaction_type).w
 	rts
 Event_Earthmen:
@@ -21970,9 +21989,9 @@ Event_Earthmen:
 	rts
 loc_E2C4:
 	bsr.w	CloseAllWindows
-	move.w	#1, (Demo_flag).w
-	move.w	#$A, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#$A, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 	move.w	#$3A, (Interaction_type).w
 	rts
 Event_EarthmenSpeech:
@@ -22122,11 +22141,11 @@ loc_E48C:
 	bne.w	loc_E4A8
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	move.w	d1, (Script_ID).w
-	move.w	#$10E, (Demo_timer).w
+	move.w	#$10E, (General_timer).w
 	addq.w	#1, ($FFFFDE70).w
 	rts
 loc_E4A8:
-	subq.w	#1, (Demo_timer).w
+	subq.w	#1, (General_timer).w
 	bne.s	loc_E4B2
 	addq.w	#1, ($FFFFDE72).w
 loc_E4B2:
@@ -22150,7 +22169,7 @@ Event_OpeningText5:
 Event_OpeningText6:
 	move.w	#$1406, d1
 	bsr.s	loc_E48C
-	tst.w	(Demo_timer).w
+	tst.w	(General_timer).w
 	bne.s	loc_E4F6
 	move.b	#GameModeID_Sega, (Game_mode_index).w
 loc_E4F6:
@@ -22898,12 +22917,12 @@ loc_EA74:
 loc_EA76:
 	subq.w	#1, d2
 	bne.s	loc_EA9A
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_EA98
 	move.w	#$8001, (Window_index).w
-	move.w	#1, (Demo_flag).w
-	move.w	#3, (Demo_index).w
-	move.w	#0, (Demo_input_frame).w
+	move.w	#1, (Cutscene_flag).w
+	move.w	#3, (Cutscene_index).w
+	move.w	#0, (Cutscene_input_frame).w
 loc_EA98:
 	rts
 loc_EA9A:
@@ -22915,7 +22934,7 @@ loc_EA9A:
 	rts
 loc_EAB0:
 	move.b	#1, ($FFFFC715).w
-	move.w	#0, (Demo_flag).w
+	move.w	#0, (Cutscene_flag).w
 	addq.w	#1, ($FFFFDE72).w
 	rts
 ; ----------------------------------------
@@ -27798,7 +27817,7 @@ ProcessRandomBattle:
 	bne.s	loc_116FE
 	tst.w	(Encounter_step_flag).w
 	beq.s	loc_116FE
-	tst.w	(Demo_flag).w
+	tst.w	(Cutscene_flag).w
 	bne.s	loc_116FE
 	tst.w	(Map_index).w
 	bne.s	loc_116E6

@@ -1334,7 +1334,7 @@ VDP_reg1_values =  ramaddr($FFFFF610)
 
 Sprite_count =  ramaddr($FFFFF618)		; number of sprite counter. Starts from 80 and when it reaches 0, you cannot create more sprites
 
-Demo_timer =  ramaddr($FFFFF61A)			; general timer for events
+General_timer =  ramaddr($FFFFF61A)
 
 V_int_routine =  ramaddr($FFFFF62A)
 
@@ -1362,10 +1362,10 @@ Collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determi
 Screen_changed_flag =  ramaddr($FFFFF734)
 Map_transition_addr =  ramaddr($FFFFF736)
 Character_pos_table_index = ramaddr($FFFFF740)
-Demo_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = not in demo; 1 = in demo
-Demo_index =  ramaddr($FFFFF752)			; determines what demo should be run
-Demo_input_frame =  ramaddr($FFFFF754)		; determines what joypad command should be run
-Joypad_demo =  ramaddr($FFFFF756)
+Cutscene_flag =  ramaddr($FFFFF750)			; flag: determines if there are events and CPU input should be handled; 0 = cutscene off; 1 = cutscene ongoing
+Cutscene_index =  ramaddr($FFFFF752)			; determines what cutscene should be run
+Cutscene_input_frame =  ramaddr($FFFFF754)		; determines joypad button to press for cutscenes
+Cutscene_joypad =  ramaddr($FFFFF756)
 
 Scene_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)
