@@ -69,3 +69,6 @@ To compress a file do, run the compressor.py script. Make sure the source file l
 
 Normally graphics are compressed in this game, so if you want to edit those, you will need these tools. Graphics data are found in the various 'art' folder
 of this project. At this time not all data were split into their own files, so those not found there will need to be extracted from the main disassembly.
+
+The game also supports Nemesis compression and it's used exclusively for map graphics. Since there are already tools available online to compress/decompress Nemesis data,
+they won't be provided in this project.
