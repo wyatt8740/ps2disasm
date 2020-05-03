@@ -14434,7 +14434,7 @@ loc_9120:
 	moveq	#1, d0
 loc_914A:
 	move.w	d0, ($FFFFF73C).w
-	lea	(MapSpriteSheetOffs).l, a1
+	lea	(MapSpriteOffs).l, a1
 	movea.l	a1, a2
 	lsl.w	#1, d2
 	adda.w	d2, a2
@@ -44954,26 +44954,26 @@ Map_NoahF1:
 
 
 ; =================================================================
-MapSpriteSheetOffs:
-	dc.w	SpriteSheet_0-MapSpriteSheetOffs	; 0
-	dc.w	SpriteSheet_1-MapSpriteSheetOffs	; 1
-	dc.w	SpriteSheet_2-MapSpriteSheetOffs	; 2
-	dc.w	SpriteSheet_3-MapSpriteSheetOffs	; 3
-	dc.w	SpriteSheet_4-MapSpriteSheetOffs	; 4
-	dc.w	SpriteSheet_5-MapSpriteSheetOffs	; 5
-	dc.w	SpriteSheet_6-MapSpriteSheetOffs	; 6
-	dc.w	SpriteSheet_7-MapSpriteSheetOffs	; 7
-	dc.w	SpriteSheet_8-MapSpriteSheetOffs	; 8
-	dc.w	SpriteSheet_9-MapSpriteSheetOffs	; 9
-	dc.w	SpriteSheet_A-MapSpriteSheetOffs	; $A
-	dc.w	SpriteSheet_B-MapSpriteSheetOffs	; $B
-	dc.w	SpriteSheet_C-MapSpriteSheetOffs	; $C
-	dc.w	SpriteSheet_D-MapSpriteSheetOffs	; $D
+MapSpriteOffs:
+	dc.w	MapSprite_0-MapSpriteOffs	; 0
+	dc.w	MapSprite_1-MapSpriteOffs	; 1
+	dc.w	MapSprite_2-MapSpriteOffs	; 2
+	dc.w	MapSprite_3-MapSpriteOffs	; 3
+	dc.w	MapSprite_4-MapSpriteOffs	; 4
+	dc.w	MapSprite_5-MapSpriteOffs	; 5
+	dc.w	MapSprite_6-MapSpriteOffs	; 6
+	dc.w	MapSprite_7-MapSpriteOffs	; 7
+	dc.w	MapSprite_8-MapSpriteOffs	; 8
+	dc.w	MapSprite_9-MapSpriteOffs	; 9
+	dc.w	MapSprite_A-MapSpriteOffs	; $A
+	dc.w	MapSprite_B-MapSpriteOffs	; $B
+	dc.w	MapSprite_C-MapSpriteOffs	; $C
+	dc.w	MapSprite_D-MapSpriteOffs	; $D
 ; =================================================================
 
 
 ; =================================================================
-SpriteSheet_0:
+MapSprite_0:
 	dc.w	3
 
 	dc.l	Art_MotaMan
@@ -44991,7 +44991,7 @@ SpriteSheet_0:
 
 
 ; =================================================================
-SpriteSheet_1:
+MapSprite_1:
 	dc.w	4
 
 	dc.l	Art_Motavian
@@ -45012,7 +45012,7 @@ SpriteSheet_1:
 
 
 ; =================================================================
-SpriteSheet_2:
+MapSprite_2:
 	dc.w	0
 
 	dc.l	Art_Dezolian
@@ -45021,7 +45021,7 @@ SpriteSheet_2:
 
 
 ; =================================================================
-SpriteSheet_3:
+MapSprite_3:
 	dc.w	1
 
 	dc.l	Art_MuskCat
@@ -45033,7 +45033,7 @@ SpriteSheet_3:
 
 
 ; =================================================================
-SpriteSheet_4:
+MapSprite_4:
 	dc.w	2
 
 	dc.l	Art_Explosion
@@ -45048,7 +45048,7 @@ SpriteSheet_4:
 
 
 ; =================================================================
-SpriteSheet_5:
+MapSprite_5:
 	dc.w	3
 	dc.l	Art_MapLutz
 	dc.w	$8000
@@ -45065,7 +45065,7 @@ SpriteSheet_5:
 
 
 ; =================================================================
-SpriteSheet_6:
+MapSprite_6:
 	dc.w	4
 
 	dc.l	Art_Explosion
@@ -45086,7 +45086,7 @@ SpriteSheet_6:
 
 
 ; =================================================================
-SpriteSheet_7:
+MapSprite_7:
 	dc.w	4
 
 	dc.l	Art_Corpse
@@ -45107,7 +45107,7 @@ SpriteSheet_7:
 
 
 ; =================================================================
-SpriteSheet_8:
+MapSprite_8:
 	dc.w	3
 
 	dc.l	Art_Explosion
@@ -45125,7 +45125,7 @@ SpriteSheet_8:
 
 
 ; =================================================================
-SpriteSheet_9:
+MapSprite_9:
 	dc.w	2
 
 	dc.l	Art_Motavian
@@ -45139,7 +45139,7 @@ SpriteSheet_9:
 ; =================================================================
 
 ; =================================================================
-SpriteSheet_A:
+MapSprite_A:
 	dc.w	1
 
 	dc.l	Art_JetScooter
@@ -45151,7 +45151,7 @@ SpriteSheet_A:
 
 
 ; =================================================================
-SpriteSheet_B:
+MapSprite_B:
 	dc.w	2
 
 	dc.l	Art_MapLutz
@@ -45166,7 +45166,7 @@ SpriteSheet_B:
 
 
 ; =================================================================
-SpriteSheet_C:
+MapSprite_C:
 	dc.w	2
 
 	dc.l	Art_MotherBrain
@@ -45181,7 +45181,7 @@ SpriteSheet_C:
 
 
 ; =================================================================
-SpriteSheet_D:
+MapSprite_D:
 	dc.w	3
 
 	dc.l	Art_PlasmaRing
