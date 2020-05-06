@@ -10924,11 +10924,11 @@ WaitForVInt:
 	rts
 
 
-; ---------------------------------------------------------------------------
+; -----------------------------------------------------------------
 ; Subroutine to generate a pseudo-random number
 ; d0 = (RNG & $FFFF0000) | ((RNG*41 & $FFFF) + ((RNG*41 & $FFFF0000) >> 16))
 ; RNG = ((RNG*41 + ((RNG*41 & $FFFF) << 16)) & $FFFF0000) | (RNG*41 & $FFFF)
-; ---------------------------------------------------------------------------
+; -----------------------------------------------------------------
 
 UpdateRNGSeed:
 	move.l	(RNG_seed).w, d1
@@ -10954,44 +10954,46 @@ UpdateRNGSeed:
 
 	move.l	d1, (RNG_seed).w
 	rts
-; ---------------------------------------------------------------------------
+; -----------------------------------------------------------------
 
-loc_6BBE:
+
+; -----------------------------------------------------------------
+ArtGradualFill:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	lea	(FadeEffectArray).l, a1
+	lea	(GradualFillPixelTable).l, a1
 	moveq	#$3F, d5
-loc_6BD2:
+-
 	moveq	#3, d4
-loc_6BD4:
+-
 	move.b	#$24, (V_int_routine).w
 	bsr.w	WaitForVInt
-	dbf	d4, loc_6BD4
+	dbf	d4, -
 
-	bsr.s	FadeArtTiles
+	bsr.s	ProcessGradualFill
 	addq.w	#1, a1
-	dbf	d5, loc_6BD2
+	dbf	d5, --
 
 	rts
+; -----------------------------------------------------------------
 
-; ---------------------------------------------------------------------------
-; d0 = address in VRAM
-; d7 = cells that this function should cover
-; a1 = address of array of tiles to fill for fading
+
+; -----------------------------------------------------------------
+; d0 = VDP command
+; d7 = number of VDP patterns
+; a1 = GradualFillPixelTable address
 ; a2 = VDP control port
 ; a3 = VDP data port
-; ---------------------------------------------------------------------------
-
-
-FadeArtTiles:
-	lea	(RAM_start&$FFFFFF).l, a0	; load address where tiles for fading are written
-	move.l	d0, d4
+; -----------------------------------------------------------------
+ProcessGradualFill:
+	lea	(RAM_start&$FFFFFF).l, a0	; graphics address
+	move.l	d0, d4					; d4 = store VRAM address
 	swap	d4
 
 	move.w	d7, d6
 -
 	move	#$2700,sr
-	bsr.s	FadeArtFill
+	bsr.s	+
 	move	#$2500,sr
 	addi.w	#$20, d4
 	adda.w	#$20, a0
@@ -11000,51 +11002,57 @@ FadeArtTiles:
 	rts
 
 
-FadeArtFill:
++
 	moveq	#0, d1
-	move.l	#$F0F000, d2
+	move.l	#$F0F000, d2	; pixel mask (1st and 2nd pixel)
 	move.b	(a1), d1
 	lsr.w	#1, d1
 	bcc.s	+
-	move.l	#$F0F00, d2
+	move.l	#$F0F00, d2		; pixel mask (3rd and 4th pixel)
 +
 	bclr	#0, d1
 	beq.s	+
 	swap	d2
 +
-	movea.l	a0, a4	; load RAM address
-	adda.w	d1, a4	; add offset
-	move.l	d4, d3	; move swapped value
-	add.w	d1, d3
-	move.w	(a4), d1	; get tile from RAM
-	and.w	d2, d1	; get upper byte
-	andi.w	#$3FFF, d3
-	swap	d3
-	move.l	d3, (a2)	; write value to control port
-	swap	d3
-	move.w	(a3), d2	; read from data port
-	ori.w	#$4000, d3
+	movea.l	a0, a4	; graphics
+	adda.w	d1, a4	; get VDP pattern word in RAM
+	move.l	d4, d3	; get VRAM address
+	add.w	d1, d3	; get VDP pattern word in VRAM
+	move.w	(a4), d1	; get word from RAM
+	and.w	d2, d1	; get pixel
+	andi.w	#$3FFF, d3	; read command
 	swap	d3
 	move.l	d3, (a2)
 	swap	d3
-	or.w	d1, d2	; or value with what was in data port
-	move.w	d2, (a3)	; write new value
+	move.w	(a3), d2	; read word from data port
+	ori.w	#$4000, d3	; write command
+	swap	d3
+	move.l	d3, (a2)
+	swap	d3
+	or.w	d1, d2	; add pixel value
+	move.w	d2, (a3)	; and update value in VRAM
 	rts
+; -----------------------------------------------------------------
 
-loc_6C54:
+
+; -----------------------------------------------------------------
+; d0 = VDP command
+; d7 = number of VDP patterns
+; -----------------------------------------------------------------
+ArtGradualClear:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	lea	(FadeEffectArray).l, a1
+	lea	(GradualFillPixelTable).l, a1
 	moveq	#$1F, d5
-loc_6C68:
+-
 	move.b	#$24, (V_int_routine).w
 	bsr.w	WaitForVInt
 	move.l	d0, d4
 	swap	d4
 	move.w	d7, d6
-loc_6C78:
+-
 	move	#$2700, sr
-	bsr.s	loc_6CA4
+	bsr.s	ProcessGradualClear
 	move	#$2500, sr
 	andi.w	#$3FFF, d4
 	addi.w	#$20, d4
@@ -11054,37 +11062,50 @@ loc_6C78:
 	swap	d4
 	add.w	d3, d4
 	swap	d4
-	dbf	d6, loc_6C78
+	dbf	d6, -
 	addq.w	#1, a1
-	dbf	d5, loc_6C68
+	dbf	d5, --
 	rts
-loc_6CA4:
+
+ProcessGradualClear:
 	moveq	#0, d1
-	move.l	#$FF0000FF, d2
+	move.l	#$FF0000FF, d2	; mask
 	move.b	(a1), d1
 	lsr.w	#1, d1
 	bclr	#0, d1
-	beq.s	loc_6CB8
+	beq.s	+
 	swap	d2
-loc_6CB8:
++
 	move.l	d4, d3
-	add.w	d1, d3
-	andi.w	#$3FFF, d3
+	add.w	d1, d3		; get VRAM offset
+	andi.w	#$3FFF, d3	; read command
 	swap	d3
 	move.l	d3, (a2)
 	swap	d3
-	move.w	(a3), d1
-	ori.w	#$4000, d3
+	move.w	(a3), d1	; read word
+	ori.w	#$4000, d3	; write command
 	swap	d3
 	move.l	d3, (a2)
 	swap	d3
-	and.w	d2, d1
-	move.w	d1, (a3)
+	and.w	d2, d1		; mask pixels
+	move.w	d1, (a3)	; update value in VRAM
 	rts
+; -----------------------------------------------------------------
+
 
 ; =================================================================
-; Array of values that will be used in VRAM for fade effects
-FadeEffectArray:
+; Table used for gradually filling VDP patterns (e.g. dream portrait)
+;
+; For each VDP pattern processed, the values hold the offset to a word (4 pixels)
+; and bits 0 and 1 determine which pixel of that word to process
+;
+; offset = byte / 2
+; bits 0-1 = 00 = 1st pixel
+;			 01 = 2nd pixel
+;			 10 = 3rd pixel
+;			 11 = 4th pixel
+; =================================================================
+GradualFillPixelTable:
 	dc.b	$00, $24, $04, $20, $12, $36, $16, $32
 	dc.b	$02, $26, $06, $22, $10, $34, $14, $30
 	dc.b	$09, $2D, $0D, $29, $1B, $3F, $1F, $3B
@@ -11783,7 +11804,7 @@ GameMode_Title:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 
-	lea	(FadeEffectArray).l, a1
+	lea	(GradualFillPixelTable).l, a1
 	moveq	#$3F, d5
 -
 	moveq	#3, d4
@@ -11797,7 +11818,7 @@ GameMode_Title:
 
 	move.l	#$5C200000, d0
 	move.w	#$11E, d7
-	bsr.w	FadeArtTiles
+	bsr.w	ProcessGradualFill
 	addq.w	#1, a1
 	dbf	d5, --
 
@@ -11807,7 +11828,7 @@ GameMode_Title:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 
-	lea	(FadeEffectArray).l, a1
+	lea	(GradualFillPixelTable).l, a1
 	moveq	#$3F, d5
 -
 	moveq	#3, d4
@@ -11821,7 +11842,7 @@ GameMode_Title:
 
 	move.l	#$40000001, d0
 	move.w	#$FF, d7
-	bsr.w	FadeArtTiles
+	bsr.w	ProcessGradualFill
 	addq.w	#1, a1
 	dbf	d5, --
 
@@ -11870,7 +11891,7 @@ GameMode_Ending:
 	lea	(RAM_start&$FFFFFF).l, a4
 	lea	(Art_Font).l, a0
 	bsr.w	DecompressToRAM
-	bsr.w	DrawArtTiles2
+	bsr.w	ClearFontBackground
 
 	lea	(VDP_control_port).l, a6
 	move.w	#$9300, (a6)
@@ -13333,7 +13354,7 @@ loc_86A2:
 	bsr.w	loc_62CC
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	lea	(FadeEffectArray).l, a1
+	lea	(GradualFillPixelTable).l, a1
 	moveq	#$3F, d5
 loc_86DA:
 	bsr.w	CheckGamePause
@@ -13351,7 +13372,7 @@ loc_86F6:
 	movem.l	(sp)+, d5/a1-a3
 	move.l	#$40000000, d0
 	move.w	#$1FF, d7
-	bsr.w	FadeArtTiles
+	bsr.w	ProcessGradualFill
 	addq.w	#1, a1
 	dbf	d5, loc_86DA
 	cmpi.w	#$103, (Enemy_formation).w
@@ -13400,7 +13421,7 @@ GameOver:
 	move.b	#MusicID_Over, (Sound_queue).w		; Game over music
 	move.l	#$40000000, d0
 	move.w	#$5BF, d7
-	bsr.w	loc_6C54
+	bsr.w	ArtGradualClear
 	bsr.w	PaletteFadeFrom
 	move	#$2700, sr
 	move.w	(VDP_reg1_values).w, d0
@@ -13411,7 +13432,7 @@ GameOver:
 	lea	(RAM_start&$FFFFFF).l, a4
 	lea	(Art_Font).l, a0
 	bsr.w	DecompressToRAM
-	bsr.w	DrawArtTiles2
+	bsr.w	ClearFontBackground
 	lea	(VDP_control_port).l, a6
 	move.w	#$9300, (a6)
 	move.w	#$940C, (a6)
@@ -13461,27 +13482,33 @@ GameOverScreenLoop:
 loc_88B2:
 	rts
 
-DrawArtTiles2:
+	
+; -----------------------------------------------------------------
+; Remove the background color used for the font
+; -----------------------------------------------------------------
+ClearFontBackground:
 	lea	(RAM_start&$FFFFFF).l, a0
 	move.w	#$1800, d1
-loc_88BE:
+-
 	move.b	(a0), d0
 	andi.b	#$F0, d0
 	cmpi.b	#$B0, d0
-	bne.s	loc_88CE
+	bne.s	+
 	andi.b	#$F, (a0)
-loc_88CE:
++
 	move.b	(a0), d0
 	andi.b	#$F, d0
 	cmpi.b	#$B, d0
-	bne.s	loc_88DE
+	bne.s	+
 	andi.b	#$F0, (a0)
-loc_88DE:
++
 	addq.w	#1, a0
-	dbf	d1, loc_88BE
-
+	dbf	d1, -
 	rts
-; ------------------------------------------------------------
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
 GameMode_Intro:
 	bsr.w	PaletteFadeFrom
 	move	#$2700, sr
@@ -19957,7 +19984,7 @@ loc_CC8E:
 	bsr.w	DecompressToRAM
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
-	bsr.w	loc_6BBE
+	bsr.w	ArtGradualFill
 	addq.w	#1, (Event_routine).w
 	move.w	#$12C, (General_timer).w
 	rts
@@ -19966,7 +19993,7 @@ loc_CCCC:
 	bne.s	loc_CCE4
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
-	bsr.w	loc_6C54
+	bsr.w	ArtGradualClear
 	addq.w	#1, (Event_routine).w
 loc_CCE4:
 	rts
@@ -19981,7 +20008,7 @@ loc_CCE6:
 	bsr.w	DecompressToRAM
 	move.l	#$40200000, d0
 	move.w	#$95, d7
-	bsr.w	loc_6BBE
+	bsr.w	ArtGradualFill
 	move.w	#$1903, (Script_ID).w
 	addq.w	#1, (Event_routine).w
 	move.w	#$12C, (General_timer).w
@@ -19991,7 +20018,7 @@ loc_CD2A:
 	bne.s	loc_CD4E
 	move.l	#$40200000, d0
 	move.w	#$95, d7
-	bsr.w	loc_6C54
+	bsr.w	ArtGradualClear
 	move.w	#$1904, (Script_ID).w
 	addq.w	#1, (Event_routine).w
 	move.w	#$B4, (General_timer).w
@@ -20030,7 +20057,7 @@ loc_CD8A:
 	bsr.w	DecompressToRAM
 	move.l	#$40200000, d0
 	move.w	#$B3, d7
-	bsr.w	loc_6BBE
+	bsr.w	ArtGradualFill
 	move.w	#$1905, (Script_ID).w
 	addq.w	#1, (Event_routine).w
 	move.w	#0, ($FFFFF764).w
@@ -20776,14 +20803,14 @@ loc_D534:
 	bsr.w	DecompressToRAM
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
-	bsr.w	loc_6BBE
+	bsr.w	ArtGradualFill
 	move.w	#$1502, (Script_ID).w
 	addq.w	#1, (Event_routine).w
 	rts
 loc_D572:
 	move.l	#$40200000, d0
 	move.w	#$F9, d7
-	bsr.w	loc_6C54
+	bsr.w	ArtGradualClear
 	lea	($FFFFFB60).w, a0
 	moveq	#0, d0
 	move.w	#$F, d1
