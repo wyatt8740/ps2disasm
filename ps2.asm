@@ -27,13 +27,11 @@ bugfixes = 0			; if 1, include bug fixes
 walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
+revision = 2			; 1 = first US release; 2 = second US release
 
 	cpu 68000
 	include "ps2.macrosetup.asm"
-
-
 	include "ps2.constants.asm"
-	include "ps2.macros.asm"
 
 
 StartOfRom:
@@ -61,10 +59,18 @@ VectorTable:
 
 Header:
 	dc.b	"SEGA MEGA DRIVE " ; Console name
+	if revision=1
+	dc.b 	"(C)SEGA 1989.JUN" ; Copyright/Date
+	else
 	dc.b 	"(C)SEGA 1990.JAN" ; Copyright/Date
+	endif
 	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
 	dc.b 	"PHANTASY STAR 2                                 " ; International name
+	if revision=1
+	dc.b 	"GM 00005501-01"   ; Version
+	else
 	dc.b 	"GM 00005501-02"   ; Version
+	endif
 
 Checksum:
 	dc.w	$3792		; Checksum
@@ -13706,23 +13712,17 @@ SetCharInitialStats:
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	' ', 0
 
-	outradix 10
-
-; CharNameLength = 4
-length	:=	CharNameLength
-
 CharNames:
-	nametxt	"ROLF"
-	nametxt	"NEI"
-	nametxt	"RUDO"
-	nametxt	"AMY"
-	nametxt	"HUGH"
-	nametxt	"ANNA"
-	nametxt	"KAIN"
-	nametxt	"SHIR"
+	dc.b	"ROLF"
+	dc.b	"NEI", $C4
+	dc.b	"RUDO"
+	dc.b	"AMY", $C4
+	dc.b	"HUGH"
+	dc.b	"ANNA"
+	dc.b	"KAIN"
+	dc.b	"SHIR"
 CharNamesEnd:
 
-	outradix 16
 	charset
 ; ======================================================
 
@@ -27156,13 +27156,13 @@ loc_11412:
 	even
 
 loc_1141A:
-	border 8, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 
 	even
 
 loc_11422:
 	dc.b	$B9
-	cursorbox "NEXT"
+	dc.b	$B4, $B5, "NEXT"
 	dc.b	$B9
 
 	even
@@ -27187,12 +27187,12 @@ loc_1143E:
 	even
 
 loc_1144A:
-	border 6, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 
 	even
 
 loc_11450:
-	cursorbox "NEXT"
+	dc.b	$B4, $B5, "NEXT"
 
 	even
 
@@ -29010,700 +29010,696 @@ InventoryData:
 	charset	'-', $46
 	charset	':', $77
 
-	outradix 10
-
-; ItemNameLength = 10
-length	:=	ItemNameLength
 
 Item_None:
-	nametxt	""
+	dc.b	$C4, "         "
 	dc.w	0
 	dc.b	$00, $00, $00, $00
 
 Item_SmallKey:
-	nametxt	"SMALL KEY"
+	dc.b	"SMALL KEY", $C4
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_Dynamite:
-	nametxt	"DYNAMITE"
+	dc.b	"DYNAMITE", $C4, " "
 	dc.w	0
 	dc.b	$48, $00, $00, $00
 
 Item_KeyTube:
-	nametxt	"KEY TUBE"
+	dc.b	"KEY TUBE", $C4, " "
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_MruraGum:
-	nametxt	"MARUERAGUM"
+	dc.b	 "MARUERAGUM"
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_GreenCard:
-	nametxt	"GREEN CARD"
+	dc.b	"GREEN CARD"
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_BlueCard:
-	nametxt	"BLUE CARD"
+	dc.b	"BLUE CARD", $C4
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_YellowCard:
-	nametxt	"YELLOWCARD"
+	dc.b	"YELLOWCARD"
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_RedCard:
-	nametxt	"RED CARD"
+	dc.b	"RED CARD", $C4, " "
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_Letter:
-	nametxt	"LETTER"
+	dc.b	"LETTER", $C4, "   "
 	dc.w	0
 	dc.b	$08, $00, $00, $00
 
 Item_Recorder:
-	nametxt	"RECORDER"
+	dc.b	"RECORDER", $C4, " "
 	dc.w	0
 	dc.b	$08, $00, $00, $00
 
 Item_MruraLeaf:
-	nametxt	"MRURA LEAF"
+	dc.b	"MRURA LEAF"
 	dc.w	0
 	dc.b	$28, $00, $00, $00
 
 Item_PlsmRing:
-	nametxt	"PLASMARING"
+	dc.b	"PLASMARING"
 	dc.w	0
 	dc.b	$08, $00, $00, $00
 
 Item_Prism:
-	nametxt	"PRISM"
+	dc.b	"PRISM", $C4, "    "
 	dc.w	0
 	dc.b	$08, $00, $00, $00
 
 Item_Telepipe:
-	nametxt	"TELEPIPE"
+	dc.b	"TELEPIPE", $C4, " "
 	dc.w	$82
 	dc.b	$E8, $00, $00, $00
 
 Item_Escapipe:
-	nametxt	"ESCAPIPE"
+	dc.b	"ESCAPIPE", $C4, " "
 	dc.w	$46
 	dc.b	$E8, $00, $00, $00
 
 Item_Hidapipe:
-	nametxt	"HIDAPIPE"
+	dc.b	"HIDAPIPE", $C4, " "
 	dc.w	$118
 	dc.b	$E8, $00, $00, $00
 
 Item_Monomate:
-	nametxt	"MONOMATE"
+	dc.b	"MONOMATE", $C4, " "
 	dc.w	$14
 	dc.b	$F8, $00, $00, $00
 
 Item_Dimate:
-	nametxt	"DIMATE"
+	dc.b	"DIMATE", $C4, "   "
 	dc.w	$3C
 	dc.b	$F8, $00, $00, $00
 
 Item_Trimate:
-	nametxt	"TRIMATE"
+	dc.b	"TRIMATE", $C4, "  "
 	dc.w	$A0
 	dc.b	$F8, $00, $00, $00
 
 Item_Antidote:
-	nametxt	"ANTIDOTE"
+	dc.b	"ANTIDOTE", $C4, " "
 	dc.w	$0A
 	dc.b	$F8, $00, $00, $00
 
 Item_StarMist:
-	nametxt	"STAR MIST"
+	dc.b	"STAR MIST", $C4
 	dc.w	$3E8
 	dc.b	$F8, $00, $00, $00
 
 Item_MoonDew:
-	nametxt	"MOON DEW"
+	dc.b	"MOON DEW", $C4, " "
 	dc.w	$2EE0
 	dc.b	$F8, $00, $00, $00
 
 Item_Headgear:
-	nametxt	"HEADGEAR"
+	dc.b	"HEADGEAR", $C4, " "
 	dc.w	$78
 	dc.b	$A1
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $03
 
 Item_Ribbon:
-	nametxt	"RIBBON"
+	dc.b	"RIBBON", $C4, "   "
 	dc.w	$50
 	dc.b	$A1
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $03
 
 Item_Fibergear:
-	nametxt	"FIBERGEAR"
+	dc.b	"FIBERGEAR", $C4
 	dc.w	$1AE
 	dc.b	$A1
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $08
 
 Item_SilRibbon:
-	nametxt	"SIL RIBBON"
+	dc.b	"SIL RIBBON"
 	dc.w	$17C
 	dc.b	$A1
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $0C
 
 Item_SilCrown:
-	nametxt	"SIL CROWN"
+	dc.b	"SIL CROWN", $C4
 	dc.w	$1D6
 	dc.b	$A1
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $0E
 
 Item_Titanigear:
-	nametxt	"TITANIGEAR"
+	dc.b	"TITANIGEAR"
 	dc.w	$578
 	dc.b	$A1
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $0E
 
 Item_Titanimet:
-	nametxt	"TITANIMET"
+	dc.b	"TITANIMET", $C4
 	dc.w	$E74
 	dc.b	$A1
 	dc.b	CharID_Rolf_Mask|CharID_Kain_Mask
 	dc.b	$00, $10
 
 Item_JwlCrown:
-	nametxt	"JWL CROWN"
+	dc.b	"JWL CROWN", $C4
 	dc.w	$11F8
 	dc.b	$A1
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $11
 
 Item_JwlRibbon:
-	nametxt	"JWL RIBBON"
+	dc.b	"JWL RIBBON"
 	dc.w	$125C
 	dc.b	$A1
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $15
 
 Item_Crescegear:
-	nametxt	"CRESCEGEAR"
+	dc.b	"CRESCEGEAR"
 	dc.w	$118
 	dc.b	$B1
 	dc.b	CharID_Rudo_Mask
 	dc.b	$00, $0E
 
 Item_SnowCrown:
-	nametxt	"SNOW CROWN"
+	dc.b	"SNOW CROWN"
 	dc.w	$1EA
 	dc.b	$B1
 	dc.b	CharID_Amy_Mask
 	dc.b	$00, $11
 
 Item_WindScarf:
-	nametxt	"WIND SCARF"
+	dc.b	"WIND SCARF"
 	dc.w	$78
 	dc.b	$B1
 	dc.b	CharID_Shir_Mask
 	dc.b	$00, $11
 
 Item_ColorScarf:
-	nametxt	"COLORSCARF"
+	dc.b	"COLORSCARF"
 	dc.w	$82
 	dc.b	$B1
 	dc.b	CharID_Anna_Mask
 	dc.b	$00, $11
 
 Item_StormGear:
-	nametxt	"STORM GEAR"
+	dc.b	"STORM GEAR"
 	dc.w	$276
 	dc.b	$B1
 	dc.b	CharID_Kain_Mask
 	dc.b	$00, $10
 
 Item_Laconigear:
-	nametxt	"LACONIGEAR"
+	dc.b	"LACONIGEAR"
 	dc.w	$6D60
 	dc.b	$A1
 	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask
 	dc.b	$00, $1B
 
 Item_Laconiamet:
-	nametxt	"LACONIAMET"
+	dc.b	"LACONIAMET"
 	dc.w	$7148
 	dc.b	$A1
 	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask
 	dc.b	$00, $1D
 
 Item_Neimet:
-	nametxt	"NEIMET"
+	dc.b	"NEIMET", $C4, "   "
 	dc.w	0
 	dc.b	$21
 	dc.b	CharID_Rolf_Mask|CharID_Kain_Mask
 	dc.b	$00, $32
 
 Item_NeiCrown:
-	nametxt	"NEICROWN"
+	dc.b	"NEICROWN", $C4, " "
 	dc.w	0
 	dc.b	$21
 	dc.b	CharID_Amy_Mask
 	dc.b	$00, $30
 
 Item_MagicCap:
-	nametxt	"MAGIC CAP"
+	dc.b	"MAGIC CAP", $C4
 	dc.w	0
 	dc.b	$21
 	dc.b	CharID_Rolf_Mask
 	dc.b	$00, $02
 
 Item_MogicCap:
-	nametxt	"MOGIC CAP"
+	dc.b	"MOGIC CAP", $C4
 	dc.w	0
 	dc.b	$21
 	dc.b	CharID_Rolf_Mask
 	dc.b	$00, $02
 
 Item_CarbonSuit:
-	nametxt	"CARBONSUIT"
+	dc.b	"CARBONSUIT"
 	dc.w	$80
 	dc.b	$A4
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $04
 
 Item_CarbonVest:
-	nametxt	"CARBONVEST"
+	dc.b	"CARBONVEST"
 	dc.w	$78
 	dc.b	$A4
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $04
 
 Item_FiberCoat:
-	nametxt	"FIBERCOAT"
+	dc.b	"FIBERCOAT", $C4
 	dc.w	$12C
 	dc.b	$A4
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $08
 
 Item_FiberCape:
-	nametxt	"FIBERCAPE"
+	dc.b	"FIBERCAPE", $C4
 	dc.w	$1A4
 	dc.b	$A4
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $08
 
 Item_FiberVest:
-	nametxt	"FIBERVEST"
+	dc.b	"FIBERVEST", $C4
 	dc.w	$118
 	dc.b	$A4
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $06
 
 Item_TtnmArmor:
-	nametxt	"TTNM ARMOR"
+	dc.b	"TTNM ARMOR"
 	dc.w	$15E0
 	dc.b	$A4
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$00, $18
 
 Item_TtnmCape:
-	nametxt	"TTNM CAPE"
+	dc.b	"TTNM CAPE", $C4
 	dc.w	$189C
 	dc.b	$A4
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask
 	dc.b	$00, $1C
 
 Item_TtnmChest:
-	nametxt	"TTNM CHEST"
+	dc.b	"TTNM CHEST"
 	dc.w	$1518
 	dc.b	$A4
 	dc.b	CharID_Rolf_Mask|CharID_Hugh_Mask
 	dc.b	$00, $15
 
 Item_CrmcArmor:
-	nametxt	"CRMC ARMOR"
+	dc.b	"CRMC ARMOR"
 	dc.w	$2DB4
 	dc.b	$A4
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$00, $30
 
 Item_CrmcCape:
-	nametxt	"CRMC CAPE"
+	dc.b	"CRMC CAPE", $C4
 	dc.w	$3070
 	dc.b	$A4
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $38
 
 Item_CrmcChest:
-	nametxt	"CRMC CHEST"
+	dc.b	"CRMC CHEST"
 	dc.w	$2710
 	dc.b	$A4
 	dc.b	CharID_Rolf_Mask|CharID_Hugh_Mask
 	dc.b	$00, $2E
 
 Item_AmberRobe:
-	nametxt	"AMBER ROBE"
+	dc.b	"AMBER ROBE"
 	dc.w	$AA
 	dc.b	$B4
 	dc.b	CharID_Hugh_Mask
 	dc.b	$00, $14
 
 Item_Crystanish:
-	nametxt	"CRYSTANISH"
+	dc.b	"CRYSTANISH"
 	dc.w	$276
 	dc.b	$B4
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$00, $3C
 
 Item_CrystCape:
-	nametxt	"CRYSTCAPE"
+	dc.b	"CRYSTCAPE", $C4
 	dc.w	$348
 	dc.b	$B4
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $3E
 
 Item_CrystChest:
-	nametxt	"CRYSTCHEST"
+	dc.b	"CRYSTCHEST"
 	dc.w	$29E
 	dc.b	$B4
 	dc.b	CharID_Rolf_Mask
 	dc.b	$00, $3C
 
 Item_Laconinish:
-	nametxt	"LACONINISH"
+	dc.b	"LACONINISH"
 	dc.w	$88B8
 	dc.b	$A4
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$00, $41
 
 Item_LaconCape:
-	nametxt	"LACONCAPE"
+	dc.b	"LACONCAPE", $C4
 	dc.w	$8CA0
 	dc.b	$A4
 	dc.b	CharID_Anna_Mask
 	dc.b	$00, $46
 
 Item_LaconChest:
-	nametxt	"LACONCHEST"
+	dc.b	"LACONCHEST"
 	dc.w	$6D60
 	dc.b	$A4
 	dc.b	CharID_Rolf_Mask
 	dc.b	$00, $50
 
 Item_NeiArmor:
-	nametxt	"NEIARMOR"
+	dc.b	"NEIARMOR", $C4, " "
 	dc.w	0
 	dc.b	$24
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$00, $5F
 
 Item_NeiCape:
-	nametxt	"NEICAPE"
+	dc.b	"NEICAPE", $C4, "  "
 	dc.w	0
 	dc.b	$24
 	dc.b	CharID_Amy_Mask|CharID_Shir_Mask
 	dc.b	$00, $58
 
 Item_Shoes:
-	nametxt	"SHOES"
+	dc.b	"SHOES", $C4, "    "
 	dc.w	$F0
 	dc.b	$A5
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $03
 
 Item_Sandals
-	nametxt	"SANDALS"
+	dc.b	"SANDALS", $C4, "  "
 	dc.w	$B4
 	dc.b	$A5
 	dc.b	CharID_Nei_Mask
 	dc.b	$00, $03
 
 Item_Boots:
-	nametxt	"BOOTS"
+	dc.b	"BOOTS", $C4, "    "
 	dc.w	$3E8
 	dc.b	$A5
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $07
 
 Item_KnifeBoots:
-	nametxt	"KNIFEBOOTS"
+	dc.b	"KNIFEBOOTS"
 	dc.w	$1068
 	dc.b	$A5
 	dc.b	CharID_Nei_Mask|CharID_Anna_Mask
 	dc.b	$07, $07
 
 Item_LongBoots:
-	nametxt	"LONG BOOTS"
+	dc.b	"LONG BOOTS"
 	dc.w	$1A90
 	dc.b	$A5
 	dc.b	CharID_Anna_Mask
 	dc.b	$05, $07
 
 Item_HirzaBoots:
-	nametxt	"HIRZABOOTS"
+	dc.b	"HIRZABOOTS"
 	dc.w	$2648
 	dc.b	$A5
 	dc.b	CharID_Amy_Mask|CharID_Shir_Mask
 	dc.b	$00, $07
 
 Item_ShuneBoots:
-	nametxt	"SHUNEBOOTS"
+	dc.b	"SHUNEBOOTS"
 	dc.w	$1D4C
 	dc.b	$A5
 	dc.b	CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $07
 
 Item_GardaBoots:
-	nametxt	"GARDABOOTS"
+	dc.b	"GARDABOOTS"
 	dc.w	$3070
 	dc.b	$A5
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $0F
 
 Item_CrbnShield:
-	nametxt	"CRBNSHIELD"
+	dc.b	"CRBNSHIELD"
 	dc.w	$21C
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $08
 
 Item_CrbnEmel:
-	nametxt	"CRBN EMEL"
+	dc.b	"CRBN EMEL", $C4
 	dc.w	$1A4
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $07
 
 Item_FibrShield:
-	nametxt	"FIBRSHILD"
+	dc.b	"FIBRSHILD", $C4
 	dc.w	$4B0
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $0F
 
 Item_FiberEmel:
-	nametxt	"FIBER EMEL"
+	dc.b	"FIBER EMEL"
 	dc.w	$550
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $11
 
 Item_MirShield:
-	nametxt	"MIR SHIELD"
+	dc.b	"MIR SHIELD"
 	dc.w	$12C0
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $20
 
 Item_MirEmel:
-	nametxt	"MIR EMEL"
+	dc.b	"MIR EMEL", $C4, " "
 	dc.w	$1400
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $1E
 
 Item_CerShield:
-	nametxt	"CER SHIELD"
+	dc.b	"CER SHIELD"
 	dc.w	$206C
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $27
 
 Item_CerEmel:
-	nametxt	"CER EMEL"
+	dc.b	"CER EMEL", $C4, " "
 	dc.w	$25E4
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $28
 
 Item_Aegis:
-	nametxt	"AEGIS"
+	dc.b	"AEGIS", $C4, "    "
 	dc.w	$4B0
 	dc.b	$B2
 	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $20
 
 Item_GrSleeves:
-	nametxt	"GR SLEEVES"
+	dc.b	"GR SLEEVES"
 	dc.w	$348
 	dc.b	$B2
 	dc.b	CharID_Anna_Mask
 	dc.b	$00, $3F
 
 Item_TruthSlvs:
-	nametxt	"TRUTH SLVS"
+	dc.b	"TRUTH SLVS"
 	dc.w	$2D0
 	dc.b	$B2
 	dc.b	CharID_Shir_Mask
 	dc.b	$00, $3B
 
 Item_LaconEmel:
-	nametxt	"LACON EMEL"
+	dc.b	"LACON EMEL"
 	dc.w	$2EE0
 	dc.b	$A2, $28, $00, $44
 
 Item_LacShield:
-	nametxt	"LAC SHIELD"
+	dc.b	"LAC SHIELD"
 	dc.w	$32C8
 	dc.b	$A2
 	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $55
 
 Item_NeiShield:
-	nametxt	"NEISHIELD"
+	dc.b	"NEISHIELD", $C4
 	dc.w	0
 	dc.b	$22
 	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$00, $5F
 
 Item_NeiEmel:
-	nametxt	"NEIEMEL"
+	dc.b	"NEIEMEL", $C4, "  "
 	dc.w	0
 	dc.b	$22
 	dc.b	CharID_Anna_Mask|CharID_Shir_Mask
 	dc.b	$00, $76
 
 Item_Knife:
-	nametxt	"KNIFE"
+	dc.b	"KNIFE", $C4, "    "
 	dc.w	$64
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$05, $00
 
 Item_Dagger:
-	nametxt	"DAGGER"
+	dc.b	"DAGGER", $C4, "   "
 	dc.w	$C8
 	dc.b	$A2
 	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$08, $01
 
 Item_Scalpel:
-	nametxt	"SCALPEL"
+	dc.b	"SCALPEL", $C4, "  "
 	dc.w	$B4
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
 	dc.b	$07, $00
 
 Item_SteelBar:
-	nametxt	"STEEL BAR"
+	dc.b	"STEEL BAR", $C4
 	dc.w	$50
 	dc.b	$A2
 	dc.b	CharID_Nei_Mask
 	dc.b	$07, $02
 
 Item_Boomerang:
-	nametxt	"BOOMERANG"
+	dc.b	"BOOMERANG", $C4
 	dc.w	$1E0
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$0C, $00
 
 Item_Slasher:
-	nametxt	"SLASHER"
+	dc.b	"SLASHER", $C4, "  "
 	dc.w	$7D0
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$11, $00
 
 Item_Sword:
-	nametxt	"SWORD"
+	dc.b	"SWORD", $C4, "    "
 	dc.w	$4B0
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask
 	dc.b	$12, $04
 
 Item_Whip:
-	nametxt	"WHIP"
+	dc.b	"WHIP", $C4, "     "
 	dc.w	$578
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$14, $02
 
 Item_CrmcSword:
-	nametxt	"CERAM SWRD"
+	dc.b	"CERAM SWRD"
 	dc.w	$C80
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask
 	dc.b	$1E, $05
 
 Item_CeramKnife
-	nametxt	"CERAM KNFE"
+	dc.b	"CERAM KNFE"
 	dc.w	$AF0
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$14, $03
 
 Item_CeramBar:
-	nametxt	"CERAM BAR"
+	dc.b	"CERAM BAR", $C4
 	dc.w	$4B0
 	dc.b	$A2
 	dc.b	CharID_Nei_Mask
 	dc.b	$1B, $02
 
 Item_LasrSlshr:
-	nametxt	"LASR SLSHR"
+	dc.b	"LASR SLSHR"
 	dc.w	$1A2C
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$1E, $00
 
 Item_LasrSword:
-	nametxt	"LASR SWRD"
+	dc.b	"LASR SWRD", $C4
 	dc.w	$1518
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask
 	dc.b	$32, $09
 
 Item_LaserBar:
-	nametxt	"LASR BAR"
+	dc.b	"LASR BAR", $C4, " "
 	dc.w	$C1C
 	dc.b	$A2
 	dc.b	CharID_Nei_Mask
 	dc.b	$26, $03
 
 Item_LaserKnife:
-	nametxt	"LASER KNFE"
+	dc.b	"LASER KNFE"
 	dc.w	$1130
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$1C, $05
 
 Item_SwdOfAnger:
-	nametxt	"SWD OF ANG"
+	dc.b	"SWD OF ANG"
 	dc.w	$118
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask
 	dc.b	$3A, $00
 
 Item_FireSlshr:
-	nametxt	"FIRE SLSHR"
+	dc.b	"FIRE SLSHR"
 	dc.w	$154
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$24, $00
 
 Item_FireStaff:
-	nametxt	"FIRE STAFF"
+	dc.b	"FIRE STAFF"
 	dc.w	$29E
 	dc.b	$B2
 	dc.b	CharID_Amy_Mask
 	dc.b	$20, $0B
 
 Item_LacnMace:
-	nametxt	"LACN MACE"
+	dc.b	"LACN MACE", $C4
 	dc.w	$41A0
 	dc.b	$A2
 	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$28, $08
 
 Item_LacDagger:
-	nametxt	"LAC DAGGER"
+	dc.b	"LAC DAGGER"
 	dc.w	$47E0
 	dc.b	$A2
 	dc.b	CharID_Shir_Mask
@@ -29717,146 +29713,146 @@ Item_LacDagger:
 	endif
 
 Item_ACSlasher:
-	nametxt	"AC SLASHR "
+	dc.b	"AC SLASHR "
 	dc.w	$5DC0
 	dc.b	$A2
 	dc.b	CharID_Anna_Mask
 	dc.b	$2A, $00
 
 Item_LacSword:
-	nametxt	"LAC SWORD"
+	dc.b	"LAC SWORD", $C4
 	dc.w	$55F0
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask
 	dc.b	$3E, $07
 
 Item_NeiSword:
-	nametxt	"NEISWORD"
+	dc.b	"NEISWORD", $C4, " "
 	dc.w	0
 	dc.b	$2B
 	dc.b	CharID_Rolf_Mask
 	dc.b	$4B, $18
 
 Item_NeiSlasher:
-	nametxt	"NEISLASHER"
+	dc.b	"NEISLASHER"
 	dc.w	0
 	dc.b	$22
 	dc.b	CharID_Anna_Mask
 	dc.b	$3C, $00
 
 Item_BowGun:
-	nametxt	"BOW GUN"
+	dc.b	"BOW GUN", $C4, "  "
 	dc.w	$12C
 	dc.b	$A3
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$08, $00
 
 Item_SonicGun:
-	nametxt	"SONIC GUN"
+	dc.b	"SONIC GUN", $C4
 	dc.w	$280
 	dc.b	$A2
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
 	dc.b	$11, $00
 
 Item_Shotgun:
-	nametxt	"SHOTGUN"
+	dc.b	"SHOTGUN", $C4, "  "
 	dc.w	$320
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$0A, $00
 
 Item_SilentShot:
-	nametxt	"SILENTSHOT"
+	dc.b	"SILENTSHOT"
 	dc.w	$398
 	dc.b	$A3
 	dc.b	CharID_Amy_Mask
 	dc.b	$0A, $00
 
 Item_PoisonShot
-	nametxt	"POISONSHOT"
+	dc.b	"POISONSHOT"
 	dc.w	$6A4
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
 	dc.b	$0F, $00
 
 Item_AcidShot:
-	nametxt	"ACIDSHOT"
+	dc.b	"ACIDSHOT", $C4, " "
 	dc.w	$12C0
 	dc.b	$A2
 	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
 	dc.b	$19, $00
 
 Item_Cannon:
-	nametxt	"CANNON"
+	dc.b	"CANNON", $C4, "   "
 	dc.w	$898
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$12, $00
 
 Item_Vulcan:
-	nametxt	"VULCAN"
+	dc.b	"VULCAN", $C4, "   "
 	dc.w	$3138
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask
 	dc.b	$1C, $00
 
 Item_LaserShot:
-	nametxt	"LASER SHOT"
+	dc.b	"LASER SHOT"
 	dc.w	$1838
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
 	dc.b	$14, $00
 
 Item_LsrCannon:
-	nametxt	"LSR CANNON"
+	dc.b	"LSR CANNON"
 	dc.w	$4E20
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask
 	dc.b	$1E, $00
 
 Item_PlsCannon:
-	nametxt	"PLS CANNON"
+	dc.b	"PLS CANNON"
 	dc.w	$7D00
 	dc.b	$A3, $04, $23, $00
 
 Item_PulseVlcn:
-	nametxt	"PULSE VLCN"
+	dc.b	"PULSE VLCN"
 	dc.w	$BB80
 	dc.b	$A3
 	dc.b	CharID_Rudo_Mask
 	dc.b	$26, $00
 
 Item_NeiShot:
-	nametxt	"NEISHOT"
+	dc.b	"NEISHOT", $C4, "  "
 	dc.w	0
 	dc.b	$23
 	dc.b	CharID_Rudo_Mask
 	dc.b	$3C, $00
 
 Item_PrsnClths:
-	nametxt	"PRSN CLTHS"
+	dc.b	"PRSN CLTHS"
 	dc.w	$64
 	dc.b	$04
 	dc.b	CharID_Rolf_Mask|CharID_Nei_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $02
 
 Item_Teim:
-	nametxt	"TEIM"
+	dc.b	"TEIM", $C4, "     "
 	dc.w	0
 	dc.b	$08, $00, $00, $00
 
 Item_Visiphone:
-	nametxt	"VISIPHONE"
+	dc.b	"VISIPHONE", $C4
 	dc.w	$BB8
 	dc.b	$A8, $00, $00, $00
 
 Item_Unknown1:
-	nametxt	"T"	; ???
+	dc.b	"T", $C4, "        "
 	dc.w	$F230
 	dc.b	$E8, $00, $00, $00
 
 Item_Unknown2:
-	nametxt	"H"	; ???
+	dc.b	"H", $C4, "        "
 	dc.w	$B3B0
 	dc.b	$E8, $00, $00, $00
 ; =======================================================================
@@ -29871,267 +29867,263 @@ Item_Unknown2:
 ; =======================================================================
 TechniqueData:
 
-; TechNameLength = 5
-length	:=	TechNameLength
-
 Tech_None:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Foi:
-	nametxt	"FOI"
+	dc.b	"FOI", $C4, " "
 	dc.b	$02, $F1, $0F
 
 Tech_Gifoi:
-	nametxt	"GIFOI"
+	dc.b	"GIFOI"
 	dc.b	$06, $F1, $28
 
 Tech_Nafoi:
-	nametxt	"NAFOI"
+	dc.b	"NAFOI"
 	dc.b	$0C, $F1, $82
 
 Tech_Zan:
-	nametxt	"ZAN"
+	dc.b	"ZAN", $C4, " "
 	dc.b	$04, $F2, $14
 
 Tech_Gizan:
-	nametxt	"GIZAN"
+	dc.b	"GIZAN"
 	dc.b	$07, $F2, $1E
 
 Tech_Nazan:
-	nametxt	"NAZAN"
+	dc.b	"NAZAN"
 	dc.b	$0B, $F2, $64
 
 Tech_Gra:
-	nametxt	"GRA"
+	dc.b	"GRA", $C4, " "
 	dc.b	$08, $F4, $14
 
 Tech_Gigra:
-	nametxt	"GIGRA"
+	dc.b	"GIGRA"
 	dc.b	$0C, $F4, $28
 
 Tech_Nagra:
-	nametxt	"NAGRA"
+	dc.b	"NAGRA"
 	dc.b	$14, $F4, $50
 
 Tech_Tsu:
-	nametxt	"TSU"
+	dc.b	"TSU", $C4, " "
 	dc.b	$06, $F1, $1E
 
 Tech_Githu:
-	nametxt	"GITHU"
+	dc.b	"GITHU"
 	dc.b	$0D, $F1, $50
 
 Tech_Nathu:
-	nametxt	"NATHU"
+	dc.b	"NATHU"
 	dc.b	$14, $F1, $96
 
 Tech_Shift:
-	nametxt	"SHIFT"
+	dc.b	"SHIFT"
 	dc.b	$05, $30, $14
 
 Tech_Fanbi:
-	nametxt	"FANBI"
+	dc.b	"FANBI"
 	dc.b	$02, $F1, $0A
 
 Tech_Eijia:
-	nametxt	"EIJIA"
+	dc.b	"EIJIA"
 	dc.b	$04, $D2, $17
 
 Tech_Brose:
-	nametxt	"BROSE"
+	dc.b	"BROSE"
 	dc.b	$08, $D1, $FF
 
 Tech_Conte:
-	nametxt	"CONTE"
+	dc.b	"CONTE"
 	dc.b	$06, $D1, $00
 
 Tech_Gaj:
-	nametxt	"GAJ"
+	dc.b	"GAJ", $C4, " "
 	dc.b	$01, $D1, $14
 
 Tech_Gigaj:
-	nametxt	"GIGAJ"
+	dc.b	"GIGAJ"
 	dc.b	$05, $D1, $3C
 
 Tech_Nagaj:
-	nametxt	"NAGAJ"
+	dc.b	"NAGAJ"
 	dc.b	$0F, $D1, $96
 
 Tech_Sag:
-	nametxt	"SAG"
+	dc.b	"SAG", $C4, " "
 	dc.b	$03, $D4, $14
 
 Tech_Gisag:
-	nametxt	"GISAG"
+	dc.b	"GISAG"
 	dc.b	$0F, $D4, $3C
 
 Tech_Nasag:
-	nametxt	"NASAG"
+	dc.b	"NASAG"
 	dc.b	$1B, $D4, $96
 
 Tech_Gen:
-	nametxt	"GEN"
+	dc.b	"GEN", $C4, " "
 	dc.b	$01, $B1, $14
 
 Tech_Sagen:
-	nametxt	"SAGEN"
+	dc.b	"SAGEN"
 	dc.b	$03, $B4, $14
 
 Tech_Vol:
-	nametxt	"VOL"
+	dc.b	"VOL", $C4, " "
 	dc.b	$08, $B1, $FF
 
 Tech_Savol:
-	nametxt	"SAVOL"
+	dc.b	"SAVOL"
 	dc.b	$10, $B2, $FF
 
 Tech_Shiza:
-	nametxt	"SHIZA"
+	dc.b	"SHIZA"
 	dc.b	$06, $B1, $00
 
 Tech_Doran:
-	nametxt	"DORAN"
+	dc.b	"DORAN"
 	dc.b	$02, $B1, $00
 
 Tech_Rimit:
-	nametxt	"RIMIT"
+	dc.b	"RIMIT"
 	dc.b	$03, $B1, $00
 
 Tech_Shinb:
-	nametxt	"SHINB"
+	dc.b	"SHINB"
 	dc.b	$04, $B4, $00
 
 Tech_Forsa:
-	nametxt	"FORSA"
+	dc.b	"FORSA"
 	dc.b	$02, $D2, $00
 
 Tech_Rimet:
-	nametxt	"RIMET"
+	dc.b	"RIMET"
 	dc.b	$03, $D1, $00
 
 Tech_Shu:
-	nametxt	"SHU"
+	dc.b	"SHU", $C4, " "
 	dc.b	$03, $11, $00
 
 Tech_Sashu:
-	nametxt	"SASHU"
+	dc.b	"SASHU"
 	dc.b	$08, $14, $00
 
 Tech_Deban:
-	nametxt	"DEBAN"
+	dc.b	"DEBAN"
 	dc.b	$04, $14, $00
 
 Tech_Ner:
-	nametxt	"NER"
+	dc.b	"NER", $C4, " "
 	dc.b	$02, $11, $00
 
 Tech_Saner:
-	nametxt	"SANER"
+	dc.b	"SANER"
 	dc.b	$06, $14, $00
 
 Tech_Res:
-	nametxt	"RES"
+	dc.b	"RES", $C4, " "
 	dc.b	$03, $19, $14
 
 Tech_Gires:
-	nametxt	"GIRES"
+	dc.b	"GIRES"
 	dc.b	$07, $19, $3C
 
 Tech_Nares:
-	nametxt	"NARES"
+	dc.b	"NARES"
 	dc.b	$0D, $19, $FF
 
 Tech_Sar:
-	nametxt	"SAR"
+	dc.b	"SAR", $C4, " "
 	dc.b	$0D, $1C, $14
 
 Tech_Gisar:
-	nametxt	"GISAR"
+	dc.b	"GISAR"
 	dc.b	$1D, $1C, $3C
 
 Tech_Nasar:
-	nametxt	"NASAR"
+	dc.b	"NASAR"
 	dc.b	$35, $1C, $FF
 
 Tech_Sak:
-	nametxt	"SAK"
+	dc.b	"SAK", $C4, " "
 	dc.b	$01, $19, $FF
 
 Tech_Nasak:
-	nametxt	"NASAK"
+	dc.b	"NASAK"
 	dc.b	$01, $1C, $FF
 
 Tech_Anti:
-	nametxt	"ANTI"
+	dc.b	"ANTI", $C4
 	dc.b	$02, $09, $00
 
 Tech_Rever:
-	nametxt	"REVER"
+	dc.b	"REVER"
 	dc.b	$1E, $09, $00
 
 Tech_Ryuka:
-	nametxt	"RYUKA"
+	dc.b	"RYUKA"
 	dc.b	$08, $0C, $00
 
 Tech_Hinas:
-	nametxt	"HINAS"
+	dc.b	"HINAS"
 	dc.b	$04, $0C, $00
 
 Tech_Musik:
-	nametxt	"MUSIK"
+	dc.b	"MUSIK"
 	dc.b	$03, $04, $00
 
 Tech_Megid:
-	nametxt	"MEGID"
+	dc.b	"MEGID"
 	dc.b	$37, $F4, $00
 
 Tech_Unknown1:
-	nametxt	"RRRRR" ; ?
+	dc.b	"RRRRR"
 	dc.b	$1C, $09, $00
 
 Tech_Unknown2:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown3:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown4:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown5:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown6:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown7:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown8:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_Unknown9:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_UnknownA:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 
 Tech_UnknownB:
-	nametxt	""
+	dc.b	$C4, "    "
 	dc.b	$00, $00, $00
 ; =======================================================================
 
-	outradix 16
 	charset
 
 ; =======================================================================
@@ -30750,92 +30742,74 @@ PtrWin_UstvestiaSoundtracks:
 	charset '/', $64
 	charset ':', $80
 
-; The border macro prints bytes of data the number of times
-; defined in the first parameter. $B9 is the top border; $BE is the bottom border.
-; The data defined between these two borders must match the number seen in the border parameter
-; cursorbox is macro which automacally puts the bytes $B4 and $B5 which together form a rectangular
-; box where the red cursors will be displayed. So 2 bytes are already inserted and you need to put
-; the remaining bytes ONLY. As an example, the window art below has borders of 7 bytes, so the top and
-; bottom will have 7 bytes of $B9 and $BE respectively. The middle data will need to be the same length
-; cursorbox already inserts 2 bytes, so you need to include only five bytes after. When there is no box
-; for the cursor, just put 7 bytes as usual.
-; If you plan to change the size of the windows, make sure to also change the data of the pointers defined
-; above (WindowArtLayoutPtrs). There's a small explanation there of what to do
+
 
 WinArt_PlayerMenu:
-	border 7, $B9
-
-	cursorbox "ITEM "
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "ITEM "
 	dc.b	"       "
-	cursorbox "STATE"
+	dc.b	$B4, $B5, "STATE"
 	dc.b	"       "
-	cursorbox "TECH "
+	dc.b	$B4, $B5, "TECH "
 	dc.b	"       "
-	cursorbox "STRNG"
+	dc.b	$B4, $B5, "STRNG"
 	dc.b	"       "
-	cursorbox "EQP  "
-
-	border 7, $BE
+	dc.b	$B4, $B5, "EQP  "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_ItemAction:
-	border 5, $B9
-
-	cursorbox "USE"
+	dc.b	$B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "USE"
 	dc.b	"     "
-	cursorbox "GIV"
+	dc.b	$B4, $B5, "GIV"
 	dc.b	"     "
-	cursorbox "TOS"
-
-	border 5, $BE
+	dc.b	$B4, $B5, "TOS"
+	dc.b	$BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13B7A:
 WinArt_ScriptMessage:
-	border 24, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9
 	dc.b	"                        "
 	dc.b	"                        "
 	dc.b	"                        "
 	dc.b	"                        "
-
-	border 24, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_YesNo:
-	border 5, $B9
-
-	cursorbox "YES"
+	dc.b	$B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "YES"
 	dc.b	"     "
-	cursorbox "NO "
-
-	border 5, $BE
+	dc.b	$B4, $B5, "NO "
+	dc.b	$BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_StateOrder:
-	border 7, $B9
-
-	cursorbox "STATE"
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "STATE"
 	dc.b	"       "
-	cursorbox "ORDER"
-
-	border 7, $BE
+	dc.b	$B4, $B5, "ORDER"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13C48
 WinArt_ScriptMessageBig:
-	border 24, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9
 	dc.b	"                        "
 	dc.b	"                        "
 	dc.b	"                        "
@@ -30844,27 +30818,24 @@ WinArt_ScriptMessageBig:
 	dc.b	"                        "
 	dc.b	"                        "
 	dc.b	"                        "
-
-	border 24, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_BuySell:
-	border 6, $B9
-
-	cursorbox "BUY "
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "BUY "
 	dc.b	"      "
-	cursorbox "SELL"
-
-	border 6, $BE
+	dc.b	$B4, $B5, "SELL"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_NameInput:
-	border 19, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                   "
 	dc.b	"                   "
 	dc.b	"                   "
@@ -30880,63 +30851,56 @@ WinArt_NameInput:
 	dc.b	"                   "
 	dc.b	"   ADV  RUB  END   "
 	dc.b	"                   "
-
-	border 19, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_LibraryOptions:
-	border 12, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"            "
-	cursorbox "HISTORY   "
+	dc.b	$B4, $B5, "HISTORY   "
 	dc.b	"            "
-	cursorbox "BIOSYSTEMS"
+	dc.b	$B4, $B5, "BIOSYSTEMS"
 	dc.b	"            "
-	cursorbox "CLIMATROL "
+	dc.b	$B4, $B5, "CLIMATROL "
 	dc.b	"            "
-	cursorbox "DAM       "
+	dc.b	$B4, $B5, "DAM       "
 	dc.b	"            "
-	cursorbox "MOTHRBRAIN"
-
-	border 12, $BE
+	dc.b	$B4, $B5, "MOTHRBRAIN"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 WinArt_HealCure:
-	border 9, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"         "
-	cursorbox "HEAL   "
+	dc.b	$B4, $B5, "HEAL   "
 	dc.b	"         "
-	cursorbox "CURE   "
-
-	border 9, $BE
+	dc.b	$B4, $B5, "CURE   "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13F60
 WinArt_RolfHouseOptions:
-	border 13, $B9
-
-	cursorbox "SEE STRNGTH"
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "SEE STRNGTH"
 	dc.b	"             "
-	cursorbox "REORGANIZE "
+	dc.b	$B4, $B5, "REORGANIZE "
 	dc.b	"             "
-	cursorbox "OUTSIDE    "
-
-	border 13, $BE
+	dc.b	$B4, $B5, "OUTSIDE    "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13FBC
 WinArt_RolfProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"LOST PARENTS AT AGE   "
 	dc.b	"                      "
@@ -30947,16 +30911,16 @@ WinArt_RolfProfile:
 	dc.b	"KNOWLEDGE.            "
 	dc.b	"                      "
 	dc.b	"                      "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_140C4
 WinArt_NeiProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"\INEI\I MEANS \ITHE HUMAN"			; \I is the " character
 	dc.b	"                      "
@@ -30967,16 +30931,16 @@ WinArt_NeiProfile:
 	dc.b	"AN ANIMAL, SHE HATES  "
 	dc.b	"                      "
 	dc.b	"CARRYING A HEAVY LOAD."
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_141CC
 WinArt_RudoProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"LEFT THE ARMY AND     "
 	dc.b	"                      "
@@ -30987,16 +30951,16 @@ WinArt_RudoProfile:
 	dc.b	"VERY STRONG, CAN USE  "
 	dc.b	"                      "
 	dc.b	"HEAVY GUNS WITH EASE. "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_142D4
 WinArt_AmyProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"A DOCTOR FROM A NORMAL"
 	dc.b	"                      "
@@ -31007,16 +30971,16 @@ WinArt_AmyProfile:
 	dc.b	"AND CURING POISON;    "
 	dc.b	"                      "
 	dc.b	"NOT STRONG IN BATTLE. "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_143DC
 WinArt_HughProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"HAS BEEN INTRIGUED BY "
 	dc.b	"                      "
@@ -31027,16 +30991,16 @@ WinArt_HughProfile:
 	dc.b	"LEADING EXPERT ON     "
 	dc.b	"                      "
 	dc.b	"PLANTS AND ANIMALS.   "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_144E4
 WinArt_AnnaProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"OF UNCERTAIN AGE AND  "
 	dc.b	"                      "
@@ -31047,16 +31011,16 @@ WinArt_AnnaProfile:
 	dc.b	"A SLICER OR WHIP.     "
 	dc.b	"                      "
 	dc.b	"TAKES NO PRISONERS.   "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_145EC
 WinArt_KainProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"WANTED TO BE A        "
 	dc.b	"                      "
@@ -31067,16 +31031,16 @@ WinArt_KainProfile:
 	dc.b	"TRIED TO FIX; DECIDED "
 	dc.b	"                      "
 	dc.b	"TO MAKE THAT HIS JOB. "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_146F4
 WinArt_ShirProfile:
-	border 22, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
 	dc.b	"                      "
 	dc.b	"ALTHOUGH WELL-TO-DO,  "
 	dc.b	"                      "
@@ -31087,94 +31051,83 @@ WinArt_ShirProfile:
 	dc.b	"                      "
 	dc.b	"                      "
 	dc.b	"                      "
-
-	border 22, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_147FC
 WinArt_CentTowerOptions:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
-	cursorbox "ROOM    "
+	dc.b	$B4, $B5, "ROOM    "
 	dc.b	"          "
-	cursorbox "LIBRARY "
+	dc.b	$B4, $B5, "LIBRARY "
 	dc.b	"          "
-	cursorbox "OUTSIDE "
-
-	border 10, $BE
+	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1484C
 WinArt_CentTowerOptions2:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
-	cursorbox "ROOM    "
+	dc.b	$B4, $B5, "ROOM    "
 	dc.b	"          "
-	cursorbox "LIBRARY "
+	dc.b	$B4, $B5, "LIBRARY "
 	dc.b	"          "
-	cursorbox "ROOF    "
+	dc.b	$B4, $B5, "ROOF    "
 	dc.b	"          "
-	cursorbox "OUTSIDE "
-
-	border 10, $BE
+	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_148B0
 WinArt_GameSelect:
-	border 17, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                 "
-	cursorbox "NEW GAME       "
+	dc.b	$B4, $B5, "NEW GAME       "
 	dc.b	"                 "
-	cursorbox "CONTINUE       "
+	dc.b	$B4, $B5, "CONTINUE       "
 	dc.b	"                 "
-	cursorbox "ERASE GAME     "
-
-	border 17, $BE
+	dc.b	$B4, $B5, "ERASE GAME     "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14938
 WinArt_RoomOptions:
-	border 16, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                "
-	cursorbox "KEEP BAGGAGE  "
+	dc.b	$B4, $B5, "KEEP BAGGAGE  "
 	dc.b	"                "
-	cursorbox "BAGGAGE PLEASE"
-
-	border 16, $BE
+	dc.b	$B4, $B5, "BAGGAGE PLEASE"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14998
 WinArt_RightLeft:
-	border 6, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"      "
-	cursorbox "RGHT"
+	dc.b	$B4, $B5, "RGHT"
 	dc.b	"      "
-	cursorbox "LEFT"
-
-	border 6, $BE
+	dc.b	$B4, $B5, "LEFT"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_149BC
 WinArt_LibrarianPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $02, $03, $04, $05, $06, $07, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $01
 	dc.b	$11, $11, $12, $13, $14, $15, $16, $17, $18, $11
@@ -31185,16 +31138,14 @@ WinArt_LibrarianPortrait:
 	dc.b	$39, $1A, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
 	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
 	dc.b	$4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14A34
 WinArt_MotaSaveEmplPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $00
 	dc.b	$09, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
 	dc.b	$09, $11, $12, $13, $14, $15, $16, $17, $18, $09
@@ -31205,16 +31156,14 @@ WinArt_MotaSaveEmplPortrait:
 	dc.b	$3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
 	dc.b	$48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
 	dc.b	$48, $52, $53, $54, $55, $56, $57, $58, $59, $5A
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14AAC
 WinArt_MotaDoctorPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 	dc.b	$01, $02, $03, $04, $05, $06, $07, $07, $08, $09
 	dc.b	$01, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12
@@ -31225,16 +31174,14 @@ WinArt_MotaDoctorPortrait:
 	dc.b	$35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E
 	dc.b	$3F, $40, $41, $42, $43, $44, $45, $46, $47, $48
 	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14B24
 WinArt_GrandmaPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $01, $02, $0B, $0C, $0D, $0E, $0F, $10, $11
 	dc.b	$00, $12, $13, $14, $15, $16, $17, $18, $19, $1A
@@ -31245,16 +31192,14 @@ WinArt_GrandmaPortrait:
 	dc.b	$00, $3F, $40, $41, $42, $43, $44, $45, $46, $47
 	dc.b	$48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
 	dc.b	$52, $49, $53, $54, $55, $56, $57, $58, $59, $5A
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14B9C
 WinArt_MotaItemSellerPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $00, $00, $02, $03, $04, $05, $06, $07
 	dc.b	$08, $01, $00, $09, $0A, $0B, $0C, $0D, $0E, $0F
 	dc.b	$00, $01, $00, $10, $11, $12, $13, $14, $15, $16
@@ -31265,16 +31210,14 @@ WinArt_MotaItemSellerPortrait:
 	dc.b	$31, $39, $39, $39, $3A, $3B, $3C, $3D, $3E, $3F
 	dc.b	$40, $41, $42, $43, $44, $45, $46, $47, $3F, $48
 	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14C14
 WinArt_MotaWpnSellerPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $05, $05, $05
 	dc.b	$06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
 	dc.b	$10, $11, $12, $13, $14, $15, $16, $17, $18, $19
@@ -31285,16 +31228,14 @@ WinArt_MotaWpnSellerPortrait:
 	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
 	dc.b	$4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
 	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E, $5F
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14C8C
 WinArt_MotaArmorSellerPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
 	dc.b	$14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B
@@ -31305,16 +31246,14 @@ WinArt_MotaArmorSellerPortrait:
 	dc.b	$41, $42, $43, $44, $45, $46, $47, $48, $49, $4A
 	dc.b	$4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54
 	dc.b	$55, $56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14D04
 WinArt_UstvestiaPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $01, $00, $02, $03, $04, $01, $01
 	dc.b	$00, $01, $05, $01, $06, $07, $08, $09, $0A, $0B
 	dc.b	$00, $01, $0C, $01, $0D, $0E, $0F, $10, $11, $12
@@ -31325,16 +31264,14 @@ WinArt_UstvestiaPortrait:
 	dc.b	$01, $36, $01, $37, $38, $39, $3A, $3B, $3C, $3D
 	dc.b	$3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
 	dc.b	$48, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14D7C
 WinArt_DezolianPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $02, $03, $0C, $0D, $0E, $0F, $08, $10
 	dc.b	$11, $12, $02, $03, $13, $14, $15, $16, $08, $17
@@ -31345,16 +31282,14 @@ WinArt_DezolianPortrait:
 	dc.b	$18, $23, $31, $32, $33, $34, $35, $36, $37, $38
 	dc.b	$18, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
 	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14DF4
 WinArt_CentTowerOutsidePortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
 	dc.b	$09, $0A, $0B, $0C, $0D, $0C, $0E, $0F, $10, $11
 	dc.b	$12, $13, $14, $14, $15, $14, $0E, $0F, $16, $17
@@ -31365,16 +31300,14 @@ WinArt_CentTowerOutsidePortrait:
 	dc.b	$2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C
 	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
 	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14E6C
 WinArt_CentTowerOutsidePortraitCopy:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
 	dc.b	$09, $0A, $0B, $0C, $0D, $2F, $30, $31, $32, $11
 	dc.b	$12, $13, $14, $14, $15, $33, $34, $35, $36, $17
@@ -31385,16 +31318,14 @@ WinArt_CentTowerOutsidePortraitCopy:
 	dc.b	$2C, $2C, $4E, $4F, $50, $51, $52, $53, $54, $55
 	dc.b	$2E, $2E, $56, $57, $58, $59, $5A, $5B, $5C, $5D
 	dc.b	$2E, $2E, $5E, $5F, $60, $61, $62, $63, $64, $65
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14EE4
 WinArt_GovernorPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $03, $04, $05, $00, $00
 	dc.b	$00, $06, $01, $07, $08, $09, $0A, $05, $0B, $00
 	dc.b	$00, $00, $0C, $0D, $0E, $0F, $10, $05, $00, $00
@@ -31405,16 +31336,14 @@ WinArt_GovernorPortrait:
 	dc.b	$33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C
 	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
 	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14F5C
 WinArt_ItemKeeperPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $00, $02, $03, $04, $05, $06, $00, $00
 	dc.b	$07, $08, $07, $09, $0A, $0B, $0C, $0D, $07, $07
 	dc.b	$0E, $0F, $0E, $10, $11, $12, $13, $11, $14, $15
@@ -31425,16 +31354,14 @@ WinArt_ItemKeeperPortrait:
 	dc.b	$33, $34, $35, $23, $36, $37, $38, $39, $23, $3A
 	dc.b	$3B, $3C, $3D, $23, $3E, $3F, $40, $41, $42, $43
 	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14FD4
 WinArt_SpaceshipPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $00, $00, $01, $02, $03, $00, $00, $00
 	dc.b	$04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0A
 	dc.b	$0D, $0E, $0D, $0F, $10, $11, $0D, $12, $13, $14
@@ -31445,16 +31372,14 @@ WinArt_SpaceshipPortrait:
 	dc.b	$3D, $3E, $3F, $40, $41, $41, $42, $43, $44, $45
 	dc.b	$46, $47, $48, $49, $49, $49, $49, $4A, $4B, $4C
 	dc.b	$46, $46, $4D, $4E, $41, $41, $41, $41, $41, $41
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1504C
 WinArt_MotaTeleportEmplPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
 	dc.b	$14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D
@@ -31465,16 +31390,14 @@ WinArt_MotaTeleportEmplPortrait:
 	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
 	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
 	dc.b	$51, $52, $53, $54, $55, $56, $57, $58, $59, $5A
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_150C4
 WinArt_RolfPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$A0, $A0, $A1, $A2, $A3, $A4, $A5, $A6, $A7, $A0
 	dc.b	$A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $B0, $B1
 	dc.b	$B2, $B3, $B4, $B5, $B6, $B7, $B8, $B9, $BA, $BB
@@ -31485,16 +31408,14 @@ WinArt_RolfPortrait:
 	dc.b	$E2, $E3, $E4, $E5, $E6, $E7, $E8, $E9, $EA, $EB
 	dc.b	$EC, $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, $F5
 	dc.b	$F6, $F7, $F8, $F9, $FA, $FB, $FC, $FD, $FE, $FF
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1513C
 WinArt_NeiPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $02, $03, $04, $04, $04, $05, $06
 	dc.b	$00, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
 	dc.b	$00, $10, $11, $12, $13, $14, $15, $16, $17, $18
@@ -31505,16 +31426,14 @@ WinArt_NeiPortrait:
 	dc.b	$00, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
 	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
 	dc.b	$00, $4F, $50, $51, $52, $53, $54, $55, $56, $57
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_151B4
 WinArt_RudoPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $03, $03, $03, $04, $03, $03
 	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0D
 	dc.b	$0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $15
@@ -31525,16 +31444,14 @@ WinArt_RudoPortrait:
 	dc.b	$3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
 	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
 	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1522C
 WinArt_AmyPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $00, $00, $02, $03, $01, $00, $00
 	dc.b	$04, $04, $05, $06, $07, $08, $09, $0A, $04, $04
 	dc.b	$0B, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $0B
@@ -31545,16 +31462,14 @@ WinArt_AmyPortrait:
 	dc.b	$38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
 	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
 	dc.b	$1D, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_152A4
 WinArt_HughPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$03, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $09
 	dc.b	$12, $13, $14, $15, $16, $17, $18, $10, $19, $09
@@ -31565,16 +31480,14 @@ WinArt_HughPortrait:
 	dc.b	$3B, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $09
 	dc.b	$43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
 	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1531C
 WinArt_AnnaPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
 	dc.b	$11, $12, $13, $14, $15, $16, $17, $18, $19, $12
@@ -31585,16 +31498,14 @@ WinArt_AnnaPortrait:
 	dc.b	$11, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
 	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
 	dc.b	$4F, $4F, $4F, $50, $51, $52, $53, $54, $55, $56
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_15394
 WinArt_KainPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $08, $09
 	dc.b	$10, $11, $12, $13, $14, $15, $16, $17, $10, $11
@@ -31605,16 +31516,14 @@ WinArt_KainPortrait:
 	dc.b	$36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F
 	dc.b	$40, $41, $42, $43, $44, $45, $46, $47, $48, $49
 	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1540C
 WinArt_ShirPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $03, $03, $03, $03, $04, $03
 	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $03, $0C, $0D
 	dc.b	$0E, $0F, $10, $11, $12, $13, $14, $15, $16, $17
@@ -31625,16 +31534,14 @@ WinArt_ShirPortrait:
 	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $03, $03, $44
 	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
 	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_15484
 WinArt_LibraryGraphPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$A0, $A1, $A2, $A3, $A1, $A4, $A5, $A6, $A7, $A3
 	dc.b	$A8, $A9, $AA, $AB, $A9, $AC, $AD, $AE, $AF, $B0
 	dc.b	$B1, $B2, $B3, $B4, $B5, $B6, $B7, $B8, $B9, $BA
@@ -31645,16 +31552,14 @@ WinArt_LibraryGraphPortrait:
 	dc.b	$A8, $D9, $DA, $DB, $DC, $DD, $DE, $DF, $E0, $E1
 	dc.b	$B1, $E2, $E3, $D0, $E4, $D1, $D0, $E5, $E6, $E7
 	dc.b	$E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $F1
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_154FC
 WinArt_RadarPortrait:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $01, $02, $01, $02, $01, $02, $01
 	dc.b	$03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C
 	dc.b	$0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $14
@@ -31665,75 +31570,64 @@ WinArt_RadarPortrait:
 	dc.b	$33, $29, $34, $35, $36, $37, $38, $08, $18, $39
 	dc.b	$0D, $14, $3A, $3B, $15, $3C, $15, $14, $15, $3D
 	dc.b	$33, $08, $3E, $3F, $18, $40, $18, $08, $18, $41
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_15574
 WinArt_BattleEmptySpots:
-	border 6, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $00, $01, $02, $03, $26
 	dc.b	$26, $04, $05, $06, $07, $26
 	dc.b	$26, $08, $09, $0A, $0B, $26
 	dc.b	$26, $0C, $0D, $0E, $0F, $26
-
-	border 6, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_15598
 WinArt_BattleOptions:
-	border 4, $B9
-
+	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $B4, $B5, $26
 	dc.b	"FGHT"
 	dc.b	$26, $B4, $B5, $26
 	dc.b	"STGY"
-
-	border 4, $BE
+	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_155B0
 WinArt_BattleOptions2:
-	border 4, $B9
-
+	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $B4, $B5, $26
 	dc.b	"ORDR"
 	dc.b	$26, $B4, $B5, $26
 	dc.b	"RUN "
-
-	border 4, $BE
+	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_155C8
 WinArt_BattleCommands:
-	border 11, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$12, $13, $26, $16, $17, $26, $1A, $1B, $26, $1E, $1F
 	dc.b	$14, $15, $26, $18, $19, $26, $1C, $1D, $26, $20, $21
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-
-	border 11, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_15600
 WinArt_BattleMessage:
-	border 20, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                    "
 	dc.b	"                    "
-
-	border 20, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
@@ -31811,11 +31705,9 @@ WinArt_IndividualCharStats:
 ; -----------------------------------------------------------------------
 ; loc_15875
 WinArt_Meseta:
-	border 11, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"MST       0"
-
-	border 11, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15896
 WinArt_CharOrderDestination:
@@ -31894,8 +31786,7 @@ WinArt_StrngHPTP:
 ; -----------------------------------------------------------------------
 ; loc_15A3C
 WinArt_StrngStats:
-	border 11, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"STRNGTH   0"
 	dc.b	"           "
 	dc.b	"MENTAL    0"
@@ -31909,13 +31800,11 @@ WinArt_StrngStats:
 	dc.b	"ATTACK    0"
 	dc.b	"           "
 	dc.b	"DEFENSE   0"
-
-	border 11, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15AE1
 WinArt_StrngEquip:
-	border 15, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"               "
 	dc.b	"HEAD           "
 	dc.b	"               "
@@ -31926,21 +31815,18 @@ WinArt_StrngEquip:
 	dc.b	"BODY           "
 	dc.b	"               "
 	dc.b	"LEGS           "
-
-	border 15, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15B95
 WinArt_StrngLVEXP:
-	border 10, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
 	dc.b	"LV 0      "
 	dc.b	"          "
 	dc.b	"          "
 	dc.b	"          "
 	dc.b	"EXP       "
-
-	border 10, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 loc_15BE5:
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -31948,16 +31834,14 @@ loc_15BE5:
 ; -----------------------------------------------------------------------
 ; loc_15BF9
 WinArt_EquipStats:
-	border 11, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"           "
 	dc.b	"AGILITY    "
 	dc.b	"           "
 	dc.b	"ATTACK     "
 	dc.b	"           "
 	dc.b	"DEFENSE    "
-
-	border 11, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15C51
 WinArt_FullTechList:
@@ -32065,14 +31949,12 @@ WinArt_RegroupSelectedChar:
 ; -----------------------------------------------------------------------
 ; loc_15F56
 WinArt_BattleCharStats:
-	border 6, $B9
-
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"HP   0"
 	dc.b	"TP   0"
 	dc.b	"      "
 	dc.b	"      "
-
-	border 6, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15F7A
 WinArt_BattleCharName:
@@ -34671,143 +34553,144 @@ EnemyNames:
 	charset	'-', $46
 	charset	':', $77
 
-	outradix 10
 
-; EnemyNameLength = 10
-length	:=	EnemyNameLength
+	dc.b	$C4, "         "
+	dc.b	"FIRE ANT", $C4, " "
+	dc.b	"ARMORANT", $C4, " "
+	dc.b	"PINCHANT", $C4, " "
+	dc.b	"MOSQUITO", $C4, " "
+	dc.b	"WASPY", $C4, "    "
+	dc.b	"STINGER", $C4, "  "
+	dc.b	"SPINNER", $C4, "  "
+	dc.b	"VORTEX", $C4, "   "
+	dc.b	"WHIRLY", $C4, "   "
+	dc.b	"BEE", $C4, "      "
+	dc.b	"BUZZER", $C4, "   "
+	dc.b	"INSECTA", $C4, "  "
+	dc.b	"POISONER", $C4, " "
+	dc.b	"SPITKILL", $C4, " "
+	dc.b	"SPITFANG", $C4, " "
+	dc.b	"HIT TAIL", $C4, " "
+	dc.b	"CENTER", $C4, "   "
+	dc.b	"SCALY", $C4, "    "
+	dc.b	"FROGGY", $C4, "   "
+	dc.b	"TOADER", $C4, "   "
+	dc.b	"SQUAT", $C4, "    "
+	dc.b	"CARRIER", $C4, "  "
+	dc.b	"MUSHROOM", $C4, " "
+	dc.b	"HEAD ROT", $C4, " "
+	dc.b	"WHISTLE", $C4, "  "
+	dc.b	"INFORMER", $C4, " "
+	dc.b	"TRACER", $C4, "   "
+	dc.b	"LOCUST", $C4, "   "
+	dc.b	"LOCUSTA", $C4, "  "
+	dc.b	"FANBITE", $C4, "  "
+	dc.b	"AMOEBA", $C4, "   "
+	dc.b	"JELLY", $C4, "    "
+	dc.b	"SLUGMESS", $C4, " "
+	dc.b	"POLEZI", $C4, "   "
+	dc.b	"POLEZIAX", $C4, " "
+	dc.b	"POLEZISS", $C4, " "
+	dc.b	"LEECHER", $C4, "  "
+	dc.b	"FANG", $C4, "     "
+	dc.b	"PYTHON", $C4, "   "
+	dc.b	"S", $C4, "        "
+	dc.b	"K", $C4, "        "
+	dc.b	"H", $C4, "        "
+	dc.b	"PULSER", $C4, "   "
+	dc.b	"BLASTER", $C4, "  "
+	dc.b	"BLASTOID", $C4, " "
+	dc.b	"ROT WOOD", $C4, " "
+	dc.b	"BLOCKHED", $C4, " "
+	dc.b	"FIRIA", $C4, "    "
+	dc.b	"WOLFANG", $C4, "  "
+	dc.b	"BURNWOLF", $C4, " "
+	dc.b	"FLAREWLF", $C4, " "
+	dc.b	"PUG HIT", $C4, "  "
+	dc.b	"PUG BRAT", $C4, " "
+	dc.b	"PUG KILL", $C4, " "
+	dc.b	"S", $C4, "        "
+	dc.b	"S", $C4, "        "
+	dc.b	"S", $C4, "        "
+	dc.b	"WIREFACE", $C4, " "
+	dc.b	"WIREHEAD", $C4, " "
+	dc.b	"POD HEAD", $C4, " "
+	dc.b	"TERAKITE", $C4, " "
+	dc.b	"REPTILE", $C4, "  "
+	if revision=1
+	dc.b	"FIRE-EYE", $C4, " "
+	dc.b	"KITEDRGN", $C4, " "
+	else
+	; revision 2 has the correct location for these two names
+	dc.b	"KITEDRGN", $C4, " "
+	dc.b	"FIRE-EYE", $C4, " "
+	endif
+	dc.b	"GLOWSTIK", $C4, " "
+	dc.b	"FOREST", $C4, "   "
+	dc.b	"CATMAN", $C4, "   "
+	dc.b	"CATFANG", $C4, "  "
+	dc.b	"CATEYE", $C4, "   "
+	dc.b	"MECHOMAN", $C4, " "
+	dc.b	"SONOMECH", $C4, " "
+	dc.b	"ATTMECH", $C4, "  "
+	dc.b	"MAZGAMMA", $C4, " "
+	dc.b	"FIRGAMMA", $C4, " "
+	dc.b	"KILGAMMA", $C4, " "
+	dc.b	"METALMAN", $C4, " "
+	dc.b	"TWIG MAN", $C4, " "
+	dc.b	"TWIGTALL", $C4, " "
+	dc.b	"COOLEY61", $C4, " "
+	dc.b	"MONSTER", $C4, "  "
+	dc.b	"LRGMINER", $C4, " "
+	dc.b	"EYESORE", $C4, "  "
+	dc.b	"HVYSOLID", $C4, " "
+	dc.b	"GUN BUST", $C4, " "
+	dc.b	"ARMY EYE", $C4, " "
+	dc.b	"TRCRBASE", $C4, " "
+	dc.b	"SPECTER", $C4, "  "
+	dc.b	"VAN", $C4, "      "
+	dc.b	"VANLEADR", $C4, " "
+	dc.b	"AEROTANK", $C4, " "
+	dc.b	"ORANGAH", $C4, "  "
+	dc.b	"ORANGOO", $C4, "  "
+	dc.b	"OHX", $C4, "      "
+	dc.b	"MASTODON", $C4, " "
+	dc.b	"ELETUSK", $C4, "  "
+	dc.b	"ELEPHANT", $C4, " "
+	dc.b	"DEZO OWL", $C4, " "
+	dc.b	"SKYTIARA", $C4, " "
+	dc.b	"OWLTALON", $C4, " "
+	dc.b	"RABBIT", $C4, "   "
+	dc.b	"RABITTA", $C4, "  "
+	dc.b	"RABITGUT", $C4, " "
+	dc.b	"WRESTLER", $C4, " "
+	dc.b	"SAKOFF", $C4, "   "
+	dc.b	"MESOMAN", $C4, "  "
+	dc.b	"LUNG", $C4, "     "
+	dc.b	"GLOSWORD", $C4, " "
+	dc.b	"DESRONA", $C4, "  "
+	dc.b	"DARKSIDE", $C4, " "
+	dc.b	"MR DEATH", $C4, " "
+	dc.b	"SHADOW", $C4, "   "
+	dc.b	"MYSTCAPE", $C4, " "
+	dc.b	"ILLUSNST", $C4, " "
+	dc.b	"IMAGIOMG", $C4, " "
+	dc.b	"ARCHDRGN", $C4, " "
+	dc.b	"FRDRAGON", $C4, " "
+	dc.b	"MXDRAGON", $C4, " "
+	dc.b	"FIREFALL", $C4, " "
+	dc.b	"VORCANO", $C4, "  "
+	dc.b	"KINGLAVA", $C4, " "
+	dc.b	"WIZARD", $C4, "   "
+	dc.b	"CAPEONE", $C4, "  "
+	dc.b	"FIEND", $C4, "    "
+	dc.b	"NEIFIRST", $C4, " "
+	dc.b	"DARKFRCE", $C4, " "
+	dc.b	"MOMBRAIN", $C4, " "
 
-
-	nametxt	""
-	nametxt	"FIRE ANT"
-	nametxt	"ARMORANT"
-	nametxt	"PINCHANT"
-	nametxt	"MOSQUITO"
-	nametxt	"WASPY"
-	nametxt	"STINGER"
-	nametxt	"SPINNER"
-	nametxt	"VORTEX"
-	nametxt	"WHIRLY"
-	nametxt	"BEE"
-	nametxt	"BUZZER"
-	nametxt	"INSECTA"
-	nametxt	"POISONER"
-	nametxt	"SPITKILL"
-	nametxt	"SPITFANG"
-	nametxt	"HIT TAIL"
-	nametxt	"CENTER"
-	nametxt	"SCALY"
-	nametxt	"FROGGY"
-	nametxt	"TOADER"
-	nametxt	"SQUAT"
-	nametxt	"CARRIER"
-	nametxt	"MUSHROOM"
-	nametxt	"HEAD ROT"
-	nametxt	"WHISTLE"
-	nametxt	"INFORMER"
-	nametxt	"TRACER"
-	nametxt	"LOCUST"
-	nametxt	"LOCUSTA"
-	nametxt	"FANBITE"
-	nametxt	"AMOEBA"
-	nametxt	"JELLY"
-	nametxt	"SLUGMESS"
-	nametxt	"POLEZI"
-	nametxt	"POLEZIAX"
-	nametxt	"POLEZISS"
-	nametxt	"LEECHER"
-	nametxt	"FANG"
-	nametxt	"PYTHON"
-	nametxt	"S"
-	nametxt	"K"
-	nametxt	"H"
-	nametxt	"PULSER"
-	nametxt	"BLASTER"
-	nametxt	"BLASTOID"
-	nametxt	"ROT WOOD"
-	nametxt	"BLOCKHED"
-	nametxt	"FIRIA"
-	nametxt	"WOLFANG"
-	nametxt	"BURNWOLF"
-	nametxt	"FLAREWLF"
-	nametxt	"PUG HIT"
-	nametxt	"PUG BRAT"
-	nametxt	"PUG KILL"
-	nametxt	"S"
-	nametxt	"S"
-	nametxt	"S"
-	nametxt	"WIREFACE"
-	nametxt	"WIREHEAD"
-	nametxt	"POD HEAD"
-	nametxt	"TERAKITE"
-	nametxt	"REPTILE"
-	nametxt	"KITEDRGN"
-	nametxt	"FIRE-EYE"
-	nametxt	"GLOWSTIK"
-	nametxt	"FOREST"
-	nametxt	"CATMAN"
-	nametxt	"CATFANG"
-	nametxt	"CATEYE"
-	nametxt	"MECHOMAN"
-	nametxt	"SONOMECH"
-	nametxt	"ATTMECH"
-	nametxt	"MAZGAMMA"
-	nametxt	"FIRGAMMA"
-	nametxt	"KILGAMMA"
-	nametxt	"METALMAN"
-	nametxt	"TWIG MAN"
-	nametxt	"TWIGTALL"
-	nametxt	"COOLEY61"
-	nametxt	"MONSTER"
-	nametxt	"LRGMINER"
-	nametxt	"EYESORE"
-	nametxt	"HVYSOLID"
-	nametxt	"GUN BUST"
-	nametxt	"ARMY EYE"
-	nametxt	"TRCRBASE"
-	nametxt	"SPECTER"
-	nametxt	"VAN"
-	nametxt	"VANLEADR"
-	nametxt	"AEROTANK"
-	nametxt	"ORANGAH"
-	nametxt	"ORANGOO"
-	nametxt	"OHX"
-	nametxt	"MASTODON"
-	nametxt	"ELETUSK"
-	nametxt	"ELEPHANT"
-	nametxt	"DEZO OWL"
-	nametxt	"SKYTIARA"
-	nametxt	"OWLTALON"
-	nametxt	"RABBIT"
-	nametxt	"RABITTA"
-	nametxt	"RABITGUT"
-	nametxt	"WRESTLER"
-	nametxt	"SAKOFF"
-	nametxt	"MESOMAN"
-	nametxt	"LUNG"
-	nametxt	"GLOSWORD"
-	nametxt	"DESRONA"
-	nametxt	"DARKSIDE"
-	nametxt	"MR DEATH"
-	nametxt	"SHADOW"
-	nametxt	"MYSTCAPE"
-	nametxt	"ILLUSNST"
-	nametxt	"IMAGIOMG"
-	nametxt	"ARCHDRGN"
-	nametxt	"FRDRAGON"
-	nametxt	"MXDRAGON"
-	nametxt	"FIREFALL"
-	nametxt	"VORCANO"
-	nametxt	"KINGLAVA"
-	nametxt	"WIZARD"
-	nametxt	"CAPEONE"
-	nametxt	"FIEND"
-	nametxt	"NEIFIRST"
-	nametxt	"DARKFRCE"
-	nametxt	"MOMBRAIN"
-
-	outradix 16
 	charset
 
+	even
 ; =============================================================================
 
 loc_17C94:
@@ -35068,45 +34951,30 @@ PlaneMap_SceneLutz:	binclude "scene/mappings/lutz.bin"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	' ', 0
 
-	; print the variables in decimal notation for the message
-	outradix 10
-
-soundtracktxt macro text
-	if	strlen(text) > SoundtrackNameLength
-		warning	"The soundtrack name \{text} is longer than \{SoundtrackNameLength} characters"
-	endif
-	dc.b	text
-	rept	SoundtrackNameLength-strlen(text)
-		dc.b	0
-	endm
-
-	endm
-
 SoundtrackCharArray:
-	soundtracktxt	"Phantasy"
-	soundtracktxt	"Restration"
-	soundtracktxt	"Pleasure"
-	soundtracktxt	"Advanced"
-	soundtracktxt	"Step Up"
-	soundtracktxt	"Bracky News"
-	soundtracktxt	"My Home"
-	soundtracktxt	"Pressure"
-	soundtracktxt	"a Prologue"
-	soundtracktxt	"Rise or Fall"
-	soundtracktxt	"Movement"
-	soundtracktxt	"Over"
-	soundtracktxt	"Secret Ways"
-	soundtracktxt	"Mystery"
-	soundtracktxt	"Death Place"
-	soundtracktxt	"Silent Zone"
-	soundtracktxt	"Excite Town"
-	soundtracktxt	"Violation"
-	soundtracktxt	"Power"
-	soundtracktxt	"Under"
-	soundtracktxt	"Exclaim"
-	soundtracktxt	"Never Dream"
+	dc.b	"Phantasy    "
+	dc.b	"Restration  "
+	dc.b	"Pleasure    "
+	dc.b	"Advanced    "
+	dc.b	"Step Up     "
+	dc.b	"Bracky News "
+	dc.b	"My Home     "
+	dc.b	"Pressure    "
+	dc.b	"a Prologue  "
+	dc.b	"Rise or Fall"
+	dc.b	"Movement    "
+	dc.b	"Over        "
+	dc.b	"Secret Ways "
+	dc.b	"Mystery     "
+	dc.b	"Death Place "
+	dc.b	"Silent Zone "
+	dc.b	"Excite Town "
+	dc.b	"Violation   "
+	dc.b	"Power       "
+	dc.b	"Under       "
+	dc.b	"Exclaim     "
+	dc.b	"Never Dream "
 
-	outradix 16
 	charset
 ; ========================================================================================
 
