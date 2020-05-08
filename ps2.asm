@@ -35111,6 +35111,106 @@ SoundtrackCharArray:
 ; ========================================================================================
 
 
+; ===============================
+; Inclusion of all(?) the text dialogs in the game.
+    ; ----------------------------------------------------------------------------------------------------------------
+; The whole script is below with all pointers and data which represent text that
+; will be mapped to VRAM data.
+; The ID's for the section and one of its text data are loaded in RAM in this way usually:
+;
+; 	move.w	#$XXXX, (Script_id).w
+;
+; where the higher byte represents the pointer of a section, and the lower byte is the text data pointer that
+; that will be displayed. As an example, if we write
+;
+;	move.w	#$1102, (Script_id).w
+;
+; , we fetch the Script_Governor pointer section ($11) and the text data pointer (02), so that data will be
+; loaded.
+;
+; While processing the text data, the software uses some control bytes to determine certain actions. They are as follows:
+;
+; $BB = name of the character - takes up 4 bytes
+; $BC = name of a second character - used if the character name defined by the control byte above is used in the same block; takes up 4 bytes
+; $BD = name of the enemy - takes up 10 bytes
+; $BE = name of the technique - takes up 5 bytes
+; $BF = name of the item - takes up 10 bytes
+; $C0 = meseta value - takes up 6 bytes
+; $C1 = draws character in a new line - takes up 2 bytes
+; $C2 = clears window
+; $C3 = stop text output until a button is pressed
+; $C4 = stops processing text and closes window
+; $C5 = brings up another window (e.g. window for YES/NO response)
+; $C6 = window either closes by pressing a button or after a certain time by itself
+; $C7 = window closes by itself after a certain time
+;
+; You don't have to keep the text aligned like the orginal. You can expand, reduce text blocks as much as you want because
+; the assembler will take care of calculating the offsets for every text block. Things you need to pay attention to
+; are as follows:
+;
+; - The whole ROM size. the maximum number of bytes allowed in a Megadrive/Genesis ROM varies with the tools you use
+;   use to play the games. There are special carts that can be used with real hardware where you can put your ROM's.
+;   I can't say a precise number, but one cart is able to hold 16GB of data, so it's virtually infinite for a MD/Gen
+;   ROM. Most official carts could hold 4MB of data so you need to watch out for this. If you just edit text, it's hard
+;   to reach 4MB, but you never know :)
+;
+; - Windows for text can hold 24 characters per line. For the text windows in battle the limit is 20.
+;   Nothing happens if you put more, but it will spill over, and I doubt you want that. Put the $C1 control byte when you
+;   want to move to a new line.
+;
+; - Text data loaded in RAM and the space reserved for it is about 700 bytes. It's a lot, but you may want to keep your text
+;   blocks small for both readability and to avoid an overwrite to the sound RAM. The music freeze bug that happens in the Esper Mansion when talking to
+;   Lutz is due to too much text which is loaded and overwrites most if not all the sound RAM. To avoid this you need to stop
+;   text processing by putting a $C4 and load other text data, if any, in another sitting. Check the code to see how this is handled.
+;   Generally you see an instruction in the following format:
+;
+;   move.l	#$01090004, (Script_id).w
+;
+;   First it loads and process the #$0109 text section and after it's done it will process the #$0004 section. You have 16 bytes of space to
+;   put your text ID's, so there could be something like
+;
+;   move.l	#$11121113, (Script_id).w
+;	move.l	#$11141115, (Script_id+4).w
+;	move.l	#$11161117, (Script_id+8).w
+;	move.l	#$11181119, (Script_id+$C).w
+;
+;   and the software will process all the text defined by the ID's above in sequence.
+;
+; ----------------------------------------------------------------------------------------------------------------
+
+
+; =================================================================
+; Game Script Pointers
+; =================================================================
+GameScriptPtrs:
+	dc.l	Script_ItemAction		; 0
+	dc.l	Script_TechAction		; 1
+	dc.l	Script_EquipAction		; 2
+	dc.l	Script_DataMemory		; 3
+	dc.l	Script_CloneLabs		; 4
+	dc.l	Script_Hospital			; 5
+	dc.l	Script_WeaponStore		; 6
+	dc.l	Script_ArmorStore		; 7
+	dc.l	Script_ItemStore		; 8
+	dc.l	Script_RolfHouse		; 9
+	dc.l	Script_UstvestiaHouse	; $A
+	dc.l	Script_InventorHouse	; $B
+	dc.l	Script_TeleportStation	; $C
+	dc.l	Script_CentralTower		; $D
+	dc.l	Script_StorageRoom				; $E
+	dc.l	Script_Roof				; $F
+	dc.l	Script_Library			; $10
+	dc.l	Script_Governor			; $11
+	dc.l	Script_Battle			; $12
+	dc.l	Script_IntroScreen		; $13
+	dc.l	Script_Opening			; $14
+	dc.l	Script_GameStart		; $15
+	dc.l	Script_NPC			; $16
+	dc.l	Script_MapActions		; $17
+	dc.l	Script_MapEvents		; $18
+	dc.l	Script_Miscellaneous	; $19
+; =================================================================
+
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -35125,11 +35225,57 @@ SoundtrackCharArray:
 	charset	'-', $46
 	charset	':', $77
 
-; ===============================
-; Inclusion of all(?) the text dialogs in the game.
-    include "script/script.asm"
-;================================
-
+Script_ItemAction:	include "script/item.asm"
+	even
+Script_TechAction:	include "script/tech.asm"
+	even
+Script_EquipAction:	include "script/equip.asm"
+	even
+Script_DataMemory:	include "script/data_memory.asm"
+	even
+Script_CloneLabs:	include "script/clone_labs.asm"
+	even
+Script_Hospital:	include "script/hospital.asm"
+	even
+Script_WeaponStore:	include "script/weapon_store.asm"
+	even
+Script_ArmorStore:	include "script/armor_store.asm"
+	even
+Script_ItemStore:	include "script/item_store.asm"
+	even
+Script_RolfHouse:	include "script/rolf_house.asm"
+	even
+Script_UstvestiaHouse:	include "script/ustvestia.asm"
+	even
+Script_InventorHouse:	include "script/inventor.asm"
+	even
+Script_TeleportStation:	include "script/teleport.asm"
+	even
+Script_CentralTower:	include "script/central_tower.asm"
+	even
+Script_StorageRoom:	include "script/storage_room.asm"
+	even
+Script_Roof:	include "script/roof.asm"
+	even
+Script_Library:	include "script/library.asm"
+	even
+Script_Governor:	include "script/governor.asm"
+	even
+Script_Battle:	include "script/battle.asm"
+	even
+Script_IntroScreen:	include "script/intro_screen.asm"
+	even
+Script_Opening:	include "script/opening.asm"
+	even
+Script_GameStart:	include "script/game_start.asm"
+	even
+Script_NPC:	include "script/NPC.asm"
+	even
+Script_MapActions:	include "script/map_actions.asm"
+	even
+Script_MapEvents:	include "script/map_events.asm"
+	even
+Script_Miscellaneous:	include "script/misc.asm"
 	even
 
 	charset
