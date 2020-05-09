@@ -27,7 +27,7 @@ bugfixes = 0			; if 1, include bug fixes
 walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
-revision = 2			; 1 = first US release; 2 = second US release
+revision = 2			; 0 = Japanese (incomplete); 1 = first US release; 2 = second US release
 
 	cpu 68000
 	include "ps2.macrosetup.asm"
@@ -58,19 +58,35 @@ VectorTable:
 	dc.l	ErrorTrap, ErrorTrap, ErrorTrap, ErrorTrap
 
 Header:
+	if revision=0
 	dc.b	"SEGA MEGA DRIVE " ; Console name
-	if revision=1
-	dc.b 	"(C)SEGA 1989.JUN" ; Copyright/Date
-	else
-	dc.b 	"(C)SEGA 1990.JAN" ; Copyright/Date
-	endif
+	dc.b 	"(C)SEGA 1988.DEC" ; Copyright/Date
 	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
 	dc.b 	"PHANTASY STAR 2                                 " ; International name
-	if revision=1
+	dc.b 	"GM 00005501-00"   ; Version
+
+Checksum:
+	dc.w	0		; Checksum
+	dc.b 	"J               " ; I/O Support
+	dc.l 	StartOfRom		; ROM Start
+
+ROMEndLoc:
+	dc.l	EndOfRom-1		; ROM End
+	dc.l 	RAM_start&$FFFFFF		; RAM Start
+	dc.l 	$FFFFFF		; RAM End
+	dc.l 	$5241F820		; Backup RAM ID
+	dc.l 	$200001		; Backup RAM start address
+	dc.l 	$203FFF		; Backup RAM end address
+	dc.b 	"            "	; Modem support
+	dc.b 	"                                        "	; Notes
+	dc.b 	"                " ; Country
+
+	elseif revision=1
+	dc.b	"SEGA MEGA DRIVE " ; Console name
+	dc.b 	"(C)SEGA 1989.JUN" ; Copyright/Date
+	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
+	dc.b 	"PHANTASY STAR 2                                 " ; International name
 	dc.b 	"GM 00005501-01"   ; Version
-	else
-	dc.b 	"GM 00005501-02"   ; Version
-	endif
 
 Checksum:
 	dc.w	$3792		; Checksum
@@ -87,6 +103,32 @@ ROMEndLoc:
 	dc.b 	"            "	; Modem support
 	dc.b 	"                                        "	; Notes
 	dc.b 	"UE              " ; Country
+
+	else
+	
+	dc.b	"SEGA MEGA DRIVE " ; Console name
+	dc.b 	"(C)SEGA 1990.JAN" ; Copyright/Date
+	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
+	dc.b 	"PHANTASY STAR 2                                 " ; International name
+	dc.b 	"GM 00005501-02"   ; Version
+
+Checksum:
+	dc.w	$3792		; Checksum
+	dc.b 	"J               " ; I/O Support
+	dc.l 	StartOfRom		; ROM Start
+
+ROMEndLoc:
+	dc.l	EndOfRom-1		; ROM End
+	dc.l 	RAM_start&$FFFFFF		; RAM Start
+	dc.l 	$FFFFFF		; RAM End
+	dc.l 	$5241F820		; Backup RAM ID
+	dc.l 	$200001		; Backup RAM start address
+	dc.l 	$203FFF		; Backup RAM end address
+	dc.b 	"            "	; Modem support
+	dc.b 	"                                        "	; Notes
+	dc.b 	"UE              " ; Country
+	
+	endif
 EndOfHeader:
 	if (*) <> $200
 		fatal	"End of header is at address $\{*}, but it should be at address $200. The header + vector table must be exactly 512 bytes long"
@@ -98,11 +140,12 @@ ErrorTrap:
 	nop
 
 EntryPoint:
+	if revision>0
 	move.b	(HW_version).l, d0	; get hardware version
 	andi.b	#$F, d0		; stored in the lower nibble
 	beq.s	SkipSecurity	; branch if hardware is older than Genesis III
 	move.l	#'SEGA', (Security_addr).l	; satisfy the TMSS
-
+	endif
 SkipSecurity:
 	btst	#6, (HW_expansion_control).l
 	if checksum_remove=1
@@ -136,9 +179,11 @@ ChecksumGood:
 	move.l	d7, (a6)+
 	dbf	d6, -
 
+	if revision>0
 	move.b	(HW_version).l, d0
 	andi.b	#$C0, d0				; get video type (NTSC, PAL)
 	move.b	d0, ($FFFFFFF8).w	; and store them
+	endif
 	move.l	#'init', (Checksum_four_CC).w	; Checksum routine successful
 GameInit:
 	lea	(RAM_start&$FFFFFF).l, a6	; load ram
@@ -2657,7 +2702,9 @@ RedCursor_Init:
 	move.w	#$85B6, 8(a0)
 	move.l	#Map_Cursors, 4(a0)
 	move.w	#1, $22(a0)
+	if revision>0
 	move.w	#0, ($FFFFDE50).w
+	endif
 ; --------------------------------------------------------------
 RedCursor_Main:
 	tst.w	(Window_index).w
@@ -2743,8 +2790,13 @@ loc_15CA:
 input_win_held_timer = $28
 input_win_curr_pos = $32
 
+	if revision>0
 input_win_char_row = 18-1		; number of characters in a row (starts from 0)
 input_win_char_col = 4			; number of columns
+	else
+input_win_char_row = 20-1		; number of characters in a row (starts from 0)
+input_win_char_col = 6			; number of columns
+	endif
 ; ----------------------------------------------------------------------------
 Obj_InputWindowCursor:
 	move.w	routine(a0), d0
@@ -2841,10 +2893,12 @@ InputWindowCursor_Main:
 ; Right pressed
 .right_pressed:
 	addq.b	#1, d1
+	if revision>0
 	cmpi.b	#input_win_char_row*3-2, d1
 	bne.s	.s
 	subi.b	#input_win_char_row-2, d1
 .s:
+	endif
 	move.l	d1, d3
 	divu.w	#input_win_char_row, d3
 	cmp.w	d2, d3
@@ -2879,6 +2933,7 @@ InputWindowCursor_Main:
 	move.w	d1, ($FFFFDE50).w
 	move.w	d1, d0
 	divu.w	#input_win_char_row, d1
+	if revision>0
 	lsl.w	#3, d1
 	move.w	d1, d2
 	lsl.w	#1, d1
@@ -2889,6 +2944,15 @@ InputWindowCursor_Main:
 	lsl.w	#3, d1
 	addi.w	#$100, d1
 	move.w	d1, x_pos(a0)
+	else
+	lsl.w	#4, d1
+	addi.w	#$B0, d1
+	move.w	d1, y_pos(a0)
+	swap	d1
+	lsl.w	#3, d1
+	addi.w	#$F8, d1
+	move.w	d1, x_pos(a0)	
+	endif
 
 	lea	(InputCharacterMap).l, a1
 	adda.w	d0, a1
@@ -2947,7 +3011,11 @@ NameDestinationTile_Init:
 	move.w	#$130, $A(a0)
 	move.w	#$98, $E(a0)
 	move.b	#$30, 2(a0)
+	if revision>0
 	move.w	#$855F, 8(a0)
+	else
+	move.w	#$8553, 8(a0)
+	endif
 	move.l	#Map_Cursors, 4(a0)
 	move.w	#7, $26(a0)
 	move.w	#4, $24(a0)
@@ -9266,6 +9334,7 @@ VInt:
 	neg.w	d0
 	swap	d0
 	move.l	d0, (VDP_data_port).l
+	if revision>0
 	btst	#6,($FFFFFFF8).w
 	beq.s	+		; branch if NTSC (bit 6 = 0)
 
@@ -9274,6 +9343,7 @@ VInt:
 	dbf	d0, -
 
 +
+	endif
 	move.b	(V_int_routine).w, d0	; get VInt index
 	andi.w	#$3C, d0
 	jsr	VIntRoutines-4(pc,d0.w)
@@ -9295,11 +9365,11 @@ VIntRoutines:
 	bra.w	VInt_SegaTitle		; 8
 	bra.w	VInt_Ending			; $C
 	bra.w	VInt_Map			; $10
-	bra.w	VInt_Scene	; $14
+	bra.w	VInt_Scene			; $14
 	bra.w	VInt_Battle			; $18
-	bra.w	VInt_NormalUpdates		; $1C
+	bra.w	VInt_NormalUpdates	; $1C
 	bra.w	VInt_GamePause		; $20
-	bra.w	VInt_NormalUpdates		; $24
+	bra.w	VInt_NormalUpdates	; $24
 ; =================================================================
 
 
@@ -9386,9 +9456,12 @@ VInt_NormalUpdates:
 	move.w	#$96FD, (a6)
 	move.w	#$977F, (a6)	; source = $FFFFFB00
 	move.w	#$C000, (a6) ; write to CRAM
-	move.w	#$80,(DMA_last_write).w
+	if revision>0
+	move.w	#$80, (DMA_last_write).w
 	move.w	(DMA_last_write).w, (a6)
-
+	else
+	move.w	#$80, (a6)
+	endif
 	; DMA 68k to VDP
 	lea	(VDP_control_port).l, a6
 	move.w	#$9340, (a6)
@@ -9864,7 +9937,7 @@ LoadWeaponTechPLC:
 	rts
 ; -----------------------------------------------------------------
 
-
+	if revision>0
 ; Nemesis decompression to VRAM
 NemDec:
 	movem.l	d0-a1/a3-a5, -(sp)
@@ -10045,7 +10118,7 @@ loc_61D4:
 	dbf	d5, -
 
 	bra.s	loc_61A6
-
+	endif
 
 PaletteFadeTo:
 	move.l	#$3F,($FFFFF626).w
@@ -11772,10 +11845,15 @@ GameMode_Title:
 	bsr.w	PaletteLoad1
 	move.b	#$81, d0		; Phantasy music
 	bsr.w	UpdateSoundQueue
+	if revision>0
 	moveq	#0, d0
 	move.l	d0, ($FFFFF61C).w	; clear y position
 	move.w	d0,(Opening_ending_flag).w
 	move.w	d0,(Window_active_flag).w
+	else
+	move.l	#0, ($FFFFF61C).w	; clear y position
+	move.w	#0,(Opening_ending_flag).w
+	endif
 	move.w	#$8006, (VDP_control_port).l
 	move.w	#$8B00, (VDP_control_port).l
 	move.w	#$B4,(General_timer).w		; set timer
@@ -14414,7 +14492,11 @@ Map_LoadData:
 	adda.w	d0, a4
 	movea.l	(a4)+, a0
 	move.l	#$40000000, (VDP_control_port).l
+	if revision>0
 	bsr.w	NemDec
+	else
+	bsr.w	DecompressToVDP
+	endif
 	move.l	#Chunk_table&$FFFFFF, (Chunk_table_addr).w
 	movea.l	(a4)+, a0
 	lea	(Chunk_table&$FFFFFF).l, a4
@@ -19720,7 +19802,11 @@ loc_C9D8:
 	move.w	#0, (Character_index).w
 	cmpi.w	#1, ($FFFFC736).w
 	beq.s	loc_C9F4
+	if revision>0
 	move.l	#$11011105, (Script_ID).w
+	else
+	move.w	#$1101, (Script_ID).w
+	endif
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C9F4:
@@ -20196,7 +20282,11 @@ loc_CF0A:
 	move.w	#0, (Character_index).w
 	cmpi.b	#2, ($FFFFC743).w
 	bne.s	loc_CF38
+	if revision>0
 	move.l	#$190B190E, (Script_ID).w
+	else
+	move.w	#$1909, (Script_ID).w
+	endif
 	addq.w	#4, (Event_routine).w
 	move.w	#0, (Map_event_load).w
 	move.b	#0, (Treasure_chest_flags+Chest_Prism).w
@@ -20220,8 +20310,12 @@ loc_CF58:
 	bne.s	loc_CF74			; if we don't have all the Nei items, branch
 	move.b	#1, ($FFFFC744).w
 ; Fix: RAM overflow (music freeze)
+	if revision>0
 	if bugfixes=1
 	move.l	#$16901693, (Script_ID).w
+	else
+	move.w	#$1690, (Script_ID).w
+	endif
 	else
 	move.w	#$1690, (Script_ID).w
 	endif
@@ -22151,8 +22245,10 @@ loc_E43E:
 	beq.s	loc_E456
 	cmp.w	4(a0), d1
 	beq.s	loc_E456
+	if revision>0
 	cmp.w	6(a0), d1
 	beq.s	loc_E456
+	endif
 	move.w	d1, (a1)+
 loc_E456:
 	rts
@@ -22372,6 +22468,7 @@ loc_E690:
 	rts
 
 ; =========================================
+	if revision>0
 loc_E6B0:
 	dc.b	$99
 	dc.b	$99
@@ -22655,7 +22752,31 @@ loc_E730:
 	dc.b	$8E
 	dc.b	$8F
 ; =========================================
+	else
+loc_E6B0:
+	dc.b	$97, $97, $98, $98, $98, $99, $99, $99, $9A, $9A, $9B, $94, $9D, $9D, $9E, $9E
+	dc.b	$99, $99, $9A, $9A, $9B, $9C, $9B, $9C, $9B, $9D, $9E, $9E, $97, $98, $97, $98
+	dc.b	$97, $98, $99, $9A, $9A, $9B, $9C, $9D, $9E, $A0, $A0, $A0, $97, $98, $99, $9A
+	dc.b	$99, $9A, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $97, $98, $97, $98
+	dc.b	$99, $9A, $99, $9A, $9B, $9C, $A0, $A0, $A0, $A0, $A0, $A0, $97, $98, $97, $98
+	dc.b	$99, $9A, $99, $9A, $9B, $9C, $9B, $9C, $9D, $9E, $A0, $A0
 
+loc_E70C:
+	dc.b	$01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10
+	dc.b	$11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
+	dc.b	$21, $22, $23, $24
+	
+loc_E730:
+	dc.b	$25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34
+	dc.b	$35, $36, $35, $36, $35, $36, $35, $36, $37, $38, $39, $3A, $3A, $3B, $3C, $3D
+	dc.b	$3E, $3F, $40, $41, $40, $41, $41, $41, $42, $43, $44, $45, $46, $47, $48, $49
+	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $41, $53, $54, $53, $55, $53, $54, $55, $53
+	dc.b	$55, $56, $53, $54, $56, $54, $55, $57, $54, $55, $54, $56, $53, $56, $53, $54
+	dc.b	$53, $55, $54, $53, $53, $55, $79, $7A, $7B, $7C, $7D, $00, $5B, $5C, $5D, $5E
+	dc.b	$5F, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $6A, $6B, $6C, $6D, $6E
+	dc.b	$6F, $70, $71, $72, $73, $74, $75, $76, $77, $78, $58, $59, $58, $5A, $58, $00
+	dc.b	$7E, $7F, $80, $7E, $7F, $81, $84, $85, $87, $89, $8A, $8B, $8C, $8D, $8E, $8F
+	endif
 	even
 
 ; -------------------------------------------------------------
@@ -24504,7 +24625,11 @@ loc_FA94:
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
+	if revision>0
 	adda.w	#$31, a1
+	else
+	adda.w	#$16, a1
+	endif
 	suba.w	#$40, a3
 	lea	(loc_11432).l, a2
 	move.w	(a3)+, d0
@@ -24520,7 +24645,11 @@ loc_FACE:
 	adda.w	#$19, a1
 	move.b	(a2)+, (a1)+
 	move.b	(a2)+, (a1)+
+	if revision>0
 	suba.w	#$1A, a1
+	else
+	addq.w	#1, a1
+	endif
 	move.w	(a3), d0
 	bsr.w	loc_1135A
 	adda.w	#$18, a1
@@ -25133,9 +25262,18 @@ Win_StrngLVEXP:
 	bsr.w	loc_11364
 	lea	(loc_11456).l, a2
 	move.w	(Character_index).w, d1
+	if revision>0
 	lsl.w	#3, d1
 	adda.w	d1, a2
 	adda.w	#$11, a1
+	else
+	lsl.w	#4, d1
+	adda.w	d1, a2
+	adda.w	#7, a1
+	move.l	(a2)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
+	move.l	(a2)+, (a1)+	; same as above
+	addq.w	#2, a1
+	endif
 	move.l	(a2)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.l	(a2)+, (a1)+	; same as above
 	adda.w	#$E, a1
@@ -26637,7 +26775,7 @@ loc_10F94:
 	addq.w	#2, a1
 	rts
 ; ----------------------------------------
-
+	if revision>0
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -26672,6 +26810,24 @@ TeleportPlaceNamesArray:
 	even
 
 	charset
+	
+	else
+	
+TeleportPlaceNamesArray:
+	dc.b	$62, $5D, $7E, $00, $00
+	dc.b	$9F, $63, $5A, $00, $00
+	dc.b	$56, $7C, $73, $A5, $78
+	dc.b	$5A, $A1, $65, $6E, $00
+	dc.b	$94, $73, $00, $00, $00
+	dc.b	$5D, $59, $7C, $62, $00
+	dc.b	$A0, $56, $65, $00, $00
+	dc.b	$56, $58, $5D, $9B, $7D
+	dc.b	$95, $A5, $60, $00, $00
+	dc.b	$7C, $8A, $5A, $82, $00
+	
+	even
+
+	endif
 
 ; -----------------------------------------
 ; loc_10FE0
@@ -27135,6 +27291,7 @@ DecimalDigitNumbers:
 	dc.l	1
 ; ====================================
 
+	if revision>0
 	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
 	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
 	charset '0', "\118\119\120\121\122\123\124\125\126\127"
@@ -27205,11 +27362,10 @@ loc_11456:
 	dc.b	"GUARDIAN"
 	dc.b	"WRECKER "
 	dc.b	" THIEF  "
-; =================================================================
-
+	
 	even
-
 	charset
+; =================================================================
 
 ; =================================================================================================
 ; Character Map in input window when choosing names
@@ -27241,7 +27397,6 @@ InputCharacterMap:
 ; =================================================================================================
 
 	even
-
 	charset
 
 
@@ -27279,7 +27434,93 @@ loc_114FE:
 loc_11506:
 	dc.b	"    miss"
 
+	even
+
 	charset
+	
+	else
+
+loc_11412:
+	dc.b	$5B, $26, $5B, $26, $36, $50, $2C, $53
+
+	even
+
+loc_1141A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11422:
+	dc.b	$B9
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
+	dc.b	$B9
+
+	even
+
+loc_1142A:
+	dc.b	$5B, $26, $26, $26, $36, $50, $3C, $53
+
+	even
+
+loc_11432:
+	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
+	dc.b	$26, $26, $A4, $A9
+
+	even
+
+loc_1143E:
+	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
+	dc.b	$26, $26, $A5, $AC
+
+	even
+
+loc_1144A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11450:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
+
+	even
+
+loc_11456:
+	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $26, $62, $96, $6A, $90, $8C, $72, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $47, $32, $5A, $2E, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $78, $8C, $6E, $96, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $72, $66, $6E, $96, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $2C, $2E, $32, $58, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $64, $61, $8C, $6E, $78, $8C, $6E, $96
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $6A, $93, $8C, $66, $82, $26
+	dc.b	$26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26, $3A, $51, $44, $29, $26, $26
+
+InputCharacterMap:
+	dc.b	$56, $57, $58, $59, $5A, $00, $00, $73, $74, $75, $76, $77, $00, $00, $8C, $8D, $8E, $8F, $90
+	dc.b	$5B, $5C, $5D, $5E, $5F, $00, $00, $78, $00, $79, $00, $7A, $00, $00, $91, $92, $93, $94, $95
+	dc.b	$60, $61, $62, $63, $64, $00, $00, $7B, $7C, $7D, $7E, $7F, $00, $00, $96, $97, $98, $99, $9A
+	dc.b	$65, $66, $67, $68, $69, $00, $00, $80, $00, $81, $00, $82, $00, $00, $9B, $9C, $9D, $4F, $9E
+	dc.b	$6A, $6B, $6C, $6D, $6E, $00, $00, $89, $8A, $8B, $88, $A5, $00, $00, $9F, $A0, $A1, $54, $A2
+	dc.b	$6F, $70, $71, $27, $72, $00, $00, $A3, $00, $00, $00, $A4, $00, $00, $00, $C4, $00, $00, $00
+
+	even
+	
+loc_114DA:
+	dc.b	$12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21
+
+loc_114EA:
+	dc.b	$B9, $B9, $32, $3C, $B9, $B9, $3E, $4F, $B9, $B9, $7D, $79, $8F, $B9, $3A, $2E, $B9, $B9, $A4, $A9
+
+loc_114FE:
+	dc.b	$26, $26, $26, $26
+	dc.b	$2C, $28, $42, $2E
+
+loc_11506:
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $7E, $6B, $26
+
+	even
+	
+	endif
 
 ; =============================================
 ; Techniques learned for each character
@@ -28640,15 +28881,21 @@ loc_12964:
 
 ; ---------------------------------------------------------------------------------
 ; filler free space - can be replaced with even
-
+	if revision>0
 	rept $162
 	dc.b	0
 	endm
+	else
+	rept $84
+	dc.b	0
+	endm	
+	endif
 ; ---------------------------------------------------------------------------------
 
 ; -----------------------------------------------------------------
 ; Mappings
 ; -----------------------------------------------------------------
+	if revision>0
 loc_12B06:
 	dc.w	loc_12B58-loc_12B06
 	dc.w	loc_12B58-loc_12B06
@@ -28757,10 +29004,126 @@ Map_Cursor_ChosenLetter:
 	dc.b	$01
 	dc.b	$00, $00, $00, $00, $00
 
+	else
+
+loc_12B06:
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+
+loc_12B1E:
+	dc.w 	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+
+loc_12B36:
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+
+; -----------------------------------------------------------------
+; Cursor Sprite Mappings
+; -----------------------------------------------------------------
+Map_Cursors:
+	dc.w	Map_Cursor_Rectangle-Map_Cursors
+	dc.w	Map_Cursor_InputTile-Map_Cursors
+	dc.w	Map_Cursor_InputTileBig-Map_Cursors
+	dc.w	Map_Cursor_Triangle-Map_Cursors
+	dc.w	Map_Cursor_ChosenLetter-Map_Cursors
+; -----------------------------------------------------------------
+
+loc_12B58:
+	dc.b	$01
+	dc.b	$E0, $07, $00, $00, $F8
+
+loc_12B5E:
+	dc.b	$01
+	dc.b	$E0, $07, $08, $00, $F8
+
+loc_12B64:
+	dc.b	$01
+	dc.b	$D8, $07, $00, $00, $F0
+
+loc_12B6A:
+	dc.b	$01
+	dc.b	$D8, $07, $08, $00, $F0
+
+loc_12B70:
+	dc.b	$03
+	dc.b	$F0, $04, $00, $22, $F8
+	dc.b	$E0, $07, $00, $00, $F8
+	dc.b	$E8, $04, $00, $20, $F8
+
+loc_12B80:
+	dc.b	$03
+	dc.b	$F0, $04, $08, $22, $F8
+	dc.b	$E0, $07, $08, $00, $F8
+	dc.b	$E8, $04, $08, $20, $F8
+
+Map_Cursor_Rectangle:
+	dc.b	$01
+	dc.b	$00, $04, $00, $00, $00
+
+Map_Cursor_InputTile:
+	dc.b	$02
+	dc.b	$F8, $00, $00, $00, $00
+	dc.b	$00, $00, $00, $00, $00
+
+	even
+
+Map_Cursor_InputTileBig:
+	dc.b	$06
+	dc.b	$F8, $00, $00, $00, $00
+	dc.b	$F8, $00, $00, $00, $08
+	dc.b	$F8, $00, $00, $00, $10
+	dc.b	$00, $00, $00, $00, $00
+	dc.b	$00, $00, $00, $00, $08
+	dc.b	$00, $00, $00, $00, $10
+	
+	even
+
+Map_Cursor_Triangle:
+	dc.b	$01
+	dc.b	$00, $05, $00, $00, $00
+
+Map_Cursor_ChosenLetter:
+	dc.b	$01
+	dc.b	$00, $00, $00, $00, $00
+
+	endif
+	
 ; ================================
 ; VDP character maps
 ; ================================
 VDPCharacterMaps:
+	if revision>0
 	dc.b	$26, $26
 	dc.b	$26, $97
 	dc.b	$26, $98
@@ -28880,97 +29243,309 @@ VDPCharacterMaps:
 	dc.b	$26, $26
 	dc.b	$26, $26
 	dc.b	$26, $26
-
 	dc.b	$26, $80
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	
+	else
 
 	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
+	dc.b	$26, $97
+	dc.b	$26, $98
+	dc.b	$26, $99
+	dc.b	$26, $9A
+	dc.b	$26, $9B
+	dc.b	$26, $9C
+	dc.b	$26, $9D
+	dc.b	$26, $9E
+	dc.b	$26, $9F
+	dc.b	$26, $A0
+	dc.b	$26, $27
+	dc.b	$26, $28
+	dc.b	$26, $29
+	dc.b	$26, $2A
+	dc.b	$26, $2B
+	dc.b	$26, $2C
+	dc.b	$26, $2D
+	dc.b	$26, $2E
+	dc.b	$26, $2F
+	dc.b	$26, $30
+	dc.b	$26, $31
+	dc.b	$26, $32
+	dc.b	$26, $33
+	dc.b	$26, $34
+	dc.b	$26, $35
+	dc.b	$26, $36
+	dc.b	$26, $37
+	dc.b	$26, $38
+	dc.b	$26, $39
+	dc.b	$26, $3A
+	dc.b	$26, $3B
+	dc.b	$26, $3C
+	dc.b	$26, $3D
+	dc.b	$26, $3E
+	dc.b	$26, $3F
+	dc.b	$26, $40
+	dc.b	$26, $41
+	dc.b	$26, $42
+	dc.b	$26, $43
+	dc.b	$26, $44
+	dc.b	$26, $45
+	dc.b	$26, $46
+	dc.b	$26, $47
+	dc.b	$26, $48
+	dc.b	$26, $49
+	dc.b	$26, $4A
+	dc.b	$26, $4B
+	dc.b	$26, $4C
+	dc.b	$26, $4D
+	dc.b	$26, $4E
+	dc.b	$26, $4F
+	dc.b	$26, $50
+	dc.b	$26, $51
+	dc.b	$26, $54
+	dc.b	$26, $55
+	dc.b	$26, $56
+	dc.b	$26, $57
+	dc.b	$26, $58
+	dc.b	$26, $59
+	dc.b	$26, $5A
+	dc.b	$5B, $2C
+	dc.b	$5B, $2D
+	dc.b	$5B, $2E
+	dc.b	$5B, $2F
+	dc.b	$5B, $30
+	dc.b	$5B, $31
+	dc.b	$5B, $32
+	dc.b	$5B, $33
+	dc.b	$5B, $34
+	dc.b	$5B, $35
+	dc.b	$5B, $36
+	dc.b	$5B, $37
+	dc.b	$5B, $38
+	dc.b	$5B, $39
+	dc.b	$5B, $3A
+	dc.b	$5B, $40
+	dc.b	$5B, $41
+	dc.b	$5B, $42
+	dc.b	$5B, $43
+	dc.b	$5B, $44
+	dc.b	$5C, $40
+	dc.b	$5C, $41
+	dc.b	$5C, $42
+	dc.b	$5C, $43
+	dc.b	$5C, $44
+	dc.b	$26, $5F
+	dc.b	$26, $60
+	dc.b	$26, $61
+	dc.b	$26, $62
+	dc.b	$26, $63
+	dc.b	$26, $64
+	dc.b	$26, $65
+	dc.b	$26, $66
+	dc.b	$26, $67
+	dc.b	$26, $68
+	dc.b	$26, $69
+	dc.b	$26, $6A
+	dc.b	$26, $6B
+	dc.b	$26, $6C
+	dc.b	$26, $6D
+	dc.b	$26, $6E
+	dc.b	$26, $6F
+	dc.b	$26, $70
+	dc.b	$26, $71
+	dc.b	$26, $72
+	dc.b	$26, $73
+	dc.b	$26, $74
+	dc.b	$26, $75
+	dc.b	$26, $76
+	dc.b	$26, $77
+	dc.b	$26, $78
+	dc.b	$26, $79
+	dc.b	$26, $7A
+	dc.b	$26, $7C
+	dc.b	$26, $7D
+	dc.b	$26, $7E
+	dc.b	$26, $7F
+	dc.b	$26, $80
+	dc.b	$26, $81
+	dc.b	$26, $82
+	dc.b	$26, $83
+	dc.b	$26, $84
+	dc.b	$26, $85
+	dc.b	$26, $86
+	dc.b	$26, $87
+	dc.b	$26, $88
+	dc.b	$26, $89
+	dc.b	$26, $8A
+	dc.b	$26, $8B
+	dc.b	$26, $8C
+	dc.b	$26, $8D
+	dc.b	$26, $8E
+	dc.b	$26, $8F
+	dc.b	$26, $90
+	dc.b	$26, $91
+	dc.b	$26, $92
+	dc.b	$26, $93
+	dc.b	$26, $94
+	dc.b	$26, $95
+	dc.b	$5B, $64
+	dc.b	$5B, $65
+	dc.b	$5B, $66
+	dc.b	$5B, $67
+	dc.b	$5B, $68
+	dc.b	$5B, $69
+	dc.b	$5B, $6A
+	dc.b	$5B, $6B
+	dc.b	$5B, $6C
+	dc.b	$5B, $6D
+	dc.b	$5B, $6E
+	dc.b	$5B, $6F
+	dc.b	$5B, $70
+	dc.b	$5B, $71
+	dc.b	$5B, $72
+	dc.b	$5B, $78
+	dc.b	$5B, $79
+	dc.b	$5B, $7A
+	dc.b	$5B, $7C
+	dc.b	$5C, $78
+	dc.b	$5C, $79
+	dc.b	$5C, $7A
+	dc.b	$5C, $7C
+	dc.b	$26, $52
+	dc.b	$26, $53
+	dc.b	$26, $96
+	dc.b	$26, $B0
+	dc.b	$26, $B1
+	dc.b	$26, $B2
+	dc.b	$26, $5D
+	dc.b	$26, $5E
+	dc.b	$26, $7B
+	dc.b	$26, $A1
+	dc.b	$26, $A2
+	dc.b	$26, $A3
+	dc.b	$26, $A4
+	dc.b	$26, $A5
+	dc.b	$26, $A6
+	dc.b	$26, $A7
+	dc.b	$26, $A8
+	dc.b	$26, $A9
+	dc.b	$26, $AA
+	dc.b	$26, $AB
+	dc.b	$26, $AC
+	dc.b	$26, $AD
+	dc.b	$26, $AE
+	dc.b	$26, $AF
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$5B, $61
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	
+	endif
+
 ; ================================
 
 ; =======================================================================
@@ -28996,6 +29571,8 @@ VDPCharacterMaps:
 ; byte 16 = defense value
 ; =======================================================================
 InventoryData:
+
+	if revision>0
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -29413,7 +29990,7 @@ Item_Shoes:
 	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
 	dc.b	$00, $03
 
-Item_Sandals
+Item_Sandals:
 	dc.b	"SANDALS", $C4, "  "
 	dc.w	$B4
 	dc.b	$A5
@@ -29628,7 +30205,7 @@ Item_CrmcSword:
 	dc.b	CharID_Rolf_Mask
 	dc.b	$1E, $05
 
-Item_CeramKnife
+Item_CeramKnife:
 	dc.b	"CERAM KNFE"
 	dc.w	$AF0
 	dc.b	$A2
@@ -29768,7 +30345,7 @@ Item_SilentShot:
 	dc.b	CharID_Amy_Mask
 	dc.b	$0A, $00
 
-Item_PoisonShot
+Item_PoisonShot:
 	dc.b	"POISONSHOT"
 	dc.w	$6A4
 	dc.b	$A2
@@ -29855,6 +30432,394 @@ Item_Unknown2:
 	dc.b	"H", $C4, "        "
 	dc.w	$B3B0
 	dc.b	$E8, $00, $00, $00
+	
+	else
+	
+Item_None:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+
+Item_SmallKey:
+	dc.b	$1B, $0C, $15, $1F, $10, $3E, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_Dynamite:
+	dc.b	$96, $57, $6A, $73, $57, $69, $C4, $00, $00, $00, $00, $00, $48, $00, $00, $00
+
+Item_KeyTube:
+	dc.b	$5C, $A5, $66, $8A, $A5, $9D, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_MruraGum:
+	dc.b	$73, $7D, $59, $7B, $8C, $75, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_GreenCard:
+	dc.b	$8E, $7C, $A5, $82, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_BlueCard:
+	dc.b	$9D, $7D, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_YellowCard:
+	dc.b	$57, $59, $7F, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_RedCard:
+	dc.b	$7E, $88, $9A, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_Letter:
+	dc.b	$11, $3C, $0D, $24, $12, $43, $3C, $0D, $C4, $00, $00, $00, $08, $00, $00, $00
+
+Item_Recorder:
+	dc.b	$61, $62, $68, $75, $7E, $5F, $A5, $96, $A5, $C4, $00, $00, $08, $00, $00, $00
+
+Item_MruraLeaf:
+	dc.b	$73, $7D, $59, $7B, $7C, $A5, $9D, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_PlsmRing:
+	dc.b	$A1, $7B, $93, $73, $7C, $82, $8E, $C4, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Prism:
+	dc.b	$59, $56, $7F, $A1, $7C, $93, $75, $C4, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Telepipe:
+	dc.b	$1A, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $00, $82, $E8, $00, $00, $00
+
+Item_Escapipe:
+	dc.b	$29, $30, $0C, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $46, $E8, $00, $00, $00
+
+Item_Hidapipe:
+	dc.b	$16, $23, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $01, $18, $E8, $00, $00, $00
+
+Item_Monomate:
+	dc.b	$77, $6E, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $14, $F8, $00, $00, $00
+
+Item_Dimate:
+	dc.b	$99, $84, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $3C, $F8, $00, $00, $00
+
+Item_Trimate:
+	dc.b	$69, $7C, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $A0, $F8, $00, $00, $00
+
+Item_Antidote:
+	dc.b	$56, $82, $68, $84, $A2, $57, $93, $82, $C4, $00, $00, $0A, $F8, $00, $00, $00
+
+Item_StarMist:
+	dc.b	$62, $65, $A5, $56, $69, $73, $57, $91, $A5, $C4, $03, $E8, $F8, $00, $00, $00
+
+Item_MoonDew:
+	dc.b	$75, $A5, $82, $56, $69, $73, $57, $91, $A5, $C4, $2E, $E0, $F8, $00, $00, $00
+
+Item_Headgear:
+	dc.b	$27, $88, $9A, $8D, $56, $C4, $00, $00, $00, $00, $00, $78, $A1, $FD, $00, $03
+
+Item_Ribbon:
+	dc.b	$7C, $9E, $82, $C4, $00, $00, $00, $00, $00, $00, $00, $50, $A1, $02, $00, $03
+
+Item_Fibergear:
+	dc.b	$8E, $7B, $62, $8D, $56, $C4, $00, $00, $00, $00, $01, $AE, $A1, $FD, $00, $08
+
+Item_SilRibbon:
+	dc.b	$61, $7D, $9B, $A5, $7C, $9E, $82, $C4, $00, $00, $01, $7C, $A1, $02, $00, $0C
+
+Item_SilCrown:
+	dc.b	$61, $7D, $9B, $A5, $5D, $7B, $58, $82, $C4, $00, $01, $D6, $A1, $A8, $00, $0E
+
+Item_Titanigear:
+	dc.b	$66, $65, $82, $8D, $56, $C4, $00, $00, $00, $00, $05, $78, $A1, $FD, $00, $0E
+
+Item_Titanimet:
+	dc.b	$66, $65, $82, $76, $88, $69, $C4, $00, $00, $00, $0E, $74, $A1, $41, $00, $10
+
+Item_JwlCrown:
+	dc.b	$92, $8A, $59, $7D, $5D, $7B, $58, $82, $C4, $00, $11, $F8, $A1, $A8, $00, $11
+
+Item_JwlRibbon:
+	dc.b	$92, $8A, $59, $7D, $7C, $9E, $82, $C4, $00, $00, $12, $5C, $A1, $02, $00, $15
+
+Item_Crescegear:
+	dc.b	$5D, $7E, $63, $82, $69, $8D, $56, $C4, $00, $00, $01, $18, $B1, $04, $00, $0E
+
+Item_SnowCrown:
+	dc.b	$2F, $11, $23, $10, $38, $2B, $32, $C4, $00, $00, $01, $EA, $B1, $08, $00, $11
+
+Item_WindScarf:
+	dc.b	$10, $45, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $78, $B1, $80, $00, $11
+
+Item_ColorScarf:
+	dc.b	$20, $43, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $82, $B1, $20, $00, $11
+
+Item_StormGear:
+	dc.b	$62, $69, $A5, $75, $8D, $56, $C4, $00, $00, $00, $02, $76, $B1, $40, $00, $10
+
+Item_Laconigear:
+	dc.b	$7B, $5F, $6B, $56, $8D, $56, $C4, $00, $00, $00, $6D, $60, $A1, $14, $00, $1B
+
+Item_Laconiamet:
+	dc.b	$7B, $5F, $6B, $56, $76, $88, $69, $C4, $00, $00, $71, $48, $A1, $14, $00, $1D
+
+Item_Neimet:
+	dc.b	$6D, $57, $76, $88, $69, $C4, $00, $00, $00, $00, $00, $00, $21, $41, $00, $32
+
+Item_NeiCrown:
+	dc.b	$6D, $57, $5D, $7B, $58, $82, $C4, $00, $00, $00, $00, $00, $21, $08, $00, $30
+
+Item_MagicCap:
+	dc.b	$73, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
+
+Item_MogicCap:
+	dc.b	$77, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
+
+Item_CarbonSuit:
+	dc.b	$5B, $A5, $9E, $82, $62, $A5, $67, $C4, $00, $00, $00, $80, $A4, $FD, $00, $04
+
+Item_CarbonVest:
+	dc.b	$5B, $A5, $9E, $82, $4F, $62, $69, $C4, $00, $00, $00, $78, $A4, $02, $00, $04
+
+Item_FiberCoat:
+	dc.b	$8E, $7B, $62, $5F, $A5, $69, $C4, $00, $00, $00, $01, $2C, $A4, $55, $00, $08
+
+Item_FiberCape:
+	dc.b	$8E, $7B, $62, $73, $82, $69, $C4, $00, $00, $00, $01, $A4, $A4, $A8, $00, $08
+
+Item_FiberVest:
+	dc.b	$8E, $7B, $62, $4F, $62, $69, $C4, $00, $00, $00, $01, $18, $A4, $02, $00, $06
+
+Item_TtnmArmor:
+	dc.b	$66, $65, $82, $56, $A5, $73, $A5, $C4, $00, $00, $15, $E0, $A4, $44, $00, $18
+
+Item_TtnmCape:
+	dc.b	$66, $65, $82, $71, $84, $9D, $7C, $7B, $C4, $00, $18, $9C, $A4, $28, $00, $1C
+
+Item_TtnmChest:
+	dc.b	$66, $65, $82, $66, $86, $62, $69, $C4, $00, $00, $15, $18, $A4, $11, $00, $15
+
+Item_CrmcArmor:
+	dc.b	$63, $7B, $74, $88, $5D, $56, $A5, $73, $A5, $C4, $2D, $B4, $A4, $44, $00, $30
+
+Item_CrmcCape:
+	dc.b	$63, $7B, $74, $88, $5D, $71, $84, $9D, $7C, $7B, $30, $70, $A4, $A8, $00, $38
+
+Item_CrmcChest:
+	dc.b	$63, $7B, $74, $88, $5D, $66, $86, $62, $69, $C4, $27, $10, $A4, $11, $00, $2E
+
+Item_AmberRobe:
+	dc.b	$14, $24, $12, $23, $28, $0D, $0C, $C4, $00, $00, $00, $AA, $B4, $10, $00, $14
+
+Item_Crystanish:
+	dc.b	$5D, $7C, $62, $65, $6F, $A5, $6B, $88, $61, $8A, $02, $76, $B4, $44, $00, $3C
+
+Item_CrystCape:
+	dc.b	$5D, $7C, $62, $65, $71, $84, $A5, $7D, $9A, $C4, $03, $48, $B4, $A8, $00, $3E
+
+Item_CrystChest:
+	dc.b	$5D, $7C, $62, $65, $66, $86, $62, $69, $C4, $00, $02, $9E, $B4, $01, $00, $3C
+
+Item_Laconinish:
+	dc.b	$7B, $5F, $6B, $56, $6F, $A5, $6B, $88, $61, $8A, $88, $B8, $A4, $44, $00, $41
+
+Item_LaconCape:
+	dc.b	$7B, $5F, $6B, $56, $71, $84, $9D, $7C, $7B, $C4, $8C, $A0, $A4, $20, $00, $46
+
+Item_LaconChest:
+	dc.b	$7B, $5F, $6B, $56, $66, $86, $62, $69, $C4, $00, $6D, $60, $A4, $01, $00, $50
+
+Item_NeiArmor:
+	dc.b	$6D, $57, $6F, $A5, $6B, $88, $61, $8A, $C4, $00, $00, $00, $24, $44, $00, $5F
+
+Item_NeiCape:
+	dc.b	$6D, $57, $71, $84, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $24, $88, $00, $58
+
+Item_Shoes:
+	dc.b	$7E, $91, $A5, $61, $8A, $A5, $93, $C4, $00, $00, $00, $F0, $A5, $FD, $00, $03
+
+Item_Sandals:
+	dc.b	$59, $62, $9F, $9A, $7C, $8A, $A5, $C4, $00, $00, $00, $B4, $A5, $02, $00, $03
+
+Item_Boots:
+	dc.b	$7E, $91, $A5, $9D, $A5, $67, $C4, $00, $00, $00, $03, $E8, $A5, $FD, $00, $07
+
+Item_KnifeBoots:
+	dc.b	$6A, $57, $71, $9D, $A5, $67, $C4, $00, $00, $00, $10, $68, $A5, $22, $07, $07
+
+Item_LongBoots:
+	dc.b	$7F, $82, $8E, $9D, $A5, $67, $C4, $00, $00, $00, $1A, $90, $A5, $20, $05, $07
+
+Item_HirzaBoots:
+	dc.b	$6F, $57, $7D, $91, $75, $9D, $A5, $67, $C4, $00, $26, $48, $A5, $88, $00, $07
+
+Item_ShuneBoots:
+	dc.b	$61, $8A, $6D, $7B, $9D, $A5, $67, $C4, $00, $00, $1D, $4C, $A5, $A0, $00, $07
+
+Item_GardaBoots:
+	dc.b	$8C, $A5, $96, $9D, $A5, $67, $C4, $00, $00, $00, $30, $70, $A5, $55, $00, $0F
+
+Item_CrbnShield:
+	dc.b	$5B, $A5, $9E, $82, $61, $A5, $7D, $9A, $C4, $00, $02, $1C, $A2, $55, $00, $08
+
+Item_CrbnEmel:
+	dc.b	$5B, $A5, $9E, $82, $59, $A5, $76, $7D, $C4, $00, $01, $A4, $A2, $A8, $00, $07
+
+Item_FibrShield:
+	dc.b	$8E, $7B, $62, $61, $A5, $7D, $9A, $C4, $00, $00, $04, $B0, $A2, $55, $00, $0F
+
+Item_FiberEmel:
+	dc.b	$8E, $7B, $62, $59, $A5, $76, $7D, $C4, $00, $00, $05, $50, $A2, $A8, $00, $11
+
+Item_MirShield:
+	dc.b	$74, $7B, $A5, $61, $A5, $7D, $9A, $C4, $00, $00, $12, $C0, $A2, $55, $00, $20
+
+Item_MirEmel:
+	dc.b	$74, $7B, $A5, $59, $A5, $76, $7D, $C4, $00, $00, $14, $00, $A2, $A8, $00, $1E
+
+Item_CerShield:
+	dc.b	$63, $7B, $74, $88, $5D, $61, $A5, $7D, $9A, $C4, $20, $6C, $A2, $55, $00, $27
+
+Item_CerEmel:
+	dc.b	$63, $7B, $74, $88, $5D, $59, $A5, $76, $7D, $C4, $25, $E4, $A2, $A8, $00, $28
+
+Item_Aegis:
+	dc.b	$18, $0C, $25, $1C, $23, $1A, $1D, $C4, $00, $00, $04, $B0, $B2, $50, $00, $20
+
+Item_GrSleeves:
+	dc.b	$8E, $7C, $A5, $82, $62, $7C, $A5, $9D, $C4, $00, $03, $48, $B2, $20, $00, $3F
+
+Item_TruthSlvs:
+	dc.b	$18, $0C, $0C, $23, $19, $4A, $C4, $00, $00, $00, $02, $D0, $B2, $80, $00, $3B
+
+Item_LaconEmel:
+	dc.b	$7B, $5F, $6B, $56, $59, $A5, $76, $7D, $C4, $00, $2E, $E0, $A2, $28, $00, $44
+
+Item_LacShield:
+	dc.b	$7B, $5F, $6B, $56, $61, $A5, $7D, $9A, $C4, $00, $32, $C8, $A2, $54, $00, $55
+
+Item_NeiShield:
+	dc.b	$6D, $57, $61, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $00, $22, $50, $00, $5F
+
+Item_NeiEmel:
+	dc.b	$6D, $57, $59, $A5, $76, $7D, $C4, $00, $00, $00, $00, $00, $22, $A0, $00, $76
+
+Item_Knife:
+	dc.b	$6A, $57, $71, $C4, $00, $00, $00, $00, $00, $00, $00, $64, $A2, $FD, $05, $00
+
+Item_Dagger:
+	dc.b	$96, $8C, $A5, $C4, $00, $00, $00, $00, $00, $00, $00, $C8, $A2, $D4, $08, $01
+
+Item_Scalpel:
+	dc.b	$76, $62, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $B4, $A2, $18, $07, $00
+
+Item_SteelBar:
+	dc.b	$62, $66, $A5, $7D, $5D, $7F, $A5, $C4, $00, $00, $00, $50, $A2, $02, $07, $02
+
+Item_Boomerang:
+	dc.b	$9D, $A5, $76, $7B, $82, $C4, $00, $00, $00, $00, $01, $E0, $A2, $20, $0C, $00
+
+Item_Slasher:
+	dc.b	$62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $07, $D0, $A2, $20, $11, $00
+
+Item_Sword:
+	dc.b	$64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $04, $B0, $A3, $01, $12, $04
+
+Item_Whip:
+	dc.b	$75, $66, $C4, $00, $00, $00, $00, $00, $00, $00, $05, $78, $A2, $20, $14, $02
+
+Item_CrmcSword:
+	dc.b	$63, $7B, $74, $88, $5D, $64, $A5, $9A, $C4, $00, $0C, $80, $A3, $01, $1E, $05
+
+Item_CeramKnife:
+	dc.b	$63, $7B, $74, $88, $5D, $6A, $57, $71, $C4, $00, $0A, $F0, $A2, $FD, $14, $03
+
+Item_CeramBar:
+	dc.b	$63, $7B, $74, $88, $5D, $5D, $7F, $A5, $C4, $00, $04, $B0, $A2, $02, $1B, $02
+
+Item_LasrSlshr:
+	dc.b	$7E, $A5, $91, $A5, $62, $7B, $57, $60, $A5, $C4, $1A, $2C, $A2, $20, $1E, $00
+
+Item_LasrSword:
+	dc.b	$7E, $A5, $91, $A5, $64, $A5, $9A, $C4, $00, $00, $15, $18, $A3, $01, $32, $09
+
+Item_LaserBar:
+	dc.b	$7E, $A5, $91, $A5, $5D, $7F, $A5, $C4, $00, $00, $0C, $1C, $A2, $02, $26, $03
+
+Item_LaserKnife:
+	dc.b	$7E, $A5, $91, $A5, $6A, $57, $71, $C4, $00, $00, $11, $30, $A2, $FD, $1C, $05
+
+Item_SwdOfAnger:
+	dc.b	$0C, $10, $32, $23, $1C, $33, $3E, $C4, $00, $00, $01, $18, $A3, $01, $3A, $00
+
+Item_FireSlshr:
+	dc.b	$71, $83, $57, $56, $62, $7B, $57, $60, $A5, $C4, $01, $54, $A2, $20, $24, $00
+
+Item_FireStaff:
+	dc.b	$10, $0E, $38, $23, $1C, $0E, $C4, $00, $00, $00, $02, $9E, $B2, $08, $20, $0B
+
+Item_LacnMace:
+	dc.b	$7B, $5F, $6B, $56, $62, $5E, $A5, $7D, $C4, $00, $41, $A0, $A2, $50, $28, $08
+
+Item_LacDagger:
+	dc.b	$7B, $5F, $6B, $56, $96, $8C, $A5, $C4, $00, $00, $47, $E0, $A2, $80, $2D, $07
+
+Item_ACSlasher:
+	dc.b	$7B, $5F, $6B, $56, $62, $7B, $57, $60, $A5, $C4, $5D, $C0, $A2, $20, $2A, $00
+
+Item_LacSword:
+	dc.b	$7B, $5F, $6B, $56, $64, $A5, $9A, $C4, $00, $00, $55, $F0, $A3, $01, $3E, $07
+
+Item_NeiSword:
+	dc.b	$6D, $57, $64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $2B, $01, $4B, $18
+
+Item_NeiSlasher:
+	dc.b	$6D, $57, $62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $22, $20, $3C, $00
+
+Item_BowGun:
+	dc.b	$9E, $58, $8C, $82, $C4, $00, $00, $00, $00, $00, $01, $2C, $A3, $55, $08, $00
+
+Item_SonicGun:
+	dc.b	$64, $6B, $88, $5D, $8C, $82, $C4, $00, $00, $00, $02, $80, $A2, $55, $11, $00
+
+Item_Shotgun:
+	dc.b	$61, $8B, $88, $69, $8C, $82, $C4, $00, $00, $00, $03, $20, $A3, $44, $0A, $00
+
+Item_SilentShot:
+	dc.b	$60, $57, $7E, $82, $69, $61, $8B, $88, $69, $C4, $03, $98, $A3, $08, $0A, $00
+
+Item_PoisonShot:
+	dc.b	$A2, $57, $93, $82, $61, $8B, $88, $69, $C4, $00, $06, $A4, $A2, $18, $0F, $00
+
+Item_AcidShot:
+	dc.b	$56, $61, $9A, $61, $8B, $88, $69, $C4, $00, $00, $12, $C0, $A2, $18, $19, $00
+
+Item_Cannon:
+	dc.b	$5B, $6E, $82, $C4, $00, $00, $00, $00, $00, $00, $08, $98, $A3, $44, $12, $00
+
+Item_Vulcan:
+	dc.b	$9B, $7D, $5B, $82, $C4, $00, $00, $00, $00, $00, $31, $38, $A3, $04, $1C, $00
+
+Item_LaserShot:
+	dc.b	$7E, $A5, $91, $A5, $61, $8B, $88, $69, $C4, $00, $18, $38, $A3, $44, $14, $00
+
+Item_LsrCannon:
+	dc.b	$7E, $A5, $91, $A5, $5B, $6E, $82, $C4, $00, $00, $4E, $20, $A3, $04, $1E, $00
+
+Item_PlsCannon:
+	dc.b	$9F, $7D, $62, $5B, $6E, $82, $C4, $00, $00, $00, $7D, $00, $A3, $04, $23, $00
+
+Item_PulseVlcn:
+	dc.b	$9F, $7D, $62, $9B, $7D, $5B, $82, $C4, $00, $00, $BB, $80, $A3, $04, $26, $00
+
+Item_NeiShot:
+	dc.b	$6D, $57, $61, $8B, $88, $69, $C4, $00, $00, $00, $00, $00, $23, $04, $3C, $00
+
+Item_PrsnClths:
+	dc.b	$16, $3B, $0D, $43, $38, $26, $12, $C4, $00, $00, $00, $64, $04, $FF, $00, $02
+	
+Item_Teim:
+	dc.b	$68, $84, $75, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Visiphone:
+	dc.b	$9C, $92, $71, $87, $82, $C4, $00, $00, $00, $00, $0B, $B8, $A8, $00, $00, $00
+	
+Item_Unknown1:
+	dc.b	$65, $57, $7F, $82, $23, $18, $11, $46, $0D, $C4, $F2, $30, $E8, $00, $00, $00
+	
+Item_Unknown2:
+	dc.b	$6F, $A1, $62, $9C, $A5, $C4, $00, $00, $00, $00, $B3, $B0, $E8, $00, $00, $00
+	
+	endif
 ; =======================================================================
 
 ; =======================================================================
@@ -47177,17 +48142,32 @@ loc_39E9C:
 	dc.b	$FF, $FF, $FF, $DF, $FF ;0x0 (0x00039EB8-0x00039EBD, Entry count: 0x00000005)
 	dc.b	$FA, $01, $FF, $FF, $FF, $FF, $F7, $F8, $FF ;0x0 (0x00039EBD-0x00039EC6, Entry count: 0x00000009)
 
-
+	if revision>0
 ArtNem_Mota:	binclude "map/mota/art/nemesis/tiles.bin"
+	else
+ArtNem_Mota:	binclude "map/mota/art/jp/tiles.bin"	
+	endif
 	even
 
+	if revision>0
 ArtNem_Dezo:	binclude "map/dezo/art/nemesis/tiles.bin"
+	else
+ArtNem_Dezo:	binclude "map/dezo/art/jp/tiles.bin"	
+	endif
 	even
 
+	if revision>0
 ArtNem_Town:	binclude "map/towns/art/nemesis/tiles.bin"
+	else
+ArtNem_Town:	binclude "map/towns/art/jp/tiles.bin"
+	endif
 	even
 
+	if revision>0
 ArtNem_IslandPassage:	binclude "map/islands and passageways/art/nemesis/tiles.bin"
+	else
+ArtNem_IslandPassage:	binclude "map/islands and passageways/art/jp/tiles.bin"	
+	endif
 	even
 
 loc_412F8:
@@ -47220,10 +48200,18 @@ loc_412F8:
 
 	even
 
+	if revision>0
 ArtNem_MotaDungeon:	binclude "map/mota dungeons/art/nemesis/tiles.bin"
+	else
+ArtNem_MotaDungeon:	binclude "map/mota dungeons/art/jp/tiles.bin"
+	endif
 	even
 
+	if revision>0
 ArtNem_DezoDungeon:	binclude "map/dezo dungeons/art/nemesis/tiles.bin"
+	else
+ArtNem_DezoDungeon:	binclude "map/dezo dungeons/art/jp/tiles.bin"
+	endif
 	even
 
 loc_44F2A:
