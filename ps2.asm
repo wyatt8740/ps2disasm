@@ -2702,6 +2702,11 @@ RedCursor_Init:
 	move.w	#$85B6, 8(a0)
 	move.l	#Map_Cursors, 4(a0)
 	move.w	#1, $22(a0)
+	; the Japanese version doesn't have the following value in memory cleared which can cause issues
+	; when you hold down a directional button when a new cursor is created. An example is a
+	; glitch that happens when you order your party, that is if you hold UP while selecting characters,
+	; it will corrupt graphics and may cause the game to crash. Just remove the following 'if' condition
+	; to fix it for the Japanese version.
 	if revision>0
 	move.w	#0, ($FFFFDE50).w
 	endif
