@@ -27,7 +27,7 @@ bugfixes = 0			; if 1, include bug fixes
 walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
-revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release
+revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
 
 	cpu 68000
 	include "ps2.macrosetup.asm"
@@ -90,6 +90,30 @@ ROMEndLoc:
 
 Checksum:
 	dc.w	$3792		; Checksum
+	dc.b 	"J               " ; I/O Support
+	dc.l 	StartOfRom		; ROM Start
+
+ROMEndLoc:
+	dc.l	EndOfRom-1		; ROM End
+	dc.l 	RAM_start&$FFFFFF		; RAM Start
+	dc.l 	$FFFFFF		; RAM End
+	dc.l 	$5241F820		; Backup RAM ID
+	dc.l 	$200001		; Backup RAM start address
+	dc.l 	$203FFF		; Backup RAM end address
+	dc.b 	"            "	; Modem support
+	dc.b 	"                                        "	; Notes
+	dc.b 	"UE              " ; Country
+	
+	elseif revision=3
+	
+	dc.b	"SEGA MEGA DRIVE " ; Console name
+	dc.b 	"(C)SEGA 1989.JUN" ; Copyright/Date
+	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
+	dc.b 	"PHANTASY STAR 2                                 " ; International name
+	dc.b 	"GM 00005501-01"   ; Version
+
+Checksum:
+	dc.w	$E964		; Checksum
 	dc.b 	"J               " ; I/O Support
 	dc.l 	StartOfRom		; ROM Start
 
@@ -2795,12 +2819,12 @@ loc_15CA:
 input_win_held_timer = $28
 input_win_curr_pos = $32
 
-	if revision>0
-input_win_char_row = 18-1		; number of characters in a row (starts from 0)
-input_win_char_col = 4			; number of columns
-	else
+	if revision=0
 input_win_char_row = 20-1		; number of characters in a row (starts from 0)
 input_win_char_col = 6			; number of columns
+	else
+input_win_char_row = 18-1		; number of characters in a row (starts from 0)
+input_win_char_col = 4			; number of columns
 	endif
 ; ----------------------------------------------------------------------------
 Obj_InputWindowCursor:
@@ -2814,10 +2838,10 @@ InputWindowCursorRoutines:
 	bra.w	InputWindowCursor_Main
 ; ----------------------------------------------------------------------------
 InputWindowCursor_Init:
-	if revision>0
-	move.w	#$100, x_pos(a0)
-	else
+	if revision=0
 	move.w	#$F8, x_pos(a0)
+	else
+	move.w	#$100, x_pos(a0)
 	endif
 	move.w	#$B0, y_pos(a0)
 	move.b	#$30, render_flags(a0)
@@ -2942,7 +2966,15 @@ InputWindowCursor_Main:
 	move.w	d1, ($FFFFDE50).w
 	move.w	d1, d0
 	divu.w	#input_win_char_row, d1
-	if revision>0
+	if revision=0
+	lsl.w	#4, d1
+	addi.w	#$B0, d1
+	move.w	d1, y_pos(a0)
+	swap	d1
+	lsl.w	#3, d1
+	addi.w	#$F8, d1
+	move.w	d1, x_pos(a0)	
+	else
 	lsl.w	#3, d1
 	move.w	d1, d2
 	lsl.w	#1, d1
@@ -2952,14 +2984,6 @@ InputWindowCursor_Main:
 	swap	d1
 	lsl.w	#3, d1
 	addi.w	#$100, d1
-	move.w	d1, x_pos(a0)
-	else
-	lsl.w	#4, d1
-	addi.w	#$B0, d1
-	move.w	d1, y_pos(a0)
-	swap	d1
-	lsl.w	#3, d1
-	addi.w	#$F8, d1
 	move.w	d1, x_pos(a0)	
 	endif
 
@@ -3020,10 +3044,10 @@ NameDestinationTile_Init:
 	move.w	#$130, $A(a0)
 	move.w	#$98, $E(a0)
 	move.b	#$30, 2(a0)
-	if revision>0
-	move.w	#$855F, 8(a0)
-	else
+	if revision=0
 	move.w	#$8553, 8(a0)
+	else
+	move.w	#$855F, 8(a0)
 	endif
 	move.l	#Map_Cursors, 4(a0)
 	move.w	#7, $26(a0)
@@ -4159,14 +4183,14 @@ loc_23F2:
 	bsr.w	Battle_SetTargetCharacter
 	bsr.w	Character_CheckTechSuccess2
 	bmi.s	loc_2416
-	if revision>0
+	if revision=0
+	moveq	#1, d3
 	tst.w	2(a1)
 	beq.s	loc_2416
-	moveq	#1, d3
 	else
-	moveq	#1, d3
 	tst.w	2(a1)
 	beq.s	loc_2416
+	moveq	#1, d3
 	endif
 	bset	#4, 3(a2)
 	tst.w	(a1)
@@ -9471,11 +9495,11 @@ VInt_NormalUpdates:
 	move.w	#$96FD, (a6)
 	move.w	#$977F, (a6)	; source = $FFFFFB00
 	move.w	#$C000, (a6) ; write to CRAM
-	if revision>0
+	if revision=0
+	move.w	#$80, (a6)
+	else
 	move.w	#$80, (DMA_last_write).w
 	move.w	(DMA_last_write).w, (a6)
-	else
-	move.w	#$80, (a6)
 	endif
 	; DMA 68k to VDP
 	lea	(VDP_control_port).l, a6
@@ -9535,10 +9559,10 @@ VDPSetupGame:
 	lea	(VDP_control_port).l, a0
 	lea	(VDP_data_port).l, a1
 	lea	(VDPSetupArray).l, a2
-	if revision>0
-	moveq	#(VDPSetupArrayEnd-VDPSetupArray)/2-1, d7
-	else
+	if revision=0
 	moveq	#(VDPSetupArrayEnd-VDPSetupArray)/2, d7
+	else
+	moveq	#(VDPSetupArrayEnd-VDPSetupArray)/2-1, d7
 	endif
 -
 	move.w	(a2)+, (a0)
@@ -11843,8 +11867,14 @@ GameMode_Title:
 	lea	(Art_TitleBG).l, a0
 	bsr.w	DecompressToVDP
 	move.l	#$60000001, (VDP_control_port).l
+	if revision=3
+	jmp	(LoadTitleCopyrightUncomp).l
+	else
 	lea	(Art_TitleCopyright).l, a0
+	endif
 	bsr.w	DecompressToVDP
+	
+loc_73C0:
 	move.l	#$60000002, (VDP_control_port).l
 	lea	(Art_Font).l, a0
 	bsr.w	DecompressToVDP
@@ -11864,14 +11894,14 @@ GameMode_Title:
 	bsr.w	PaletteLoad1
 	move.b	#$81, d0		; Phantasy music
 	bsr.w	UpdateSoundQueue
-	if revision>0
+	if revision=0
+	move.l	#0, ($FFFFF61C).w	; clear y position
+	move.w	#0,(Opening_ending_flag).w
+	else
 	moveq	#0, d0
 	move.l	d0, ($FFFFF61C).w	; clear y position
 	move.w	d0,(Opening_ending_flag).w
 	move.w	d0,(Window_active_flag).w
-	else
-	move.l	#0, ($FFFFF61C).w	; clear y position
-	move.w	#0,(Opening_ending_flag).w
 	endif
 	move.w	#$8006, (VDP_control_port).l
 	move.w	#$8B00, (VDP_control_port).l
@@ -13805,7 +13835,21 @@ SetCharInitialStats:
 ; ======================================================
 ; Character names
 ; ======================================================
-	if revision>0
+	if revision=0
+	
+CharNames:
+	dc.b	$79, $A5, $61, $62
+	dc.b	$6D, $57, $C4, $00
+	dc.b	$7D, $9A, $8C, $A5
+	dc.b	$56, $82, $6C, $C4
+	dc.b	$70, $8A, $A5, $57
+	dc.b	$56, $A5, $74, $56
+	dc.b	$5B, $57, $82, $93
+	dc.b	$61, $7D, $5B, $C4
+CharNamesEnd:
+
+	else
+
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	' ', 0
@@ -13822,19 +13866,6 @@ CharNames:
 CharNamesEnd:
 
 	charset
-	
-	else
-
-CharNames:
-	dc.b	$79, $A5, $61, $62
-	dc.b	$6D, $57, $C4, $00
-	dc.b	$7D, $9A, $8C, $A5
-	dc.b	$56, $82, $6C, $C4
-	dc.b	$70, $8A, $A5, $57
-	dc.b	$56, $A5, $74, $56
-	dc.b	$5B, $57, $82, $93
-	dc.b	$61, $7D, $5B, $C4
-CharNamesEnd:
 
 	endif
 ; ======================================================
@@ -14527,10 +14558,10 @@ Map_LoadData:
 	adda.w	d0, a4
 	movea.l	(a4)+, a0
 	move.l	#$40000000, (VDP_control_port).l
-	if revision>0
-	bsr.w	NemDec
-	else
+	if revision=0
 	bsr.w	DecompressToVDP
+	else
+	bsr.w	NemDec
 	endif
 	move.l	#Chunk_table&$FFFFFF, (Chunk_table_addr).w
 	movea.l	(a4)+, a0
@@ -15079,10 +15110,10 @@ loc_96AE:
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
 	bne.s	loc_96C4
-	if revision>0
-	move.w	#$13, d1
-	else
+	if revision=0
 	move.w	#$11, d1
+	else
+	move.w	#$13, d1
 	endif
 loc_96C4:
 	addq.w	#1, d2
@@ -19305,29 +19336,17 @@ loc_C3E6:
 	moveq	#ItemID_Recorder, d2
 	bsr.w	CheckItemExistInventory
 	bne.s	loc_C406
-	if revision>0
-	move.w	#$1010, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$100C, (Script_ID).w
+	else
+	move.w	#$1010, (Script_ID).w
 	endif
 	addq.w	#5, (Event_routine).w
 	rts
 loc_C406:
 	move.w	#0, (Character_index).w
 	move.w	#$1001, (Script_ID).w
-	if revision>0
-	move.w	#$1015, ($FFFFCD04).w
-	move.w	#$1016, ($FFFFCD02).w
-	tst.b	($FFFFC722).w
-	beq.s	loc_C442
-	move.w	#$1017, ($FFFFCD02).w
-	tst.b	($FFFFC737).w
-	beq.s	loc_C442
-	move.w	#$1018, ($FFFFCD02).w
-	tst.b	($FFFFC73F).w
-	beq.s	loc_C442
-	move.w	#$1019, ($FFFFCD02).w
-	else
+	if revision=0
 	move.w	#$100F, ($FFFFCD04).w
 	move.w	#$1010, ($FFFFCD02).w
 	tst.b	($FFFFC722).w
@@ -19338,7 +19357,19 @@ loc_C406:
 	move.w	#$1012, ($FFFFCD02).w
 	tst.b	($FFFFC73F).w
 	beq.s	loc_C442
-	move.w	#$1013, ($FFFFCD02).w	
+	move.w	#$1013, ($FFFFCD02).w
+	else
+	move.w	#$1015, ($FFFFCD04).w
+	move.w	#$1016, ($FFFFCD02).w
+	tst.b	($FFFFC722).w
+	beq.s	loc_C442
+	move.w	#$1017, ($FFFFCD02).w
+	tst.b	($FFFFC737).w
+	beq.s	loc_C442
+	move.w	#$1018, ($FFFFCD02).w
+	tst.b	($FFFFC73F).w
+	beq.s	loc_C442
+	move.w	#$1019, ($FFFFCD02).w	
 	endif
 loc_C442:
 	addq.w	#1, (Event_routine).w
@@ -19377,10 +19408,10 @@ loc_C49A:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C4A6:
-	if revision>0
-	move.w	#$1012, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$100D, (Script_ID).w
+	else
+	move.w	#$1012, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
@@ -19390,10 +19421,10 @@ loc_C4B2:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C4BE:
-	if revision>0
-	move.w	#$1013, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$100E, (Script_ID).w
+	else
+	move.w	#$1013, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
@@ -19411,18 +19442,18 @@ loc_C4CA:
 ; the library
 ; =============================================
 LibraryTextIndArray:
-	if revision>0
-	dc.b	$04
-	dc.b	$05
-	dc.b	$08
-	dc.b	$0A
-	dc.b	$0D
-	else
+	if revision=0
 	dc.b	$04
 	dc.b	$05
 	dc.b	$07
 	dc.b	$08
 	dc.b	$0A
+	else
+	dc.b	$04
+	dc.b	$05
+	dc.b	$08
+	dc.b	$0A
+	dc.b	$0D
 	endif
 ; =============================================
 
@@ -19770,7 +19801,15 @@ GumInvHouseEventIndex:
 	bra.w	loc_C936
 
 loc_C8CA:
+	if revision=3
+	; Brazilian version fixes the missing dialogue for the Kueri inventory
+	; by checking if you have the Gum in your inventory, however it doesn't
+	; cover the case when you don't have a character in your party that has the item.
+	; When the item is not present, the inventor will say his initial line.
+	jmp	(Inventor_PatchDialogue).l
+	else
 	move.w	#WinID_ScriptMessage2, (Window_index).w
+	endif
 	move.w	#$B08, (Script_ID).w
 ; Fix: unused text for the Kueri inventor
 	if bugfixes=1
@@ -19855,10 +19894,10 @@ loc_C98E:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
 	tst.b	($FFFFC736).w
 	beq.s	loc_C9BE
-	if revision>0
-	move.w	#$1111, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$110B, (Script_ID).w
+	else
+	move.w	#$1111, (Script_ID).w
 	endif
 	addq.w	#6, (Event_routine).w
 	move.w	#MapID_Paseo, (Map_index).w
@@ -19872,10 +19911,10 @@ loc_C9BE:
 	bsr.w	CheckItemExistInventory
 	bne.s	loc_C9D8
 	move.w	#0, (Character_index).w
-	if revision>0
-	move.w	#$1107, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1104, (Script_ID).w
+	else
+	move.w	#$1107, (Script_ID).w
 	endif
 	addq.w	#2, (Event_routine).w
 	rts
@@ -19883,18 +19922,18 @@ loc_C9D8:
 	move.w	#0, (Character_index).w
 	cmpi.w	#1, ($FFFFC736).w
 	beq.s	loc_C9F4
-	if revision>0
-	move.l	#$11011105, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1101, (Script_ID).w
+	else
+	move.l	#$11011105, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C9F4:
-	if revision>0
-	move.w	#$110A, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1106, (Script_ID).w
+	else
+	move.w	#$110A, (Script_ID).w
 	endif
 	addq.w	#3, (Event_routine).w
 	rts
@@ -19915,12 +19954,12 @@ loc_CA36:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_CA42:
-	if revision>0
-	move.l	#$110C110D, (Script_ID).w
-	move.l	#$110F1110, (Script_ID+4).w
-	else
+	if revision=0
 	move.l	#$11071108, (Script_ID).w
 	move.l	#$1109110A, (Script_ID+4).w
+	else
+	move.l	#$110C110D, (Script_ID).w
+	move.l	#$110F1110, (Script_ID+4).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
@@ -20251,10 +20290,10 @@ loc_CDDE:
 	bra.w	PlaneMapToVRAM
 
 loc_CDF8:
-	if revision>0
-	move.w	#$1907, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1906, (Script_ID).w
+	else
+	move.w	#$1907, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	moveq	#1, d0
@@ -20311,10 +20350,10 @@ loc_CE4C:
 loc_CE50:
 	rts
 loc_CE52:
-	if revision>0
-	move.w	#$1908, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1907, (Script_ID).w
+	else
+	move.w	#$1908, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
@@ -20380,10 +20419,10 @@ loc_CF0A:
 	move.w	#0, (Character_index).w
 	cmpi.b	#2, ($FFFFC743).w
 	bne.s	loc_CF38
-	if revision>0
-	move.l	#$190B190E, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1909, (Script_ID).w
+	else
+	move.l	#$190B190E, (Script_ID).w
 	endif
 	addq.w	#4, (Event_routine).w
 	move.w	#0, (Map_event_load).w
@@ -20422,18 +20461,18 @@ loc_CF74:
 	addq.w	#1, (Event_routine_2).w
 	rts
 loc_CF7A:
-	if revision>0
-	move.w	#$1913, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$190F, (Script_ID).w
+	else
+	move.w	#$1913, (Script_ID).w
 	endif
 	moveq	#ItemID_NeiSword, d2
 	bsr.w	CheckItemExistInventory
 	bne.s	loc_CF74
-	if revision>0
-	move.w	#$1911, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$190D, (Script_ID).w
+	else
+	move.w	#$1911, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	bra.w	loc_DDA2
@@ -20444,18 +20483,18 @@ loc_CF96:
 loc_CFA2:
 	move.w	(Yes_no_input).w, d0
 	bne.s	loc_CFB4
-	if revision>0
-	move.w	#$1695, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1693, (Script_ID).w
+	else
+	move.w	#$1695, (Script_ID).w
 	endif
 	addq.w	#1, (Event_routine).w
 	rts
 loc_CFB4:
-	if revision>0
-	move.w	#$1912, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$190E, (Script_ID).w
+	else
+	move.w	#$1912, (Script_ID).w
 	endif
 	addq.w	#3, (Event_routine).w
 	rts
@@ -21745,10 +21784,10 @@ loc_DD58:
 	subq.w	#1, d2
 	bne.s	loc_DD7A
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
-	if revision>0
-	move.w	#$183D, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1824, (Script_ID).w
+	else
+	move.w	#$183D, (Script_ID).w
 	endif
 	tst.w	(Party_members_num).w
 	bne.s	+
@@ -21930,10 +21969,10 @@ Event_Gaira:
 	rts
 loc_DF38:
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
-	if revision>0
-	move.w	#$1839, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1811, (Script_ID).w
+	else
+	move.w	#$1839, (Script_ID).w
 	endif
 	addq.w	#1, ($FFFFDE72).w
 	move.w	#$708, (General_timer).w
@@ -22045,16 +22084,16 @@ loc_E072:
 Event_Esper:
 	tst.w	d2
 	bne.s	loc_E096
-	if revision>0
-	move.w	#$1697, (Script_ID).w
-	tst.b	($FFFFC743).w
-	beq.s	loc_E090
-	move.w	#$1698, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1695, (Script_ID).w
 	tst.b	($FFFFC743).w
 	beq.s	loc_E090
-	move.w	#$1696, (Script_ID).w	
+	move.w	#$1696, (Script_ID).w
+	else
+	move.w	#$1697, (Script_ID).w
+	tst.b	($FFFFC743).w
+	beq.s	loc_E090
+	move.w	#$1698, (Script_ID).w	
 	endif
 loc_E090:
 	addq.w	#1, ($FFFFDE70).w
@@ -22097,10 +22136,10 @@ loc_E0FE:
 	subq.w	#1, d2
 	bne.s	loc_E114
 	move.w	#WinID_ScriptMessageBig, (Window_index).w
-	if revision>0
-	move.w	#$1910, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$190C, (Script_ID).w
+	else
+	move.w	#$1910, (Script_ID).w
 	endif
 	addq.w	#1, ($FFFFDE70).w
 	rts
@@ -22157,7 +22196,11 @@ loc_E194:
 	bne.s	loc_E1B6
 	tst.w	(Yes_no_input).w
 	bne.s	loc_E1AA
+	if revision=3
+	move.w	#$1816, (Script_ID).w
+	else
 	move.w	#$1817, (Script_ID).w
+	endif
 	addq.w	#2, ($FFFFDE70).w
 	rts
 loc_E1AA:
@@ -22211,10 +22254,10 @@ loc_E230:
 loc_E236:
 	subq.w	#1, d2
 	bne.s	loc_E248
-	if revision>0
-	move.l	#$183B181F, (Script_ID).w
-	else
+	if revision=0
 	move.l	#$181D181F, (Script_ID).w
+	else
+	move.l	#$183B181F, (Script_ID).w
 	endif
 	addq.w	#1, ($FFFFDE70).w
 	rts
@@ -22319,10 +22362,10 @@ loc_E36A:
 loc_E37A:
 	subq.w	#1, d2
 	bne.s	loc_E398
-	if revision>0
-	move.w	#$183F, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$1829, (Script_ID).w
+	else
+	move.w	#$183F, (Script_ID).w
 	endif
 	tst.w	(Yes_no_input).w
 	beq.s	loc_E392
@@ -22534,10 +22577,10 @@ loc_E5D0:
 	bcs.s	loc_E5EA
 	cmpi.b	#3, ($FFFFC743).w
 	bne.s	loc_E5EA
-	if revision>0
-	move.w	#$16A1, (Script_ID).w
-	else
+	if revision=0
 	move.w	#$169F, (Script_ID).w
+	else
+	move.w	#$16A1, (Script_ID).w
 	endif
 	rts
 
@@ -22613,7 +22656,33 @@ loc_E690:
 	rts
 
 ; =========================================
-	if revision>0
+	if revision=0
+loc_E6B0:
+	dc.b	$97, $97, $98, $98, $98, $99, $99, $99, $9A, $9A, $9B, $94, $9D, $9D, $9E, $9E
+	dc.b	$99, $99, $9A, $9A, $9B, $9C, $9B, $9C, $9B, $9D, $9E, $9E, $97, $98, $97, $98
+	dc.b	$97, $98, $99, $9A, $9A, $9B, $9C, $9D, $9E, $A0, $A0, $A0, $97, $98, $99, $9A
+	dc.b	$99, $9A, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $97, $98, $97, $98
+	dc.b	$99, $9A, $99, $9A, $9B, $9C, $A0, $A0, $A0, $A0, $A0, $A0, $97, $98, $97, $98
+	dc.b	$99, $9A, $99, $9A, $9B, $9C, $9B, $9C, $9D, $9E, $A0, $A0
+
+loc_E70C:
+	dc.b	$01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10
+	dc.b	$11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
+	dc.b	$21, $22, $23, $24
+	
+loc_E730:
+	dc.b	$25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34
+	dc.b	$35, $36, $35, $36, $35, $36, $35, $36, $37, $38, $39, $3A, $3A, $3B, $3C, $3D
+	dc.b	$3E, $3F, $40, $41, $40, $41, $41, $41, $42, $43, $44, $45, $46, $47, $48, $49
+	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $41, $53, $54, $53, $55, $53, $54, $55, $53
+	dc.b	$55, $56, $53, $54, $56, $54, $55, $57, $54, $55, $54, $56, $53, $56, $53, $54
+	dc.b	$53, $55, $54, $53, $53, $55, $79, $7A, $7B, $7C, $7D, $00, $5B, $5C, $5D, $5E
+	dc.b	$5F, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $6A, $6B, $6C, $6D, $6E
+	dc.b	$6F, $70, $71, $72, $73, $74, $75, $76, $77, $78, $58, $59, $58, $5A, $58, $00
+	dc.b	$7E, $7F, $80, $7E, $7F, $81, $84, $85, $87, $89, $8A, $8B, $8C, $8D, $8E, $8F
+
+	else
+
 loc_E6B0:
 	dc.b	$99
 	dc.b	$99
@@ -22628,6 +22697,9 @@ loc_E6B0:
 	dc.b	$9D
 ; Fix: wrong text pointer
 	if bugfixes=1
+	dc.b	$96
+	; Brazilian version also fixes this
+	elseif revision=3
 	dc.b	$96
 	else
 	dc.b	$94
@@ -22897,30 +22969,6 @@ loc_E730:
 	dc.b	$8E
 	dc.b	$8F
 ; =========================================
-	else
-loc_E6B0:
-	dc.b	$97, $97, $98, $98, $98, $99, $99, $99, $9A, $9A, $9B, $94, $9D, $9D, $9E, $9E
-	dc.b	$99, $99, $9A, $9A, $9B, $9C, $9B, $9C, $9B, $9D, $9E, $9E, $97, $98, $97, $98
-	dc.b	$97, $98, $99, $9A, $9A, $9B, $9C, $9D, $9E, $A0, $A0, $A0, $97, $98, $99, $9A
-	dc.b	$99, $9A, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $9B, $9C, $97, $98, $97, $98
-	dc.b	$99, $9A, $99, $9A, $9B, $9C, $A0, $A0, $A0, $A0, $A0, $A0, $97, $98, $97, $98
-	dc.b	$99, $9A, $99, $9A, $9B, $9C, $9B, $9C, $9D, $9E, $A0, $A0
-
-loc_E70C:
-	dc.b	$01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10
-	dc.b	$11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
-	dc.b	$21, $22, $23, $24
-	
-loc_E730:
-	dc.b	$25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34
-	dc.b	$35, $36, $35, $36, $35, $36, $35, $36, $37, $38, $39, $3A, $3A, $3B, $3C, $3D
-	dc.b	$3E, $3F, $40, $41, $40, $41, $41, $41, $42, $43, $44, $45, $46, $47, $48, $49
-	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $41, $53, $54, $53, $55, $53, $54, $55, $53
-	dc.b	$55, $56, $53, $54, $56, $54, $55, $57, $54, $55, $54, $56, $53, $56, $53, $54
-	dc.b	$53, $55, $54, $53, $53, $55, $79, $7A, $7B, $7C, $7D, $00, $5B, $5C, $5D, $5E
-	dc.b	$5F, $60, $61, $62, $63, $64, $65, $66, $67, $68, $69, $6A, $6B, $6C, $6D, $6E
-	dc.b	$6F, $70, $71, $72, $73, $74, $75, $76, $77, $78, $58, $59, $58, $5A, $58, $00
-	dc.b	$7E, $7F, $80, $7E, $7F, $81, $84, $85, $87, $89, $8A, $8B, $8C, $8D, $8E, $8F
 	endif
 	even
 
@@ -24506,15 +24554,15 @@ loc_F828:
 	move.w	(a0), (Character_index).w
 	rts
 loc_F83A:
-	lea	(WinArt_CharList).l, a1
-	lea	(Window_art_buffer+WinArt_CharList-DynamicWindowsStart).w, a2
+	lea	(PlaneMap_WinCharList).l, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList-DynamicWindowsStart).w, a2
 	move.w	#$F, d0
 loc_F848:
 	move.l	(a1)+, (a2)+	; WARNING: a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	dbf	d0, loc_F848
 
 	lea	(Party_member_ID).w, a0
-	lea	(Window_art_buffer+WinArt_CharList-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList-DynamicWindowsStart+8).w, a1
 	move.w	(Party_members_num).w, d0
 loc_F85A:
 	lea	(Character_stats+name).w, a2
@@ -24528,7 +24576,7 @@ loc_F85A:
 	dbf	d0, loc_F85A
 
 	subq.w	#1, a1
-	lea	(Window_art_buffer+WinArt_CharList-DynamicWindowsStart+$37).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList-DynamicWindowsStart+$37).w, a1
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
@@ -24605,7 +24653,7 @@ loc_F922:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_MenuItemList-DynamicWindowsStart).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinMenuItemList-DynamicWindowsStart).w, a1
 	move.l	(a3)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.l	(a3), (a1)+
 	addq.w	#5, a1
@@ -24747,14 +24795,14 @@ loc_FA58:
 ; loc_FA6E
 Win_MenuCharStats:
 	move.w	#0, (Window_index_saved).w
-	lea	(WinArt_MenuCharStats).l, a1
-	lea	(Window_art_buffer+WinArt_MenuCharStats-DynamicWindowsStart).w, a2
+	lea	(PlaneMap_WinMenuCharStats).l, a1
+	lea	(Window_art_buffer+PlaneMap_WinMenuCharStats-DynamicWindowsStart).w, a2
 	move.w	#$2E, d0
 loc_FA82:
 	move.l	(a1)+, (a2)+	; WARNING: a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	dbf	d0, loc_FA82
 	lea	(Party_member_ID).w, a0
-	lea	(Window_art_buffer+WinArt_MenuCharStats-DynamicWindowsStart+$1C).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinMenuCharStats-DynamicWindowsStart+$1C).w, a1
 	move.w	(Party_members_num).w, d5
 loc_FA94:
 	lea	(Character_stats+name).w, a3
@@ -24770,10 +24818,10 @@ loc_FA94:
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
-	if revision>0
-	adda.w	#$31, a1
-	else
+	if revision=0
 	adda.w	#$16, a1
+	else
+	adda.w	#$31, a1
 	endif
 	suba.w	#$40, a3
 	lea	(loc_11432).l, a2
@@ -24790,10 +24838,10 @@ loc_FACE:
 	adda.w	#$19, a1
 	move.b	(a2)+, (a1)+
 	move.b	(a2)+, (a1)+
-	if revision>0
-	suba.w	#$1A, a1
-	else
+	if revision=0
 	addq.w	#1, a1
+	else
+	suba.w	#$1A, a1
 	endif
 	move.w	(a3), d0
 	bsr.w	loc_1135A
@@ -25016,7 +25064,7 @@ Win_FourthCharStats:
 
 loc_FD04:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_IndividualCharStats-DynamicWindowsStart+$D).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinIndividualCharStats-DynamicWindowsStart+$D).w, a1
 	bsr.s	loc_FD50
 	subq.w	#8, a3
 	lea	(loc_1143E).l, a2
@@ -25034,14 +25082,14 @@ loc_FD26:
 	move.b	(a2)+, (a1)+
 	move.b	(a2)+, (a1)+
 	addq.w	#8, a3
-	lea	(Window_art_buffer+WinArt_IndividualCharStats-DynamicWindowsStart+$34).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinIndividualCharStats-DynamicWindowsStart+$34).w, a1
 	move.w	(a3)+, d0
 	bsr.w	loc_11364
 	addq.w	#1, a1
 	adda.w	#$30, a3
 	move.l	(a3), (a1)	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	subq.w	#4, a3
-	lea	(Window_art_buffer+WinArt_IndividualCharStats-DynamicWindowsStart+$2D).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinIndividualCharStats-DynamicWindowsStart+$2D).w, a1
 	move.l	(a3), (a1)	; same as above
 	rts
 loc_FD50:
@@ -25069,16 +25117,16 @@ Win_MenuMeseta:
 	add.w	(Party_members_num).w, d1
 	bra.w	loc_11064
 loc_FD8C:
-	lea	(Window_art_buffer+WinArt_Meseta-DynamicWindowsStart+$E).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinMeseta-DynamicWindowsStart+$E).w, a1
 	move.l	(Current_money).w, d0
 	bra.w	Meseta_ConvertToDecimal
 ; ----------------------------------------
 ; loc_FD98
 Win_CharOrderDestination:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_CharOrderDestination-DynamicWindowsStart+8).w, a1
-	lea	(WinArt_CharOrderDestination).l, a3
-	lea	(Window_art_buffer+WinArt_CharOrderDestination-DynamicWindowsStart).w, a2
+	lea	(Window_art_buffer+PlaneMap_WinCharOrderDestination-DynamicWindowsStart+8).w, a1
+	lea	(PlaneMap_WinCharOrderDestination).l, a3
+	lea	(Window_art_buffer+PlaneMap_WinCharOrderDestination-DynamicWindowsStart).w, a2
 	move.w	#$E, d0
 loc_FDB0:
 	move.l	(a3)+, (a2)+	; WARNING: a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
@@ -25103,7 +25151,7 @@ loc_FDD6:
 Win_OrderCharList:
 	tst.b	d1
 	bne.s	loc_FDE2
-	lea	(Window_art_buffer+WinArt_CharList2-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList2-DynamicWindowsStart+8).w, a1
 	bra.s	loc_FE10
 loc_FDE2:
 	subq.w	#1, d1
@@ -25122,8 +25170,8 @@ loc_FDF6:
 	move.w	(a0), (Character_index).w
 	rts
 loc_FE10:
-	lea	(WinArt_CharList2).l, a3
-	lea	(Window_art_buffer+WinArt_CharList2-DynamicWindowsStart).w, a2
+	lea	(PlaneMap_WinCharList2).l, a3
+	lea	(Window_art_buffer+PlaneMap_WinCharList2-DynamicWindowsStart).w, a2
 	move.w	#$E, d0
 loc_FE1E:
 	move.l	(a3)+, (a2)+; WARNING: a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
@@ -25210,7 +25258,7 @@ loc_FEF2:
 	move.w	(Character_index).w, d1
 	lsl.w	#5, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_MapTechList-DynamicWindowsStart).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinMapTechList-DynamicWindowsStart).w, a1
 	move.l	(a3)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.w	(a3), (a1)+
 	addq.w	#1, a1
@@ -25305,7 +25353,7 @@ loc_FFD6:
 ; ----------------------------------------------------
 ; loc_FFD8
 Win_StrngHPTP:
-	lea	(Window_art_buffer+WinArt_StrngHPTP-DynamicWindowsStart+$D).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinStrngHPTP-DynamicWindowsStart+$D).w, a1
 	move.w	(Character_index).w, d1
 	bsr.w	loc_FD50
 	move.w	#0, (Window_index_saved).w
@@ -25313,7 +25361,7 @@ Win_StrngHPTP:
 ; ----------------------------------------------------
 ; loc_FFEC
 Win_StrngStats:
-	lea	(Window_art_buffer+WinArt_StrngStats-DynamicWindowsStart+$13).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinStrngStats-DynamicWindowsStart+$13).w, a1
 	move.w	(Character_index).w, d1
 	bsr.w	loc_10000
 	move.w	#0, (Window_index_saved).w
@@ -25368,7 +25416,7 @@ loc_10076:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_StrngEquip-DynamicWindowsStart+$14).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinStrngEquip-DynamicWindowsStart+$14).w, a1
 	move.w	#4, d0
 loc_1008A:
 	move.b	(a2), d1
@@ -25391,7 +25439,7 @@ Win_StrngLVEXP:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a3
-	lea	(Window_art_buffer+WinArt_StrngLVEXP-DynamicWindowsStart+$10).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinStrngLVEXP-DynamicWindowsStart+$10).w, a1
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
 	move.b	(a3)+, (a1)+
@@ -25407,17 +25455,17 @@ Win_StrngLVEXP:
 	bsr.w	loc_11364
 	lea	(loc_11456).l, a2
 	move.w	(Character_index).w, d1
-	if revision>0
-	lsl.w	#3, d1
-	adda.w	d1, a2
-	adda.w	#$11, a1
-	else
+	if revision=0
 	lsl.w	#4, d1
 	adda.w	d1, a2
 	adda.w	#7, a1
 	move.l	(a2)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.l	(a2)+, (a1)+	; same as above
 	addq.w	#2, a1
+	else
+	lsl.w	#3, d1
+	adda.w	d1, a2
+	adda.w	#$11, a1
 	endif
 	move.l	(a2)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.l	(a2)+, (a1)+	; same as above
@@ -25428,7 +25476,7 @@ Win_StrngLVEXP:
 ; --------------------------------------------------
 ; loc_100FC
 Win_EquipStats:
-	lea	(Window_art_buffer+WinArt_EquipStats-DynamicWindowsStart+$1E).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinEquipStats-DynamicWindowsStart+$1E).w, a1
 	move.w	(Character_index).w, d1
 	bsr.w	loc_10110
 	move.w	#0, (Window_index_saved).w
@@ -25621,7 +25669,7 @@ loc_102F0:
 	move.w	(Character_index).w, d1
 	lsl.w	#5, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_FullTechList-DynamicWindowsStart+$B).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinFullTechList-DynamicWindowsStart+$B).w, a1
 	move.w	#7, d0
 loc_10300:
 	moveq	#0, d3
@@ -25632,7 +25680,7 @@ loc_10300:
 	addq.w	#6, a1
 	addq.w	#1, a2
 	dbf	d0, loc_10300
-	lea	(Window_art_buffer+WinArt_FullTechList-DynamicWindowsStart+$11).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinFullTechList-DynamicWindowsStart+$11).w, a1
 	move.w	#7, d0
 loc_1031A:
 	moveq	#0, d3
@@ -25690,7 +25738,7 @@ loc_1038A:
 ; -------------------------------------------
 ; loc_10394
 Win_StoreMeseta:
-	lea	(Window_art_buffer+WinArt_Meseta-DynamicWindowsStart+$E).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinMeseta-DynamicWindowsStart+$E).w, a1
 	move.l	(Current_money).w, d0
 	bsr.w	Meseta_ConvertToDecimal
 	move.w	#0, (Window_index_saved).w
@@ -25817,7 +25865,7 @@ loc_104E2:
 	bra.w	loc_11028
 loc_104EC:
 	lea	($200701).l, a0
-	lea	(Window_art_buffer+WinArt_SaveSlots-DynamicWindowsStart+$C).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinSaveSlots-DynamicWindowsStart+$C).w, a1
 	moveq	#3, d5
 loc_104F8:
 	moveq	#0, d3
@@ -25912,7 +25960,7 @@ loc_105C6:
 	move.w	($FFFFF766).w, d1
 	mulu.w	#6, d1
 	adda.w	d1, a0
-	lea	(Window_art_buffer+WinArt_StoreInventory-DynamicWindowsStart+$14).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinStoreInventory-DynamicWindowsStart+$14).w, a1
 	moveq	#5, d5
 loc_105DC:
 	move.b	(a0), d1
@@ -25984,7 +26032,7 @@ loc_10676:
 	move.w	d1, (Character_index).w
 	rts
 loc_10684:
-	lea	(Window_art_buffer+WinArt_ProfileCharList-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinProfileCharList-DynamicWindowsStart+8).w, a1
 	move.w	(Party_members_joined).w, d0
 	moveq	#0, d1
 loc_1068E:
@@ -26059,14 +26107,14 @@ loc_10726:
 	rts
 
 loc_10728:
-	lea	(WinArt_RegroupCharList).l, a3
-	lea	(Window_art_buffer+WinArt_RegroupCharList-DynamicWindowsStart).w, a2
+	lea	(PlaneMap_WinRegroupCharList).l, a3
+	lea	(Window_art_buffer+PlaneMap_WinRegroupCharList-DynamicWindowsStart).w, a2
 	move.w	#$14, d0
 loc_10736:
 	move.l	(a3)+, (a2)+	; WARNING: a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	dbf	d0, loc_10736
 	move.w	#$FFFF, ($FFFFC602).w
-	lea	(Window_art_buffer+WinArt_RegroupCharList-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinRegroupCharList-DynamicWindowsStart+8).w, a1
 	move.w	(Party_members_joined).w, d0
 	subq.w	#2, d0
 	bcs.s	loc_1077C
@@ -26097,9 +26145,9 @@ loc_1077C:
 ; loc_1077E
 Win_RegroupSelectedChar:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_RegroupSelectedChar-DynamicWindowsStart+4).w, a1
-	lea	(WinArt_RegroupSelectedChar).l, a3
-	lea	(Window_art_buffer+WinArt_RegroupSelectedChar-DynamicWindowsStart).w, a2
+	lea	(Window_art_buffer+PlaneMap_WinRegroupSelectedChar-DynamicWindowsStart+4).w, a1
+	lea	(PlaneMap_WinRegroupSelectedChar).l, a3
+	lea	(Window_art_buffer+PlaneMap_WinRegroupSelectedChar-DynamicWindowsStart).w, a2
 	move.w	#9, d0
 loc_10796:
 	move.l	(a3)+, (a2)+	; WARNING: a2 and a3 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
@@ -26206,7 +26254,7 @@ Win_StrngCharList:
 	bne.s	loc_10886
 	move.l	(Party_member_ID).w, ($FFFFC618).w
 	move.l	($FFFFC60C).w, ($FFFFC61C).w
-	lea	(Window_art_buffer+WinArt_CharList2-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList2-DynamicWindowsStart+8).w, a1
 	bra.w	loc_FE10
 loc_10886:
 	subq.w	#1, d1
@@ -26230,7 +26278,7 @@ Win_StoreCharList:
 	bne.s	loc_108C8
 	move.l	(Party_member_ID).w, ($FFFFC618).w
 	move.l	($FFFFC60C).w, ($FFFFC61C).w
-	lea	(Window_art_buffer+WinArt_CharList2-DynamicWindowsStart+8).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinCharList2-DynamicWindowsStart+8).w, a1
 	bra.w	loc_FE10
 loc_108C8:
 	subq.w	#1, d1
@@ -26306,10 +26354,10 @@ loc_1095A:
 	lsl.w	#4, d0
 	adda.w	d0, a1
 	move.w	(a1), d5
-	if revision>0
-	lea	(Window_art_buffer+WinArt_BattleCharStats-DynamicWindowsStart+6).w, a1
+	if revision=0
+	lea	(Window_art_buffer+PlaneMap_WinBattleCharStats-DynamicWindowsStart).w, a1
 	else
-	lea	(Window_art_buffer+WinArt_BattleCharStats-DynamicWindowsStart).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleCharStats-DynamicWindowsStart+6).w, a1
 	endif
 	lea	(Character_stats+curr_hp).w, a3
 	lsl.w	#6, d1
@@ -26336,10 +26384,10 @@ loc_1099C:
 	move.w	(a2)+, (a1)+
 	addq.w	#4, a1
 	move.w	(a2)+, (a1)
-	if revision>0
-	subq.w	#3, a1
-	else
+	if revision=0
 	addq.w	#3, a1
+	else
+	subq.w	#3, a1
 	endif
 	move.w	(a3), d0
 	bsr.w	loc_1135A
@@ -26433,7 +26481,7 @@ loc_10A8E:
 ; loc_10A90
 Win_BattleCharName:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_BattleCharName-DynamicWindowsStart+4).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleCharName-DynamicWindowsStart+4).w, a1
 	lea	(Character_stats+name).w, a3
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
@@ -26492,7 +26540,7 @@ loc_10B24:
 	move.w	d1, (Character_index_2).w
 	rts
 loc_10B2A:
-	lea	(Window_art_buffer+WinArt_EnemyGroups-DynamicWindowsStart+$E).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinEnemyGroups-DynamicWindowsStart+$E).w, a1
 	move.w	(Enemy_1).w, d0
 	bsr.s	loc_10B38
 	move.w	(Enemy_2).w, d0
@@ -26636,7 +26684,7 @@ loc_10CBE:
 	move.w	(Character_index).w, d1
 	lsl.w	#5, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_BattleTechList-DynamicWindowsStart).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleTechList-DynamicWindowsStart).w, a1
 	move.l	(a3)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.w	(a3), (a1)+
 	addq.w	#1, a1
@@ -26746,7 +26794,7 @@ loc_10DF0:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	lea	(Window_art_buffer+WinArt_BattleItemList-DynamicWindowsStart).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleItemList-DynamicWindowsStart).w, a1
 	move.l	(a3)+, (a1)+	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	move.l	(a3), (a1)+
 	addq.w	#5, a1
@@ -26763,7 +26811,7 @@ loc_10E06:
 ; loc_10E1A
 Win_BattleItemUsed:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_BattleItemUsed-DynamicWindowsStart+$A).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleItemUsed-DynamicWindowsStart+$A).w, a1
 	move.b	(Item_index).w, d1
 	moveq	#0, d3
 	bsr.w	loc_F95A
@@ -26774,7 +26822,7 @@ Win_BattleItemUsed:
 ; loc_10E38
 Win_BattleTechUsed:
 	move.w	#0, (Window_index_saved).w
-	lea	(Window_art_buffer+WinArt_BattleTechUsed-DynamicWindowsStart+5).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinBattleTechUsed-DynamicWindowsStart+5).w, a1
 	move.b	(Technique_index).w, d1
 	moveq	#0, d3
 	bsr.w	loc_FF1C
@@ -26797,7 +26845,7 @@ loc_10E68:
 	tst.b	d1
 	bne.s	loc_10E80
 	move.w	#$500, ($FFFFF72C).w
-	lea	(Window_art_buffer+WinArt_EnemyNames-DynamicWindowsStart+$A).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinEnemyNames-DynamicWindowsStart+$A).w, a1
 	moveq	#0, d3
 	bsr.s	loc_10E8E
 	moveq	#1, d3
@@ -26840,7 +26888,7 @@ loc_10EC2:
 	rts
 loc_10ED4:
 	move.w	#$500, ($FFFFF72C).w
-	lea	(Window_art_buffer+WinArt_EnemyInfo-DynamicWindowsStart+4).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinEnemyInfo-DynamicWindowsStart+4).w, a1
 	lea	(loc_114FE).l, a3
 	tst.w	d0
 	bmi.s	loc_10EF0
@@ -26874,14 +26922,14 @@ loc_10F1E:
 	bsr.w	loc_11028
 	rts
 loc_10F2A:
-	lea	(WinArt_TeleportPlaceNames).l, a1
-	lea	(Window_art_buffer+WinArt_TeleportPlaceNames-DynamicWindowsStart).w, a2
+	lea	(PlaneMap_WinTeleportPlaceNames).l, a1
+	lea	(Window_art_buffer+PlaneMap_WinTeleportPlaceNames-DynamicWindowsStart).w, a2
 	move.w	#$14, d0
 loc_10F38:
 	move.l	(a1)+, (a2)+	; WARNING: a1 and a2 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
 	dbf	d0, loc_10F38
 
-	lea	(Window_art_buffer+WinArt_TeleportPlaceNames-DynamicWindowsStart+9).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinTeleportPlaceNames-DynamicWindowsStart+9).w, a1
 	lea	($FFFFF768).w, a3
 	move.w	#$FFFF, ($FFFFDED6).w
 	moveq	#5, d2
@@ -26928,7 +26976,24 @@ loc_10F94:
 	addq.w	#2, a1
 	rts
 ; ----------------------------------------
-	if revision>0
+	if revision=0
+
+TeleportPlaceNamesArray:
+	dc.b	$62, $5D, $7E, $00, $00
+	dc.b	$9F, $63, $5A, $00, $00
+	dc.b	$56, $7C, $73, $A5, $78
+	dc.b	$5A, $A1, $65, $6E, $00
+	dc.b	$94, $73, $00, $00, $00
+	dc.b	$5D, $59, $7C, $62, $00
+	dc.b	$A0, $56, $65, $00, $00
+	dc.b	$56, $58, $5D, $9B, $7D
+	dc.b	$95, $A5, $60, $00, $00
+	dc.b	$7C, $8A, $5A, $82, $00
+	
+	even
+
+	else
+	
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -26963,22 +27028,6 @@ TeleportPlaceNamesArray:
 	even
 
 	charset
-	
-	else
-	
-TeleportPlaceNamesArray:
-	dc.b	$62, $5D, $7E, $00, $00
-	dc.b	$9F, $63, $5A, $00, $00
-	dc.b	$56, $7C, $73, $A5, $78
-	dc.b	$5A, $A1, $65, $6E, $00
-	dc.b	$94, $73, $00, $00, $00
-	dc.b	$5D, $59, $7C, $62, $00
-	dc.b	$A0, $56, $65, $00, $00
-	dc.b	$56, $58, $5D, $9B, $7D
-	dc.b	$95, $A5, $60, $00, $00
-	dc.b	$7C, $8A, $5A, $82, $00
-	
-	even
 
 	endif
 
@@ -26988,7 +27037,7 @@ Win_UstvestiaSoundtracks:
 	move.w	#0, (Window_index_saved).w
 	move.w	(Enemy_1).w, d0
 	lsr.w	#1, d0
-	lea	(Window_art_buffer+WinArt_UstvestiaSoundtracks-DynamicWindowsStart+$C).w, a1
+	lea	(Window_art_buffer+PlaneMap_WinUstvestiaSoundtracks-DynamicWindowsStart+$C).w, a1
 	moveq	#0, d3
 	bsr.s	+
 	moveq	#1, d3
@@ -27444,7 +27493,240 @@ DecimalDigitNumbers:
 	dc.l	1
 ; ====================================
 
-	if revision>0
+	if revision=0
+
+loc_11412:
+	dc.b	$5B, $26, $5B, $26, $36, $50, $2C, $53
+
+	even
+
+loc_1141A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11422:
+	dc.b	$B9
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
+	dc.b	$B9
+
+	even
+
+loc_1142A:
+	dc.b	$5B, $26, $26, $26, $36, $50, $3C, $53
+
+	even
+
+loc_11432:
+	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
+	dc.b	$26, $26, $A4, $A9
+
+	even
+
+loc_1143E:
+	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
+	dc.b	$26, $26, $A5, $AC
+
+	even
+
+loc_1144A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11450:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
+
+	even
+
+loc_11456:
+	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $26, $62, $96, $6A, $90, $8C, $72, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $47, $32, $5A, $2E, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $78, $8C, $6E, $96, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $72, $66, $6E, $96, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $2C, $2E, $32, $58, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $64, $61, $8C, $6E, $78, $8C, $6E, $96
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $6A, $93, $8C, $66, $82, $26
+	dc.b	$26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26, $3A, $51, $44, $29, $26, $26
+
+InputCharacterMap:
+	dc.b	$56, $57, $58, $59, $5A, $00, $00, $73, $74, $75, $76, $77, $00, $00, $8C, $8D, $8E, $8F, $90
+	dc.b	$5B, $5C, $5D, $5E, $5F, $00, $00, $78, $00, $79, $00, $7A, $00, $00, $91, $92, $93, $94, $95
+	dc.b	$60, $61, $62, $63, $64, $00, $00, $7B, $7C, $7D, $7E, $7F, $00, $00, $96, $97, $98, $99, $9A
+	dc.b	$65, $66, $67, $68, $69, $00, $00, $80, $00, $81, $00, $82, $00, $00, $9B, $9C, $9D, $4F, $9E
+	dc.b	$6A, $6B, $6C, $6D, $6E, $00, $00, $89, $8A, $8B, $88, $A5, $00, $00, $9F, $A0, $A1, $54, $A2
+	dc.b	$6F, $70, $71, $27, $72, $00, $00, $A3, $00, $00, $00, $A4, $00, $00, $00, $C4, $00, $00, $00
+
+	even
+	
+loc_114DA:
+	dc.b	$12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21
+
+loc_114EA:
+	dc.b	$B9, $B9, $32, $3C, $B9, $B9, $3E, $4F, $B9, $B9, $7D, $79, $8F, $B9, $3A, $2E, $B9, $B9, $A4, $A9
+
+loc_114FE:
+	dc.b	$26, $26, $26, $26
+	dc.b	$2C, $28, $42, $2E
+
+loc_11506:
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $7E, $6B, $26
+
+	even
+
+	elseif revision=3
+
+	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
+	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
+	charset '0', "\118\119\120\121\122\123\124\125\126\127"
+	charset ' ', $26
+	charset ',', $5B
+	charset '.', $5C
+	charset ';', $5D
+	charset '"', $5E
+	charset '?', $5F
+	charset '!', $60
+	charset 39, $61  ; apostrophe
+	charset '-', $62
+	charset '/', $64
+	charset ':', $80
+
+loc_11412:
+	dc.b	"    "
+	dc.b	$BE, $BE, $BE, $BE
+
+	even
+
+loc_1141A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11422:
+	dc.b	$B9
+	dc.b	$B4, $B5, "PROX"
+	dc.b	$B9
+
+	even
+
+loc_1142A:
+	dc.b	"    "
+	dc.b	$BE, $BE, $BE, $BE
+	
+	even
+
+loc_11432:
+	dc.b	$70, $71, $74, $75
+	dc.b	$6E, $6F, $72, $73
+	dc.b	"PEPT"
+
+	even
+
+loc_1143E:
+	dc.b	$70, $71, $74, $75
+	dc.b	$6E, $6F, $72, $73
+	dc.b	"  NV"
+
+	even
+
+loc_1144A:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+
+	even
+
+loc_11450:
+	dc.b	$B4, $B5, "PROX"
+
+	even
+
+loc_11456:
+	dc.b	" AGENTE "
+	dc.b	" CLONE  "
+	dc.b	" CACADOR"
+	dc.b	" DOUTORA"
+	dc.b	"BIOLOGO "
+	dc.b	"GUARDIA "
+	dc.b	"DESTROBO"
+	dc.b	" GATUNA "
+	
+	even
+	charset
+; =================================================================
+
+; =================================================================================================
+; Character Map in input window when choosing names
+;
+; $B-$24 = A-Z
+; $A3 = Advance character
+; $A4 = Delete character
+; $C4 = Close window
+
+	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
+	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
+	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
+	charset	' ', 0
+	charset	',', $3F
+	charset	'.', $40
+	charset	';', $41
+	charset	'"', $42
+	charset	'?', $43
+	charset	'!', $44
+	charset	39, $45	; apostrophe
+	charset	'-', $46
+	charset	':', $77
+
+InputCharacterMap:
+	dc.b	"A B C D E F G H I"
+	dc.b	"J K L M N O P Q R"
+	dc.b	"S T U V W X Y Z  "
+	dc.b	$A3, "     ", $A4, "     ", $C4, "    "
+; =================================================================================================
+
+	even
+	charset
+
+
+	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
+	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
+	charset '0', "\118\119\120\121\122\123\124\125\126\127"
+	charset ' ', $26
+	charset ',', $5B
+	charset '.', $5C
+	charset ';', $5D
+	charset '"', $5E
+	charset '?', $5F
+	charset '!', $60
+	charset 39, $61  ; apostrophe
+	charset '-', $62
+	charset '/', $64
+	charset ':', $80
+
+loc_114DA:
+	dc.w	$1213, $1415
+	dc.w	$1617, $1819
+	dc.w	$1A1B, $1C1D
+	dc.w	$1E1F, $2021
+
+loc_114EA:
+	dc.w	$7071, $7475
+	dc.b	$6A, $6B, "TP"
+	dc.b	$6C, $6D, "TP"
+	dc.w	$6E6F, $7273
+	dc.b	"PEPT"
+
+loc_114FE:
+	dc.b	"    CURA"
+
+loc_11506:
+	dc.b	"    ERRA"
+
+	even
+
+	charset
+	
+	else
+
 	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
 	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
 	charset '0', "\118\119\120\121\122\123\124\125\126\127"
@@ -27590,88 +27872,6 @@ loc_11506:
 	even
 
 	charset
-	
-	else
-
-loc_11412:
-	dc.b	$5B, $26, $5B, $26, $36, $50, $2C, $53
-
-	even
-
-loc_1141A:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-
-	even
-
-loc_11422:
-	dc.b	$B9
-	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
-	dc.b	$B9
-
-	even
-
-loc_1142A:
-	dc.b	$5B, $26, $26, $26, $36, $50, $3C, $53
-
-	even
-
-loc_11432:
-	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
-	dc.b	$26, $26, $A4, $A9
-
-	even
-
-loc_1143E:
-	dc.b	$26, $26, $32, $3C, $5B, $26, $3A, $2E
-	dc.b	$26, $26, $A5, $AC
-
-	even
-
-loc_1144A:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-
-	even
-
-loc_11450:
-	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
-
-	even
-
-loc_11456:
-	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $26, $62, $96, $6A, $90, $8C, $72, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $47, $32, $5A, $2E, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $78, $8C, $6E, $96, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $72, $66, $6E, $96, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $2C, $2E, $32, $58, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $64, $61, $8C, $6E, $78, $8C, $6E, $96
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $6A, $93, $8C, $66, $82, $26
-	dc.b	$26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26, $3A, $51, $44, $29, $26, $26
-
-InputCharacterMap:
-	dc.b	$56, $57, $58, $59, $5A, $00, $00, $73, $74, $75, $76, $77, $00, $00, $8C, $8D, $8E, $8F, $90
-	dc.b	$5B, $5C, $5D, $5E, $5F, $00, $00, $78, $00, $79, $00, $7A, $00, $00, $91, $92, $93, $94, $95
-	dc.b	$60, $61, $62, $63, $64, $00, $00, $7B, $7C, $7D, $7E, $7F, $00, $00, $96, $97, $98, $99, $9A
-	dc.b	$65, $66, $67, $68, $69, $00, $00, $80, $00, $81, $00, $82, $00, $00, $9B, $9C, $9D, $4F, $9E
-	dc.b	$6A, $6B, $6C, $6D, $6E, $00, $00, $89, $8A, $8B, $88, $A5, $00, $00, $9F, $A0, $A1, $54, $A2
-	dc.b	$6F, $70, $71, $27, $72, $00, $00, $A3, $00, $00, $00, $A4, $00, $00, $00, $C4, $00, $00, $00
-
-	even
-	
-loc_114DA:
-	dc.b	$12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21
-
-loc_114EA:
-	dc.b	$B9, $B9, $32, $3C, $B9, $B9, $3E, $4F, $B9, $B9, $7D, $79, $8F, $B9, $3A, $2E, $B9, $B9, $A4, $A9
-
-loc_114FE:
-	dc.b	$26, $26, $26, $26
-	dc.b	$2C, $28, $42, $2E
-
-loc_11506:
-	dc.b	$26, $26, $26, $26
-	dc.b	$26, $7E, $6B, $26
-
-	even
 	
 	endif
 
@@ -29034,12 +29234,12 @@ loc_12964:
 
 ; ---------------------------------------------------------------------------------
 ; filler free space - can be replaced with even
-	if revision>0
-	rept $162
+	if revision=0
+	rept $84
 	dc.b	0
 	endm
 	else
-	rept $84
+	rept $162
 	dc.b	0
 	endm	
 	endif
@@ -29048,117 +29248,7 @@ loc_12964:
 ; -----------------------------------------------------------------
 ; Mappings
 ; -----------------------------------------------------------------
-	if revision>0
-loc_12B06:
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B58-loc_12B06
-	dc.w	loc_12B5E-loc_12B06
-	dc.w	loc_12B5E-loc_12B06
-	dc.w	loc_12B5E-loc_12B06
-
-loc_12B1E:
-	dc.w 	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B64-loc_12B1E
-	dc.w	loc_12B6A-loc_12B1E
-	dc.w	loc_12B6A-loc_12B1E
-	dc.w	loc_12B6A-loc_12B1E
-
-loc_12B36:
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B70-loc_12B36
-	dc.w	loc_12B80-loc_12B36
-	dc.w	loc_12B80-loc_12B36
-	dc.w	loc_12B80-loc_12B36
-
-; -----------------------------------------------------------------
-; Cursor Sprite Mappings
-; -----------------------------------------------------------------
-Map_Cursors:
-	dc.w	Map_Cursor_Rectangle-Map_Cursors
-	dc.w	Map_Cursor_InputTile-Map_Cursors
-	dc.w	Map_Cursor_InputTileBig-Map_Cursors
-	dc.w	Map_Cursor_Triangle-Map_Cursors
-	dc.w	Map_Cursor_ChosenLetter-Map_Cursors
-; -----------------------------------------------------------------
-
-loc_12B58:
-	dc.b	$01
-	dc.b	$E0, $07, $00, $00, $F8
-
-loc_12B5E:
-	dc.b	$01
-	dc.b	$E0, $07, $08, $00, $F8
-
-loc_12B64:
-	dc.b	$01
-	dc.b	$D8, $07, $00, $00, $F0
-
-loc_12B6A:
-	dc.b	$01
-	dc.b	$D8, $07, $08, $00, $F0
-
-loc_12B70:
-	dc.b	$03
-	dc.b	$F0, $04, $00, $22, $F8
-	dc.b	$E0, $07, $00, $00, $F8
-	dc.b	$E8, $04, $00, $20, $F8
-
-loc_12B80:
-	dc.b	$03
-	dc.b	$F0, $04, $08, $22, $F8
-	dc.b	$E0, $07, $08, $00, $F8
-	dc.b	$E8, $04, $08, $20, $F8
-
-Map_Cursor_Rectangle:
-	dc.b	$01
-	dc.b	$00, $04, $00, $00, $00
-
-Map_Cursor_InputTile:
-	dc.b	$02
-	dc.b	$F8, $00, $00, $00, $00
-	dc.b	$00, $00, $00, $00, $00
-
-	even
-
-Map_Cursor_InputTileBig:
-	dc.b	$05
-	dc.b	$00, $00, $00, $00, $00
-	dc.b	$00, $00, $00, $00, $08
-	dc.b	$00, $00, $00, $00, $10
-	dc.b	$00, $00, $00, $00, $18
-	dc.b	$00, $00, $00, $00, $20
-
-Map_Cursor_Triangle:
-	dc.b	$01
-	dc.b	$00, $05, $00, $00, $00
-
-Map_Cursor_ChosenLetter:
-	dc.b	$01
-	dc.b	$00, $00, $00, $00, $00
-
-	else
-
+	if revision=0
 loc_12B06:
 	dc.w	loc_12B58-loc_12B06
 	dc.w	loc_12B58-loc_12B06
@@ -29269,6 +29359,116 @@ Map_Cursor_Triangle:
 Map_Cursor_ChosenLetter:
 	dc.b	$01
 	dc.b	$00, $00, $00, $00, $00
+	
+	else
+
+loc_12B06:
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B58-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+	dc.w	loc_12B5E-loc_12B06
+
+loc_12B1E:
+	dc.w 	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B64-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+	dc.w	loc_12B6A-loc_12B1E
+
+loc_12B36:
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B70-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+	dc.w	loc_12B80-loc_12B36
+
+; -----------------------------------------------------------------
+; Cursor Sprite Mappings
+; -----------------------------------------------------------------
+Map_Cursors:
+	dc.w	Map_Cursor_Rectangle-Map_Cursors
+	dc.w	Map_Cursor_InputTile-Map_Cursors
+	dc.w	Map_Cursor_InputTileBig-Map_Cursors
+	dc.w	Map_Cursor_Triangle-Map_Cursors
+	dc.w	Map_Cursor_ChosenLetter-Map_Cursors
+; -----------------------------------------------------------------
+
+loc_12B58:
+	dc.b	$01
+	dc.b	$E0, $07, $00, $00, $F8
+
+loc_12B5E:
+	dc.b	$01
+	dc.b	$E0, $07, $08, $00, $F8
+
+loc_12B64:
+	dc.b	$01
+	dc.b	$D8, $07, $00, $00, $F0
+
+loc_12B6A:
+	dc.b	$01
+	dc.b	$D8, $07, $08, $00, $F0
+
+loc_12B70:
+	dc.b	$03
+	dc.b	$F0, $04, $00, $22, $F8
+	dc.b	$E0, $07, $00, $00, $F8
+	dc.b	$E8, $04, $00, $20, $F8
+
+loc_12B80:
+	dc.b	$03
+	dc.b	$F0, $04, $08, $22, $F8
+	dc.b	$E0, $07, $08, $00, $F8
+	dc.b	$E8, $04, $08, $20, $F8
+
+Map_Cursor_Rectangle:
+	dc.b	$01
+	dc.b	$00, $04, $00, $00, $00
+
+Map_Cursor_InputTile:
+	dc.b	$02
+	dc.b	$F8, $00, $00, $00, $00
+	dc.b	$00, $00, $00, $00, $00
+
+	even
+
+Map_Cursor_InputTileBig:
+	dc.b	$05
+	dc.b	$00, $00, $00, $00, $00
+	dc.b	$00, $00, $00, $00, $08
+	dc.b	$00, $00, $00, $00, $10
+	dc.b	$00, $00, $00, $00, $18
+	dc.b	$00, $00, $00, $00, $20
+
+Map_Cursor_Triangle:
+	dc.b	$01
+	dc.b	$00, $05, $00, $00, $00
+
+Map_Cursor_ChosenLetter:
+	dc.b	$01
+	dc.b	$00, $00, $00, $00, $00
 
 	endif
 	
@@ -29276,218 +29476,7 @@ Map_Cursor_ChosenLetter:
 ; VDP character maps
 ; ================================
 VDPCharacterMaps:
-	if revision>0
-	dc.b	$26, $26
-	dc.b	$26, $97
-	dc.b	$26, $98
-	dc.b	$26, $99
-	dc.b	$26, $9A
-	dc.b	$26, $9B
-	dc.b	$26, $9C
-	dc.b	$26, $9D
-	dc.b	$26, $9E
-	dc.b	$26, $9F
-	dc.b	$26, $A0
-	dc.b	$26, $27
-	dc.b	$26, $28
-	dc.b	$26, $29
-	dc.b	$26, $2A
-	dc.b	$26, $2B
-	dc.b	$26, $2C
-	dc.b	$26, $2D
-	dc.b	$26, $2E
-	dc.b	$26, $2F
-	dc.b	$26, $30
-	dc.b	$26, $31
-	dc.b	$26, $32
-	dc.b	$26, $33
-	dc.b	$26, $34
-	dc.b	$26, $35
-	dc.b	$26, $36
-	dc.b	$26, $37
-	dc.b	$26, $38
-	dc.b	$26, $39
-	dc.b	$26, $3A
-	dc.b	$26, $3B
-	dc.b	$26, $3C
-	dc.b	$26, $3D
-	dc.b	$26, $3E
-	dc.b	$26, $3F
-	dc.b	$26, $40
-	dc.b	$26, $41
-	dc.b	$26, $42
-	dc.b	$26, $43
-	dc.b	$26, $44
-	dc.b	$26, $45
-	dc.b	$26, $46
-	dc.b	$26, $47
-	dc.b	$26, $48
-	dc.b	$26, $49
-	dc.b	$26, $4A
-	dc.b	$26, $4B
-	dc.b	$26, $4C
-	dc.b	$26, $4D
-	dc.b	$26, $4E
-	dc.b	$26, $4F
-	dc.b	$26, $50
-	dc.b	$26, $51
-	dc.b	$26, $52
-	dc.b	$26, $53
-	dc.b	$26, $54
-	dc.b	$26, $55
-	dc.b	$26, $56
-	dc.b	$26, $57
-	dc.b	$26, $58
-	dc.b	$26, $59
-	dc.b	$26, $5A
-	dc.b	$26, $5B
-	dc.b	$26, $5C
-	dc.b	$26, $5D
-	dc.b	$26, $5E
-	dc.b	$26, $5F
-	dc.b	$26, $60
-	dc.b	$26, $61
-	dc.b	$26, $62
-	dc.b	$26, $63
-	dc.b	$26, $64
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $80
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	dc.b	$26, $26
-	
-	else
-
+	if revision=0
 	dc.b	$26, $26
 	dc.b	$26, $97
 	dc.b	$26, $98
@@ -29697,6 +29686,217 @@ VDPCharacterMaps:
 	dc.b	$26, $26
 	dc.b	$26, $26
 	
+	else
+
+	dc.b	$26, $26
+	dc.b	$26, $97
+	dc.b	$26, $98
+	dc.b	$26, $99
+	dc.b	$26, $9A
+	dc.b	$26, $9B
+	dc.b	$26, $9C
+	dc.b	$26, $9D
+	dc.b	$26, $9E
+	dc.b	$26, $9F
+	dc.b	$26, $A0
+	dc.b	$26, $27
+	dc.b	$26, $28
+	dc.b	$26, $29
+	dc.b	$26, $2A
+	dc.b	$26, $2B
+	dc.b	$26, $2C
+	dc.b	$26, $2D
+	dc.b	$26, $2E
+	dc.b	$26, $2F
+	dc.b	$26, $30
+	dc.b	$26, $31
+	dc.b	$26, $32
+	dc.b	$26, $33
+	dc.b	$26, $34
+	dc.b	$26, $35
+	dc.b	$26, $36
+	dc.b	$26, $37
+	dc.b	$26, $38
+	dc.b	$26, $39
+	dc.b	$26, $3A
+	dc.b	$26, $3B
+	dc.b	$26, $3C
+	dc.b	$26, $3D
+	dc.b	$26, $3E
+	dc.b	$26, $3F
+	dc.b	$26, $40
+	dc.b	$26, $41
+	dc.b	$26, $42
+	dc.b	$26, $43
+	dc.b	$26, $44
+	dc.b	$26, $45
+	dc.b	$26, $46
+	dc.b	$26, $47
+	dc.b	$26, $48
+	dc.b	$26, $49
+	dc.b	$26, $4A
+	dc.b	$26, $4B
+	dc.b	$26, $4C
+	dc.b	$26, $4D
+	dc.b	$26, $4E
+	dc.b	$26, $4F
+	dc.b	$26, $50
+	dc.b	$26, $51
+	dc.b	$26, $52
+	dc.b	$26, $53
+	dc.b	$26, $54
+	dc.b	$26, $55
+	dc.b	$26, $56
+	dc.b	$26, $57
+	dc.b	$26, $58
+	dc.b	$26, $59
+	dc.b	$26, $5A
+	dc.b	$26, $5B
+	dc.b	$26, $5C
+	dc.b	$26, $5D
+	dc.b	$26, $5E
+	dc.b	$26, $5F
+	dc.b	$26, $60
+	dc.b	$26, $61
+	dc.b	$26, $62
+	dc.b	$26, $63
+	dc.b	$26, $64
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $80
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	dc.b	$26, $26
+	
 	endif
 
 ; ================================
@@ -29725,7 +29925,1255 @@ VDPCharacterMaps:
 ; =======================================================================
 InventoryData:
 
-	if revision>0
+	if revision=0
+Item_None:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+
+Item_SmallKey:
+	dc.b	$1B, $0C, $15, $1F, $10, $3E, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_Dynamite:
+	dc.b	$96, $57, $6A, $73, $57, $69, $C4, $00, $00, $00, $00, $00, $48, $00, $00, $00
+
+Item_KeyTube:
+	dc.b	$5C, $A5, $66, $8A, $A5, $9D, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_MruraGum:
+	dc.b	$73, $7D, $59, $7B, $8C, $75, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_GreenCard:
+	dc.b	$8E, $7C, $A5, $82, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_BlueCard:
+	dc.b	$9D, $7D, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_YellowCard:
+	dc.b	$57, $59, $7F, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_RedCard:
+	dc.b	$7E, $88, $9A, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_Letter:
+	dc.b	$11, $3C, $0D, $24, $12, $43, $3C, $0D, $C4, $00, $00, $00, $08, $00, $00, $00
+
+Item_Recorder:
+	dc.b	$61, $62, $68, $75, $7E, $5F, $A5, $96, $A5, $C4, $00, $00, $08, $00, $00, $00
+
+Item_MruraLeaf:
+	dc.b	$73, $7D, $59, $7B, $7C, $A5, $9D, $C4, $00, $00, $00, $00, $28, $00, $00, $00
+
+Item_PlsmRing:
+	dc.b	$A1, $7B, $93, $73, $7C, $82, $8E, $C4, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Prism:
+	dc.b	$59, $56, $7F, $A1, $7C, $93, $75, $C4, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Telepipe:
+	dc.b	$1A, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $00, $82, $E8, $00, $00, $00
+
+Item_Escapipe:
+	dc.b	$29, $30, $0C, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $46, $E8, $00, $00, $00
+
+Item_Hidapipe:
+	dc.b	$16, $23, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $01, $18, $E8, $00, $00, $00
+
+Item_Monomate:
+	dc.b	$77, $6E, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $14, $F8, $00, $00, $00
+
+Item_Dimate:
+	dc.b	$99, $84, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $3C, $F8, $00, $00, $00
+
+Item_Trimate:
+	dc.b	$69, $7C, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $A0, $F8, $00, $00, $00
+
+Item_Antidote:
+	dc.b	$56, $82, $68, $84, $A2, $57, $93, $82, $C4, $00, $00, $0A, $F8, $00, $00, $00
+
+Item_StarMist:
+	dc.b	$62, $65, $A5, $56, $69, $73, $57, $91, $A5, $C4, $03, $E8, $F8, $00, $00, $00
+
+Item_MoonDew:
+	dc.b	$75, $A5, $82, $56, $69, $73, $57, $91, $A5, $C4, $2E, $E0, $F8, $00, $00, $00
+
+Item_Headgear:
+	dc.b	$27, $88, $9A, $8D, $56, $C4, $00, $00, $00, $00, $00, $78, $A1, $FD, $00, $03
+
+Item_Ribbon:
+	dc.b	$7C, $9E, $82, $C4, $00, $00, $00, $00, $00, $00, $00, $50, $A1, $02, $00, $03
+
+Item_Fibergear:
+	dc.b	$8E, $7B, $62, $8D, $56, $C4, $00, $00, $00, $00, $01, $AE, $A1, $FD, $00, $08
+
+Item_SilRibbon:
+	dc.b	$61, $7D, $9B, $A5, $7C, $9E, $82, $C4, $00, $00, $01, $7C, $A1, $02, $00, $0C
+
+Item_SilCrown:
+	dc.b	$61, $7D, $9B, $A5, $5D, $7B, $58, $82, $C4, $00, $01, $D6, $A1, $A8, $00, $0E
+
+Item_Titanigear:
+	dc.b	$66, $65, $82, $8D, $56, $C4, $00, $00, $00, $00, $05, $78, $A1, $FD, $00, $0E
+
+Item_Titanimet:
+	dc.b	$66, $65, $82, $76, $88, $69, $C4, $00, $00, $00, $0E, $74, $A1, $41, $00, $10
+
+Item_JwlCrown:
+	dc.b	$92, $8A, $59, $7D, $5D, $7B, $58, $82, $C4, $00, $11, $F8, $A1, $A8, $00, $11
+
+Item_JwlRibbon:
+	dc.b	$92, $8A, $59, $7D, $7C, $9E, $82, $C4, $00, $00, $12, $5C, $A1, $02, $00, $15
+
+Item_Crescegear:
+	dc.b	$5D, $7E, $63, $82, $69, $8D, $56, $C4, $00, $00, $01, $18, $B1, $04, $00, $0E
+
+Item_SnowCrown:
+	dc.b	$2F, $11, $23, $10, $38, $2B, $32, $C4, $00, $00, $01, $EA, $B1, $08, $00, $11
+
+Item_WindScarf:
+	dc.b	$10, $45, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $78, $B1, $80, $00, $11
+
+Item_ColorScarf:
+	dc.b	$20, $43, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $82, $B1, $20, $00, $11
+
+Item_StormGear:
+	dc.b	$62, $69, $A5, $75, $8D, $56, $C4, $00, $00, $00, $02, $76, $B1, $40, $00, $10
+
+Item_Laconigear:
+	dc.b	$7B, $5F, $6B, $56, $8D, $56, $C4, $00, $00, $00, $6D, $60, $A1, $14, $00, $1B
+
+Item_Laconiamet:
+	dc.b	$7B, $5F, $6B, $56, $76, $88, $69, $C4, $00, $00, $71, $48, $A1, $14, $00, $1D
+
+Item_Neimet:
+	dc.b	$6D, $57, $76, $88, $69, $C4, $00, $00, $00, $00, $00, $00, $21, $41, $00, $32
+
+Item_NeiCrown:
+	dc.b	$6D, $57, $5D, $7B, $58, $82, $C4, $00, $00, $00, $00, $00, $21, $08, $00, $30
+
+Item_MagicCap:
+	dc.b	$73, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
+
+Item_MogicCap:
+	dc.b	$77, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
+
+Item_CarbonSuit:
+	dc.b	$5B, $A5, $9E, $82, $62, $A5, $67, $C4, $00, $00, $00, $80, $A4, $FD, $00, $04
+
+Item_CarbonVest:
+	dc.b	$5B, $A5, $9E, $82, $4F, $62, $69, $C4, $00, $00, $00, $78, $A4, $02, $00, $04
+
+Item_FiberCoat:
+	dc.b	$8E, $7B, $62, $5F, $A5, $69, $C4, $00, $00, $00, $01, $2C, $A4, $55, $00, $08
+
+Item_FiberCape:
+	dc.b	$8E, $7B, $62, $73, $82, $69, $C4, $00, $00, $00, $01, $A4, $A4, $A8, $00, $08
+
+Item_FiberVest:
+	dc.b	$8E, $7B, $62, $4F, $62, $69, $C4, $00, $00, $00, $01, $18, $A4, $02, $00, $06
+
+Item_TtnmArmor:
+	dc.b	$66, $65, $82, $56, $A5, $73, $A5, $C4, $00, $00, $15, $E0, $A4, $44, $00, $18
+
+Item_TtnmCape:
+	dc.b	$66, $65, $82, $71, $84, $9D, $7C, $7B, $C4, $00, $18, $9C, $A4, $28, $00, $1C
+
+Item_TtnmChest:
+	dc.b	$66, $65, $82, $66, $86, $62, $69, $C4, $00, $00, $15, $18, $A4, $11, $00, $15
+
+Item_CrmcArmor:
+	dc.b	$63, $7B, $74, $88, $5D, $56, $A5, $73, $A5, $C4, $2D, $B4, $A4, $44, $00, $30
+
+Item_CrmcCape:
+	dc.b	$63, $7B, $74, $88, $5D, $71, $84, $9D, $7C, $7B, $30, $70, $A4, $A8, $00, $38
+
+Item_CrmcChest:
+	dc.b	$63, $7B, $74, $88, $5D, $66, $86, $62, $69, $C4, $27, $10, $A4, $11, $00, $2E
+
+Item_AmberRobe:
+	dc.b	$14, $24, $12, $23, $28, $0D, $0C, $C4, $00, $00, $00, $AA, $B4, $10, $00, $14
+
+Item_Crystanish:
+	dc.b	$5D, $7C, $62, $65, $6F, $A5, $6B, $88, $61, $8A, $02, $76, $B4, $44, $00, $3C
+
+Item_CrystCape:
+	dc.b	$5D, $7C, $62, $65, $71, $84, $A5, $7D, $9A, $C4, $03, $48, $B4, $A8, $00, $3E
+
+Item_CrystChest:
+	dc.b	$5D, $7C, $62, $65, $66, $86, $62, $69, $C4, $00, $02, $9E, $B4, $01, $00, $3C
+
+Item_Laconinish:
+	dc.b	$7B, $5F, $6B, $56, $6F, $A5, $6B, $88, $61, $8A, $88, $B8, $A4, $44, $00, $41
+
+Item_LaconCape:
+	dc.b	$7B, $5F, $6B, $56, $71, $84, $9D, $7C, $7B, $C4, $8C, $A0, $A4, $20, $00, $46
+
+Item_LaconChest:
+	dc.b	$7B, $5F, $6B, $56, $66, $86, $62, $69, $C4, $00, $6D, $60, $A4, $01, $00, $50
+
+Item_NeiArmor:
+	dc.b	$6D, $57, $6F, $A5, $6B, $88, $61, $8A, $C4, $00, $00, $00, $24, $44, $00, $5F
+
+Item_NeiCape:
+	dc.b	$6D, $57, $71, $84, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $24, $88, $00, $58
+
+Item_Shoes:
+	dc.b	$7E, $91, $A5, $61, $8A, $A5, $93, $C4, $00, $00, $00, $F0, $A5, $FD, $00, $03
+
+Item_Sandals:
+	dc.b	$59, $62, $9F, $9A, $7C, $8A, $A5, $C4, $00, $00, $00, $B4, $A5, $02, $00, $03
+
+Item_Boots:
+	dc.b	$7E, $91, $A5, $9D, $A5, $67, $C4, $00, $00, $00, $03, $E8, $A5, $FD, $00, $07
+
+Item_KnifeBoots:
+	dc.b	$6A, $57, $71, $9D, $A5, $67, $C4, $00, $00, $00, $10, $68, $A5, $22, $07, $07
+
+Item_LongBoots:
+	dc.b	$7F, $82, $8E, $9D, $A5, $67, $C4, $00, $00, $00, $1A, $90, $A5, $20, $05, $07
+
+Item_HirzaBoots:
+	dc.b	$6F, $57, $7D, $91, $75, $9D, $A5, $67, $C4, $00, $26, $48, $A5, $88, $00, $07
+
+Item_ShuneBoots:
+	dc.b	$61, $8A, $6D, $7B, $9D, $A5, $67, $C4, $00, $00, $1D, $4C, $A5, $A0, $00, $07
+
+Item_GardaBoots:
+	dc.b	$8C, $A5, $96, $9D, $A5, $67, $C4, $00, $00, $00, $30, $70, $A5, $55, $00, $0F
+
+Item_CrbnShield:
+	dc.b	$5B, $A5, $9E, $82, $61, $A5, $7D, $9A, $C4, $00, $02, $1C, $A2, $55, $00, $08
+
+Item_CrbnEmel:
+	dc.b	$5B, $A5, $9E, $82, $59, $A5, $76, $7D, $C4, $00, $01, $A4, $A2, $A8, $00, $07
+
+Item_FibrShield:
+	dc.b	$8E, $7B, $62, $61, $A5, $7D, $9A, $C4, $00, $00, $04, $B0, $A2, $55, $00, $0F
+
+Item_FiberEmel:
+	dc.b	$8E, $7B, $62, $59, $A5, $76, $7D, $C4, $00, $00, $05, $50, $A2, $A8, $00, $11
+
+Item_MirShield:
+	dc.b	$74, $7B, $A5, $61, $A5, $7D, $9A, $C4, $00, $00, $12, $C0, $A2, $55, $00, $20
+
+Item_MirEmel:
+	dc.b	$74, $7B, $A5, $59, $A5, $76, $7D, $C4, $00, $00, $14, $00, $A2, $A8, $00, $1E
+
+Item_CerShield:
+	dc.b	$63, $7B, $74, $88, $5D, $61, $A5, $7D, $9A, $C4, $20, $6C, $A2, $55, $00, $27
+
+Item_CerEmel:
+	dc.b	$63, $7B, $74, $88, $5D, $59, $A5, $76, $7D, $C4, $25, $E4, $A2, $A8, $00, $28
+
+Item_Aegis:
+	dc.b	$18, $0C, $25, $1C, $23, $1A, $1D, $C4, $00, $00, $04, $B0, $B2, $50, $00, $20
+
+Item_GrSleeves:
+	dc.b	$8E, $7C, $A5, $82, $62, $7C, $A5, $9D, $C4, $00, $03, $48, $B2, $20, $00, $3F
+
+Item_TruthSlvs:
+	dc.b	$18, $0C, $0C, $23, $19, $4A, $C4, $00, $00, $00, $02, $D0, $B2, $80, $00, $3B
+
+Item_LaconEmel:
+	dc.b	$7B, $5F, $6B, $56, $59, $A5, $76, $7D, $C4, $00, $2E, $E0, $A2, $28, $00, $44
+
+Item_LacShield:
+	dc.b	$7B, $5F, $6B, $56, $61, $A5, $7D, $9A, $C4, $00, $32, $C8, $A2, $54, $00, $55
+
+Item_NeiShield:
+	dc.b	$6D, $57, $61, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $00, $22, $50, $00, $5F
+
+Item_NeiEmel:
+	dc.b	$6D, $57, $59, $A5, $76, $7D, $C4, $00, $00, $00, $00, $00, $22, $A0, $00, $76
+
+Item_Knife:
+	dc.b	$6A, $57, $71, $C4, $00, $00, $00, $00, $00, $00, $00, $64, $A2, $FD, $05, $00
+
+Item_Dagger:
+	dc.b	$96, $8C, $A5, $C4, $00, $00, $00, $00, $00, $00, $00, $C8, $A2, $D4, $08, $01
+
+Item_Scalpel:
+	dc.b	$76, $62, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $B4, $A2, $18, $07, $00
+
+Item_SteelBar:
+	dc.b	$62, $66, $A5, $7D, $5D, $7F, $A5, $C4, $00, $00, $00, $50, $A2, $02, $07, $02
+
+Item_Boomerang:
+	dc.b	$9D, $A5, $76, $7B, $82, $C4, $00, $00, $00, $00, $01, $E0, $A2, $20, $0C, $00
+
+Item_Slasher:
+	dc.b	$62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $07, $D0, $A2, $20, $11, $00
+
+Item_Sword:
+	dc.b	$64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $04, $B0, $A3, $01, $12, $04
+
+Item_Whip:
+	dc.b	$75, $66, $C4, $00, $00, $00, $00, $00, $00, $00, $05, $78, $A2, $20, $14, $02
+
+Item_CrmcSword:
+	dc.b	$63, $7B, $74, $88, $5D, $64, $A5, $9A, $C4, $00, $0C, $80, $A3, $01, $1E, $05
+
+Item_CeramKnife:
+	dc.b	$63, $7B, $74, $88, $5D, $6A, $57, $71, $C4, $00, $0A, $F0, $A2, $FD, $14, $03
+
+Item_CeramBar:
+	dc.b	$63, $7B, $74, $88, $5D, $5D, $7F, $A5, $C4, $00, $04, $B0, $A2, $02, $1B, $02
+
+Item_LasrSlshr:
+	dc.b	$7E, $A5, $91, $A5, $62, $7B, $57, $60, $A5, $C4, $1A, $2C, $A2, $20, $1E, $00
+
+Item_LasrSword:
+	dc.b	$7E, $A5, $91, $A5, $64, $A5, $9A, $C4, $00, $00, $15, $18, $A3, $01, $32, $09
+
+Item_LaserBar:
+	dc.b	$7E, $A5, $91, $A5, $5D, $7F, $A5, $C4, $00, $00, $0C, $1C, $A2, $02, $26, $03
+
+Item_LaserKnife:
+	dc.b	$7E, $A5, $91, $A5, $6A, $57, $71, $C4, $00, $00, $11, $30, $A2, $FD, $1C, $05
+
+Item_SwdOfAnger:
+	dc.b	$0C, $10, $32, $23, $1C, $33, $3E, $C4, $00, $00, $01, $18, $A3, $01, $3A, $00
+
+Item_FireSlshr:
+	dc.b	$71, $83, $57, $56, $62, $7B, $57, $60, $A5, $C4, $01, $54, $A2, $20, $24, $00
+
+Item_FireStaff:
+	dc.b	$10, $0E, $38, $23, $1C, $0E, $C4, $00, $00, $00, $02, $9E, $B2, $08, $20, $0B
+
+Item_LacnMace:
+	dc.b	$7B, $5F, $6B, $56, $62, $5E, $A5, $7D, $C4, $00, $41, $A0, $A2, $50, $28, $08
+
+Item_LacDagger:
+	dc.b	$7B, $5F, $6B, $56, $96, $8C, $A5, $C4, $00, $00, $47, $E0, $A2, $80, $2D, $07
+
+Item_ACSlasher:
+	dc.b	$7B, $5F, $6B, $56, $62, $7B, $57, $60, $A5, $C4, $5D, $C0, $A2, $20, $2A, $00
+
+Item_LacSword:
+	dc.b	$7B, $5F, $6B, $56, $64, $A5, $9A, $C4, $00, $00, $55, $F0, $A3, $01, $3E, $07
+
+Item_NeiSword:
+	dc.b	$6D, $57, $64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $2B, $01, $4B, $18
+
+Item_NeiSlasher:
+	dc.b	$6D, $57, $62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $22, $20, $3C, $00
+
+Item_BowGun:
+	dc.b	$9E, $58, $8C, $82, $C4, $00, $00, $00, $00, $00, $01, $2C, $A3, $55, $08, $00
+
+Item_SonicGun:
+	dc.b	$64, $6B, $88, $5D, $8C, $82, $C4, $00, $00, $00, $02, $80, $A2, $55, $11, $00
+
+Item_Shotgun:
+	dc.b	$61, $8B, $88, $69, $8C, $82, $C4, $00, $00, $00, $03, $20, $A3, $44, $0A, $00
+
+Item_SilentShot:
+	dc.b	$60, $57, $7E, $82, $69, $61, $8B, $88, $69, $C4, $03, $98, $A3, $08, $0A, $00
+
+Item_PoisonShot:
+	dc.b	$A2, $57, $93, $82, $61, $8B, $88, $69, $C4, $00, $06, $A4, $A2, $18, $0F, $00
+
+Item_AcidShot:
+	dc.b	$56, $61, $9A, $61, $8B, $88, $69, $C4, $00, $00, $12, $C0, $A2, $18, $19, $00
+
+Item_Cannon:
+	dc.b	$5B, $6E, $82, $C4, $00, $00, $00, $00, $00, $00, $08, $98, $A3, $44, $12, $00
+
+Item_Vulcan:
+	dc.b	$9B, $7D, $5B, $82, $C4, $00, $00, $00, $00, $00, $31, $38, $A3, $04, $1C, $00
+
+Item_LaserShot:
+	dc.b	$7E, $A5, $91, $A5, $61, $8B, $88, $69, $C4, $00, $18, $38, $A3, $44, $14, $00
+
+Item_LsrCannon:
+	dc.b	$7E, $A5, $91, $A5, $5B, $6E, $82, $C4, $00, $00, $4E, $20, $A3, $04, $1E, $00
+
+Item_PlsCannon:
+	dc.b	$9F, $7D, $62, $5B, $6E, $82, $C4, $00, $00, $00, $7D, $00, $A3, $04, $23, $00
+
+Item_PulseVlcn:
+	dc.b	$9F, $7D, $62, $9B, $7D, $5B, $82, $C4, $00, $00, $BB, $80, $A3, $04, $26, $00
+
+Item_NeiShot:
+	dc.b	$6D, $57, $61, $8B, $88, $69, $C4, $00, $00, $00, $00, $00, $23, $04, $3C, $00
+
+Item_PrsnClths:
+	dc.b	$16, $3B, $0D, $43, $38, $26, $12, $C4, $00, $00, $00, $64, $04, $FF, $00, $02
+	
+Item_Teim:
+	dc.b	$68, $84, $75, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $08, $00, $00, $00
+
+Item_Visiphone:
+	dc.b	$9C, $92, $71, $87, $82, $C4, $00, $00, $00, $00, $0B, $B8, $A8, $00, $00, $00
+	
+Item_Unknown1:
+	dc.b	$65, $57, $7F, $82, $23, $18, $11, $46, $0D, $C4, $F2, $30, $E8, $00, $00, $00
+	
+Item_Unknown2:
+	dc.b	$6F, $A1, $62, $9C, $A5, $C4, $00, $00, $00, $00, $B3, $B0, $E8, $00, $00, $00
+
+	elseif revision=3
+
+	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
+	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
+	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
+	charset	' ', 0
+	charset	',', $3F
+	charset	'.', $40
+	charset	';', $41
+	charset	'"', $42
+	charset	'?', $43
+	charset	'!', $44
+	charset	39, $45	; apostrophe
+	charset	'-', $46
+	charset	':', $77
+
+
+Item_None:
+	dc.b	$C4, "         "
+	dc.w	0
+	dc.b	$00, $00, $00, $00
+
+Item_SmallKey:
+	dc.b	"CHAVINHA", $C4, " "
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_Dynamite:
+	dc.b	"DINAMITE", $C4, " "
+	dc.w	0
+	dc.b	$48, $00, $00, $00
+
+Item_KeyTube:
+	dc.b	"TUBO CHAVE"
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_MruraGum:
+	dc.b	 "G MARUERA", $C4
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_GreenCard:
+	dc.b	"C VERDE", $C4, "  "
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_BlueCard:
+	dc.b	"C AZUL", $C4, "   "
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_YellowCard:
+	dc.b	"C AMARELO", $C4
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_RedCard:
+	dc.b	"C VERMELHO"
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_Letter:
+	dc.b	"CARTA", $C4, "    "
+	dc.w	0
+	dc.b	$08, $00, $00, $00
+
+Item_Recorder:
+	dc.b	"STREAMER", $C4, " "
+	dc.w	0
+	dc.b	$08, $00, $00, $00
+
+Item_MruraLeaf:
+	dc.b	"FL MARUERA"
+	dc.w	0
+	dc.b	$28, $00, $00, $00
+
+Item_PlsmRing:
+	dc.b	"ANEL PLASM"
+	dc.w	0
+	dc.b	$08, $00, $00, $00
+
+Item_Prism:
+	dc.b	"PRISMA", $C4, "   "
+	dc.w	0
+	dc.b	$08, $00, $00, $00
+
+Item_Telepipe:
+	dc.b	"TELEFLAU", $C4, " "
+	dc.w	$82
+	dc.b	$E8, $00, $00, $00
+
+Item_Escapipe:
+	dc.b	"FUGAFLAU", $C4, " "
+	dc.w	$46
+	dc.b	$E8, $00, $00, $00
+
+Item_Hidapipe:
+	dc.b	"OCULTAFLAU"
+	dc.w	$118
+	dc.b	$E8, $00, $00, $00
+
+Item_Monomate:
+	dc.b	"MONOMATE", $C4, " "
+	dc.w	$14
+	dc.b	$F8, $00, $00, $00
+
+Item_Dimate:
+	dc.b	"DIMATE", $C4, "   "
+	dc.w	$3C
+	dc.b	$F8, $00, $00, $00
+
+Item_Trimate:
+	dc.b	"TRIMATE", $C4, "  "
+	dc.w	$A0
+	dc.b	$F8, $00, $00, $00
+
+Item_Antidote:
+	dc.b	"ANTIDOTO", $C4, " "
+	dc.w	$0A
+	dc.b	$F8, $00, $00, $00
+
+Item_StarMist:
+	dc.b	"ESTRL MIST"
+	dc.w	$3E8
+	dc.b	$F8, $00, $00, $00
+
+Item_MoonDew:
+	dc.b	"GOTA LUNAR"
+	dc.w	$2EE0
+	dc.b	$F8, $00, $00, $00
+
+Item_Headgear:
+	dc.b	"ARCO COURO"
+	dc.w	$78
+	dc.b	$A1
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $03
+
+Item_Ribbon:
+	dc.b	"FITA", $C4, "     "
+	dc.w	$50
+	dc.b	$A1
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $03
+
+Item_Fibergear:
+	dc.b	"ARCO FIBRA"
+	dc.w	$1AE
+	dc.b	$A1
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $08
+
+Item_SilRibbon:
+	dc.b	"FITA PRAT", $C4
+	dc.w	$17C
+	dc.b	$A1
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $0C
+
+Item_SilCrown:
+	dc.b	"COROA PRAT"
+	dc.w	$1D6
+	dc.b	$A1
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $0E
+
+Item_Titanigear:
+	dc.b	"ARCO TITAN"
+	dc.w	$578
+	dc.b	$A1
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $0E
+
+Item_Titanimet:
+	dc.b	"CAP TITAN", $C4
+	dc.w	$E74
+	dc.b	$A1
+	dc.b	CharID_Rolf_Mask|CharID_Kain_Mask
+	dc.b	$00, $10
+
+Item_JwlCrown:
+	dc.b	"COROA PREC"
+	dc.w	$11F8
+	dc.b	$A1
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $11
+
+Item_JwlRibbon:
+	dc.b	"FITA PREC", $C4
+	dc.w	$125C
+	dc.b	$A1
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $15
+
+Item_Crescegear:
+	dc.b	"ARCO CRESC"
+	dc.w	$118
+	dc.b	$B1
+	dc.b	CharID_Rudo_Mask
+	dc.b	$00, $0E
+
+Item_SnowCrown:
+	dc.b	"COROA NEVE"
+	dc.w	$1EA
+	dc.b	$B1
+	dc.b	CharID_Amy_Mask
+	dc.b	$00, $11
+
+Item_WindScarf:
+	dc.b	"CACHEC VEN"
+	dc.w	$78
+	dc.b	$B1
+	dc.b	CharID_Shir_Mask
+	dc.b	$00, $11
+
+Item_ColorScarf:
+	dc.b	"CACHEC COR"
+	dc.w	$82
+	dc.b	$B1
+	dc.b	CharID_Anna_Mask
+	dc.b	$00, $11
+
+Item_StormGear:
+	dc.b	"ARCO TEMPS"
+	dc.w	$276
+	dc.b	$B1
+	dc.b	CharID_Kain_Mask
+	dc.b	$00, $10
+
+Item_Laconigear:
+	dc.b	"ARCO LACON"
+	dc.w	$6D60
+	dc.b	$A1
+	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask
+	dc.b	$00, $1B
+
+Item_Laconiamet:
+	dc.b	"CAP LACON", $C4
+	dc.w	$7148
+	dc.b	$A1
+	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask
+	dc.b	$00, $1D
+
+Item_Neimet:
+	dc.b	"CAP NEI", $C4, "  "
+	dc.w	0
+	dc.b	$21
+	dc.b	CharID_Rolf_Mask|CharID_Kain_Mask
+	dc.b	$00, $32
+
+Item_NeiCrown:
+	dc.b	"COROA NEI", $C4
+	dc.w	0
+	dc.b	$21
+	dc.b	CharID_Amy_Mask
+	dc.b	$00, $30
+
+Item_MagicCap:
+	dc.b	"CHAPEU ENC"
+	dc.w	0
+	dc.b	$21
+	dc.b	CharID_Rolf_Mask
+	dc.b	$00, $02
+
+Item_MogicCap:
+	dc.b	"CHAPEU MAG"
+	dc.w	0
+	dc.b	$21
+	dc.b	CharID_Rolf_Mask
+	dc.b	$00, $02
+
+Item_CarbonSuit:
+	dc.b	"ROUPA CARB"
+	dc.w	$80
+	dc.b	$A4
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $04
+
+Item_CarbonVest:
+	dc.b	"VEST CARB", $C4
+	dc.w	$78
+	dc.b	$A4
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $04
+
+Item_FiberCoat:
+	dc.b	"CAS FIBRA "
+	dc.w	$12C
+	dc.b	$A4
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $08
+
+Item_FiberCape:
+	dc.b	"MANT FIBRA"
+	dc.w	$1A4
+	dc.b	$A4
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $08
+
+Item_FiberVest:
+	dc.b	"VEST FIBRA"
+	dc.w	$118
+	dc.b	$A4
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $06
+
+Item_TtnmArmor:
+	dc.b	"ARMD TITAN"
+	dc.w	$15E0
+	dc.b	$A4
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$00, $18
+
+Item_TtnmCape:
+	dc.b	"MANT TITAN"
+	dc.w	$189C
+	dc.b	$A4
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask
+	dc.b	$00, $1C
+
+Item_TtnmChest:
+	dc.b	"COL TITAN", $C4
+	dc.w	$1518
+	dc.b	$A4
+	dc.b	CharID_Rolf_Mask|CharID_Hugh_Mask
+	dc.b	$00, $15
+
+Item_CrmcArmor:
+	dc.b	"ARMD CERAM"
+	dc.w	$2DB4
+	dc.b	$A4
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$00, $30
+
+Item_CrmcCape:
+	dc.b	"MANT CERAM"
+	dc.w	$3070
+	dc.b	$A4
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $38
+
+Item_CrmcChest:
+	dc.b	"COL CERAM", $C4
+	dc.w	$2710
+	dc.b	$A4
+	dc.b	CharID_Rolf_Mask|CharID_Hugh_Mask
+	dc.b	$00, $2E
+
+Item_AmberRobe:
+	dc.b	"TOGA AMBAR"
+	dc.w	$AA
+	dc.b	$B4
+	dc.b	CharID_Hugh_Mask
+	dc.b	$00, $14
+
+Item_Crystanish:
+	dc.b	"CRISTALYN", $C4
+	dc.w	$276
+	dc.b	$B4
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$00, $3C
+
+Item_CrystCape:
+	dc.b	"MANT CRIST"
+	dc.w	$348
+	dc.b	$B4
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $3E
+
+Item_CrystChest:
+	dc.b	"COL CRIST", $C4
+	dc.w	$29E
+	dc.b	$B4
+	dc.b	CharID_Rolf_Mask
+	dc.b	$00, $3C
+
+Item_Laconinish:
+	dc.b	"LACONIAL", $C4, " "
+	dc.w	$88B8
+	dc.b	$A4
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$00, $41
+
+Item_LaconCape:
+	dc.b	"MANT LACON"
+	dc.w	$8CA0
+	dc.b	$A4
+	dc.b	CharID_Anna_Mask
+	dc.b	$00, $46
+
+Item_LaconChest:
+	dc.b	"COL LACON", $C4
+	dc.w	$6D60
+	dc.b	$A4
+	dc.b	CharID_Rolf_Mask
+	dc.b	$00, $50
+
+Item_NeiArmor:
+	dc.b	"ARMD NEI", $C4, " "
+	dc.w	0
+	dc.b	$24
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$00, $5F
+
+Item_NeiCape:
+	dc.b	"MANT NEI", $C4, " "
+	dc.w	0
+	dc.b	$24
+	dc.b	CharID_Amy_Mask|CharID_Shir_Mask
+	dc.b	$00, $58
+
+Item_Shoes:
+	dc.b	"SAPATOS", $C4, "  "
+	dc.w	$F0
+	dc.b	$A5
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $03
+
+Item_Sandals:
+	dc.b	"SANDALIAS", $C4
+	dc.w	$B4
+	dc.b	$A5
+	dc.b	CharID_Nei_Mask
+	dc.b	$00, $03
+
+Item_Boots:
+	dc.b	"BOTAS", $C4, "    "
+	dc.w	$3E8
+	dc.b	$A5
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $07
+
+Item_KnifeBoots:
+	dc.b	"BOTA FACA", $C4
+	dc.w	$1068
+	dc.b	$A5
+	dc.b	CharID_Nei_Mask|CharID_Anna_Mask
+	dc.b	$07, $07
+
+Item_LongBoots:
+	dc.b	"BOTA LONGA"
+	dc.w	$1A90
+	dc.b	$A5
+	dc.b	CharID_Anna_Mask
+	dc.b	$05, $07
+
+Item_HirzaBoots:
+	dc.b	"BOTA HIRZA"
+	dc.w	$2648
+	dc.b	$A5
+	dc.b	CharID_Amy_Mask|CharID_Shir_Mask
+	dc.b	$00, $07
+
+Item_ShuneBoots:
+	dc.b	"BOTA SHUNE"
+	dc.w	$1D4C
+	dc.b	$A5
+	dc.b	CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $07
+
+Item_GardaBoots:
+	dc.b	"BOTA GARDA"
+	dc.w	$3070
+	dc.b	$A5
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $0F
+
+Item_CrbnShield:
+	dc.b	"ESC CARB", $C4, " "
+	dc.w	$21C
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $08
+
+Item_CrbnEmel:
+	dc.b	"PROT CARB", $C4
+	dc.w	$1A4
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $07
+
+Item_FibrShield:
+	dc.b	"ESC FIBRA", $C4
+	dc.w	$4B0
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $0F
+
+Item_FiberEmel:
+	dc.b	"PROT FIBRA"
+	dc.w	$550
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $11
+
+Item_MirShield:
+	dc.b	"ESC REFLT", $C4
+	dc.w	$12C0
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $20
+
+Item_MirEmel:
+	dc.b	"PROT REFLT"
+	dc.w	$1400
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $1E
+
+Item_CerShield:
+	dc.b	"ESC CERAM", $C4
+	dc.w	$206C
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $27
+
+Item_CerEmel:
+	dc.b	"PROT CERAM"
+	dc.w	$25E4
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $28
+
+Item_Aegis:
+	dc.b	"EGIDE", $C4, "    "
+	dc.w	$4B0
+	dc.b	$B2
+	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $20
+
+Item_GrSleeves:
+	dc.b	"BRC VERDE", $C4
+	dc.w	$348
+	dc.b	$B2
+	dc.b	CharID_Anna_Mask
+	dc.b	$00, $3F
+
+Item_TruthSlvs:
+	dc.b	"BRC VERDAD"
+	dc.w	$2D0
+	dc.b	$B2
+	dc.b	CharID_Shir_Mask
+	dc.b	$00, $3B
+
+Item_LaconEmel:
+	dc.b	"PROT LACON"
+	dc.w	$2EE0
+	dc.b	$A2, $28, $00, $44
+
+Item_LacShield:
+	dc.b	"ESC LACON", $C4
+	dc.w	$32C8
+	dc.b	$A2
+	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $55
+
+Item_NeiShield:
+	dc.b	"ESC NEI", $C4, "  "
+	dc.w	0
+	dc.b	$22
+	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$00, $5F
+
+Item_NeiEmel:
+	dc.b	"PROT NEI", $C4, " "
+	dc.w	0
+	dc.b	$22
+	dc.b	CharID_Anna_Mask|CharID_Shir_Mask
+	dc.b	$00, $76
+
+Item_Knife:
+	dc.b	"FACA", $C4, "     "
+	dc.w	$64
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$05, $00
+
+Item_Dagger:
+	dc.b	"ADAGA", $C4, "    "
+	dc.w	$C8
+	dc.b	$A2
+	dc.b	CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$08, $01
+
+Item_Scalpel:
+	dc.b	"BISTURI", $C4, "  "
+	dc.w	$B4
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
+	dc.b	$07, $00
+
+Item_SteelBar:
+	dc.b	"GARRA ACO", $C4
+	dc.w	$50
+	dc.b	$A2
+	dc.b	CharID_Nei_Mask
+	dc.b	$07, $02
+
+Item_Boomerang:
+	dc.b	"BUMERANGUE"
+	dc.w	$1E0
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$0C, $00
+
+Item_Slasher:
+	dc.b	"GOLPEADOR", $C4
+	dc.w	$7D0
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$11, $00
+
+Item_Sword:
+	dc.b	"ESPADA", $C4, "   "
+	dc.w	$4B0
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask
+	dc.b	$12, $04
+
+Item_Whip:
+	dc.b	"CHICOTE", $C4, "  "
+	dc.w	$578
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$14, $02
+
+Item_CrmcSword:
+	dc.b	"ESP CERAM", $C4
+	dc.w	$C80
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask
+	dc.b	$1E, $05
+
+Item_CeramKnife:
+	dc.b	"FACA CERAM"
+	dc.w	$AF0
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$14, $03
+
+Item_CeramBar:
+	dc.b	"GAR CERAM", $C4
+	dc.w	$4B0
+	dc.b	$A2
+	dc.b	CharID_Nei_Mask
+	dc.b	$1B, $02
+
+Item_LasrSlshr:
+	dc.b	"FOIC LASER"
+	dc.w	$1A2C
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$1E, $00
+
+Item_LasrSword:
+	dc.b	"ESP LASER", $C4
+	dc.w	$1518
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask
+	dc.b	$32, $09
+
+Item_LaserBar:
+	dc.b	"GAR LASER", $C4
+	dc.w	$C1C
+	dc.b	$A2
+	dc.b	CharID_Nei_Mask
+	dc.b	$26, $03
+
+Item_LaserKnife:
+	dc.b	"FACA LASER"
+	dc.w	$1130
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$1C, $05
+
+Item_SwdOfAnger:
+	dc.b	"ESP ANG", $C4, "  "
+	dc.w	$118
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask
+	dc.b	$3A, $00
+
+Item_FireSlshr:
+	dc.b	"FOICE FOGO"
+	dc.w	$154
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$24, $00
+
+Item_FireStaff:
+	dc.b	"CAJAD FOGO"
+	dc.w	$29E
+	dc.b	$B2
+	dc.b	CharID_Amy_Mask
+	dc.b	$20, $0B
+
+Item_LacnMace:
+	dc.b	"MACA LACON"
+	dc.w	$41A0
+	dc.b	$A2
+	dc.b	CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$28, $08
+
+Item_LacDagger:
+	dc.b	"ADAG LACON"
+	dc.w	$47E0
+	dc.b	$A2
+	dc.b	CharID_Shir_Mask
+; Fix: Laconia Dagger attack and defense boost
+	if bugfixes=1
+	dc.b	$2D
+	dc.b	$07
+	else
+	dc.b	$04
+	dc.b	$16
+	endif
+
+Item_ACSlasher:
+	dc.b	"FOICE ACID"
+	dc.w	$5DC0
+	dc.b	$A2
+	dc.b	CharID_Anna_Mask
+	dc.b	$2A, $00
+
+Item_LacSword:
+	dc.b	"ESP LACON", $C4
+	dc.w	$55F0
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask
+	dc.b	$3E, $07
+
+Item_NeiSword:
+	dc.b	"ESP NEI", $C4, "  "
+	dc.w	0
+	dc.b	$2B
+	dc.b	CharID_Rolf_Mask
+	dc.b	$4B, $18
+
+Item_NeiSlasher:
+	dc.b	"FOICE NEI", $C4
+	dc.w	0
+	dc.b	$22
+	dc.b	CharID_Anna_Mask
+	dc.b	$3C, $00
+
+Item_BowGun:
+	dc.b	"BESTA", $C4, "    "
+	dc.w	$12C
+	dc.b	$A3
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$08, $00
+
+Item_SonicGun:
+	dc.b	"PIST SONIC"
+	dc.w	$280
+	dc.b	$A2
+	dc.b	CharID_Rolf_Mask|CharID_Rudo_Mask|CharID_Hugh_Mask|CharID_Kain_Mask
+	dc.b	$11, $00
+
+Item_Shotgun:
+	dc.b	"ESPINGARDA"
+	dc.w	$320
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$0A, $00
+
+Item_SilentShot:
+	dc.b	"DISP SILEN"
+	dc.w	$398
+	dc.b	$A3
+	dc.b	CharID_Amy_Mask
+	dc.b	$0A, $00
+
+Item_PoisonShot:
+	dc.b	"DISP VENEN"
+	dc.w	$6A4
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
+	dc.b	$0F, $00
+
+Item_AcidShot:
+	dc.b	"DISP ACIDO"
+	dc.w	$12C0
+	dc.b	$A2
+	dc.b	CharID_Amy_Mask|CharID_Hugh_Mask
+	dc.b	$19, $00
+
+Item_Cannon:
+	dc.b	"CANHAO", $C4, "   "
+	dc.w	$898
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$12, $00
+
+Item_Vulcan:
+	dc.b	"VULCAO", $C4, "   "
+	dc.w	$3138
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask
+	dc.b	$1C, $00
+
+Item_LaserShot:
+	dc.b	"PHASER", $C4, "   "
+	dc.w	$1838
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask|CharID_Kain_Mask
+	dc.b	$14, $00
+
+Item_LsrCannon:
+	dc.b	"CANHAO LSR"
+	dc.w	$4E20
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask
+	dc.b	$1E, $00
+
+Item_PlsCannon:
+	dc.b	"CANHAO PLS"
+	dc.w	$7D00
+	dc.b	$A3, $04, $23, $00
+
+Item_PulseVlcn:
+	dc.b	"VULCAO PLS"
+	dc.w	$BB80
+	dc.b	$A3
+	dc.b	CharID_Rudo_Mask
+	dc.b	$26, $00
+
+Item_NeiShot:
+	dc.b	"DISP NEI", $C4, " "
+	dc.w	0
+	dc.b	$23
+	dc.b	CharID_Rudo_Mask
+	dc.b	$3C, $00
+
+Item_PrsnClths:
+	dc.b	"ROUPA PRSN"
+	dc.w	$64
+	dc.b	$04
+	dc.b	CharID_Rolf_Mask|CharID_Nei_Mask|CharID_Rudo_Mask|CharID_Amy_Mask|CharID_Hugh_Mask|CharID_Anna_Mask|CharID_Kain_Mask|CharID_Shir_Mask
+	dc.b	$00, $02
+
+Item_Teim:
+	dc.b	"TEIM", $C4, "     "
+	dc.w	0
+	dc.b	$08, $00, $00, $00
+
+Item_Visiphone:
+	dc.b	"VISIFONE ", $C4
+	dc.w	$BB8
+	dc.b	$A8, $00, $00, $00
+
+Item_Unknown1:
+	dc.b	"T", $C4, "        "
+	dc.w	$F230
+	dc.b	$E8, $00, $00, $00
+
+Item_Unknown2:
+	dc.b	"H", $C4, "        "
+	dc.w	$B3B0
+	dc.b	$E8, $00, $00, $00
+	
+	else
+	
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -30586,392 +32034,6 @@ Item_Unknown2:
 	dc.w	$B3B0
 	dc.b	$E8, $00, $00, $00
 	
-	else
-	
-Item_None:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-
-Item_SmallKey:
-	dc.b	$1B, $0C, $15, $1F, $10, $3E, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_Dynamite:
-	dc.b	$96, $57, $6A, $73, $57, $69, $C4, $00, $00, $00, $00, $00, $48, $00, $00, $00
-
-Item_KeyTube:
-	dc.b	$5C, $A5, $66, $8A, $A5, $9D, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_MruraGum:
-	dc.b	$73, $7D, $59, $7B, $8C, $75, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_GreenCard:
-	dc.b	$8E, $7C, $A5, $82, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_BlueCard:
-	dc.b	$9D, $7D, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_YellowCard:
-	dc.b	$57, $59, $7F, $A5, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_RedCard:
-	dc.b	$7E, $88, $9A, $5B, $A5, $9A, $C4, $00, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_Letter:
-	dc.b	$11, $3C, $0D, $24, $12, $43, $3C, $0D, $C4, $00, $00, $00, $08, $00, $00, $00
-
-Item_Recorder:
-	dc.b	$61, $62, $68, $75, $7E, $5F, $A5, $96, $A5, $C4, $00, $00, $08, $00, $00, $00
-
-Item_MruraLeaf:
-	dc.b	$73, $7D, $59, $7B, $7C, $A5, $9D, $C4, $00, $00, $00, $00, $28, $00, $00, $00
-
-Item_PlsmRing:
-	dc.b	$A1, $7B, $93, $73, $7C, $82, $8E, $C4, $00, $00, $00, $00, $08, $00, $00, $00
-
-Item_Prism:
-	dc.b	$59, $56, $7F, $A1, $7C, $93, $75, $C4, $00, $00, $00, $00, $08, $00, $00, $00
-
-Item_Telepipe:
-	dc.b	$1A, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $00, $82, $E8, $00, $00, $00
-
-Item_Escapipe:
-	dc.b	$29, $30, $0C, $23, $5A, $5B, $7C, $6A, $C4, $00, $00, $46, $E8, $00, $00, $00
-
-Item_Hidapipe:
-	dc.b	$16, $23, $4D, $23, $5A, $5B, $7C, $6A, $C4, $00, $01, $18, $E8, $00, $00, $00
-
-Item_Monomate:
-	dc.b	$77, $6E, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $14, $F8, $00, $00, $00
-
-Item_Dimate:
-	dc.b	$99, $84, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $3C, $F8, $00, $00, $00
-
-Item_Trimate:
-	dc.b	$69, $7C, $76, $57, $69, $C4, $00, $00, $00, $00, $00, $A0, $F8, $00, $00, $00
-
-Item_Antidote:
-	dc.b	$56, $82, $68, $84, $A2, $57, $93, $82, $C4, $00, $00, $0A, $F8, $00, $00, $00
-
-Item_StarMist:
-	dc.b	$62, $65, $A5, $56, $69, $73, $57, $91, $A5, $C4, $03, $E8, $F8, $00, $00, $00
-
-Item_MoonDew:
-	dc.b	$75, $A5, $82, $56, $69, $73, $57, $91, $A5, $C4, $2E, $E0, $F8, $00, $00, $00
-
-Item_Headgear:
-	dc.b	$27, $88, $9A, $8D, $56, $C4, $00, $00, $00, $00, $00, $78, $A1, $FD, $00, $03
-
-Item_Ribbon:
-	dc.b	$7C, $9E, $82, $C4, $00, $00, $00, $00, $00, $00, $00, $50, $A1, $02, $00, $03
-
-Item_Fibergear:
-	dc.b	$8E, $7B, $62, $8D, $56, $C4, $00, $00, $00, $00, $01, $AE, $A1, $FD, $00, $08
-
-Item_SilRibbon:
-	dc.b	$61, $7D, $9B, $A5, $7C, $9E, $82, $C4, $00, $00, $01, $7C, $A1, $02, $00, $0C
-
-Item_SilCrown:
-	dc.b	$61, $7D, $9B, $A5, $5D, $7B, $58, $82, $C4, $00, $01, $D6, $A1, $A8, $00, $0E
-
-Item_Titanigear:
-	dc.b	$66, $65, $82, $8D, $56, $C4, $00, $00, $00, $00, $05, $78, $A1, $FD, $00, $0E
-
-Item_Titanimet:
-	dc.b	$66, $65, $82, $76, $88, $69, $C4, $00, $00, $00, $0E, $74, $A1, $41, $00, $10
-
-Item_JwlCrown:
-	dc.b	$92, $8A, $59, $7D, $5D, $7B, $58, $82, $C4, $00, $11, $F8, $A1, $A8, $00, $11
-
-Item_JwlRibbon:
-	dc.b	$92, $8A, $59, $7D, $7C, $9E, $82, $C4, $00, $00, $12, $5C, $A1, $02, $00, $15
-
-Item_Crescegear:
-	dc.b	$5D, $7E, $63, $82, $69, $8D, $56, $C4, $00, $00, $01, $18, $B1, $04, $00, $0E
-
-Item_SnowCrown:
-	dc.b	$2F, $11, $23, $10, $38, $2B, $32, $C4, $00, $00, $01, $EA, $B1, $08, $00, $11
-
-Item_WindScarf:
-	dc.b	$10, $45, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $78, $B1, $80, $00, $11
-
-Item_ColorScarf:
-	dc.b	$20, $43, $23, $9B, $82, $96, $6A, $C4, $00, $00, $00, $82, $B1, $20, $00, $11
-
-Item_StormGear:
-	dc.b	$62, $69, $A5, $75, $8D, $56, $C4, $00, $00, $00, $02, $76, $B1, $40, $00, $10
-
-Item_Laconigear:
-	dc.b	$7B, $5F, $6B, $56, $8D, $56, $C4, $00, $00, $00, $6D, $60, $A1, $14, $00, $1B
-
-Item_Laconiamet:
-	dc.b	$7B, $5F, $6B, $56, $76, $88, $69, $C4, $00, $00, $71, $48, $A1, $14, $00, $1D
-
-Item_Neimet:
-	dc.b	$6D, $57, $76, $88, $69, $C4, $00, $00, $00, $00, $00, $00, $21, $41, $00, $32
-
-Item_NeiCrown:
-	dc.b	$6D, $57, $5D, $7B, $58, $82, $C4, $00, $00, $00, $00, $00, $21, $08, $00, $30
-
-Item_MagicCap:
-	dc.b	$73, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
-
-Item_MogicCap:
-	dc.b	$77, $92, $88, $5D, $6F, $88, $69, $C4, $00, $00, $00, $00, $21, $01, $00, $02
-
-Item_CarbonSuit:
-	dc.b	$5B, $A5, $9E, $82, $62, $A5, $67, $C4, $00, $00, $00, $80, $A4, $FD, $00, $04
-
-Item_CarbonVest:
-	dc.b	$5B, $A5, $9E, $82, $4F, $62, $69, $C4, $00, $00, $00, $78, $A4, $02, $00, $04
-
-Item_FiberCoat:
-	dc.b	$8E, $7B, $62, $5F, $A5, $69, $C4, $00, $00, $00, $01, $2C, $A4, $55, $00, $08
-
-Item_FiberCape:
-	dc.b	$8E, $7B, $62, $73, $82, $69, $C4, $00, $00, $00, $01, $A4, $A4, $A8, $00, $08
-
-Item_FiberVest:
-	dc.b	$8E, $7B, $62, $4F, $62, $69, $C4, $00, $00, $00, $01, $18, $A4, $02, $00, $06
-
-Item_TtnmArmor:
-	dc.b	$66, $65, $82, $56, $A5, $73, $A5, $C4, $00, $00, $15, $E0, $A4, $44, $00, $18
-
-Item_TtnmCape:
-	dc.b	$66, $65, $82, $71, $84, $9D, $7C, $7B, $C4, $00, $18, $9C, $A4, $28, $00, $1C
-
-Item_TtnmChest:
-	dc.b	$66, $65, $82, $66, $86, $62, $69, $C4, $00, $00, $15, $18, $A4, $11, $00, $15
-
-Item_CrmcArmor:
-	dc.b	$63, $7B, $74, $88, $5D, $56, $A5, $73, $A5, $C4, $2D, $B4, $A4, $44, $00, $30
-
-Item_CrmcCape:
-	dc.b	$63, $7B, $74, $88, $5D, $71, $84, $9D, $7C, $7B, $30, $70, $A4, $A8, $00, $38
-
-Item_CrmcChest:
-	dc.b	$63, $7B, $74, $88, $5D, $66, $86, $62, $69, $C4, $27, $10, $A4, $11, $00, $2E
-
-Item_AmberRobe:
-	dc.b	$14, $24, $12, $23, $28, $0D, $0C, $C4, $00, $00, $00, $AA, $B4, $10, $00, $14
-
-Item_Crystanish:
-	dc.b	$5D, $7C, $62, $65, $6F, $A5, $6B, $88, $61, $8A, $02, $76, $B4, $44, $00, $3C
-
-Item_CrystCape:
-	dc.b	$5D, $7C, $62, $65, $71, $84, $A5, $7D, $9A, $C4, $03, $48, $B4, $A8, $00, $3E
-
-Item_CrystChest:
-	dc.b	$5D, $7C, $62, $65, $66, $86, $62, $69, $C4, $00, $02, $9E, $B4, $01, $00, $3C
-
-Item_Laconinish:
-	dc.b	$7B, $5F, $6B, $56, $6F, $A5, $6B, $88, $61, $8A, $88, $B8, $A4, $44, $00, $41
-
-Item_LaconCape:
-	dc.b	$7B, $5F, $6B, $56, $71, $84, $9D, $7C, $7B, $C4, $8C, $A0, $A4, $20, $00, $46
-
-Item_LaconChest:
-	dc.b	$7B, $5F, $6B, $56, $66, $86, $62, $69, $C4, $00, $6D, $60, $A4, $01, $00, $50
-
-Item_NeiArmor:
-	dc.b	$6D, $57, $6F, $A5, $6B, $88, $61, $8A, $C4, $00, $00, $00, $24, $44, $00, $5F
-
-Item_NeiCape:
-	dc.b	$6D, $57, $71, $84, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $24, $88, $00, $58
-
-Item_Shoes:
-	dc.b	$7E, $91, $A5, $61, $8A, $A5, $93, $C4, $00, $00, $00, $F0, $A5, $FD, $00, $03
-
-Item_Sandals:
-	dc.b	$59, $62, $9F, $9A, $7C, $8A, $A5, $C4, $00, $00, $00, $B4, $A5, $02, $00, $03
-
-Item_Boots:
-	dc.b	$7E, $91, $A5, $9D, $A5, $67, $C4, $00, $00, $00, $03, $E8, $A5, $FD, $00, $07
-
-Item_KnifeBoots:
-	dc.b	$6A, $57, $71, $9D, $A5, $67, $C4, $00, $00, $00, $10, $68, $A5, $22, $07, $07
-
-Item_LongBoots:
-	dc.b	$7F, $82, $8E, $9D, $A5, $67, $C4, $00, $00, $00, $1A, $90, $A5, $20, $05, $07
-
-Item_HirzaBoots:
-	dc.b	$6F, $57, $7D, $91, $75, $9D, $A5, $67, $C4, $00, $26, $48, $A5, $88, $00, $07
-
-Item_ShuneBoots:
-	dc.b	$61, $8A, $6D, $7B, $9D, $A5, $67, $C4, $00, $00, $1D, $4C, $A5, $A0, $00, $07
-
-Item_GardaBoots:
-	dc.b	$8C, $A5, $96, $9D, $A5, $67, $C4, $00, $00, $00, $30, $70, $A5, $55, $00, $0F
-
-Item_CrbnShield:
-	dc.b	$5B, $A5, $9E, $82, $61, $A5, $7D, $9A, $C4, $00, $02, $1C, $A2, $55, $00, $08
-
-Item_CrbnEmel:
-	dc.b	$5B, $A5, $9E, $82, $59, $A5, $76, $7D, $C4, $00, $01, $A4, $A2, $A8, $00, $07
-
-Item_FibrShield:
-	dc.b	$8E, $7B, $62, $61, $A5, $7D, $9A, $C4, $00, $00, $04, $B0, $A2, $55, $00, $0F
-
-Item_FiberEmel:
-	dc.b	$8E, $7B, $62, $59, $A5, $76, $7D, $C4, $00, $00, $05, $50, $A2, $A8, $00, $11
-
-Item_MirShield:
-	dc.b	$74, $7B, $A5, $61, $A5, $7D, $9A, $C4, $00, $00, $12, $C0, $A2, $55, $00, $20
-
-Item_MirEmel:
-	dc.b	$74, $7B, $A5, $59, $A5, $76, $7D, $C4, $00, $00, $14, $00, $A2, $A8, $00, $1E
-
-Item_CerShield:
-	dc.b	$63, $7B, $74, $88, $5D, $61, $A5, $7D, $9A, $C4, $20, $6C, $A2, $55, $00, $27
-
-Item_CerEmel:
-	dc.b	$63, $7B, $74, $88, $5D, $59, $A5, $76, $7D, $C4, $25, $E4, $A2, $A8, $00, $28
-
-Item_Aegis:
-	dc.b	$18, $0C, $25, $1C, $23, $1A, $1D, $C4, $00, $00, $04, $B0, $B2, $50, $00, $20
-
-Item_GrSleeves:
-	dc.b	$8E, $7C, $A5, $82, $62, $7C, $A5, $9D, $C4, $00, $03, $48, $B2, $20, $00, $3F
-
-Item_TruthSlvs:
-	dc.b	$18, $0C, $0C, $23, $19, $4A, $C4, $00, $00, $00, $02, $D0, $B2, $80, $00, $3B
-
-Item_LaconEmel:
-	dc.b	$7B, $5F, $6B, $56, $59, $A5, $76, $7D, $C4, $00, $2E, $E0, $A2, $28, $00, $44
-
-Item_LacShield:
-	dc.b	$7B, $5F, $6B, $56, $61, $A5, $7D, $9A, $C4, $00, $32, $C8, $A2, $54, $00, $55
-
-Item_NeiShield:
-	dc.b	$6D, $57, $61, $A5, $7D, $9A, $C4, $00, $00, $00, $00, $00, $22, $50, $00, $5F
-
-Item_NeiEmel:
-	dc.b	$6D, $57, $59, $A5, $76, $7D, $C4, $00, $00, $00, $00, $00, $22, $A0, $00, $76
-
-Item_Knife:
-	dc.b	$6A, $57, $71, $C4, $00, $00, $00, $00, $00, $00, $00, $64, $A2, $FD, $05, $00
-
-Item_Dagger:
-	dc.b	$96, $8C, $A5, $C4, $00, $00, $00, $00, $00, $00, $00, $C8, $A2, $D4, $08, $01
-
-Item_Scalpel:
-	dc.b	$76, $62, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $B4, $A2, $18, $07, $00
-
-Item_SteelBar:
-	dc.b	$62, $66, $A5, $7D, $5D, $7F, $A5, $C4, $00, $00, $00, $50, $A2, $02, $07, $02
-
-Item_Boomerang:
-	dc.b	$9D, $A5, $76, $7B, $82, $C4, $00, $00, $00, $00, $01, $E0, $A2, $20, $0C, $00
-
-Item_Slasher:
-	dc.b	$62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $07, $D0, $A2, $20, $11, $00
-
-Item_Sword:
-	dc.b	$64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $04, $B0, $A3, $01, $12, $04
-
-Item_Whip:
-	dc.b	$75, $66, $C4, $00, $00, $00, $00, $00, $00, $00, $05, $78, $A2, $20, $14, $02
-
-Item_CrmcSword:
-	dc.b	$63, $7B, $74, $88, $5D, $64, $A5, $9A, $C4, $00, $0C, $80, $A3, $01, $1E, $05
-
-Item_CeramKnife:
-	dc.b	$63, $7B, $74, $88, $5D, $6A, $57, $71, $C4, $00, $0A, $F0, $A2, $FD, $14, $03
-
-Item_CeramBar:
-	dc.b	$63, $7B, $74, $88, $5D, $5D, $7F, $A5, $C4, $00, $04, $B0, $A2, $02, $1B, $02
-
-Item_LasrSlshr:
-	dc.b	$7E, $A5, $91, $A5, $62, $7B, $57, $60, $A5, $C4, $1A, $2C, $A2, $20, $1E, $00
-
-Item_LasrSword:
-	dc.b	$7E, $A5, $91, $A5, $64, $A5, $9A, $C4, $00, $00, $15, $18, $A3, $01, $32, $09
-
-Item_LaserBar:
-	dc.b	$7E, $A5, $91, $A5, $5D, $7F, $A5, $C4, $00, $00, $0C, $1C, $A2, $02, $26, $03
-
-Item_LaserKnife:
-	dc.b	$7E, $A5, $91, $A5, $6A, $57, $71, $C4, $00, $00, $11, $30, $A2, $FD, $1C, $05
-
-Item_SwdOfAnger:
-	dc.b	$0C, $10, $32, $23, $1C, $33, $3E, $C4, $00, $00, $01, $18, $A3, $01, $3A, $00
-
-Item_FireSlshr:
-	dc.b	$71, $83, $57, $56, $62, $7B, $57, $60, $A5, $C4, $01, $54, $A2, $20, $24, $00
-
-Item_FireStaff:
-	dc.b	$10, $0E, $38, $23, $1C, $0E, $C4, $00, $00, $00, $02, $9E, $B2, $08, $20, $0B
-
-Item_LacnMace:
-	dc.b	$7B, $5F, $6B, $56, $62, $5E, $A5, $7D, $C4, $00, $41, $A0, $A2, $50, $28, $08
-
-Item_LacDagger:
-	dc.b	$7B, $5F, $6B, $56, $96, $8C, $A5, $C4, $00, $00, $47, $E0, $A2, $80, $2D, $07
-
-Item_ACSlasher:
-	dc.b	$7B, $5F, $6B, $56, $62, $7B, $57, $60, $A5, $C4, $5D, $C0, $A2, $20, $2A, $00
-
-Item_LacSword:
-	dc.b	$7B, $5F, $6B, $56, $64, $A5, $9A, $C4, $00, $00, $55, $F0, $A3, $01, $3E, $07
-
-Item_NeiSword:
-	dc.b	$6D, $57, $64, $A5, $9A, $C4, $00, $00, $00, $00, $00, $00, $2B, $01, $4B, $18
-
-Item_NeiSlasher:
-	dc.b	$6D, $57, $62, $7B, $57, $60, $A5, $C4, $00, $00, $00, $00, $22, $20, $3C, $00
-
-Item_BowGun:
-	dc.b	$9E, $58, $8C, $82, $C4, $00, $00, $00, $00, $00, $01, $2C, $A3, $55, $08, $00
-
-Item_SonicGun:
-	dc.b	$64, $6B, $88, $5D, $8C, $82, $C4, $00, $00, $00, $02, $80, $A2, $55, $11, $00
-
-Item_Shotgun:
-	dc.b	$61, $8B, $88, $69, $8C, $82, $C4, $00, $00, $00, $03, $20, $A3, $44, $0A, $00
-
-Item_SilentShot:
-	dc.b	$60, $57, $7E, $82, $69, $61, $8B, $88, $69, $C4, $03, $98, $A3, $08, $0A, $00
-
-Item_PoisonShot:
-	dc.b	$A2, $57, $93, $82, $61, $8B, $88, $69, $C4, $00, $06, $A4, $A2, $18, $0F, $00
-
-Item_AcidShot:
-	dc.b	$56, $61, $9A, $61, $8B, $88, $69, $C4, $00, $00, $12, $C0, $A2, $18, $19, $00
-
-Item_Cannon:
-	dc.b	$5B, $6E, $82, $C4, $00, $00, $00, $00, $00, $00, $08, $98, $A3, $44, $12, $00
-
-Item_Vulcan:
-	dc.b	$9B, $7D, $5B, $82, $C4, $00, $00, $00, $00, $00, $31, $38, $A3, $04, $1C, $00
-
-Item_LaserShot:
-	dc.b	$7E, $A5, $91, $A5, $61, $8B, $88, $69, $C4, $00, $18, $38, $A3, $44, $14, $00
-
-Item_LsrCannon:
-	dc.b	$7E, $A5, $91, $A5, $5B, $6E, $82, $C4, $00, $00, $4E, $20, $A3, $04, $1E, $00
-
-Item_PlsCannon:
-	dc.b	$9F, $7D, $62, $5B, $6E, $82, $C4, $00, $00, $00, $7D, $00, $A3, $04, $23, $00
-
-Item_PulseVlcn:
-	dc.b	$9F, $7D, $62, $9B, $7D, $5B, $82, $C4, $00, $00, $BB, $80, $A3, $04, $26, $00
-
-Item_NeiShot:
-	dc.b	$6D, $57, $61, $8B, $88, $69, $C4, $00, $00, $00, $00, $00, $23, $04, $3C, $00
-
-Item_PrsnClths:
-	dc.b	$16, $3B, $0D, $43, $38, $26, $12, $C4, $00, $00, $00, $64, $04, $FF, $00, $02
-	
-Item_Teim:
-	dc.b	$68, $84, $75, $C4, $00, $00, $00, $00, $00, $00, $00, $00, $08, $00, $00, $00
-
-Item_Visiphone:
-	dc.b	$9C, $92, $71, $87, $82, $C4, $00, $00, $00, $00, $0B, $B8, $A8, $00, $00, $00
-	
-Item_Unknown1:
-	dc.b	$65, $57, $7F, $82, $23, $18, $11, $46, $0D, $C4, $F2, $30, $E8, $00, $00, $00
-	
-Item_Unknown2:
-	dc.b	$6F, $A1, $62, $9C, $A5, $C4, $00, $00, $00, $00, $B3, $B0, $E8, $00, $00, $00
-	
 	endif
 ; =======================================================================
 
@@ -30984,7 +32046,201 @@ Item_Unknown2:
 ; byte 8 = damage/heal rate value
 ; =======================================================================
 TechniqueData:
-	if revision>0
+	if revision=0
+
+Tech_None:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Foi:
+	dc.b	$71, $87, $57, $59, $C4, $02, $F1, $0F
+
+Tech_Gifoi:
+	dc.b	$8D, $71, $87, $57, $59, $06, $F1, $28
+
+Tech_Nafoi:
+	dc.b	$6A, $71, $87, $57, $59, $0C, $F1, $82
+
+Tech_Zan:
+	dc.b	$91, $82, $C4, $00, $00, $04, $F2, $14
+
+Tech_Gizan:
+	dc.b	$8D, $91, $82, $C4, $00, $07, $F2, $1E
+
+Tech_Nazan:
+	dc.b	$6A, $91, $82, $C4, $00, $0B, $F2, $64
+
+Tech_Gra:
+	dc.b	$8E, $7B, $9D, $69, $C4, $08, $F4, $14
+
+Tech_Gigra:
+	dc.b	$8D, $8E, $7B, $9D, $69, $0C, $F4, $28
+
+Tech_Nagra:
+	dc.b	$6A, $8E, $7B, $9D, $69, $14, $F4, $50
+
+Tech_Tsu:
+	dc.b	$8E, $7B, $82, $67, $C4, $06, $F1, $1E
+
+Tech_Githu:
+	dc.b	$8D, $8E, $7B, $82, $67, $0D, $F1, $50
+
+Tech_Nathu:
+	dc.b	$6A, $8E, $7B, $82, $67, $14, $F1, $96
+
+Tech_Shift:
+	dc.b	$61, $71, $65, $C4, $00, $05, $30, $14
+
+Tech_Fanbi:
+	dc.b	$71, $83, $82, $9C, $56, $02, $F1, $0A
+
+Tech_Eijia:
+	dc.b	$59, $57, $92, $56, $C4, $04, $D2, $17
+
+Tech_Brose:
+	dc.b	$A1, $7F, $63, $96, $82, $08, $D1, $FF
+
+Tech_Conte:
+	dc.b	$5F, $82, $68, $7D, $C4, $06, $D1, $00
+
+Tech_Gaj:
+	dc.b	$8C, $A5, $92, $C4, $00, $01, $D1, $14
+
+Tech_Gigaj:
+	dc.b	$8D, $8C, $A5, $92, $C4, $05, $D1, $3C
+
+Tech_Nagaj:
+	dc.b	$6A, $8C, $A5, $92, $C4, $0F, $D1, $96
+
+Tech_Sag:
+	dc.b	$60, $8C, $A5, $92, $C4, $03, $D4, $14
+
+Tech_Gisag:
+	dc.b	$8D, $60, $8C, $A5, $92, $0F, $D4, $3C
+
+Tech_Nasag:
+	dc.b	$6A, $60, $8C, $A5, $92, $1B, $D4, $96
+
+Tech_Gen:
+	dc.b	$92, $86, $6D, $7B, $C4, $01, $B1, $14
+
+Tech_Sagen:
+	dc.b	$60, $92, $86, $6D, $7B, $03, $B4, $14
+
+Tech_Vol:
+	dc.b	$9E, $7D, $69, $C4, $00, $08, $B1, $FF
+
+Tech_Savol:
+	dc.b	$60, $9E, $7D, $69, $C4, $10, $B2, $FF
+
+Tech_Shiza:
+	dc.b	$61, $A5, $91, $62, $C4, $06, $B1, $00
+
+Tech_Doran:
+	dc.b	$9A, $7B, $82, $5D, $C4, $02, $B1, $00
+
+Tech_Rimit:
+	dc.b	$7C, $74, $65, $C4, $00, $03, $B1, $00
+
+Tech_Shinb:
+	dc.b	$61, $82, $9F, $7F, $C4, $04, $B4, $00
+
+Tech_Forsa:
+	dc.b	$71, $87, $7D, $60, $C4, $02, $D2, $00
+
+Tech_Rimet:
+	dc.b	$7C, $74, $68, $C4, $00, $03, $D1, $00
+
+Tech_Shu:
+	dc.b	$61, $8A, $A5, $67, $C4, $03, $11, $00
+
+Tech_Sashu:
+	dc.b	$60, $61, $8A, $A5, $67, $08, $14, $00
+
+Tech_Deban:
+	dc.b	$99, $9B, $82, $9A, $C4, $04, $14, $00
+
+Tech_Ner:
+	dc.b	$61, $8A, $6D, $7B, $C4, $02, $11, $00
+
+Tech_Saner:
+	dc.b	$60, $61, $8A, $6D, $7B, $06, $14, $00
+
+Tech_Res:
+	dc.b	$7E, $62, $65, $C4, $00, $03, $19, $14
+
+Tech_Gires:
+	dc.b	$8D, $7E, $62, $65, $C4, $07, $19, $3C
+
+Tech_Nares:
+	dc.b	$6A, $7E, $62, $65, $C4, $0D, $19, $FF
+
+Tech_Sar:
+	dc.b	$60, $7E, $62, $65, $C4, $0D, $1C, $14
+
+Tech_Gisar:
+	dc.b	$8D, $60, $7E, $62, $65, $1D, $1C, $3C
+
+Tech_Nasar:
+	dc.b	$6A, $60, $7E, $62, $65, $35, $1C, $FF
+
+Tech_Sak:
+	dc.b	$60, $A5, $5D, $7B, $C4, $01, $19, $FF
+
+Tech_Nasak:
+	dc.b	$6A, $60, $A5, $5D, $7B, $01, $1C, $FF
+
+Tech_Anti:
+	dc.b	$56, $82, $68, $84, $C4, $02, $09, $00
+
+Tech_Rever:
+	dc.b	$7C, $9B, $A5, $60, $A5, $1E, $09, $00
+
+Tech_Ryuka:
+	dc.b	$7C, $8A, $A5, $5B, $A5, $08, $0C, $00
+
+Tech_Hinas:
+	dc.b	$70, $A5, $6A, $62, $C4, $04, $0C, $00
+
+Tech_Musik:
+	dc.b	$75, $61, $5B, $C4, $00, $03, $04, $00
+
+Tech_Megid:
+	dc.b	$76, $8D, $9A, $C4, $00, $37, $F4, $00
+
+Tech_Unknown1:
+	dc.b	$7D, $8A, $A5, $71, $86, $1C, $09, $00
+
+Tech_Unknown2:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown3:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown4:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown5:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown6:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown7:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown8:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_Unknown9:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_UnknownA:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+Tech_UnknownB:
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
+
+	else
 
 Tech_None:
 	dc.b	$C4, "    "
@@ -31243,200 +32499,6 @@ Tech_UnknownB:
 	dc.b	$00, $00, $00
 	
 	charset
-
-	else
-
-Tech_None:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Foi:
-	dc.b	$71, $87, $57, $59, $C4, $02, $F1, $0F
-
-Tech_Gifoi:
-	dc.b	$8D, $71, $87, $57, $59, $06, $F1, $28
-
-Tech_Nafoi:
-	dc.b	$6A, $71, $87, $57, $59, $0C, $F1, $82
-
-Tech_Zan:
-	dc.b	$91, $82, $C4, $00, $00, $04, $F2, $14
-
-Tech_Gizan:
-	dc.b	$8D, $91, $82, $C4, $00, $07, $F2, $1E
-
-Tech_Nazan:
-	dc.b	$6A, $91, $82, $C4, $00, $0B, $F2, $64
-
-Tech_Gra:
-	dc.b	$8E, $7B, $9D, $69, $C4, $08, $F4, $14
-
-Tech_Gigra:
-	dc.b	$8D, $8E, $7B, $9D, $69, $0C, $F4, $28
-
-Tech_Nagra:
-	dc.b	$6A, $8E, $7B, $9D, $69, $14, $F4, $50
-
-Tech_Tsu:
-	dc.b	$8E, $7B, $82, $67, $C4, $06, $F1, $1E
-
-Tech_Githu:
-	dc.b	$8D, $8E, $7B, $82, $67, $0D, $F1, $50
-
-Tech_Nathu:
-	dc.b	$6A, $8E, $7B, $82, $67, $14, $F1, $96
-
-Tech_Shift:
-	dc.b	$61, $71, $65, $C4, $00, $05, $30, $14
-
-Tech_Fanbi:
-	dc.b	$71, $83, $82, $9C, $56, $02, $F1, $0A
-
-Tech_Eijia:
-	dc.b	$59, $57, $92, $56, $C4, $04, $D2, $17
-
-Tech_Brose:
-	dc.b	$A1, $7F, $63, $96, $82, $08, $D1, $FF
-
-Tech_Conte:
-	dc.b	$5F, $82, $68, $7D, $C4, $06, $D1, $00
-
-Tech_Gaj:
-	dc.b	$8C, $A5, $92, $C4, $00, $01, $D1, $14
-
-Tech_Gigaj:
-	dc.b	$8D, $8C, $A5, $92, $C4, $05, $D1, $3C
-
-Tech_Nagaj:
-	dc.b	$6A, $8C, $A5, $92, $C4, $0F, $D1, $96
-
-Tech_Sag:
-	dc.b	$60, $8C, $A5, $92, $C4, $03, $D4, $14
-
-Tech_Gisag:
-	dc.b	$8D, $60, $8C, $A5, $92, $0F, $D4, $3C
-
-Tech_Nasag:
-	dc.b	$6A, $60, $8C, $A5, $92, $1B, $D4, $96
-
-Tech_Gen:
-	dc.b	$92, $86, $6D, $7B, $C4, $01, $B1, $14
-
-Tech_Sagen:
-	dc.b	$60, $92, $86, $6D, $7B, $03, $B4, $14
-
-Tech_Vol:
-	dc.b	$9E, $7D, $69, $C4, $00, $08, $B1, $FF
-
-Tech_Savol:
-	dc.b	$60, $9E, $7D, $69, $C4, $10, $B2, $FF
-
-Tech_Shiza:
-	dc.b	$61, $A5, $91, $62, $C4, $06, $B1, $00
-
-Tech_Doran:
-	dc.b	$9A, $7B, $82, $5D, $C4, $02, $B1, $00
-
-Tech_Rimit:
-	dc.b	$7C, $74, $65, $C4, $00, $03, $B1, $00
-
-Tech_Shinb:
-	dc.b	$61, $82, $9F, $7F, $C4, $04, $B4, $00
-
-Tech_Forsa:
-	dc.b	$71, $87, $7D, $60, $C4, $02, $D2, $00
-
-Tech_Rimet:
-	dc.b	$7C, $74, $68, $C4, $00, $03, $D1, $00
-
-Tech_Shu:
-	dc.b	$61, $8A, $A5, $67, $C4, $03, $11, $00
-
-Tech_Sashu:
-	dc.b	$60, $61, $8A, $A5, $67, $08, $14, $00
-
-Tech_Deban:
-	dc.b	$99, $9B, $82, $9A, $C4, $04, $14, $00
-
-Tech_Ner:
-	dc.b	$61, $8A, $6D, $7B, $C4, $02, $11, $00
-
-Tech_Saner:
-	dc.b	$60, $61, $8A, $6D, $7B, $06, $14, $00
-
-Tech_Res:
-	dc.b	$7E, $62, $65, $C4, $00, $03, $19, $14
-
-Tech_Gires:
-	dc.b	$8D, $7E, $62, $65, $C4, $07, $19, $3C
-
-Tech_Nares:
-	dc.b	$6A, $7E, $62, $65, $C4, $0D, $19, $FF
-
-Tech_Sar:
-	dc.b	$60, $7E, $62, $65, $C4, $0D, $1C, $14
-
-Tech_Gisar:
-	dc.b	$8D, $60, $7E, $62, $65, $1D, $1C, $3C
-
-Tech_Nasar:
-	dc.b	$6A, $60, $7E, $62, $65, $35, $1C, $FF
-
-Tech_Sak:
-	dc.b	$60, $A5, $5D, $7B, $C4, $01, $19, $FF
-
-Tech_Nasak:
-	dc.b	$6A, $60, $A5, $5D, $7B, $01, $1C, $FF
-
-Tech_Anti:
-	dc.b	$56, $82, $68, $84, $C4, $02, $09, $00
-
-Tech_Rever:
-	dc.b	$7C, $9B, $A5, $60, $A5, $1E, $09, $00
-
-Tech_Ryuka:
-	dc.b	$7C, $8A, $A5, $5B, $A5, $08, $0C, $00
-
-Tech_Hinas:
-	dc.b	$70, $A5, $6A, $62, $C4, $04, $0C, $00
-
-Tech_Musik:
-	dc.b	$75, $61, $5B, $C4, $00, $03, $04, $00
-
-Tech_Megid:
-	dc.b	$76, $8D, $9A, $C4, $00, $37, $F4, $00
-
-Tech_Unknown1:
-	dc.b	$7D, $8A, $A5, $71, $86, $1C, $09, $00
-
-Tech_Unknown2:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown3:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown4:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown5:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown6:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown7:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown8:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_Unknown9:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_UnknownA:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
-
-Tech_UnknownB:
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00
 	
 	endif
 ; =======================================================================
@@ -31458,598 +32520,1495 @@ WindowArtLayoutPtrs:
 
 PtrWin_PlayerMenu:
 	dc.b	$40, $82				; Y and X position
-	dc.l	WinArt_PlayerMenu	; pointer to art	(see the example in this address)
+	dc.l	PlaneMap_WinPlayerMenu	; pointer to art	(see the example in this address)
 	dc.b	$08, $0A				; 7 columns and 11 rows when drawing the window
 
 PtrWin_MenuItemChar:
 	dc.b	$44, $88
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList-DynamicWindowsStart
 	dc.b	$07, $0A
 
 PtrWin_MenuItemList:
 	dc.b	$40, $9A
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MenuItemList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_MenuItemList2:
 	dc.b	$41, $1C
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MenuItemList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ItemAction:
 	dc.b	$40, $BC
-	dc.l	WinArt_ItemAction
+	dc.l	PlaneMap_WinItemAction
 	dc.b	$06, $06
 
 PtrWin_ChosenItemChar:
 	dc.b	$44, $BE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList-DynamicWindowsStart
 	dc.b	$07, $0A
 
 PtrWin_MenuCharStats:
 	dc.b	$4A, $0C
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MenuCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuCharStats-DynamicWindowsStart
 	dc.b	$1C, $06
 
 PtrWin_ScriptMessage:
 	dc.b	$4A, $8E
-	dc.l	WinArt_ScriptMessage
+	dc.l	PlaneMap_WinScriptMessage
 	dc.b	$19, $05
 
 PtrWin_YesNo:
 	dc.b	$45, $BC
-	dc.l	WinArt_YesNo
+	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_StateOrder:
 	dc.b	$46, $04
-	dc.l	WinArt_StateOrder
+	dc.l	PlaneMap_WinStateOrder
 	dc.b	$08, $04
 
 PtrWin_FirstCharStats:
 	dc.b	$47, $1E
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_IndividualCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_SecondCharStats:
 	dc.b	$47, $36
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_IndividualCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_ThirdCharStats:
 	dc.b	$4A, $1E
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_IndividualCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_FourthCharStats:
 	dc.b	$4A, $36
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_IndividualCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_MenuMeseta:
 	dc.b	$49, $04
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_Meseta-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMeseta-DynamicWindowsStart
 	dc.b	$0C, $02
 
 PtrWin_CharOrderDestination:
 	dc.b	$42, $20
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharOrderDestination-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharOrderDestination-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_CharList2:
 	dc.b	$43, $B8
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharList2-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_MapTechList:
 	dc.b	$40, $98
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MapTechList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMapTechList-DynamicWindowsStart
 	dc.b	$08, $11
 
 PtrWin_MapTechList2:
 	dc.b	$41, $1A
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MapTechList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMapTechList-DynamicWindowsStart
 	dc.b	$08, $11
 
 PtrWin_StrngHPTP:
 	dc.b	$40, $B6
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngHPTP-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngHPTP-DynamicWindowsStart
 	dc.b	$0B, $04
 
 PtrWin_StrngStats:
 	dc.b	$46, $34
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngStats-DynamicWindowsStart
 	dc.b	$0C, $0E
 
 PtrWin_StrngEquip:
 	dc.b	$47, $8C
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngEquip-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngEquip-DynamicWindowsStart
 	dc.b	$10, $0B
 
 PtrWin_StrngLVEXP:
 	dc.b	$40, $96
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngLVEXP-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngLVEXP-DynamicWindowsStart
 	dc.b	$0B, $07
 
 PtrWin_EquipStats:
 	dc.b	$49, $AE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EquipStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEquipStats-DynamicWindowsStart
 	dc.b	$0C, $07
 
 PtrWin_EqpEquipList:
 	dc.b	$47, $8C
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngEquip-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngEquip-DynamicWindowsStart
 	dc.b	$10, $0B
 
 PtrWin_ItemList2:
 	dc.b	$40, $AE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MenuItemList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ItemList3:
 	dc.b	$41, $30
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_MenuItemList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ScriptMessageBig:
 	dc.b	$48, $8E
-	dc.l	WinArt_ScriptMessageBig
+	dc.l	PlaneMap_WinScriptMessageBig
 	dc.b	$19, $09
 
 PtrWin_FullTechList:
 	dc.b	$44, $18
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_FullTechList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinFullTechList-DynamicWindowsStart
 	dc.b	$0C, $11
 
 PtrWin_FullTechList2:
 	dc.b	$44, $34
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_FullTechList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinFullTechList-DynamicWindowsStart
 	dc.b	$0C, $11
 
 PtrWin_YesNo2:
 	dc.b	$49, $3E
-	dc.l	WinArt_YesNo
+	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_YesNo3:
 	dc.b	$46, $20
-	dc.l	WinArt_YesNo
+	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_ScriptMessage2:
 	dc.b	$4A, $04
-	dc.l	WinArt_ScriptMessage
+	dc.l	PlaneMap_WinScriptMessage
 	dc.b	$19, $05
 
 PtrWin_BuySell:
 	dc.b	$4A, $B8
-	dc.l	WinArt_BuySell
+	dc.l	PlaneMap_WinBuySell
 	dc.b	$07, $04
 
 PtrWin_StoreMeseta:
 	dc.b	$41, $B4
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_Meseta-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMeseta-DynamicWindowsStart
 	dc.b	$0C, $02
 
 PtrWin_NameInput:
 	dc.b	$40, $9C
-	dc.l	WinArt_NameInput
+	dc.l	PlaneMap_WinNameInput
 	dc.b	$14, $10
 
 PtrWin_SaveSlots:
 	dc.b	$48, $B8
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_SaveSlots-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinSaveSlots-DynamicWindowsStart
 	dc.b	$0A, $09
 
 PtrWin_LibraryOptions:
 	dc.b	$41, $AE
-	dc.l	WinArt_LibraryOptions
+	dc.l	PlaneMap_WinLibraryOptions
 	dc.b	$0D, $0B
 
 PtrWin_HealCure:
 	dc.b	$42, $9A
-	dc.l	WinArt_HealCure
+	dc.l	PlaneMap_WinHealCure
 	dc.b	$0A, $05
 
 PtrWin_StoreInventory:
 	dc.b	$43, $1A
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StoreInventory-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStoreInventory-DynamicWindowsStart
 	dc.b	$13, $0D
 
 PtrWin_RolfHouseOptions:
 	dc.b	$41, $18
-	dc.l	WinArt_RolfHouseOptions
+	dc.l	PlaneMap_WinRolfHouseOptions
 	dc.b	$0E, $06
 
 PtrWin_ProfileCharList:
 	dc.b	$42, $92
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_ProfileCharList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinProfileCharList-DynamicWindowsStart
 	dc.b	$07, $11
 
 PtrWin_RolfProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_RolfProfile
+	dc.l	PlaneMap_WinRolfProfile
 	dc.b	$17, $0B
 
 PtrWin_NeiProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_NeiProfile
+	dc.l	PlaneMap_WinNeiProfile
 	dc.b	$17, $0B
 
 PtrWin_RudoProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_RudoProfile
+	dc.l	PlaneMap_WinRudoProfile
 	dc.b	$17, $0B
 
 PtrWin_AmyProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_AmyProfile
+	dc.l	PlaneMap_WinAmyProfile
 	dc.b	$17, $0B
 
 PtrWin_HughProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_HughProfile
+	dc.l	PlaneMap_WinHughProfile
 	dc.b	$17, $0B
 
 PtrWin_AnnaProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_AnnaProfile
+	dc.l	PlaneMap_WinAnnaProfile
 	dc.b	$17, $0B
 
 PtrWin_KainProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_KainProfile
+	dc.l	PlaneMap_WinKainProfile
 	dc.b	$17, $0B
 
 PtrWin_ShirProfile:
 	dc.b	$47, $84
-	dc.l	WinArt_ShirProfile
+	dc.l	PlaneMap_WinShirProfile
 	dc.b	$17, $0B
 
 PtrWin_RegroupCharList:
 	dc.b	$41, $02
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_RegroupCharList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinRegroupCharList-DynamicWindowsStart
 	dc.b	$07, $0D
 
 PtrWin_RegroupSelectedChar:
 	dc.b	$43, $16
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_RegroupSelectedChar-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinRegroupSelectedChar-DynamicWindowsStart
 	dc.b	$05, $09
 
 PtrWin_CentTowerOptions:
 	dc.b	$43, $32
-	dc.l	WinArt_CentTowerOptions
+	dc.l	PlaneMap_WinCentTowerOptions
 	dc.b	$0B, $07
 
 PtrWin_CentTowerOptions2:
 	dc.b	$43, $32
-	dc.l	WinArt_CentTowerOptions2
+	dc.l	PlaneMap_WinCentTowerOptions2
 	dc.b	$0B, $09
 
 PtrWin_GameSelect:
 	dc.b	$41, $8E
-	dc.l	WinArt_GameSelect
+	dc.l	PlaneMap_WinGameSelect
 	dc.b	$12, $07
 
 PtrWin_RoomOptions:
 	dc.b	$47, $82
-	dc.l	WinArt_RoomOptions
+	dc.l	PlaneMap_WinRoomOptions
 	dc.b	$11, $05
 
 PtrWin_RightLeft:
 	dc.b	$44, $9C
-	dc.l	WinArt_RightLeft
+	dc.l	PlaneMap_WinRightLeft
 	dc.b	$07, $05
 
 PtrWin_StrngCharList:
 	dc.b	$45, $86
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharList2-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_PortraitStart:
 
 PtrWin_RolfPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_RolfPortrait
+	dc.l	PlaneMap_WinRolfPortrait
 	dc.b	$0B, $0B
 
 PtrWin_NeiPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_NeiPortrait
+	dc.l	PlaneMap_WinNeiPortrait
 	dc.b	$0B, $0B
 
 PtrWin_RudoPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_RudoPortrait
+	dc.l	PlaneMap_WinRudoPortrait
 	dc.b	$0B, $0B
 
 PtrWin_AmyPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_AmyPortrait
+	dc.l	PlaneMap_WinAmyPortrait
 	dc.b	$0B, $0B
 
 PtrWin_HughPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_HughPortrait
+	dc.l	PlaneMap_WinHughPortrait
 	dc.b	$0B, $0B
 
 PtrWin_AnnaPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_AnnaPortrait
+	dc.l	PlaneMap_WinAnnaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_KainPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_KainPortrait
+	dc.l	PlaneMap_WinKainPortrait
 	dc.b	$0B, $0B
 
 PtrWin_ShirPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_ShirPortrait
+	dc.l	PlaneMap_WinShirPortrait
 	dc.b	$0B, $0B
 
 PtrWin_LibrarianPortrait:
 	dc.b	$41, $14
-	dc.l	WinArt_LibrarianPortrait
+	dc.l	PlaneMap_WinLibrarianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaSaveEmplPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaSaveEmplPortrait
+	dc.l	PlaneMap_WinMotaSaveEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaDoctorPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaDoctorPortrait
+	dc.l	PlaneMap_WinMotaDoctorPortrait
 	dc.b	$0B, $0B
 
 PtrWin_GrandmaPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_GrandmaPortrait
+	dc.l	PlaneMap_WinGrandmaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaItemSellerPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaItemSellerPortrait
+	dc.l	PlaneMap_WinMotaItemSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaWpnSellerPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaWpnSellerPortrait
+	dc.l	PlaneMap_WinMotaWpnSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaArmorSellerPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaArmorSellerPortrait
+	dc.l	PlaneMap_WinMotaArmorSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_UstvestiaPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_UstvestiaPortrait
+	dc.l	PlaneMap_WinUstvestiaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian1Portrait:
 	dc.b	$41, $02
-	dc.l	WinArt_DezolianPortrait
+	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian2Portrait:
 	dc.b	$41, $02
-	dc.l	WinArt_DezolianPortrait
+	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian3Portrait:
 	dc.b	$41, $02
-	dc.l	WinArt_DezolianPortrait
+	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian4Portrait:
 	dc.b	$41, $02
-	dc.l	WinArt_DezolianPortrait
+	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_ItemKeeperPortrait:
 	dc.b	$41, $02
-	dc.l	WinArt_ItemKeeperPortrait
+	dc.l	PlaneMap_WinItemKeeperPortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait:
 	dc.b	$41, $14
-	dc.l	WinArt_CentTowerOutsidePortrait
+	dc.l	PlaneMap_WinCentTowerOutsidePortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortraitCopy:
 	dc.b	$41, $14
-	dc.l	WinArt_CentTowerOutsidePortraitCopy
+	dc.l	PlaneMap_WinCentTowerOutsidePortraitCopy
 	dc.b	$0B, $0B
 
 PtrWin_GovernorPortrait:
 	dc.b	$41, $14
-	dc.l	WinArt_GovernorPortrait
+	dc.l	PlaneMap_WinGovernorPortrait
 	dc.b	$0B, $0B
 
 PtrWin_SpaceshipPortrait:
 	dc.b	$41, $14
-	dc.l	WinArt_SpaceshipPortrait
+	dc.l	PlaneMap_WinSpaceshipPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaTeleportEmplPortrait:
 	dc.b	$41, $12
-	dc.l	WinArt_MotaTeleportEmplPortrait
+	dc.l	PlaneMap_WinMotaTeleportEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_LibraryGraphPortrait:
 	dc.b	$41, $2E
-	dc.l	WinArt_LibraryGraphPortrait
+	dc.l	PlaneMap_WinLibraryGraphPortrait
 	dc.b	$0B, $0B
 
 PtrWin_RadarPortrait:
 	dc.b	$41, $1C
-	dc.l	WinArt_RadarPortrait
+	dc.l	PlaneMap_WinRadarPortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait3:
 	dc.b	$41, $AE
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait3_2:
 	dc.b	$41, $AE
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$0B, $0B
 
 PtrWin_MotaTeleportEmplPortrait2:
 	dc.b	$41, $02
-	dc.l	WinArt_MotaTeleportEmplPortrait
+	dc.l	PlaneMap_WinMotaTeleportEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_HouseLVEXP:
 	dc.b	$42, $36
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_StrngLVEXP-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngLVEXP-DynamicWindowsStart
 	dc.b	$0B, $07
 
 PtrWin_StoreCharList:
 	dc.b	$43, $B8
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_CharList2-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_BattleCharStats:
 
 PtrWin_BattleFirstCharStats:
 	dc.b	$4A, $92
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleSecondCharStats:
 	dc.b	$4A, $AE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleThirdCharStats:
 	dc.b	$4A, $82
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleFourthCharStats:
 	dc.b	$4A, $BE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleCharStats-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleOptions:
 	dc.b	$4A, $A2
-	dc.l	WinArt_BattleOptions
+	dc.l	PlaneMap_WinBattleOptions
 	dc.b	$05, $05
 
 PtrWin_BattleOptions2:
 	dc.b	$4A, $A2
-	dc.l	WinArt_BattleOptions2
+	dc.l	PlaneMap_WinBattleOptions2
 	dc.b	$05, $05
 
 PtrWin_BattleCharName:
 	dc.b	$48, $A2
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleCharName-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharName-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_BattleCommands:
 	dc.b	$48, $08
-	dc.l	WinArt_BattleCommands
+	dc.l	PlaneMap_WinBattleCommands
 	dc.b	$0C, $04
 
 PtrWin_EnemyGroups:
 	dc.b	$47, $AE
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EnemyGroups-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyGroups-DynamicWindowsStart
 	dc.b	$0D, $05
 
 PtrWin_BattleMessage:
-	if revision>0
-	dc.b	$48, $92
-	dc.l	WinArt_BattleMessage
-	dc.b	$15, $03
-	else
+	if revision=0
 	dc.b	$48, $94
-	dc.l	WinArt_BattleMessage
+	dc.l	PlaneMap_WinBattleMessage
 	dc.b	$13, $03
+	else
+	dc.b	$48, $92
+	dc.l	PlaneMap_WinBattleMessage
+	dc.b	$15, $03
 	endif
 
 PtrWin_BattleTechList:
 	dc.b	$47, $90
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleTechList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleTechList-DynamicWindowsStart
 	dc.b	$08, $09
 
 PtrWin_BattleItemList:
 	dc.b	$47, $84
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleItemList-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleItemList-DynamicWindowsStart
 	dc.b	$0E, $09
 
 PtrWin_BattleItemUsed:
 	dc.b	$48, $9C
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleItemUsed-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleItemUsed-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_BattleTechUsed:
 	dc.b	$48, $A2
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_BattleTechUsed-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleTechUsed-DynamicWindowsStart
 	dc.b	$06, $03
 
 PtrWin_FirstEnemyName:
 	dc.b	$60, $82
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EnemyNames-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyNames-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_SecondEnemyName:
 	dc.b	$60, $AA
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EnemyNames-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyNames-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_FirstEnemyInfo:
 	dc.b	$60, $9A
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EnemyInfo-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyInfo-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_SecondEnemyInfo:
 	dc.b	$60, $C2
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_EnemyInfo-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyInfo-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_BattleEmptySpotStart:
 
 PtrWin_BattleFirstEmptySpot:
 	dc.b	$4A, $92
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleSecondEmptySpot:
 	dc.b	$4A, $AE
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleThirdEmptySpot:
 	dc.b	$4A, $82
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleFourthEmptySpot:
 	dc.b	$4A, $BE
-	dc.l	WinArt_BattleEmptySpots
+	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_RolfPortrait2:
 	dc.b	$42, $36
-	dc.l	WinArt_RolfPortrait
+	dc.l	PlaneMap_WinRolfPortrait
 	dc.b	$0B, $0B
 
 PtrWin_TeleportPlaceNames:
 	dc.b	$43, $A4
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_TeleportPlaceNames-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinTeleportPlaceNames-DynamicWindowsStart
 	dc.b	$08, $0B
 
 PtrWin_UstvestiaSoundtracks:
 	dc.b	$45, $1A
-	dc.l	(Window_art_buffer&$FFFFFF)+WinArt_UstvestiaSoundtracks-DynamicWindowsStart
+	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinUstvestiaSoundtracks-DynamicWindowsStart
 	dc.b	$0D, $03
 ; =======================================================================
 
-	if revision>0
+	if revision=0
+PlaneMap_WinPlayerMenu:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B4, $B5, $5F, $60, $71, $7F, $26, $26, $26
+	dc.b	$5B, $26, $26, $26, $26, $B4, $B5, $32, $5A, $29, $36, $28, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $B4, $B5, $71, $66, $74, $92, $66, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $38, $4C, $31, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $B4
+	dc.b	$B5, $35, $29, $41, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+	even
+	
+PlaneMap_WinItemAction:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $B9, $B4, $B5, $38, $2C, $29, $26, $26, $26, $26, $26, $B4, $B5, $54
+	dc.b	$36, $33, $26, $26, $26, $26, $26, $B4, $B5, $33, $39, $4F, $BE, $BE, $BE, $BE
+	dc.b	$BE
+	
+	even
+
+PlaneMap_WinScriptMessage:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+	
+PlaneMap_WinYesNo:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B4, $B5, $AF, $A3, $AA, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $A7, $A8, $26, $BE, $BE, $BE, $BE, $BE
+
+	even
+
+PlaneMap_WinStateOrder:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B4, $B5, $6B, $71, $96, $6E, $6B, $26, $26, $26, $26, $5B, $26
+	dc.b	$26, $B4, $B5, $3B, $4D, $41, $2C, $36, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+	even
+	
+PlaneMap_WinScriptMessageBig:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBuySell:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B4, $B5, $2C, $28, $36, $28, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $29, $4E, $36, $28, $BE, $BE, $BE, $BE, $BE, $BE
+	
+
+PlaneMap_WinNameInput:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $5F, $60, $61
+	dc.b	$62, $63, $26, $26, $7D, $7E, $7F, $80, $81, $26, $26, $64, $65, $66, $67, $68
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B
+	dc.b	$5B, $5B, $5B, $64, $65, $66, $67, $68, $26, $26, $82, $26, $83, $26, $84, $26
+	dc.b	$26, $69, $6A, $6B, $6C, $6D, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $69, $6A, $6B, $6C, $6D, $26, $26
+	dc.b	$85, $86, $87, $88, $89, $26, $26, $6E, $6F, $70, $71, $72, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $6E
+	dc.b	$6F, $70, $71, $72, $26, $26, $8A, $26, $8B, $26, $8C, $26, $26, $78, $79, $7A
+	dc.b	$43, $7C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$5C, $5C, $5C, $5C, $5C, $73, $74, $75, $76, $77, $26, $26, $93, $94, $95, $92
+	dc.b	$96, $26, $26, $78, $79, $7A, $43, $7C, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $78, $79, $7A, $43, $7C
+	dc.b	$26, $26, $6B, $6B, $7F, $26, $81, $72, $87, $26, $63, $8A, $87, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE
+	
+	even
+	
+PlaneMap_WinLibraryOptions:
+	dc.b	$86, $6B, $72, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $81, $6E, $79, $5F
+	dc.b	$3F, $26, $50, $2D, $32, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $78, $60, $63, $6A, $6B, $71, $7F, $3A, $40, $26, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $5F, $80, $6E, $6B
+	dc.b	$3C, $26, $38, $28, $39, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $6E, $7F, $3C, $26, $38, $28, $39, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $B4, $B5, $7D, $69, $96, $7A
+	dc.b	$88, $60, $8C, $3A, $40, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+	
+PlaneMap_WinHealCure:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $5B, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $2D, $33, $3F, $37, $4E, $5A, $29, $26, $26, $5B
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $3A, $2E, $3F, $37, $4E, $5A, $29, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinRolfHouseOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B4, $B5, $38, $4C, $31, $55, $26, $46, $4F, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $B4
+	dc.b	$B5, $80, $8C, $78, $96, $55, $26, $2E, $46, $3B, $2B, $33, $26, $26, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $B4, $B5, $35, $3A, $3C, $26, $39
+	dc.b	$4F, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE
+	
+	even
+	
+PlaneMap_WinRolfProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9A
+	dc.b	$5D, $97, $A0, $5D, $98, $9E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $98, $97
+	dc.b	$31, $28, $3F, $3A, $2D, $26, $32, $30, $39, $26, $4E, $5A, $29, $32, $56, $55
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $29, $32, $3B, $29, $5E, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $96, $96, $2F, $56, $30, $29, $3B, $26, $2C, $4D, $36, $3A
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $40, $40, $41, $51, $28, $26, $37, $32, $2D, $55, $26, $49, $38, $5E
+	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinNeiProfile:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
+	dc.b	$41, $26, $A1, $AD, $98, $99, $9F, $9A, $5D, $97, $9F, $5D, $9A, $97, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $96, $96, $76, $60, $3A, $28, $29, $3B, $45, $2A, $40, $26
+	dc.b	$B0, $3C, $56, $2F, $56, $3C, $26, $32, $39, $26, $26, $26, $26, $26, $5B, $26
+	dc.b	$26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $3C, $56, $2F, $56, $3C, $26, $27, $4D, $33, $B1, $3A, $28, $29, $26
+	dc.b	$28, $46, $55, $49, $38, $5E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26, $26, $96, $96, $2F, $49
+	dc.b	$3F, $3F, $4C, $29, $3C, $26, $32, $3B, $4A, $2C, $39, $26, $33, $40, $4A, $28
+	dc.b	$5E, $26, $26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $5B, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $30, $39, $30, $39, $3A, $32
+	dc.b	$36, $26, $35, $29, $41, $55, $26, $2D, $4D, $29, $5E, $26, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinRudoProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9B, $A0
+	dc.b	$5D, $97, $9E, $5D, $97, $98, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $9A, $3E
+	dc.b	$56, $45, $2A, $26, $38, $45, $3A, $26, $47, $33, $48, $55, $26, $29, $32, $3B
+	dc.b	$28, $5D, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2E, $56, $36, $28, $55, $26
+	dc.b	$4A, $48, $39, $26, $78, $8C, $6E, $96, $3C, $26, $3B, $57, $36, $5E, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5B, $26, $96, $96, $36, $2E, $45, $32, $28, $26, $2C, $4D, $36, $39
+	dc.b	$26, $2B, $49, $36, $28, $26, $64, $8C, $39, $49, $26, $26, $26, $26, $5B, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $2C, $4F, $2C, $4F, $3A, $26, $27, $38, $2C, $29, $30, $3A, $2C, $26
+	dc.b	$39, $2D, $4F, $5E, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinAmyProfile:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
+	dc.b	$41, $26, $A1, $AD, $98, $99, $9D, $98, $5D, $97, $9B, $5D, $99, $9D, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $96, $96, $81, $6E, $79, $5F, $3F, $26, $43, $28, $2D, $56
+	dc.b	$39, $2D, $3B, $26, $2C, $39, $28, $3C, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $35, $36, $37, $5D, $30, $3A, $32, $26, $28, $32, $58, $3A, $3B, $4F
+	dc.b	$5E, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $2D, $33
+	dc.b	$4A, $26, $3A, $2E, $3F, $26, $37, $4E, $5A, $29, $55, $26, $34, $56, $49, $56
+	dc.b	$3A, $32, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $30, $29, $2F, $2D, $3F, $29
+	dc.b	$4E, $5A, $2E, $40, $26, $31, $44, $3A, $26, $3B, $28, $5E, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinHughProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9B
+	dc.b	$5D, $97, $9D, $5D, $98, $9B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $5B, $26, $96, $96, $2B, $31
+	dc.b	$3B, $28, $30, $51, $2C, $4D, $26, $3A, $29, $42, $38, $4A, $26, $32, $5A, $2E
+	dc.b	$42, $38, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $3C, $26, $32, $36, $32, $46
+	dc.b	$26, $2C, $2E, $32, $58, $3C, $26, $3B, $57, $36, $5E, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26
+	dc.b	$26, $26, $26, $26, $96, $96, $34, $28, $42, $38, $3C, $26, $2C, $56, $33, $4F
+	dc.b	$26, $37, $32, $2D, $39, $40, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $2C, $50, $3F, $26, $46, $2D, $3C, $26, $39, $4F, $49, $3F, $40, $26
+	dc.b	$28, $3B, $28, $5E, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinAnnaProfile:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5B, $26, $26, $26, $26, $26, $96, $96, $3E, $56, $50, $28, $42, $32
+	dc.b	$5A, $29, $5E, $26, $2C, $3F, $32, $5A, $2C, $26, $2C, $38, $39, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $3B, $3C, $55, $32, $39, $28, $36, $2C, $40, $26
+	dc.b	$36, $50, $49, $26, $32, $4D, $3B, $28, $5E, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $6B, $85, $60, $69, $96, $4A, $7F, $6F, $3B, $3A, $3F, $26, $42, $2D
+	dc.b	$55, $38, $2C, $28, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $39, $2D
+	dc.b	$3C, $26, $3A, $41, $2C, $2C, $57, $39, $26, $36, $2B, $33, $3F, $2C, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2C, $3F, $32, $5A, $3F, $26
+	dc.b	$36, $36, $2C, $28, $2C, $36, $39, $27, $4F, $5E, $26, $26, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinKainProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9A
+	dc.b	$5D, $98, $99, $5D, $97, $A0, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $96, $96, $62, $8C
+	dc.b	$6A, $74, $5F, $3C, $26, $3B, $51, $29, $3A, $2B, $49, $57, $39, $28, $36, $2C
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2D, $2C, $28, $55, $26, $2E
+	dc.b	$46, $36, $39, $4C, $29, $3A, $32, $39, $49, $26, $30, $54, $32, $39, $26, $26
+	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $32, $45, $29, $40, $2C, $4E, $3B, $3F, $39, $26
+	dc.b	$27, $2D, $4D, $48, $36, $5E, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
+	dc.b	$96, $96, $89, $7C, $92, $72, $4A, $7D, $6A, $8C, $55, $26, $30, $54, $33, $3F
+	dc.b	$2C, $26, $3A, $2E, $28, $5E, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinShirProfile:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
+	dc.b	$41, $26, $A1, $AD, $98, $99, $9D, $9A, $5D, $97, $9B, $5D, $97, $98, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $26, $96, $96, $28, $2A, $2C, $4D, $49, $26, $4C, $2E, $26, $31
+	dc.b	$28, $31, $56, $49, $26, $27, $4F, $2C, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $3D, $33, $46, $3F, $26, $6B, $86, $87, $55, $26, $2B, $28, $49, $3A
+	dc.b	$48, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $5B
+	dc.b	$26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $2D, $45
+	dc.b	$45, $3C, $26, $3A, $51, $44, $29, $55, $26, $32, $38, $38, $2F, $39, $28, $4F
+	dc.b	$5E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $49, $3F, $55, $26, $3D, $33
+	dc.b	$47, $3F, $2C, $26, $3A, $2E, $28, $5E, $26, $26, $26, $26, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinCentTowerOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $3A, $49, $36, $37, $3F, $26
+	dc.b	$43, $4A, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $85, $60
+	dc.b	$7A, $85, $86, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26
+	dc.b	$B4, $B5, $35, $3A, $43, $39, $4F, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinCentTowerOptions2:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $3A, $49, $36, $37, $3F, $26
+	dc.b	$43, $4A, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $85, $60
+	dc.b	$7A, $85, $86, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $2B, $2E, $32, $5A, $29, $26, $26, $26, $26, $26, $26, $26, $26, $5B
+	dc.b	$26, $26, $26, $26, $B4, $B5, $35, $3A, $43, $39, $4F, $26, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinGameSelect:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $5B, $26, $26, $26, $26, $26, $5B, $26, $26, $B4, $B5, $27, $36, $4D, $32
+	dc.b	$2E, $26, $67, $96, $7F, $55, $26, $40, $32, $48, $4F, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $67, $96
+	dc.b	$7F, $3F, $26, $38, $38, $2D, $55, $26, $33, $4F, $26, $26, $26, $26, $26, $5B
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$71, $96, $6E, $55, $26, $2F, $33, $26, $26, $26, $26, $26, $26, $26, $26, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinRoomOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $3C, $49, $38, $55, $26, $27, $33, $2C, $57, $39, $44, $32, $28, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $3C, $49, $38, $55, $26, $41, $2D, $3A, $4E, $36, $28, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinRightLeft:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $5B, $26, $26, $B4, $B5, $46, $2D
+	dc.b	$39, $26, $26, $26, $26, $5B, $26, $26, $B4, $B5, $41, $36, $4E, $39, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinLibrarianPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$01, $02, $03, $04, $05, $06, $07, $01, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+	dc.b	$10, $01, $11, $11, $12, $13, $14, $15, $16, $17, $18, $11, $19, $1A, $1B, $1C
+	dc.b	$1D, $1E, $1F, $20, $21, $1A, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $23
+	dc.b	$2B, $1A, $2C, $2D, $2E, $2F, $30, $31, $32, $1A, $2B, $23, $24, $33, $34, $35
+	dc.b	$36, $37, $38, $23, $39, $1A, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43
+	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53
+	dc.b	$54, $55, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaSaveEmplPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $00
+	dc.b	$09, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09, $09, $11, $12, $13, $14, $15
+	dc.b	$16, $17, $18, $09, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $19, $22, $23
+	dc.b	$24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33
+	dc.b	$34, $2B, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $2B, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
+	dc.b	$48, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaDoctorPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
+	dc.b	$00, $00, $00, $00, $00, $00, $00, $00, $01, $02, $03, $04, $05, $06, $07, $07
+	dc.b	$08, $09, $01, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $16
+	dc.b	$17, $18, $19, $1A, $1B, $12, $1C, $1C, $1D, $1E, $1F, $20, $21, $22, $1C, $1C
+	dc.b	$23, $24, $25, $26, $27, $28, $29, $2A, $23, $23, $2B, $2C, $2D, $2E, $2F, $30
+	dc.b	$31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40
+	dc.b	$41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
+	dc.b	$51, $52, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinGrandmaPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$0A, $01, $02, $0B, $0C, $0D, $0E, $0F, $10, $11, $00, $12, $13, $14, $15, $16
+	dc.b	$17, $18, $19, $1A, $00, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $00, $24
+	dc.b	$25, $26, $27, $28, $29, $2A, $2B, $2C, $00, $2D, $2E, $2F, $30, $31, $32, $33
+	dc.b	$34, $35, $00, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $00, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
+	dc.b	$52, $49, $53, $54, $55, $56, $57, $58, $59, $5A, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaItemSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$00, $00, $02, $03, $04, $05, $06, $07, $08, $01, $00, $09, $0A, $0B, $0C, $0D
+	dc.b	$0E, $0F, $00, $01, $00, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A
+	dc.b	$1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $22, $23, $24, $25, $26, $27, $28
+	dc.b	$29, $2A, $2B, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $32, $33, $34
+	dc.b	$35, $36, $37, $38, $31, $39, $39, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $3F, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
+	dc.b	$51, $52, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaWpnSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $04, $05, $05, $05, $05
+	dc.b	$06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15
+	dc.b	$16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25
+	dc.b	$26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35
+	dc.b	$36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45
+	dc.b	$46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
+	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E, $5F, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaArmorSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11
+	dc.b	$12, $13, $14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1C, $1C, $1D
+	dc.b	$1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $26, $3C
+	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
+	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C
+	dc.b	$5D, $5E, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinUstvestiaPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $01, $01, $00, $02, $03, $04, $01, $01
+	dc.b	$00, $01, $05, $01, $06, $07, $08, $09, $0A, $0B, $00, $01, $0C, $01, $0D, $0E
+	dc.b	$0F, $10, $11, $12, $13, $14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C
+	dc.b	$01, $01, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A
+	dc.b	$2B, $01, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $01, $36, $01, $37
+	dc.b	$38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
+	dc.b	$48, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinDezolianPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $02, $03, $0C, $0D, $0E, $0F
+	dc.b	$08, $10, $11, $12, $02, $03, $13, $14, $15, $16, $08, $17, $18, $19, $02, $03
+	dc.b	$1A, $1B, $1C, $1D, $08, $17, $18, $1E, $02, $03, $1F, $20, $21, $22, $08, $17
+	dc.b	$18, $23, $02, $03, $24, $25, $26, $27, $08, $28, $18, $23, $29, $2A, $2B, $2C
+	dc.b	$2D, $2E, $2F, $30, $18, $23, $31, $32, $33, $34, $35, $36, $37, $38, $18, $39
+	dc.b	$3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49
+	dc.b	$4A, $4B, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinCentTowerOutsidePortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $04, $05, $06, $07, $08
+	dc.b	$09, $0A, $0B, $0C, $0D, $0C, $0E, $0F, $10, $11, $12, $13, $14, $14, $15, $14
+	dc.b	$0E, $0F, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $0E, $0F, $1E, $1F, $20, $21
+	dc.b	$22, $23, $24, $25, $26, $27, $27, $27, $28, $29, $2A, $2B, $2C, $2C, $2C, $2C
+	dc.b	$2C, $2C, $2D, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2C, $2C, $2C, $2C
+	dc.b	$2C, $2C, $2C, $2C, $2C, $2C, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
+	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinCentTowerOutsidePortraitCopy:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
+	dc.b	$01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $2F, $30, $31
+	dc.b	$32, $11, $12, $13, $14, $14, $15, $33, $34, $35, $36, $17, $18, $19, $1A, $1B
+	dc.b	$37, $38, $39, $3A, $3B, $1F, $20, $21, $22, $23, $24, $3C, $3D, $3E, $3F, $40
+	dc.b	$28, $29, $2A, $2B, $41, $42, $43, $44, $45, $46, $2D, $2E, $2E, $47, $48, $49
+	dc.b	$4A, $4B, $4C, $4D, $2C, $2C, $4E, $4F, $50, $51, $52, $53, $54, $55, $2E, $2E
+	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $2E, $2E, $5E, $5F, $60, $61, $62, $63
+	dc.b	$64, $65, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinGovernorPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $03, $04, $05, $00, $00
+	dc.b	$00, $06, $01, $07, $08, $09, $0A, $05, $0B, $00, $00, $00, $0C, $0D, $0E, $0F
+	dc.b	$10, $05, $00, $00, $00, $11, $12, $13, $14, $15, $16, $05, $11, $00, $17, $18
+	dc.b	$19, $1A, $1B, $1C, $1D, $1E, $1F, $17, $20, $21, $22, $23, $24, $25, $26, $27
+	dc.b	$28, $20, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $36
+	dc.b	$37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinItemKeeperPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$00, $02, $03, $04, $05, $06, $00, $00, $07, $08, $07, $09, $0A, $0B, $0C, $0D
+	dc.b	$07, $07, $0E, $0F, $0E, $10, $11, $12, $13, $11, $14, $15, $16, $16, $16, $17
+	dc.b	$18, $19, $1A, $1B, $1C, $1D, $11, $1E, $11, $17, $1F, $20, $21, $22, $1C, $23
+	dc.b	$11, $24, $25, $17, $26, $27, $28, $29, $1C, $23, $11, $2A, $2B, $2C, $2D, $2E
+	dc.b	$2F, $30, $31, $32, $33, $34, $35, $23, $36, $37, $38, $39, $23, $3A, $3B, $3C
+	dc.b	$3D, $23, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
+	dc.b	$4C, $4D, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinSpaceshipPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $00, $00, $01, $02, $03, $00, $00, $00
+	dc.b	$04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0A, $0D, $0E, $0D, $0F, $10, $11
+	dc.b	$0D, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
+	dc.b	$21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30
+	dc.b	$31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40
+	dc.b	$41, $41, $42, $43, $44, $45, $46, $47, $48, $49, $49, $49, $49, $4A, $4B, $4C
+	dc.b	$46, $46, $4D, $4E, $41, $41, $41, $41, $41, $41, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinMotaTeleportEmplPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11
+	dc.b	$12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $14, $15, $1E, $1F
+	dc.b	$20, $21, $22, $23, $24, $25, $14, $15, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$14, $15, $2E, $2F, $30, $31, $32, $33, $34, $35, $14, $15, $2E, $36, $37, $38
+	dc.b	$39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48
+	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
+	dc.b	$59, $5A, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinRolfPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A0, $A0, $A1, $A2, $A3, $A4, $A5, $A6, $A7, $A0
+	dc.b	$A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $B0, $B1, $B2, $B3, $B4, $B5, $B6, $B7
+	dc.b	$B8, $B9, $BA, $BB, $BC, $BD, $BE, $BF, $C0, $C1, $C2, $C3, $C4, $C5, $C6, $C7
+	dc.b	$C8, $C9, $CA, $CB, $CC, $CD, $CE, $C5, $CF, $D0, $D1, $D2, $D3, $D4, $D5, $D6
+	dc.b	$D7, $C5, $D8, $D9, $DA, $DB, $DC, $DD, $DE, $DF, $E0, $E1, $E2, $E3, $E4, $E5
+	dc.b	$E6, $E7, $E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, $F5
+	dc.b	$F6, $F7, $F8, $F9, $FA, $FB, $FC, $FD, $FE, $FF, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinNeiPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$01, $02, $03, $04, $04, $04, $05, $06, $00, $07, $08, $09, $0A, $0B, $0C, $0D
+	dc.b	$0E, $0F, $00, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C
+	dc.b	$1D, $1E, $1F, $20, $21, $06, $00, $22, $23, $24, $25, $26, $27, $28, $29, $06
+	dc.b	$00, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $06, $32, $33, $34, $35, $36, $37
+	dc.b	$38, $39, $3A, $3B, $00, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $00, $4F, $50, $51, $52, $53, $54, $55
+	dc.b	$56, $57, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinRudoPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $03, $03, $03, $04, $03, $03
+	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0D, $0D, $0E, $0F, $10, $11, $12
+	dc.b	$13, $14, $15, $15, $0D, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1D, $1E, $1F
+	dc.b	$20, $21, $22, $23, $24, $25, $26, $0D, $27, $28, $29, $2A, $2B, $2C, $2D, $2E
+	dc.b	$2F, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E
+	dc.b	$3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
+	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+
+PlaneMap_WinAmyPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
+	dc.b	$01, $00, $00, $02, $03, $01, $00, $00, $04, $04, $05, $06, $07, $08, $09, $0A
+	dc.b	$04, $04, $0B, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $0B, $13, $14, $15, $16
+	dc.b	$17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $04
+	dc.b	$1D, $1E, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33
+	dc.b	$34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43
+	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $1D, $4C, $4D, $4E, $4F, $50, $51, $52
+	dc.b	$53, $54, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinHughPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$03, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $09, $12, $13, $14, $15, $16, $17
+	dc.b	$18, $10, $19, $09, $1A, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $09, $22, $23
+	dc.b	$24, $25, $26, $27, $28, $29, $2A, $09, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
+	dc.b	$33, $09, $34, $34, $34, $35, $36, $37, $38, $39, $3A, $09, $3B, $3B, $3C, $3D
+	dc.b	$3E, $3F, $40, $41, $42, $09, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
+	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+
+PlaneMap_WinAnnaPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $03, $04, $05, $06, $07, $00, $01, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+	dc.b	$10, $09, $11, $12, $13, $14, $15, $16, $17, $18, $19, $12, $11, $1A, $1B, $1C
+	dc.b	$1D, $1E, $1F, $20, $21, $1A, $11, $22, $23, $24, $25, $26, $27, $28, $29, $2A
+	dc.b	$11, $22, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $11, $33, $34, $35, $36, $37
+	dc.b	$38, $39, $3A, $3B, $11, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $4F, $4F, $50, $51, $52, $53, $54
+	dc.b	$55, $56, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinKainPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $00, $01
+	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $08, $09, $10, $11, $12, $13, $14, $15
+	dc.b	$16, $17, $10, $11, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $18, $19, $20, $21
+	dc.b	$22, $23, $24, $25, $26, $27, $20, $21, $20, $21, $28, $29, $2A, $2B, $2C, $27
+	dc.b	$20, $21, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $2E, $36, $37, $38, $39
+	dc.b	$3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49
+	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinShirPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $03, $03, $03, $03, $03, $04, $03, $05, $06, $07, $08, $09, $0A, $0B, $03
+	dc.b	$0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
+	dc.b	$1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B
+	dc.b	$22, $2C, $2D, $2E, $2F, $30, $31, $03, $04, $32, $33, $34, $35, $36, $37, $38
+	dc.b	$39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $03, $03, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56
+	dc.b	$57, $58, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinLibraryGraphPortrait:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A0, $A1, $A2, $A3, $A1, $A4, $A5, $A6, $A7, $A3
+	dc.b	$A8, $A9, $AA, $AB, $A9, $AC, $AD, $AE, $AF, $B0, $B1, $B2, $B3, $B4, $B5, $B6
+	dc.b	$B7, $B8, $B9, $BA, $A0, $A1, $A2, $BB, $BC, $BD, $BE, $BF, $C0, $A3, $A8, $C1
+	dc.b	$C2, $C3, $C4, $C5, $C6, $C7, $C8, $C9, $B1, $CA, $CB, $CC, $CD, $CE, $CF, $B5
+	dc.b	$D0, $CF, $A0, $D1, $D2, $D3, $D4, $D5, $A3, $D6, $D7, $A3, $A8, $D8, $D9, $DA
+	dc.b	$DB, $DC, $DD, $DE, $DF, $E0, $B1, $E1, $E2, $CF, $E3, $D0, $CF, $E4, $E5, $E6
+	dc.b	$E7, $E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+	
+PlaneMap_WinRadarPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
+	dc.b	$02, $01, $02, $01, $02, $01, $02, $01, $03, $04, $05, $06, $07, $08, $09, $0A
+	dc.b	$0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $14, $16, $17, $18, $08
+	dc.b	$19, $1A, $1B, $1C, $18, $08, $1D, $1E, $1F, $20, $21, $22, $15, $23, $15, $14
+	dc.b	$24, $25, $26, $27, $28, $08, $18, $29, $2A, $08, $2B, $2C, $15, $2D, $2E, $2F
+	dc.b	$30, $14, $31, $32, $33, $29, $34, $35, $36, $37, $38, $08, $18, $39, $0D, $14
+	dc.b	$3A, $3B, $15, $3C, $15, $14, $15, $3D, $33, $08, $3E, $3F, $18, $40, $18, $08
+	dc.b	$18, $41, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinBattleEmptySpots:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $00, $01, $02, $03, $26, $26, $04, $05, $06, $07, $26, $26, $08
+	dc.b	$09, $0A, $0B, $26, $26, $0C, $0D, $0E, $0F, $26, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBattleOptions:
+	dc.b	$B9, $B9, $B9, $B9, $26, $B4, $B5, $26, $36, $36, $2C, $29, $26, $B4, $B5, $26
+	dc.b	$31, $2E, $34, $56, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinBattleOptions2:
+	dc.b	$B9, $B9, $B9, $B9, $26, $B4, $B5, $26
+	dc.b	$48, $28, $50, $28, $26, $B4, $B5, $26, $39, $57, $36, $28, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBattleCommands:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $12, $13, $26, $16, $17
+	dc.b	$26, $1A, $1B, $26, $1E, $1F, $14, $15, $26, $18, $19, $26, $1C, $1D, $26, $20
+	dc.b	$21, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+	even
+
+PlaneMap_WinBattleMessage:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+	even
+	
+DynamicWindowsStart:
+
+PlaneMap_WinCharList:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+
+PlaneMap_WinMenuItemList:
+	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4
+	dc.b	$B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinMenuCharStats:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $A4, $A9, $26, $26, $26, $97, $26, $A4
+	dc.b	$A9, $26, $26, $26, $97, $26, $A4, $A9, $26, $26, $26, $97, $26, $A4, $A9, $26
+	dc.b	$26, $26, $97, $AB, $A9, $26, $26, $26, $97, $26, $AB, $A9, $26, $26, $26, $97
+	dc.b	$26, $AB, $A9, $26, $26, $26, $97, $26, $AB, $A9, $26, $26, $26, $97, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinIndividualCharStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $A4, $A9, $26, $26, $26, $97, $B2, $26, $26, $97, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $AB, $A9, $26, $26, $26, $97, $B2, $26, $26
+	dc.b	$97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $26, $97, $26
+	dc.b	$26, $26, $26, $26, $BE
+	
+PlaneMap_WinMeseta:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$80, $6C, $6E, $26, $26, $26, $26, $26, $26, $26, $97, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinCharOrderDestination:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
+	dc.b	$26, $26, $98, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $99, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $9A, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $9B, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+	
+PlaneMap_WinCharList2:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinMapTechList:
+	dc.b	$B4, $B5
+	dc.b	$A7, $A3, $AE, $AB, $B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+loc_1598C:
+	dc.b	$B4, $B5, $A7, $A3
+	dc.b	$AE, $AB, $B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
+	dc.b	$26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinStrngHPTP:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $A4, $A9, $26, $26, $26, $97, $B2, $26, $26, $97, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $AB, $A9, $26, $26, $26, $97, $B2, $26
+	dc.b	$26, $97, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinStrngStats:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $36, $28, $4E, $5A, $2E, $26, $26, $26, $26
+	dc.b	$26, $97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $34, $28, $32
+	dc.b	$56, $4E, $5A, $2E, $26, $26, $26, $97, $26, $5B, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $33, $40, $4A, $31, $26, $26, $26, $26, $26, $26, $97, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $30, $29, $29, $56, $26, $26, $26
+	dc.b	$26, $26, $26, $97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2D
+	dc.b	$4C, $29, $31, $26, $26, $26, $26, $26, $26, $97, $26, $26, $5B, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $30, $29, $2F, $2D, $4E, $5A, $2E, $26, $26, $26, $97
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $32, $59, $41, $4E, $5A
+	dc.b	$2E, $26, $26, $26, $26, $97, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE
+	
+PlaneMap_WinStrngEquip:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $27
+	dc.b	$36, $45, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $46, $2D, $39
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $41, $36, $4E, $39, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $2C, $4D, $36, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $27, $32, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinStrngLVEXP:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $26, $97, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $A3, $AE, $A9, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE
+	
+loc_15BE5:
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26
+	
+PlaneMap_WinEquipStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $33
+	dc.b	$40, $4A, $31, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $30, $29, $2F, $2D, $4E, $5A, $2E, $26, $26, $26, $26
+	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $32, $59, $41, $4E, $5A
+	dc.b	$2E, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE
+	
+PlaneMap_WinFullTechList:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinSaveSlots:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC, $98, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $99, $B4, $B5, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $9A, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $9B
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE
+	
+	even
+
+PlaneMap_WinStoreInventory:
+	dc.b	$B9, $B9, $49, $2E, $51, $2E, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinProfileCharList:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinRegroupCharList:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinRegroupSelectedChar:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinBattleCharStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A4, $A9, $26, $26
+	dc.b	$26, $97, $AB, $A9, $26, $26, $26, $97, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinBattleCharName:
+	dc.b	$B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	
+loc_15F8A:
+	dc.b	$B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinEnemyGroups:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinBattleItemUsed:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBattleTechUsed:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBattleTechList:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
+	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
+PlaneMap_WinBattleItemList:
+	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4
+	dc.b	$B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+	
+PlaneMap_WinEnemyNames:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinEnemyInfo:
+	dc.b	$B9, $B9, $B9, $B9, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinTeleportPlaceNames:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+PlaneMap_WinUstvestiaSoundtracks:
+	dc.b	$B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	
+DynamicWindowsEnd:
+
+	even
+
+	elseif revision=3
+
 	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
 	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
 	charset '0', "\118\119\120\121\122\123\124\125\126\127"
@@ -32067,15 +34026,15 @@ PtrWin_UstvestiaSoundtracks:
 
 
 
-WinArt_PlayerMenu:
+PlaneMap_WinPlayerMenu:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B4, $B5, "ITEM "
 	dc.b	"       "
-	dc.b	$B4, $B5, "STATE"
+	dc.b	$B4, $B5, "ESTAD"
 	dc.b	"       "
-	dc.b	$B4, $B5, "TECH "
+	dc.b	$B4, $B5, "TECN "
 	dc.b	"       "
-	dc.b	$B4, $B5, "STRNG"
+	dc.b	$B4, $B5, "FORCA"
 	dc.b	"       "
 	dc.b	$B4, $B5, "EQP  "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
@@ -32083,20 +34042,20 @@ WinArt_PlayerMenu:
 
 	even
 
-WinArt_ItemAction:
+PlaneMap_WinItemAction:
 	dc.b	$B9, $B9, $B9, $B9, $B9
-	dc.b	$B4, $B5, "USE"
+	dc.b	$B4, $B5, "USA"
 	dc.b	"     "
-	dc.b	$B4, $B5, "GIV"
+	dc.b	$B4, $B5, "PAS"
 	dc.b	"     "
-	dc.b	$B4, $B5, "TOS"
+	dc.b	$B4, $B5, "DEX"
 	dc.b	$BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13B7A:
-WinArt_ScriptMessage:
+PlaneMap_WinScriptMessage:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	"                        "
@@ -32109,28 +34068,28 @@ WinArt_ScriptMessage:
 
 	even
 
-WinArt_YesNo:
+PlaneMap_WinYesNo:
 	dc.b	$B9, $B9, $B9, $B9, $B9
-	dc.b	$B4, $B5, "YES"
+	dc.b	$B4, $B5, "SIM"
 	dc.b	"     "
-	dc.b	$B4, $B5, "NO "
+	dc.b	$B4, $B5, "NAO"
 	dc.b	$BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
-WinArt_StateOrder:
+PlaneMap_WinStateOrder:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B4, $B5, "STATE"
+	dc.b	$B4, $B5, "ESTAD"
 	dc.b	"       "
-	dc.b	$B4, $B5, "ORDER"
+	dc.b	$B4, $B5, "ORDEM"
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13C48
-WinArt_ScriptMessageBig:
+PlaneMap_WinScriptMessageBig:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	"                        "
@@ -32147,17 +34106,17 @@ WinArt_ScriptMessageBig:
 
 	even
 
-WinArt_BuySell:
+PlaneMap_WinBuySell:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B4, $B5, "BUY "
+	dc.b	$B4, $B5, "COMP"
 	dc.b	"      "
-	dc.b	$B4, $B5, "SELL"
+	dc.b	$B4, $B5, "VEND"
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
-WinArt_NameInput:
+PlaneMap_WinNameInput:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                   "
 	dc.b	"                   "
@@ -32172,66 +34131,66 @@ WinArt_NameInput:
 	dc.b	" S T U V W X Y Z   "
 	dc.b	"                   "
 	dc.b	"                   "
-	dc.b	"   ADV  RUB  END   "
+	dc.b	"   AVA  RET  FIM   "
 	dc.b	"                   "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
-WinArt_LibraryOptions:
+PlaneMap_WinLibraryOptions:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"            "
-	dc.b	$B4, $B5, "HISTORY   "
+	dc.b	$B4, $B5, "HISTORIA  "
 	dc.b	"            "
-	dc.b	$B4, $B5, "BIOSYSTEMS"
+	dc.b	$B4, $B5, "LAB BIOSIS"
 	dc.b	"            "
 	dc.b	$B4, $B5, "CLIMATROL "
 	dc.b	"            "
-	dc.b	$B4, $B5, "DAM       "
+	dc.b	$B4, $B5, "REPRESA   "
 	dc.b	"            "
-	dc.b	$B4, $B5, "MOTHRBRAIN"
+	dc.b	$B4, $B5, "CEREBRO M "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
-WinArt_HealCure:
+PlaneMap_WinHealCure:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"         "
-	dc.b	$B4, $B5, "HEAL   "
+	dc.b	$B4, $B5, "TRATAR "
 	dc.b	"         "
-	dc.b	$B4, $B5, "CURE   "
+	dc.b	$B4, $B5, "ANTIDT "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13F60
-WinArt_RolfHouseOptions:
+PlaneMap_WinRolfHouseOptions:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B4, $B5, "SEE STRNGTH"
+	dc.b	$B4, $B5, "VER FORCA  "
 	dc.b	"             "
-	dc.b	$B4, $B5, "REORGANIZE "
+	dc.b	$B4, $B5, "REORGANIZAR"
 	dc.b	"             "
-	dc.b	$B4, $B5, "OUTSIDE    "
+	dc.b	$B4, $B5, "SAIR       "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_13FBC
-WinArt_RolfProfile:
+PlaneMap_WinRolfProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"LOST PARENTS AT AGE   "
+	dc.b	"PERDEU OS PAIS AOS    "
 	dc.b	"                      "
-	dc.b	"10. HEALTHY AND HAS   "
+	dc.b	"10 ANOS. SAUDE        "
 	dc.b	"                      "
-	dc.b	"BROAD RANGE OF        "
+	dc.b	"PERFEITA E VASTOS     "
 	dc.b	"                      "
-	dc.b	"KNOWLEDGE.            "
+	dc.b	"CONHECIMENTOS.        "
 	dc.b	"                      "
 	dc.b	"                      "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
@@ -32241,19 +34200,19 @@ WinArt_RolfProfile:
 	even
 
 ; loc_140C4
-WinArt_NeiProfile:
+PlaneMap_WinNeiProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"\INEI\I MEANS \ITHE HUMAN"			; \I is the " character
+	dc.b	"\INEI\I SIGNIFICA HUMANO"			; \I is the " character
 	dc.b	"                      "
-	dc.b	"WHO WAS NOT A HUMAN.\I "
+	dc.b	"QUE NAO E HUMANO.     "
 	dc.b	"                      "
-	dc.b	"LITHE AND AGILE LIKE  "
+	dc.b	"AGIL E FLEXIVEL COMO  "
 	dc.b	"                      "
-	dc.b	"AN ANIMAL, SHE HATES  "
+	dc.b	"UM ANIMAL, ELA ODEIA  "
 	dc.b	"                      "
-	dc.b	"CARRYING A HEAVY LOAD."
+	dc.b	"CARREGAR PESO.        "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32261,19 +34220,19 @@ WinArt_NeiProfile:
 	even
 
 ; loc_141CC
-WinArt_RudoProfile:
+PlaneMap_WinRudoProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"LEFT THE ARMY AND     "
+	dc.b	"DEIXOU O EXERCITO E   "
 	dc.b	"                      "
-	dc.b	"BECAME A HUNTER AFTER "
+	dc.b	"VIROU UM CACADOR, APOS"
 	dc.b	"                      "
-	dc.b	"WIFE AND CHILD DIED.  "
+	dc.b	"SUA FAMILIA SER MORTA."
 	dc.b	"                      "
-	dc.b	"VERY STRONG, CAN USE  "
+	dc.b	"MUITO FORTE, USA ARMAS"
 	dc.b	"                      "
-	dc.b	"HEAVY GUNS WITH EASE. "
+	dc.b	"PESADAS COM DESTREZA. "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32281,19 +34240,19 @@ WinArt_RudoProfile:
 	even
 
 ; loc_142D4
-WinArt_AmyProfile:
+PlaneMap_WinAmyProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"A DOCTOR FROM A NORMAL"
+	dc.b	"UMA DOUTORA           "
 	dc.b	"                      "
-	dc.b	"HOME. SPECIALIZES IN  "
+	dc.b	"ESPECIALISTA EM CURA  "
 	dc.b	"                      "
-	dc.b	"BOTH HEALING WOUNDS   "
+	dc.b	"DE FERIMENTOS E DE    "
 	dc.b	"                      "
-	dc.b	"AND CURING POISON;    "
+	dc.b	"ENVENENAMENTOS.       "
 	dc.b	"                      "
-	dc.b	"NOT STRONG IN BATTLE. "
+	dc.b	"FRACA EM COMBATES.    "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32301,19 +34260,19 @@ WinArt_AmyProfile:
 	even
 
 ; loc_143DC
-WinArt_HughProfile:
+PlaneMap_WinHughProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"HAS BEEN INTRIGUED BY "
+	dc.b	"INTRIGADO POR NATUREZA"
 	dc.b	"                      "
-	dc.b	"NATURE SINCE HIS      "
+	dc.b	"DESDE SUA INFANCIA,   "
 	dc.b	"                      "
-	dc.b	"CHILDHOOD; NOW THE    "
+	dc.b	"AGORA E UM            "
 	dc.b	"                      "
-	dc.b	"LEADING EXPERT ON     "
+	dc.b	"ESPECIALISTA EM       "
 	dc.b	"                      "
-	dc.b	"PLANTS AND ANIMALS.   "
+	dc.b	"PLANTAS E ANIMAIS.    "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32321,19 +34280,19 @@ WinArt_HughProfile:
 	even
 
 ; loc_144E4
-WinArt_AnnaProfile:
+PlaneMap_WinAnnaProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"OF UNCERTAIN AGE AND  "
+	dc.b	"DE PASSADO E IDADE    "
 	dc.b	"                      "
-	dc.b	"BACKGROUND, SHE IS A  "
+	dc.b	"INCERTOS. ELA E UMA   "
 	dc.b	"                      "
-	dc.b	"VICIOUS FIGHTER WITH  "
+	dc.b	"GUERREIRA SELVAGEM COM"
 	dc.b	"                      "
-	dc.b	"A SLICER OR WHIP.     "
+	dc.b	"O CHICOTE OU UMA FACA."
 	dc.b	"                      "
-	dc.b	"TAKES NO PRISONERS.   "
+	dc.b	"NAO LEVA PRISIONEIROS."
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32341,19 +34300,19 @@ WinArt_AnnaProfile:
 	even
 
 ; loc_145EC
-WinArt_KainProfile:
+PlaneMap_WinKainProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"WANTED TO BE A        "
+	dc.b	"QUIS SER MECANICO, MAS"
 	dc.b	"                      "
-	dc.b	"MECHANIC, BUT ALWAYS  "
+	dc.b	"SEMPRE QUEBROU TUDO   "
 	dc.b	"                      "
-	dc.b	"BROKE WHATEVER HE     "
+	dc.b	"QUE TENTOU CONSERTAR. "
 	dc.b	"                      "
-	dc.b	"TRIED TO FIX; DECIDED "
+	dc.b	"DECIDIU FAZER DISTO,  "
 	dc.b	"                      "
-	dc.b	"TO MAKE THAT HIS JOB. "
+	dc.b	"SEU TRABALHO.         "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 	dc.b	$BE, $BE
 ; -----------------------------------------------------------------------
@@ -32361,15 +34320,15 @@ WinArt_KainProfile:
 	even
 
 ; loc_146F4
-WinArt_ShirProfile:
+PlaneMap_WinShirProfile:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9
 	dc.b	"                      "
-	dc.b	"ALTHOUGH WELL-TO-DO,  "
+	dc.b	"APESAR DE SER RICA,   "
 	dc.b	"                      "
-	dc.b	"SHE ENJOYS THE THRILL "
+	dc.b	"ELA ACHA QUE ROUBAR E "
 	dc.b	"                      "
-	dc.b	"OF STEALING.          "
+	dc.b	"ALGO INTERESSANTE.    "
 	dc.b	"                      "
 	dc.b	"                      "
 	dc.b	"                      "
@@ -32381,75 +34340,75 @@ WinArt_ShirProfile:
 	even
 
 ; loc_147FC
-WinArt_CentTowerOptions:
+PlaneMap_WinCentTowerOptions:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
-	dc.b	$B4, $B5, "ROOM    "
+	dc.b	$B4, $B5, "SALA    "
 	dc.b	"          "
-	dc.b	$B4, $B5, "LIBRARY "
+	dc.b	$B4, $B5, "BIBLIOT "
 	dc.b	"          "
-	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$B4, $B5, "SAIDA   "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_1484C
-WinArt_CentTowerOptions2:
+PlaneMap_WinCentTowerOptions2:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
-	dc.b	$B4, $B5, "ROOM    "
+	dc.b	$B4, $B5, "SALA    "
 	dc.b	"          "
-	dc.b	$B4, $B5, "LIBRARY "
+	dc.b	$B4, $B5, "BIBLIOT "
 	dc.b	"          "
-	dc.b	$B4, $B5, "ROOF    "
+	dc.b	$B4, $B5, "COBERT  "
 	dc.b	"          "
-	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$B4, $B5, "SAIDA   "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_148B0
-WinArt_GameSelect:
+PlaneMap_WinGameSelect:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                 "
-	dc.b	$B4, $B5, "NEW GAME       "
+	dc.b	$B4, $B5, "NOVO JOGO      "
 	dc.b	"                 "
-	dc.b	$B4, $B5, "CONTINUE       "
+	dc.b	$B4, $B5, "CONTINUA       "
 	dc.b	"                 "
-	dc.b	$B4, $B5, "ERASE GAME     "
+	dc.b	$B4, $B5, "APAGA JOGO     "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14938
-WinArt_RoomOptions:
+PlaneMap_WinRoomOptions:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                "
-	dc.b	$B4, $B5, "KEEP BAGGAGE  "
+	dc.b	$B4, $B5, "GUARDAR ITEM  "
 	dc.b	"                "
-	dc.b	$B4, $B5, "BAGGAGE PLEASE"
+	dc.b	$B4, $B5, "DEVOLVER ITEM "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_14998
-WinArt_RightLeft:
+PlaneMap_WinRightLeft:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"      "
-	dc.b	$B4, $B5, "RGHT"
+	dc.b	$B4, $B5, "DIR "
 	dc.b	"      "
-	dc.b	$B4, $B5, "LEFT"
+	dc.b	$B4, $B5, "ESQ "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_149BC
-WinArt_LibrarianPortrait:
+PlaneMap_WinLibrarianPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $02, $03, $04, $05, $06, $07, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $01
@@ -32467,7 +34426,7 @@ WinArt_LibrarianPortrait:
 	even
 
 ; loc_14A34
-WinArt_MotaSaveEmplPortrait:
+PlaneMap_WinMotaSaveEmplPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $00
 	dc.b	$09, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
@@ -32485,7 +34444,7 @@ WinArt_MotaSaveEmplPortrait:
 	even
 
 ; loc_14AAC
-WinArt_MotaDoctorPortrait:
+PlaneMap_WinMotaDoctorPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 	dc.b	$01, $02, $03, $04, $05, $06, $07, $07, $08, $09
@@ -32503,7 +34462,7 @@ WinArt_MotaDoctorPortrait:
 	even
 
 ; loc_14B24
-WinArt_GrandmaPortrait:
+PlaneMap_WinGrandmaPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $01, $02, $0B, $0C, $0D, $0E, $0F, $10, $11
@@ -32521,7 +34480,7 @@ WinArt_GrandmaPortrait:
 	even
 
 ; loc_14B9C
-WinArt_MotaItemSellerPortrait:
+PlaneMap_WinMotaItemSellerPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $00, $00, $02, $03, $04, $05, $06, $07
 	dc.b	$08, $01, $00, $09, $0A, $0B, $0C, $0D, $0E, $0F
@@ -32539,7 +34498,7 @@ WinArt_MotaItemSellerPortrait:
 	even
 
 ; loc_14C14
-WinArt_MotaWpnSellerPortrait:
+PlaneMap_WinMotaWpnSellerPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $05, $05, $05
 	dc.b	$06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
@@ -32557,7 +34516,7 @@ WinArt_MotaWpnSellerPortrait:
 	even
 
 ; loc_14C8C
-WinArt_MotaArmorSellerPortrait:
+PlaneMap_WinMotaArmorSellerPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
@@ -32575,7 +34534,7 @@ WinArt_MotaArmorSellerPortrait:
 	even
 
 ; loc_14D04
-WinArt_UstvestiaPortrait:
+PlaneMap_WinUstvestiaPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $01, $00, $02, $03, $04, $01, $01
 	dc.b	$00, $01, $05, $01, $06, $07, $08, $09, $0A, $0B
@@ -32593,7 +34552,7 @@ WinArt_UstvestiaPortrait:
 	even
 
 ; loc_14D7C
-WinArt_DezolianPortrait:
+PlaneMap_WinDezolianPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $02, $03, $0C, $0D, $0E, $0F, $08, $10
@@ -32611,7 +34570,7 @@ WinArt_DezolianPortrait:
 	even
 
 ; loc_14DF4
-WinArt_CentTowerOutsidePortrait:
+PlaneMap_WinCentTowerOutsidePortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
 	dc.b	$09, $0A, $0B, $0C, $0D, $0C, $0E, $0F, $10, $11
@@ -32629,7 +34588,7 @@ WinArt_CentTowerOutsidePortrait:
 	even
 
 ; loc_14E6C
-WinArt_CentTowerOutsidePortraitCopy:
+PlaneMap_WinCentTowerOutsidePortraitCopy:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
 	dc.b	$09, $0A, $0B, $0C, $0D, $2F, $30, $31, $32, $11
@@ -32647,7 +34606,7 @@ WinArt_CentTowerOutsidePortraitCopy:
 	even
 
 ; loc_14EE4
-WinArt_GovernorPortrait:
+PlaneMap_WinGovernorPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $02, $03, $03, $04, $05, $00, $00
 	dc.b	$00, $06, $01, $07, $08, $09, $0A, $05, $0B, $00
@@ -32665,7 +34624,7 @@ WinArt_GovernorPortrait:
 	even
 
 ; loc_14F5C
-WinArt_ItemKeeperPortrait:
+PlaneMap_WinItemKeeperPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $00, $02, $03, $04, $05, $06, $00, $00
 	dc.b	$07, $08, $07, $09, $0A, $0B, $0C, $0D, $07, $07
@@ -32683,7 +34642,7 @@ WinArt_ItemKeeperPortrait:
 	even
 
 ; loc_14FD4
-WinArt_SpaceshipPortrait:
+PlaneMap_WinSpaceshipPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $00, $00, $01, $02, $03, $00, $00, $00
 	dc.b	$04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0A
@@ -32701,7 +34660,7 @@ WinArt_SpaceshipPortrait:
 	even
 
 ; loc_1504C
-WinArt_MotaTeleportEmplPortrait:
+PlaneMap_WinMotaTeleportEmplPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
@@ -32719,7 +34678,7 @@ WinArt_MotaTeleportEmplPortrait:
 	even
 
 ; loc_150C4
-WinArt_RolfPortrait:
+PlaneMap_WinRolfPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$A0, $A0, $A1, $A2, $A3, $A4, $A5, $A6, $A7, $A0
 	dc.b	$A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $B0, $B1
@@ -32737,7 +34696,7 @@ WinArt_RolfPortrait:
 	even
 
 ; loc_1513C
-WinArt_NeiPortrait:
+PlaneMap_WinNeiPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $01, $02, $03, $04, $04, $04, $05, $06
 	dc.b	$00, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
@@ -32755,7 +34714,7 @@ WinArt_NeiPortrait:
 	even
 
 ; loc_151B4
-WinArt_RudoPortrait:
+PlaneMap_WinRudoPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $03, $03, $03, $04, $03, $03
 	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0D
@@ -32773,7 +34732,7 @@ WinArt_RudoPortrait:
 	even
 
 ; loc_1522C
-WinArt_AmyPortrait:
+PlaneMap_WinAmyPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $00, $01, $00, $00, $02, $03, $01, $00, $00
 	dc.b	$04, $04, $05, $06, $07, $08, $09, $0A, $04, $04
@@ -32791,7 +34750,7 @@ WinArt_AmyPortrait:
 	even
 
 ; loc_152A4
-WinArt_HughPortrait:
+PlaneMap_WinHughPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
 	dc.b	$03, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $09
@@ -32809,7 +34768,7 @@ WinArt_HughPortrait:
 	even
 
 ; loc_1531C
-WinArt_AnnaPortrait:
+PlaneMap_WinAnnaPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
@@ -32827,7 +34786,7 @@ WinArt_AnnaPortrait:
 	even
 
 ; loc_15394
-WinArt_KainPortrait:
+PlaneMap_WinKainPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
 	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $08, $09
@@ -32845,7 +34804,7 @@ WinArt_KainPortrait:
 	even
 
 ; loc_1540C
-WinArt_ShirPortrait:
+PlaneMap_WinShirPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $03, $03, $03, $03, $03, $04, $03
 	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $03, $0C, $0D
@@ -32863,7 +34822,7 @@ WinArt_ShirPortrait:
 	even
 
 ; loc_15484
-WinArt_LibraryGraphPortrait:
+PlaneMap_WinLibraryGraphPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$A0, $A1, $A2, $A3, $A1, $A4, $A5, $A6, $A7, $A3
 	dc.b	$A8, $A9, $AA, $AB, $A9, $AC, $AD, $AE, $AF, $B0
@@ -32881,7 +34840,7 @@ WinArt_LibraryGraphPortrait:
 	even
 
 ; loc_154FC
-WinArt_RadarPortrait:
+PlaneMap_WinRadarPortrait:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$00, $01, $02, $01, $02, $01, $02, $01, $02, $01
 	dc.b	$03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C
@@ -32899,7 +34858,7 @@ WinArt_RadarPortrait:
 	even
 
 ; loc_15574
-WinArt_BattleEmptySpots:
+PlaneMap_WinBattleEmptySpots:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $00, $01, $02, $03, $26
 	dc.b	$26, $04, $05, $06, $07, $26
@@ -32911,31 +34870,31 @@ WinArt_BattleEmptySpots:
 	even
 
 ; loc_15598
-WinArt_BattleOptions:
+PlaneMap_WinBattleOptions:
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $B4, $B5, $26
-	dc.b	"FGHT"
+	dc.b	"LUTA"
 	dc.b	$26, $B4, $B5, $26
-	dc.b	"STGY"
+	dc.b	"PLAN"
 	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_155B0
-WinArt_BattleOptions2:
+PlaneMap_WinBattleOptions2:
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $B4, $B5, $26
-	dc.b	"ORDR"
+	dc.b	"ORGZ"
 	dc.b	$26, $B4, $B5, $26
-	dc.b	"RUN "
+	dc.b	"FUGA"
 	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 
 	even
 
 ; loc_155C8
-WinArt_BattleCommands:
+PlaneMap_WinBattleCommands:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$12, $13, $26, $16, $17, $26, $1A, $1B, $26, $1E, $1F
 	dc.b	$14, $15, $26, $18, $19, $26, $1C, $1D, $26, $20, $21
@@ -32946,7 +34905,7 @@ WinArt_BattleCommands:
 	even
 
 ; loc_15600
-WinArt_BattleMessage:
+PlaneMap_WinBattleMessage:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"                    "
 	dc.b	"                    "
@@ -32965,7 +34924,7 @@ WinArt_BattleMessage:
 DynamicWindowsStart:
 
 ; loc_15650
-WinArt_CharList:
+PlaneMap_WinCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26
@@ -32979,7 +34938,7 @@ WinArt_CharList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15692
-WinArt_MenuItemList:
+PlaneMap_WinMenuItemList:
 	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33001,7 +34960,7 @@ WinArt_MenuItemList:
 ; -----------------------------------------------------------------------
 
 ; loc_1577C
-WinArt_MenuCharStats:
+PlaneMap_WinMenuCharStats:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33018,22 +34977,22 @@ WinArt_MenuCharStats:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15839
-WinArt_IndividualCharStats:
+PlaneMap_WinIndividualCharStats:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$2E, $36, $26, $26, $26, $76, $64, $26, $26, $76	; HP
+	dc.b	$36, $2B, $26, $26, $26, $76, $64, $26, $26, $76	; HP
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$3A, $36, $26, $26, $26, $76, $64, $26, $26, $76	; TP
+	dc.b	$36, $3A, $26, $26, $26, $76, $64, $26, $26, $76	; TP
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$32, $3C, $26, $76, $26, $26, $26, $26, $26, $BE
+	dc.b	$34, $3C, $26, $76, $26, $26, $26, $26, $26, $BE
 ; -----------------------------------------------------------------------
 ; loc_15875
-WinArt_Meseta:
+PlaneMap_WinMeseta:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"MST       0"
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15896
-WinArt_CharOrderDestination:
+PlaneMap_WinCharOrderDestination:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$98, $26, $26, $26, $26, $26	; 1
@@ -33046,7 +35005,7 @@ WinArt_CharOrderDestination:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_158D2
-WinArt_CharList2:
+PlaneMap_WinCharList2:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26
@@ -33059,7 +35018,7 @@ WinArt_CharList2:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_1590E
-WinArt_MapTechList:
+PlaneMap_WinMapTechList:
 	dc.b	$B4, $B5, $A7, $A3, $AE, $AB, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26, $26
@@ -33100,51 +35059,51 @@ loc_1598C:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15A0A
-WinArt_StrngHPTP:
+PlaneMap_WinStrngHPTP:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$2E, $36, $26, $26, $26, $76, $64, $26, $26, $76	; HP
+	dc.b	$36, $2B, $26, $26, $26, $76, $64, $26, $26, $76	; HP
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$3A, $36, $26, $26, $26, $76, $64, $26, $26, $76	; TP
+	dc.b	$36, $3A, $26, $26, $26, $76, $64, $26, $26, $76	; TP
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15A3C
-WinArt_StrngStats:
+PlaneMap_WinStrngStats:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	"STRNGTH   0"
+	dc.b	"FORCA     0"
 	dc.b	"           "
-	dc.b	"MENTAL    0"
+	dc.b	"INTELIG   0"
 	dc.b	"           "
-	dc.b	"AGILITY   0"
+	dc.b	"AGILID    0"
 	dc.b	"           "
-	dc.b	"LUCK      0"
+	dc.b	"SORTE     0"
 	dc.b	"           "
-	dc.b	"DEXTRTY   0"
+	dc.b	"DESTREZ   0"
 	dc.b	"           "
-	dc.b	"ATTACK    0"
+	dc.b	"ATAQUE    0"
 	dc.b	"           "
-	dc.b	"DEFENSE   0"
+	dc.b	"DEFESA    0"
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15AE1
-WinArt_StrngEquip:
+PlaneMap_WinStrngEquip:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"               "
-	dc.b	"HEAD           "
+	dc.b	"CAB            "
 	dc.b	"               "
-	dc.b	"RGHT           "
+	dc.b	"DIR            "
 	dc.b	"               "
-	dc.b	"LEFT           "
+	dc.b	"ESQ            "
 	dc.b	"               "
-	dc.b	"BODY           "
+	dc.b	"CORP           "
 	dc.b	"               "
-	dc.b	"LEGS           "
+	dc.b	"PES            "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15B95
-WinArt_StrngLVEXP:
+PlaneMap_WinStrngLVEXP:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"          "
-	dc.b	"LV 0      "
+	dc.b	"NV 0      "
 	dc.b	"          "
 	dc.b	"          "
 	dc.b	"          "
@@ -33156,18 +35115,18 @@ loc_15BE5:
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 ; -----------------------------------------------------------------------
 ; loc_15BF9
-WinArt_EquipStats:
+PlaneMap_WinEquipStats:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	"           "
-	dc.b	"AGILITY    "
+	dc.b	"AGILID     "
 	dc.b	"           "
-	dc.b	"ATTACK     "
+	dc.b	"ATAQUE     "
 	dc.b	"           "
-	dc.b	"DEFENSE    "
+	dc.b	"DEFESA     "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15C51
-WinArt_FullTechList:
+PlaneMap_WinFullTechList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33188,22 +35147,22 @@ WinArt_FullTechList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15D17
-WinArt_SaveSlots:
+PlaneMap_WinSaveSlots:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A7, $AC
 	dc.b	$98, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A7, $AC
 	dc.b	$99, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A7, $AC
 	dc.b	$9A, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A7, $AC
 	dc.b	$9B, $B4, $B5, $26, $26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 	even
 
 ; loc_15D72
-WinArt_StoreInventory:
+PlaneMap_WinStoreInventory:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33220,7 +35179,7 @@ WinArt_StoreInventory:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15E6E
-WinArt_ProfileCharList:
+PlaneMap_WinProfileCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26
@@ -33241,7 +35200,7 @@ WinArt_ProfileCharList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15EDA
-WinArt_RegroupCharList:
+PlaneMap_WinRegroupCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26
@@ -33258,7 +35217,7 @@ WinArt_RegroupCharList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15F2E
-WinArt_RegroupSelectedChar:
+PlaneMap_WinRegroupSelectedChar:
     dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26
 	dc.b	$26, $26, $26, $26
@@ -33271,16 +35230,16 @@ WinArt_RegroupSelectedChar:
 	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15F56
-WinArt_BattleCharStats:
+PlaneMap_WinBattleCharStats:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	"HP   0"
-	dc.b	"TP   0"
+	dc.b	"PE   0"
+	dc.b	"PT   0"
 	dc.b	"      "
 	dc.b	"      "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15F7A
-WinArt_BattleCharName:
+PlaneMap_WinBattleCharName:
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26
 	dc.b	$26, $26, $26, $26
@@ -33293,7 +35252,7 @@ loc_15F8A:
 	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15F96
-WinArt_EnemyGroups:
+PlaneMap_WinEnemyGroups:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33302,21 +35261,21 @@ WinArt_EnemyGroups:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_15FDE
-WinArt_BattleItemUsed:
+PlaneMap_WinBattleItemUsed:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_16006
-WinArt_BattleTechUsed:
+PlaneMap_WinBattleTechUsed:
 	dc.b	$B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26
 	dc.b	$26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_1601A
-WinArt_BattleTechList:
+PlaneMap_WinBattleTechList:
 	dc.b	$B4, $B5, $A7, $A3, $AE, $AB, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26, $26
@@ -33329,7 +35288,7 @@ WinArt_BattleTechList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_16060
-WinArt_BattleItemList:
+PlaneMap_WinBattleItemList:
 	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33342,21 +35301,21 @@ WinArt_BattleItemList:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_160E2
-WinArt_EnemyNames:
+PlaneMap_WinEnemyNames:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_1610A
-WinArt_EnemyInfo:
+PlaneMap_WinEnemyInfo:
 	dc.b	$B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26
 	dc.b	$26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_1611A
-WinArt_TeleportPlaceNames:
+PlaneMap_WinTeleportPlaceNames:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26
 	dc.b	$B4, $B5, $26, $26, $26, $26, $26
@@ -33371,7 +35330,7 @@ WinArt_TeleportPlaceNames:
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
 ; -----------------------------------------------------------------------
 ; loc_1616E
-WinArt_UstvestiaSoundtracks:
+PlaneMap_WinUstvestiaSoundtracks:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
 	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
@@ -33385,900 +35344,1339 @@ DynamicWindowsEnd:
 	
 	else
 
-WinArt_PlayerMenu:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B4, $B5, $5F, $60, $71, $7F, $26, $26, $26
-	dc.b	$5B, $26, $26, $26, $26, $B4, $B5, $32, $5A, $29, $36, $28, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $B4, $B5, $71, $66, $74, $92, $66, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $B4, $B5, $38, $4C, $31, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $B4
-	dc.b	$B5, $35, $29, $41, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-	even
-	
-WinArt_ItemAction:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $B9, $B4, $B5, $38, $2C, $29, $26, $26, $26, $26, $26, $B4, $B5, $54
-	dc.b	$36, $33, $26, $26, $26, $26, $26, $B4, $B5, $33, $39, $4F, $BE, $BE, $BE, $BE
-	dc.b	$BE
-	
-	even
+	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
+	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
+	charset '0', "\118\119\120\121\122\123\124\125\126\127"
+	charset ' ', $26
+	charset ',', $5B
+	charset '.', $5C
+	charset ';', $5D
+	charset '"', $5E
+	charset '?', $5F
+	charset '!', $60
+	charset 39, $61  ; apostrophe
+	charset '-', $62
+	charset '/', $64
+	charset ':', $80
 
-WinArt_ScriptMessage:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE
-	
-WinArt_YesNo:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B4, $B5, $AF, $A3, $AA, $26, $26, $26, $26
-	dc.b	$26, $B4, $B5, $A7, $A8, $26, $BE, $BE, $BE, $BE, $BE
 
-	even
 
-WinArt_StateOrder:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B4, $B5, $6B, $71, $96, $6E, $6B, $26, $26, $26, $26, $5B, $26
-	dc.b	$26, $B4, $B5, $3B, $4D, $41, $2C, $36, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-	even
-	
-WinArt_ScriptMessageBig:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_BuySell:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B4, $B5, $2C, $28, $36, $28, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $29, $4E, $36, $28, $BE, $BE, $BE, $BE, $BE, $BE
-	
-
-WinArt_NameInput:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $5F, $60, $61
-	dc.b	$62, $63, $26, $26, $7D, $7E, $7F, $80, $81, $26, $26, $64, $65, $66, $67, $68
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B
-	dc.b	$5B, $5B, $5B, $64, $65, $66, $67, $68, $26, $26, $82, $26, $83, $26, $84, $26
-	dc.b	$26, $69, $6A, $6B, $6C, $6D, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $69, $6A, $6B, $6C, $6D, $26, $26
-	dc.b	$85, $86, $87, $88, $89, $26, $26, $6E, $6F, $70, $71, $72, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $5B, $5B, $5B, $6E
-	dc.b	$6F, $70, $71, $72, $26, $26, $8A, $26, $8B, $26, $8C, $26, $26, $78, $79, $7A
-	dc.b	$43, $7C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$5C, $5C, $5C, $5C, $5C, $73, $74, $75, $76, $77, $26, $26, $93, $94, $95, $92
-	dc.b	$96, $26, $26, $78, $79, $7A, $43, $7C, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $78, $79, $7A, $43, $7C
-	dc.b	$26, $26, $6B, $6B, $7F, $26, $81, $72, $87, $26, $63, $8A, $87, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE
-	
-	even
-	
-WinArt_LibraryOptions:
-	dc.b	$86, $6B, $72, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $81, $6E, $79, $5F
-	dc.b	$3F, $26, $50, $2D, $32, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $78, $60, $63, $6A, $6B, $71, $7F, $3A, $40, $26, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $5F, $80, $6E, $6B
-	dc.b	$3C, $26, $38, $28, $39, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $6E, $7F, $3C, $26, $38, $28, $39, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $B4, $B5, $7D, $69, $96, $7A
-	dc.b	$88, $60, $8C, $3A, $40, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE
-	
-WinArt_HealCure:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $5B, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $2D, $33, $3F, $37, $4E, $5A, $29, $26, $26, $5B
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $3A, $2E, $3F, $37, $4E, $5A, $29, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_RolfHouseOptions:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B4, $B5, $38, $4C, $31, $55, $26, $46, $4F, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $B4
-	dc.b	$B5, $80, $8C, $78, $96, $55, $26, $2E, $46, $3B, $2B, $33, $26, $26, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $B4, $B5, $35, $3A, $3C, $26, $39
-	dc.b	$4F, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE
-	
-	even
-	
-WinArt_RolfProfile:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9A
-	dc.b	$5D, $97, $A0, $5D, $98, $9E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $98, $97
-	dc.b	$31, $28, $3F, $3A, $2D, $26, $32, $30, $39, $26, $4E, $5A, $29, $32, $56, $55
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $29, $32, $3B, $29, $5E, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $96, $96, $2F, $56, $30, $29, $3B, $26, $2C, $4D, $36, $3A
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $40, $40, $41, $51, $28, $26, $37, $32, $2D, $55, $26, $49, $38, $5E
-	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_NeiProfile:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
-	dc.b	$41, $26, $A1, $AD, $98, $99, $9F, $9A, $5D, $97, $9F, $5D, $9A, $97, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $96, $96, $76, $60, $3A, $28, $29, $3B, $45, $2A, $40, $26
-	dc.b	$B0, $3C, $56, $2F, $56, $3C, $26, $32, $39, $26, $26, $26, $26, $26, $5B, $26
-	dc.b	$26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $3C, $56, $2F, $56, $3C, $26, $27, $4D, $33, $B1, $3A, $28, $29, $26
-	dc.b	$28, $46, $55, $49, $38, $5E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26, $26, $96, $96, $2F, $49
-	dc.b	$3F, $3F, $4C, $29, $3C, $26, $32, $3B, $4A, $2C, $39, $26, $33, $40, $4A, $28
-	dc.b	$5E, $26, $26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $5B, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $30, $39, $30, $39, $3A, $32
-	dc.b	$36, $26, $35, $29, $41, $55, $26, $2D, $4D, $29, $5E, $26, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_RudoProfile:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9B, $A0
-	dc.b	$5D, $97, $9E, $5D, $97, $98, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $9A, $3E
-	dc.b	$56, $45, $2A, $26, $38, $45, $3A, $26, $47, $33, $48, $55, $26, $29, $32, $3B
-	dc.b	$28, $5D, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2E, $56, $36, $28, $55, $26
-	dc.b	$4A, $48, $39, $26, $78, $8C, $6E, $96, $3C, $26, $3B, $57, $36, $5E, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $5B, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5B, $26, $96, $96, $36, $2E, $45, $32, $28, $26, $2C, $4D, $36, $39
-	dc.b	$26, $2B, $49, $36, $28, $26, $64, $8C, $39, $49, $26, $26, $26, $26, $5B, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $5B, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $2C, $4F, $2C, $4F, $3A, $26, $27, $38, $2C, $29, $30, $3A, $2C, $26
-	dc.b	$39, $2D, $4F, $5E, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_AmyProfile:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
-	dc.b	$41, $26, $A1, $AD, $98, $99, $9D, $98, $5D, $97, $9B, $5D, $99, $9D, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $96, $96, $81, $6E, $79, $5F, $3F, $26, $43, $28, $2D, $56
-	dc.b	$39, $2D, $3B, $26, $2C, $39, $28, $3C, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $35, $36, $37, $5D, $30, $3A, $32, $26, $28, $32, $58, $3A, $3B, $4F
-	dc.b	$5E, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $2D, $33
-	dc.b	$4A, $26, $3A, $2E, $3F, $26, $37, $4E, $5A, $29, $55, $26, $34, $56, $49, $56
-	dc.b	$3A, $32, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $30, $29, $2F, $2D, $3F, $29
-	dc.b	$4E, $5A, $2E, $40, $26, $31, $44, $3A, $26, $3B, $28, $5E, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_HughProfile:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9B
-	dc.b	$5D, $97, $9D, $5D, $98, $9B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $5B, $26, $26, $26, $26, $26, $26, $5B, $26, $96, $96, $2B, $31
-	dc.b	$3B, $28, $30, $51, $2C, $4D, $26, $3A, $29, $42, $38, $4A, $26, $32, $5A, $2E
-	dc.b	$42, $38, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $3C, $26, $32, $36, $32, $46
-	dc.b	$26, $2C, $2E, $32, $58, $3C, $26, $3B, $57, $36, $5E, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26
-	dc.b	$26, $26, $26, $26, $96, $96, $34, $28, $42, $38, $3C, $26, $2C, $56, $33, $4F
-	dc.b	$26, $37, $32, $2D, $39, $40, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $2C, $50, $3F, $26, $46, $2D, $3C, $26, $39, $4F, $49, $3F, $40, $26
-	dc.b	$28, $3B, $28, $5E, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_AnnaProfile:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5B, $26, $26, $26, $26, $26, $96, $96, $3E, $56, $50, $28, $42, $32
-	dc.b	$5A, $29, $5E, $26, $2C, $3F, $32, $5A, $2C, $26, $2C, $38, $39, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $3B, $3C, $55, $32, $39, $28, $36, $2C, $40, $26
-	dc.b	$36, $50, $49, $26, $32, $4D, $3B, $28, $5E, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $5B, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $6B, $85, $60, $69, $96, $4A, $7F, $6F, $3B, $3A, $3F, $26, $42, $2D
-	dc.b	$55, $38, $2C, $28, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $39, $2D
-	dc.b	$3C, $26, $3A, $41, $2C, $2C, $57, $39, $26, $36, $2B, $33, $3F, $2C, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2C, $3F, $32, $5A, $3F, $26
-	dc.b	$36, $36, $2C, $28, $2C, $36, $39, $27, $4F, $5E, $26, $26, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_KainProfile:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$5B, $26, $5C, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $34, $28, $3E, $56, $2C, $57, $41, $26, $A1, $AD, $98, $99, $9D, $9A
-	dc.b	$5D, $98, $99, $5D, $97, $A0, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $96, $96, $62, $8C
-	dc.b	$6A, $74, $5F, $3C, $26, $3B, $51, $29, $3A, $2B, $49, $57, $39, $28, $36, $2C
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2D, $2C, $28, $55, $26, $2E
-	dc.b	$46, $36, $39, $4C, $29, $3A, $32, $39, $49, $26, $30, $54, $32, $39, $26, $26
-	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $32, $45, $29, $40, $2C, $4E, $3B, $3F, $39, $26
-	dc.b	$27, $2D, $4D, $48, $36, $5E, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
-	dc.b	$96, $96, $89, $7C, $92, $72, $4A, $7D, $6A, $8C, $55, $26, $30, $54, $33, $3F
-	dc.b	$2C, $26, $3A, $2E, $28, $5E, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_ShirProfile:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $5B, $26, $5C, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $34, $28, $3E, $56, $2C, $57
-	dc.b	$41, $26, $A1, $AD, $98, $99, $9D, $9A, $5D, $97, $9B, $5D, $97, $98, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $26, $96, $96, $28, $2A, $2C, $4D, $49, $26, $4C, $2E, $26, $31
-	dc.b	$28, $31, $56, $49, $26, $27, $4F, $2C, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $3D, $33, $46, $3F, $26, $6B, $86, $87, $55, $26, $2B, $28, $49, $3A
-	dc.b	$48, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $5B
-	dc.b	$26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $2D, $45
-	dc.b	$45, $3C, $26, $3A, $51, $44, $29, $55, $26, $32, $38, $38, $2F, $39, $28, $4F
-	dc.b	$5E, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $96, $96, $49, $3F, $55, $26, $3D, $33
-	dc.b	$47, $3F, $2C, $26, $3A, $2E, $28, $5E, $26, $26, $26, $26, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_CentTowerOptions:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $3A, $49, $36, $37, $3F, $26
-	dc.b	$43, $4A, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $85, $60
-	dc.b	$7A, $85, $86, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26
-	dc.b	$B4, $B5, $35, $3A, $43, $39, $4F, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_CentTowerOptions2:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $3A, $49, $36, $37, $3F, $26
-	dc.b	$43, $4A, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $B4, $B5, $85, $60
-	dc.b	$7A, $85, $86, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $2B, $2E, $32, $5A, $29, $26, $26, $26, $26, $26, $26, $26, $26, $5B
-	dc.b	$26, $26, $26, $26, $B4, $B5, $35, $3A, $43, $39, $4F, $26, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_GameSelect:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $5B, $26, $26, $26, $26, $26, $5B, $26, $26, $B4, $B5, $27, $36, $4D, $32
-	dc.b	$2E, $26, $67, $96, $7F, $55, $26, $40, $32, $48, $4F, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $67, $96
-	dc.b	$7F, $3F, $26, $38, $38, $2D, $55, $26, $33, $4F, $26, $26, $26, $26, $26, $5B
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$71, $96, $6E, $55, $26, $2F, $33, $26, $26, $26, $26, $26, $26, $26, $26, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_RoomOptions:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $3C, $49, $38, $55, $26, $27, $33, $2C, $57, $39, $44, $32, $28, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $3C, $49, $38, $55, $26, $41, $2D, $3A, $4E, $36, $28, $26, $26, $26
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_RightLeft:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $5B, $26, $26, $B4, $B5, $46, $2D
-	dc.b	$39, $26, $26, $26, $26, $5B, $26, $26, $B4, $B5, $41, $36, $4E, $39, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_LibrarianPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$01, $02, $03, $04, $05, $06, $07, $01, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
-	dc.b	$10, $01, $11, $11, $12, $13, $14, $15, $16, $17, $18, $11, $19, $1A, $1B, $1C
-	dc.b	$1D, $1E, $1F, $20, $21, $1A, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $23
-	dc.b	$2B, $1A, $2C, $2D, $2E, $2F, $30, $31, $32, $1A, $2B, $23, $24, $33, $34, $35
-	dc.b	$36, $37, $38, $23, $39, $1A, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43
-	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53
-	dc.b	$54, $55, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_MotaSaveEmplPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $00
-	dc.b	$09, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09, $09, $11, $12, $13, $14, $15
-	dc.b	$16, $17, $18, $09, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $19, $22, $23
-	dc.b	$24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33
-	dc.b	$34, $2B, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $2B, $3E, $3F, $40, $41
-	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
-	dc.b	$48, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_MotaDoctorPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
-	dc.b	$00, $00, $00, $00, $00, $00, $00, $00, $01, $02, $03, $04, $05, $06, $07, $07
-	dc.b	$08, $09, $01, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $16
-	dc.b	$17, $18, $19, $1A, $1B, $12, $1C, $1C, $1D, $1E, $1F, $20, $21, $22, $1C, $1C
-	dc.b	$23, $24, $25, $26, $27, $28, $29, $2A, $23, $23, $2B, $2C, $2D, $2E, $2F, $30
-	dc.b	$31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40
-	dc.b	$41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
-	dc.b	$51, $52, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_GrandmaPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09
-	dc.b	$0A, $01, $02, $0B, $0C, $0D, $0E, $0F, $10, $11, $00, $12, $13, $14, $15, $16
-	dc.b	$17, $18, $19, $1A, $00, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $00, $24
-	dc.b	$25, $26, $27, $28, $29, $2A, $2B, $2C, $00, $2D, $2E, $2F, $30, $31, $32, $33
-	dc.b	$34, $35, $00, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $00, $3F, $40, $41
-	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
-	dc.b	$52, $49, $53, $54, $55, $56, $57, $58, $59, $5A, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_MotaItemSellerPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$00, $00, $02, $03, $04, $05, $06, $07, $08, $01, $00, $09, $0A, $0B, $0C, $0D
-	dc.b	$0E, $0F, $00, $01, $00, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A
-	dc.b	$1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $22, $23, $24, $25, $26, $27, $28
-	dc.b	$29, $2A, $2B, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $32, $33, $34
-	dc.b	$35, $36, $37, $38, $31, $39, $39, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
-	dc.b	$42, $43, $44, $45, $46, $47, $3F, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
-	dc.b	$51, $52, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_MotaWpnSellerPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $04, $05, $05, $05, $05
-	dc.b	$06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15
-	dc.b	$16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25
-	dc.b	$26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35
-	dc.b	$36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45
-	dc.b	$46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
-	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E, $5F, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_MotaArmorSellerPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11
-	dc.b	$12, $13, $14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1C, $1C, $1D
-	dc.b	$1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D
-	dc.b	$2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $26, $3C
-	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
-	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C
-	dc.b	$5D, $5E, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_UstvestiaPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $01, $01, $00, $02, $03, $04, $01, $01
-	dc.b	$00, $01, $05, $01, $06, $07, $08, $09, $0A, $0B, $00, $01, $0C, $01, $0D, $0E
-	dc.b	$0F, $10, $11, $12, $13, $14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C
-	dc.b	$01, $01, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A
-	dc.b	$2B, $01, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $01, $36, $01, $37
-	dc.b	$38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
-	dc.b	$48, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_DezolianPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $02, $03, $0C, $0D, $0E, $0F
-	dc.b	$08, $10, $11, $12, $02, $03, $13, $14, $15, $16, $08, $17, $18, $19, $02, $03
-	dc.b	$1A, $1B, $1C, $1D, $08, $17, $18, $1E, $02, $03, $1F, $20, $21, $22, $08, $17
-	dc.b	$18, $23, $02, $03, $24, $25, $26, $27, $08, $28, $18, $23, $29, $2A, $2B, $2C
-	dc.b	$2D, $2E, $2F, $30, $18, $23, $31, $32, $33, $34, $35, $36, $37, $38, $18, $39
-	dc.b	$3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49
-	dc.b	$4A, $4B, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_CentTowerOutsidePortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $04, $05, $06, $07, $08
-	dc.b	$09, $0A, $0B, $0C, $0D, $0C, $0E, $0F, $10, $11, $12, $13, $14, $14, $15, $14
-	dc.b	$0E, $0F, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $0E, $0F, $1E, $1F, $20, $21
-	dc.b	$22, $23, $24, $25, $26, $27, $27, $27, $28, $29, $2A, $2B, $2C, $2C, $2C, $2C
-	dc.b	$2C, $2C, $2D, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2C, $2C, $2C, $2C
-	dc.b	$2C, $2C, $2C, $2C, $2C, $2C, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
-	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_CentTowerOutsidePortraitCopy:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
-	dc.b	$01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $2F, $30, $31
-	dc.b	$32, $11, $12, $13, $14, $14, $15, $33, $34, $35, $36, $17, $18, $19, $1A, $1B
-	dc.b	$37, $38, $39, $3A, $3B, $1F, $20, $21, $22, $23, $24, $3C, $3D, $3E, $3F, $40
-	dc.b	$28, $29, $2A, $2B, $41, $42, $43, $44, $45, $46, $2D, $2E, $2E, $47, $48, $49
-	dc.b	$4A, $4B, $4C, $4D, $2C, $2C, $4E, $4F, $50, $51, $52, $53, $54, $55, $2E, $2E
-	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $2E, $2E, $5E, $5F, $60, $61, $62, $63
-	dc.b	$64, $65, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_GovernorPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $01, $02, $03, $03, $04, $05, $00, $00
-	dc.b	$00, $06, $01, $07, $08, $09, $0A, $05, $0B, $00, $00, $00, $0C, $0D, $0E, $0F
-	dc.b	$10, $05, $00, $00, $00, $11, $12, $13, $14, $15, $16, $05, $11, $00, $17, $18
-	dc.b	$19, $1A, $1B, $1C, $1D, $1E, $1F, $17, $20, $21, $22, $23, $24, $25, $26, $27
-	dc.b	$28, $20, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $36
-	dc.b	$37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
-	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_ItemKeeperPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$00, $02, $03, $04, $05, $06, $00, $00, $07, $08, $07, $09, $0A, $0B, $0C, $0D
-	dc.b	$07, $07, $0E, $0F, $0E, $10, $11, $12, $13, $11, $14, $15, $16, $16, $16, $17
-	dc.b	$18, $19, $1A, $1B, $1C, $1D, $11, $1E, $11, $17, $1F, $20, $21, $22, $1C, $23
-	dc.b	$11, $24, $25, $17, $26, $27, $28, $29, $1C, $23, $11, $2A, $2B, $2C, $2D, $2E
-	dc.b	$2F, $30, $31, $32, $33, $34, $35, $23, $36, $37, $38, $39, $23, $3A, $3B, $3C
-	dc.b	$3D, $23, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
-	dc.b	$4C, $4D, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_SpaceshipPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $00, $00, $00, $01, $02, $03, $00, $00, $00
-	dc.b	$04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0A, $0D, $0E, $0D, $0F, $10, $11
-	dc.b	$0D, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
-	dc.b	$21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30
-	dc.b	$31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40
-	dc.b	$41, $41, $42, $43, $44, $45, $46, $47, $48, $49, $49, $49, $49, $4A, $4B, $4C
-	dc.b	$46, $46, $4D, $4E, $41, $41, $41, $41, $41, $41, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_MotaTeleportEmplPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11
-	dc.b	$12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $14, $15, $1E, $1F
-	dc.b	$20, $21, $22, $23, $24, $25, $14, $15, $26, $27, $28, $29, $2A, $2B, $2C, $2D
-	dc.b	$14, $15, $2E, $2F, $30, $31, $32, $33, $34, $35, $14, $15, $2E, $36, $37, $38
-	dc.b	$39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48
-	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
-	dc.b	$59, $5A, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_RolfPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A0, $A0, $A1, $A2, $A3, $A4, $A5, $A6, $A7, $A0
-	dc.b	$A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $B0, $B1, $B2, $B3, $B4, $B5, $B6, $B7
-	dc.b	$B8, $B9, $BA, $BB, $BC, $BD, $BE, $BF, $C0, $C1, $C2, $C3, $C4, $C5, $C6, $C7
-	dc.b	$C8, $C9, $CA, $CB, $CC, $CD, $CE, $C5, $CF, $D0, $D1, $D2, $D3, $D4, $D5, $D6
-	dc.b	$D7, $C5, $D8, $D9, $DA, $DB, $DC, $DD, $DE, $DF, $E0, $E1, $E2, $E3, $E4, $E5
-	dc.b	$E6, $E7, $E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, $F5
-	dc.b	$F6, $F7, $F8, $F9, $FA, $FB, $FC, $FD, $FE, $FF, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_NeiPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$01, $02, $03, $04, $04, $04, $05, $06, $00, $07, $08, $09, $0A, $0B, $0C, $0D
-	dc.b	$0E, $0F, $00, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C
-	dc.b	$1D, $1E, $1F, $20, $21, $06, $00, $22, $23, $24, $25, $26, $27, $28, $29, $06
-	dc.b	$00, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $06, $32, $33, $34, $35, $36, $37
-	dc.b	$38, $39, $3A, $3B, $00, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
-	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $00, $4F, $50, $51, $52, $53, $54, $55
-	dc.b	$56, $57, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_RudoPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $03, $03, $03, $04, $03, $03
-	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0D, $0D, $0E, $0F, $10, $11, $12
-	dc.b	$13, $14, $15, $15, $0D, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1D, $1E, $1F
-	dc.b	$20, $21, $22, $23, $24, $25, $26, $0D, $27, $28, $29, $2A, $2B, $2C, $2D, $2E
-	dc.b	$2F, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E
-	dc.b	$3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
-	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-
-WinArt_AmyPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $00
-	dc.b	$01, $00, $00, $02, $03, $01, $00, $00, $04, $04, $05, $06, $07, $08, $09, $0A
-	dc.b	$04, $04, $0B, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $0B, $13, $14, $15, $16
-	dc.b	$17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $04
-	dc.b	$1D, $1E, $26, $27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33
-	dc.b	$34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43
-	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $1D, $4C, $4D, $4E, $4F, $50, $51, $52
-	dc.b	$53, $54, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_HughPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09
-	dc.b	$03, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $09, $12, $13, $14, $15, $16, $17
-	dc.b	$18, $10, $19, $09, $1A, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $09, $22, $23
-	dc.b	$24, $25, $26, $27, $28, $29, $2A, $09, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
-	dc.b	$33, $09, $34, $34, $34, $35, $36, $37, $38, $39, $3A, $09, $3B, $3B, $3C, $3D
-	dc.b	$3E, $3F, $40, $41, $42, $09, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
-	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-
-WinArt_AnnaPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $03, $04, $05, $06, $07, $00, $01, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
-	dc.b	$10, $09, $11, $12, $13, $14, $15, $16, $17, $18, $19, $12, $11, $1A, $1B, $1C
-	dc.b	$1D, $1E, $1F, $20, $21, $1A, $11, $22, $23, $24, $25, $26, $27, $28, $29, $2A
-	dc.b	$11, $22, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $11, $33, $34, $35, $36, $37
-	dc.b	$38, $39, $3A, $3B, $11, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
-	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $4F, $4F, $50, $51, $52, $53, $54
-	dc.b	$55, $56, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_KainPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $00, $01, $02, $03, $04, $05, $06, $07, $00, $01
-	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $08, $09, $10, $11, $12, $13, $14, $15
-	dc.b	$16, $17, $10, $11, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $18, $19, $20, $21
-	dc.b	$22, $23, $24, $25, $26, $27, $20, $21, $20, $21, $28, $29, $2A, $2B, $2C, $27
-	dc.b	$20, $21, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $2E, $36, $37, $38, $39
-	dc.b	$3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47, $48, $49
-	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_ShirPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $03, $03, $03, $03, $03, $04, $03, $05, $06, $07, $08, $09, $0A, $0B, $03
-	dc.b	$0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B
-	dc.b	$1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B
-	dc.b	$22, $2C, $2D, $2E, $2F, $30, $31, $03, $04, $32, $33, $34, $35, $36, $37, $38
-	dc.b	$39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $03, $03, $44, $45, $46
-	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56
-	dc.b	$57, $58, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_LibraryGraphPortrait:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A0, $A1, $A2, $A3, $A1, $A4, $A5, $A6, $A7, $A3
-	dc.b	$A8, $A9, $AA, $AB, $A9, $AC, $AD, $AE, $AF, $B0, $B1, $B2, $B3, $B4, $B5, $B6
-	dc.b	$B7, $B8, $B9, $BA, $A0, $A1, $A2, $BB, $BC, $BD, $BE, $BF, $C0, $A3, $A8, $C1
-	dc.b	$C2, $C3, $C4, $C5, $C6, $C7, $C8, $C9, $B1, $CA, $CB, $CC, $CD, $CE, $CF, $B5
-	dc.b	$D0, $CF, $A0, $D1, $D2, $D3, $D4, $D5, $A3, $D6, $D7, $A3, $A8, $D8, $D9, $DA
-	dc.b	$DB, $DC, $DD, $DE, $DF, $E0, $B1, $E1, $E2, $CF, $E3, $D0, $CF, $E4, $E5, $E6
-	dc.b	$E7, $E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE
-	
-WinArt_RadarPortrait:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $00, $01
-	dc.b	$02, $01, $02, $01, $02, $01, $02, $01, $03, $04, $05, $06, $07, $08, $09, $0A
-	dc.b	$0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $14, $16, $17, $18, $08
-	dc.b	$19, $1A, $1B, $1C, $18, $08, $1D, $1E, $1F, $20, $21, $22, $15, $23, $15, $14
-	dc.b	$24, $25, $26, $27, $28, $08, $18, $29, $2A, $08, $2B, $2C, $15, $2D, $2E, $2F
-	dc.b	$30, $14, $31, $32, $33, $29, $34, $35, $36, $37, $38, $08, $18, $39, $0D, $14
-	dc.b	$3A, $3B, $15, $3C, $15, $14, $15, $3D, $33, $08, $3E, $3F, $18, $40, $18, $08
-	dc.b	$18, $41, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_BattleEmptySpots:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $00, $01, $02, $03, $26, $26, $04, $05, $06, $07, $26, $26, $08
-	dc.b	$09, $0A, $0B, $26, $26, $0C, $0D, $0E, $0F, $26, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_BattleOptions:
-	dc.b	$B9, $B9, $B9, $B9, $26, $B4, $B5, $26, $36, $36, $2C, $29, $26, $B4, $B5, $26
-	dc.b	$31, $2E, $34, $56, $BE, $BE, $BE, $BE
-	
-WinArt_BattleOptions2:
-	dc.b	$B9, $B9, $B9, $B9, $26, $B4, $B5, $26
-	dc.b	$48, $28, $50, $28, $26, $B4, $B5, $26, $39, $57, $36, $28, $BE, $BE, $BE, $BE
-
-WinArt_BattleCommands:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $12, $13, $26, $16, $17
-	dc.b	$26, $1A, $1B, $26, $1E, $1F, $14, $15, $26, $18, $19, $26, $1C, $1D, $26, $20
-	dc.b	$21, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+PlaneMap_WinPlayerMenu:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "ITEM "
+	dc.b	"       "
+	dc.b	$B4, $B5, "STATE"
+	dc.b	"       "
+	dc.b	$B4, $B5, "TECH "
+	dc.b	"       "
+	dc.b	$B4, $B5, "STRNG"
+	dc.b	"       "
+	dc.b	$B4, $B5, "EQP  "
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
+; -----------------------------------------------------------------------
+
 	even
 
-WinArt_BattleMessage:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
+PlaneMap_WinItemAction:
+	dc.b	$B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "USE"
+	dc.b	"     "
+	dc.b	$B4, $B5, "GIV"
+	dc.b	"     "
+	dc.b	$B4, $B5, "TOS"
+	dc.b	$BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
 	even
-	
+
+; loc_13B7A:
+PlaneMap_WinScriptMessage:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinYesNo:
+	dc.b	$B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "YES"
+	dc.b	"     "
+	dc.b	$B4, $B5, "NO "
+	dc.b	$BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinStateOrder:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "STATE"
+	dc.b	"       "
+	dc.b	$B4, $B5, "ORDER"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_13C48
+PlaneMap_WinScriptMessageBig:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	"                        "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinBuySell:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "BUY "
+	dc.b	"      "
+	dc.b	$B4, $B5, "SELL"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinNameInput:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	" A B C D E F G H I "
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	" J K L M N O P Q R "
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	" S T U V W X Y Z   "
+	dc.b	"                   "
+	dc.b	"                   "
+	dc.b	"   ADV  RUB  END   "
+	dc.b	"                   "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinLibraryOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"            "
+	dc.b	$B4, $B5, "HISTORY   "
+	dc.b	"            "
+	dc.b	$B4, $B5, "BIOSYSTEMS"
+	dc.b	"            "
+	dc.b	$B4, $B5, "CLIMATROL "
+	dc.b	"            "
+	dc.b	$B4, $B5, "DAM       "
+	dc.b	"            "
+	dc.b	$B4, $B5, "MOTHRBRAIN"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+PlaneMap_WinHealCure:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"         "
+	dc.b	$B4, $B5, "HEAL   "
+	dc.b	"         "
+	dc.b	$B4, $B5, "CURE   "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_13F60
+PlaneMap_WinRolfHouseOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B4, $B5, "SEE STRNGTH"
+	dc.b	"             "
+	dc.b	$B4, $B5, "REORGANIZE "
+	dc.b	"             "
+	dc.b	$B4, $B5, "OUTSIDE    "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_13FBC
+PlaneMap_WinRolfProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"LOST PARENTS AT AGE   "
+	dc.b	"                      "
+	dc.b	"10. HEALTHY AND HAS   "
+	dc.b	"                      "
+	dc.b	"BROAD RANGE OF        "
+	dc.b	"                      "
+	dc.b	"KNOWLEDGE.            "
+	dc.b	"                      "
+	dc.b	"                      "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_140C4
+PlaneMap_WinNeiProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"\INEI\I MEANS \ITHE HUMAN"			; \I is the " character
+	dc.b	"                      "
+	dc.b	"WHO WAS NOT A HUMAN.\I "
+	dc.b	"                      "
+	dc.b	"LITHE AND AGILE LIKE  "
+	dc.b	"                      "
+	dc.b	"AN ANIMAL, SHE HATES  "
+	dc.b	"                      "
+	dc.b	"CARRYING A HEAVY LOAD."
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_141CC
+PlaneMap_WinRudoProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"LEFT THE ARMY AND     "
+	dc.b	"                      "
+	dc.b	"BECAME A HUNTER AFTER "
+	dc.b	"                      "
+	dc.b	"WIFE AND CHILD DIED.  "
+	dc.b	"                      "
+	dc.b	"VERY STRONG, CAN USE  "
+	dc.b	"                      "
+	dc.b	"HEAVY GUNS WITH EASE. "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_142D4
+PlaneMap_WinAmyProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"A DOCTOR FROM A NORMAL"
+	dc.b	"                      "
+	dc.b	"HOME. SPECIALIZES IN  "
+	dc.b	"                      "
+	dc.b	"BOTH HEALING WOUNDS   "
+	dc.b	"                      "
+	dc.b	"AND CURING POISON;    "
+	dc.b	"                      "
+	dc.b	"NOT STRONG IN BATTLE. "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_143DC
+PlaneMap_WinHughProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"HAS BEEN INTRIGUED BY "
+	dc.b	"                      "
+	dc.b	"NATURE SINCE HIS      "
+	dc.b	"                      "
+	dc.b	"CHILDHOOD; NOW THE    "
+	dc.b	"                      "
+	dc.b	"LEADING EXPERT ON     "
+	dc.b	"                      "
+	dc.b	"PLANTS AND ANIMALS.   "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_144E4
+PlaneMap_WinAnnaProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"OF UNCERTAIN AGE AND  "
+	dc.b	"                      "
+	dc.b	"BACKGROUND, SHE IS A  "
+	dc.b	"                      "
+	dc.b	"VICIOUS FIGHTER WITH  "
+	dc.b	"                      "
+	dc.b	"A SLICER OR WHIP.     "
+	dc.b	"                      "
+	dc.b	"TAKES NO PRISONERS.   "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_145EC
+PlaneMap_WinKainProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"WANTED TO BE A        "
+	dc.b	"                      "
+	dc.b	"MECHANIC, BUT ALWAYS  "
+	dc.b	"                      "
+	dc.b	"BROKE WHATEVER HE     "
+	dc.b	"                      "
+	dc.b	"TRIED TO FIX; DECIDED "
+	dc.b	"                      "
+	dc.b	"TO MAKE THAT HIS JOB. "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_146F4
+PlaneMap_WinShirProfile:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9
+	dc.b	"                      "
+	dc.b	"ALTHOUGH WELL-TO-DO,  "
+	dc.b	"                      "
+	dc.b	"SHE ENJOYS THE THRILL "
+	dc.b	"                      "
+	dc.b	"OF STEALING.          "
+	dc.b	"                      "
+	dc.b	"                      "
+	dc.b	"                      "
+	dc.b	"                      "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_147FC
+PlaneMap_WinCentTowerOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"          "
+	dc.b	$B4, $B5, "ROOM    "
+	dc.b	"          "
+	dc.b	$B4, $B5, "LIBRARY "
+	dc.b	"          "
+	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1484C
+PlaneMap_WinCentTowerOptions2:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"          "
+	dc.b	$B4, $B5, "ROOM    "
+	dc.b	"          "
+	dc.b	$B4, $B5, "LIBRARY "
+	dc.b	"          "
+	dc.b	$B4, $B5, "ROOF    "
+	dc.b	"          "
+	dc.b	$B4, $B5, "OUTSIDE "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_148B0
+PlaneMap_WinGameSelect:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"                 "
+	dc.b	$B4, $B5, "NEW GAME       "
+	dc.b	"                 "
+	dc.b	$B4, $B5, "CONTINUE       "
+	dc.b	"                 "
+	dc.b	$B4, $B5, "ERASE GAME     "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14938
+PlaneMap_WinRoomOptions:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"                "
+	dc.b	$B4, $B5, "KEEP BAGGAGE  "
+	dc.b	"                "
+	dc.b	$B4, $B5, "BAGGAGE PLEASE"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14998
+PlaneMap_WinRightLeft:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"      "
+	dc.b	$B4, $B5, "RGHT"
+	dc.b	"      "
+	dc.b	$B4, $B5, "LEFT"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_149BC
+PlaneMap_WinLibrarianPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $01, $02, $03, $04, $05, $06, $07, $01
+	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $01
+	dc.b	$11, $11, $12, $13, $14, $15, $16, $17, $18, $11
+	dc.b	$19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $1A
+	dc.b	$22, $23, $24, $25, $26, $27, $28, $29, $2A, $23
+	dc.b	$2B, $1A, $2C, $2D, $2E, $2F, $30, $31, $32, $1A
+	dc.b	$2B, $23, $24, $33, $34, $35, $36, $37, $38, $23
+	dc.b	$39, $1A, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
+	dc.b	$4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14A34
+PlaneMap_WinMotaSaveEmplPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $00
+	dc.b	$09, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
+	dc.b	$09, $11, $12, $13, $14, $15, $16, $17, $18, $09
+	dc.b	$19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $19
+	dc.b	$22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B
+	dc.b	$2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $2B
+	dc.b	$35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $2B
+	dc.b	$3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
+	dc.b	$48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
+	dc.b	$48, $52, $53, $54, $55, $56, $57, $58, $59, $5A
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14AAC
+PlaneMap_WinMotaDoctorPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$01, $02, $03, $04, $05, $06, $07, $07, $08, $09
+	dc.b	$01, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12
+	dc.b	$13, $14, $15, $16, $17, $18, $19, $1A, $1B, $12
+	dc.b	$1C, $1C, $1D, $1E, $1F, $20, $21, $22, $1C, $1C
+	dc.b	$23, $24, $25, $26, $27, $28, $29, $2A, $23, $23
+	dc.b	$2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $34
+	dc.b	$35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E
+	dc.b	$3F, $40, $41, $42, $43, $44, $45, $46, $47, $48
+	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14B24
+PlaneMap_WinGrandmaPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$0A, $01, $02, $0B, $0C, $0D, $0E, $0F, $10, $11
+	dc.b	$00, $12, $13, $14, $15, $16, $17, $18, $19, $1A
+	dc.b	$00, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23
+	dc.b	$00, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C
+	dc.b	$00, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35
+	dc.b	$00, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E
+	dc.b	$00, $3F, $40, $41, $42, $43, $44, $45, $46, $47
+	dc.b	$48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51
+	dc.b	$52, $49, $53, $54, $55, $56, $57, $58, $59, $5A
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14B9C
+PlaneMap_WinMotaItemSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $00, $00, $02, $03, $04, $05, $06, $07
+	dc.b	$08, $01, $00, $09, $0A, $0B, $0C, $0D, $0E, $0F
+	dc.b	$00, $01, $00, $10, $11, $12, $13, $14, $15, $16
+	dc.b	$17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20
+	dc.b	$21, $22, $23, $22, $23, $24, $25, $26, $27, $28
+	dc.b	$29, $2A, $2B, $2A, $2B, $2C, $2D, $2E, $2F, $30
+	dc.b	$31, $32, $33, $32, $33, $34, $35, $36, $37, $38
+	dc.b	$31, $39, $39, $39, $3A, $3B, $3C, $3D, $3E, $3F
+	dc.b	$40, $41, $42, $43, $44, $45, $46, $47, $3F, $48
+	dc.b	$49, $4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14C14
+PlaneMap_WinMotaWpnSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $01, $02, $03, $04, $05, $05, $05, $05
+	dc.b	$06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+	dc.b	$10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+	dc.b	$1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23
+	dc.b	$24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37
+	dc.b	$38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
+	dc.b	$4C, $4D, $4E, $4F, $50, $51, $52, $53, $54, $55
+	dc.b	$56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E, $5F
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14C8C
+PlaneMap_WinMotaArmorSellerPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
+	dc.b	$14, $14, $14, $15, $16, $17, $18, $19, $1A, $1B
+	dc.b	$1C, $1C, $1C, $1D, $1E, $1F, $20, $21, $22, $23
+	dc.b	$24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37
+	dc.b	$38, $39, $3A, $3B, $26, $3C, $3D, $3E, $3F, $40
+	dc.b	$41, $42, $43, $44, $45, $46, $47, $48, $49, $4A
+	dc.b	$4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54
+	dc.b	$55, $56, $57, $58, $59, $5A, $5B, $5C, $5D, $5E
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14D04
+PlaneMap_WinUstvestiaPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $01, $01, $00, $02, $03, $04, $01, $01
+	dc.b	$00, $01, $05, $01, $06, $07, $08, $09, $0A, $0B
+	dc.b	$00, $01, $0C, $01, $0D, $0E, $0F, $10, $11, $12
+	dc.b	$13, $14, $14, $14, $15, $16, $17, $18, $19, $1A
+	dc.b	$1B, $1C, $01, $01, $1D, $1E, $1F, $20, $21, $22
+	dc.b	$23, $24, $25, $26, $27, $28, $29, $2A, $2B, $01
+	dc.b	$2C, $2D, $2E, $2F, $30, $31, $32, $33, $34, $35
+	dc.b	$01, $36, $01, $37, $38, $39, $3A, $3B, $3C, $3D
+	dc.b	$3E, $3F, $40, $41, $42, $43, $44, $45, $46, $47
+	dc.b	$48, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14D7C
+PlaneMap_WinDezolianPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$0A, $0B, $02, $03, $0C, $0D, $0E, $0F, $08, $10
+	dc.b	$11, $12, $02, $03, $13, $14, $15, $16, $08, $17
+	dc.b	$18, $19, $02, $03, $1A, $1B, $1C, $1D, $08, $17
+	dc.b	$18, $1E, $02, $03, $1F, $20, $21, $22, $08, $17
+	dc.b	$18, $23, $02, $03, $24, $25, $26, $27, $08, $28
+	dc.b	$18, $23, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30
+	dc.b	$18, $23, $31, $32, $33, $34, $35, $36, $37, $38
+	dc.b	$18, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14DF4
+PlaneMap_WinCentTowerOutsidePortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
+	dc.b	$09, $0A, $0B, $0C, $0D, $0C, $0E, $0F, $10, $11
+	dc.b	$12, $13, $14, $14, $15, $14, $0E, $0F, $16, $17
+	dc.b	$18, $19, $1A, $1B, $1C, $1D, $0E, $0F, $1E, $1F
+	dc.b	$20, $21, $22, $23, $24, $25, $26, $27, $27, $27
+	dc.b	$28, $29, $2A, $2B, $2C, $2C, $2C, $2C, $2C, $2C
+	dc.b	$2D, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
+	dc.b	$2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C, $2C
+	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
+	dc.b	$2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E, $2E
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14E6C
+PlaneMap_WinCentTowerOutsidePortraitCopy:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $01, $02, $03, $04, $05, $06, $07, $08
+	dc.b	$09, $0A, $0B, $0C, $0D, $2F, $30, $31, $32, $11
+	dc.b	$12, $13, $14, $14, $15, $33, $34, $35, $36, $17
+	dc.b	$18, $19, $1A, $1B, $37, $38, $39, $3A, $3B, $1F
+	dc.b	$20, $21, $22, $23, $24, $3C, $3D, $3E, $3F, $40
+	dc.b	$28, $29, $2A, $2B, $41, $42, $43, $44, $45, $46
+	dc.b	$2D, $2E, $2E, $47, $48, $49, $4A, $4B, $4C, $4D
+	dc.b	$2C, $2C, $4E, $4F, $50, $51, $52, $53, $54, $55
+	dc.b	$2E, $2E, $56, $57, $58, $59, $5A, $5B, $5C, $5D
+	dc.b	$2E, $2E, $5E, $5F, $60, $61, $62, $63, $64, $65
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14EE4
+PlaneMap_WinGovernorPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $01, $02, $03, $03, $04, $05, $00, $00
+	dc.b	$00, $06, $01, $07, $08, $09, $0A, $05, $0B, $00
+	dc.b	$00, $00, $0C, $0D, $0E, $0F, $10, $05, $00, $00
+	dc.b	$00, $11, $12, $13, $14, $15, $16, $05, $11, $00
+	dc.b	$17, $18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $17
+	dc.b	$20, $21, $22, $23, $24, $25, $26, $27, $28, $20
+	dc.b	$29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
+	dc.b	$33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C
+	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14F5C
+PlaneMap_WinItemKeeperPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $00, $02, $03, $04, $05, $06, $00, $00
+	dc.b	$07, $08, $07, $09, $0A, $0B, $0C, $0D, $07, $07
+	dc.b	$0E, $0F, $0E, $10, $11, $12, $13, $11, $14, $15
+	dc.b	$16, $16, $16, $17, $18, $19, $1A, $1B, $1C, $1D
+	dc.b	$11, $1E, $11, $17, $1F, $20, $21, $22, $1C, $23
+	dc.b	$11, $24, $25, $17, $26, $27, $28, $29, $1C, $23
+	dc.b	$11, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
+	dc.b	$33, $34, $35, $23, $36, $37, $38, $39, $23, $3A
+	dc.b	$3B, $3C, $3D, $23, $3E, $3F, $40, $41, $42, $43
+	dc.b	$44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_14FD4
+PlaneMap_WinSpaceshipPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $00, $00, $01, $02, $03, $00, $00, $00
+	dc.b	$04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0A
+	dc.b	$0D, $0E, $0D, $0F, $10, $11, $0D, $12, $13, $14
+	dc.b	$15, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1E
+	dc.b	$1F, $20, $21, $22, $23, $24, $25, $26, $27, $28
+	dc.b	$29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
+	dc.b	$33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C
+	dc.b	$3D, $3E, $3F, $40, $41, $41, $42, $43, $44, $45
+	dc.b	$46, $47, $48, $49, $49, $49, $49, $4A, $4B, $4C
+	dc.b	$46, $46, $4D, $4E, $41, $41, $41, $41, $41, $41
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1504C
+PlaneMap_WinMotaTeleportEmplPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $13
+	dc.b	$14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $1D
+	dc.b	$14, $15, $1E, $1F, $20, $21, $22, $23, $24, $25
+	dc.b	$14, $15, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$14, $15, $2E, $2F, $30, $31, $32, $33, $34, $35
+	dc.b	$14, $15, $2E, $36, $37, $38, $39, $3A, $3B, $3C
+	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $44, $45, $46
+	dc.b	$47, $48, $49, $4A, $4B, $4C, $4D, $4E, $4F, $50
+	dc.b	$51, $52, $53, $54, $55, $56, $57, $58, $59, $5A
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_150C4
+PlaneMap_WinRolfPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$A0, $A0, $A1, $A2, $A3, $A4, $A5, $A6, $A7, $A0
+	dc.b	$A8, $A9, $AA, $AB, $AC, $AD, $AE, $AF, $B0, $B1
+	dc.b	$B2, $B3, $B4, $B5, $B6, $B7, $B8, $B9, $BA, $BB
+	dc.b	$BC, $BD, $BE, $BF, $C0, $C1, $C2, $C3, $C4, $C5
+	dc.b	$C6, $C7, $C8, $C9, $CA, $CB, $CC, $CD, $CE, $C5
+	dc.b	$CF, $D0, $D1, $D2, $D3, $D4, $D5, $D6, $D7, $C5
+	dc.b	$D8, $D9, $DA, $DB, $DC, $DD, $DE, $DF, $E0, $E1
+	dc.b	$E2, $E3, $E4, $E5, $E6, $E7, $E8, $E9, $EA, $EB
+	dc.b	$EC, $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, $F5
+	dc.b	$F6, $F7, $F8, $F9, $FA, $FB, $FC, $FD, $FE, $FF
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1513C
+PlaneMap_WinNeiPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $01, $02, $03, $04, $04, $04, $05, $06
+	dc.b	$00, $07, $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+	dc.b	$00, $10, $11, $12, $13, $14, $15, $16, $17, $18
+	dc.b	$19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $06
+	dc.b	$00, $22, $23, $24, $25, $26, $27, $28, $29, $06
+	dc.b	$00, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $06
+	dc.b	$32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B
+	dc.b	$00, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
+	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
+	dc.b	$00, $4F, $50, $51, $52, $53, $54, $55, $56, $57
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_151B4
+PlaneMap_WinRudoPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $03, $03, $03, $04, $03, $03
+	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0D
+	dc.b	$0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $15
+	dc.b	$0D, $16, $17, $18, $19, $1A, $1B, $1C, $1D, $1D
+	dc.b	$1E, $1F, $20, $21, $22, $23, $24, $25, $26, $0D
+	dc.b	$27, $28, $29, $2A, $2B, $2C, $2D, $2E, $2F, $30
+	dc.b	$31, $32, $33, $34, $35, $36, $37, $38, $39, $3A
+	dc.b	$3B, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
+	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
+	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1522C
+PlaneMap_WinAmyPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $00, $01, $00, $00, $02, $03, $01, $00, $00
+	dc.b	$04, $04, $05, $06, $07, $08, $09, $0A, $04, $04
+	dc.b	$0B, $0B, $0C, $0D, $0E, $0F, $10, $11, $12, $0B
+	dc.b	$13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C
+	dc.b	$1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $04
+	dc.b	$1D, $1E, $26, $27, $28, $29, $2A, $2B, $2C, $2D
+	dc.b	$2E, $2F, $30, $31, $32, $33, $34, $35, $36, $37
+	dc.b	$38, $39, $3A, $3B, $3C, $3D, $3E, $3F, $40, $41
+	dc.b	$42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B
+	dc.b	$1D, $4C, $4D, $4E, $4F, $50, $51, $52, $53, $54
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_152A4
+PlaneMap_WinHughPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $08, $09
+	dc.b	$03, $0A, $0B, $0C, $0D, $0E, $0F, $10, $11, $09
+	dc.b	$12, $13, $14, $15, $16, $17, $18, $10, $19, $09
+	dc.b	$1A, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $09
+	dc.b	$22, $23, $24, $25, $26, $27, $28, $29, $2A, $09
+	dc.b	$2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $09
+	dc.b	$34, $34, $34, $35, $36, $37, $38, $39, $3A, $09
+	dc.b	$3B, $3B, $3C, $3D, $3E, $3F, $40, $41, $42, $09
+	dc.b	$43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C
+	dc.b	$4D, $4E, $4F, $50, $51, $52, $53, $54, $55, $56
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1531C
+PlaneMap_WinAnnaPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
+	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $10, $09
+	dc.b	$11, $12, $13, $14, $15, $16, $17, $18, $19, $12
+	dc.b	$11, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $1A
+	dc.b	$11, $22, $23, $24, $25, $26, $27, $28, $29, $2A
+	dc.b	$11, $22, $2B, $2C, $2D, $2E, $2F, $30, $31, $32
+	dc.b	$11, $33, $34, $35, $36, $37, $38, $39, $3A, $3B
+	dc.b	$11, $3C, $3D, $3E, $3F, $40, $41, $42, $43, $44
+	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
+	dc.b	$4F, $4F, $4F, $50, $51, $52, $53, $54, $55, $56
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_15394
+PlaneMap_WinKainPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $04, $05, $06, $07, $00, $01
+	dc.b	$08, $09, $0A, $0B, $0C, $0D, $0E, $0F, $08, $09
+	dc.b	$10, $11, $12, $13, $14, $15, $16, $17, $10, $11
+	dc.b	$18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $18, $19
+	dc.b	$20, $21, $22, $23, $24, $25, $26, $27, $20, $21
+	dc.b	$20, $21, $28, $29, $2A, $2B, $2C, $27, $20, $21
+	dc.b	$2D, $2E, $2F, $30, $31, $32, $33, $34, $35, $2E
+	dc.b	$36, $37, $38, $39, $3A, $3B, $3C, $3D, $3E, $3F
+	dc.b	$40, $41, $42, $43, $44, $45, $46, $47, $48, $49
+	dc.b	$4A, $4B, $4C, $4D, $4E, $4F, $50, $51, $52, $53
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_1540C
+PlaneMap_WinShirPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $03, $03, $03, $03, $03, $04, $03
+	dc.b	$05, $06, $07, $08, $09, $0A, $0B, $03, $0C, $0D
+	dc.b	$0E, $0F, $10, $11, $12, $13, $14, $15, $16, $17
+	dc.b	$18, $19, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21
+	dc.b	$22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B
+	dc.b	$22, $2C, $2D, $2E, $2F, $30, $31, $03, $04, $32
+	dc.b	$33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C
+	dc.b	$3D, $3E, $3F, $40, $41, $42, $43, $03, $03, $44
+	dc.b	$45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $4E
+	dc.b	$4F, $50, $51, $52, $53, $54, $55, $56, $57, $58
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_15484
+PlaneMap_WinLibraryGraphPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$A0, $A1, $A2, $A3, $A1, $A4, $A5, $A6, $A7, $A3
+	dc.b	$A8, $A9, $AA, $AB, $A9, $AC, $AD, $AE, $AF, $B0
+	dc.b	$B1, $B2, $B3, $B4, $B5, $B6, $B7, $B8, $B9, $BA
+	dc.b	$A0, $A1, $A2, $BB, $BC, $BD, $BE, $BF, $C0, $C1
+	dc.b	$A8, $C2, $C3, $C4, $C5, $C6, $C7, $C8, $C9, $CA
+	dc.b	$B1, $CB, $CC, $CD, $CE, $CF, $D0, $B5, $D1, $D0
+	dc.b	$A0, $D2, $D3, $D4, $D5, $D6, $A3, $D7, $D8, $A3
+	dc.b	$A8, $D9, $DA, $DB, $DC, $DD, $DE, $DF, $E0, $E1
+	dc.b	$B1, $E2, $E3, $D0, $E4, $D1, $D0, $E5, $E6, $E7
+	dc.b	$E8, $E9, $EA, $EB, $EC, $ED, $EE, $EF, $F0, $F1
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_154FC
+PlaneMap_WinRadarPortrait:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$00, $01, $02, $01, $02, $01, $02, $01, $02, $01
+	dc.b	$03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C
+	dc.b	$0D, $0E, $0F, $10, $11, $12, $13, $14, $15, $14
+	dc.b	$16, $17, $18, $08, $19, $1A, $1B, $1C, $18, $08
+	dc.b	$1D, $1E, $1F, $20, $21, $22, $15, $23, $15, $14
+	dc.b	$24, $25, $26, $27, $28, $08, $18, $29, $2A, $08
+	dc.b	$2B, $2C, $15, $2D, $2E, $2F, $30, $14, $31, $32
+	dc.b	$33, $29, $34, $35, $36, $37, $38, $08, $18, $39
+	dc.b	$0D, $14, $3A, $3B, $15, $3C, $15, $14, $15, $3D
+	dc.b	$33, $08, $3E, $3F, $18, $40, $18, $08, $18, $41
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_15574
+PlaneMap_WinBattleEmptySpots:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $00, $01, $02, $03, $26
+	dc.b	$26, $04, $05, $06, $07, $26
+	dc.b	$26, $08, $09, $0A, $0B, $26
+	dc.b	$26, $0C, $0D, $0E, $0F, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_15598
+PlaneMap_WinBattleOptions:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $B4, $B5, $26
+	dc.b	"FGHT"
+	dc.b	$26, $B4, $B5, $26
+	dc.b	"STGY"
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_155B0
+PlaneMap_WinBattleOptions2:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $B4, $B5, $26
+	dc.b	"ORDR"
+	dc.b	$26, $B4, $B5, $26
+	dc.b	"RUN "
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_155C8
+PlaneMap_WinBattleCommands:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$12, $13, $26, $16, $17, $26, $1A, $1B, $26, $1E, $1F
+	dc.b	$14, $15, $26, $18, $19, $26, $1C, $1D, $26, $20, $21
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; loc_15600
+PlaneMap_WinBattleMessage:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"                    "
+	dc.b	"                    "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+
+	even
+
+; I use the term "dynamic" for windows data which are put in RAM. The reason
+; is that content inside these windows varies, thus they are processed later.
+; The size can be changed for these as well, but you need to change the code that
+; handles these windows.
+; I focused mainly on editing the windows with text only so that it's easier to change if
+; desired. The others are complicated to clean up through assembly only
+
 DynamicWindowsStart:
 
-WinArt_CharList:
+; loc_15650
+PlaneMap_WinCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE
-
-WinArt_MenuItemList:
-	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4
-	dc.b	$B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_MenuCharStats:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $A4, $A9, $26, $26, $26, $97, $26, $A4
-	dc.b	$A9, $26, $26, $26, $97, $26, $A4, $A9, $26, $26, $26, $97, $26, $A4, $A9, $26
-	dc.b	$26, $26, $97, $AB, $A9, $26, $26, $26, $97, $26, $AB, $A9, $26, $26, $26, $97
-	dc.b	$26, $AB, $A9, $26, $26, $26, $97, $26, $AB, $A9, $26, $26, $26, $97, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_IndividualCharStats:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $A4, $A9, $26, $26, $26, $97, $B2, $26, $26, $97, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $AB, $A9, $26, $26, $26, $97, $B2, $26, $26
-	dc.b	$97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $26, $97, $26
-	dc.b	$26, $26, $26, $26, $BE
-	
-WinArt_Meseta:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$80, $6C, $6E, $26, $26, $26, $26, $26, $26, $26, $97, $BE, $BE, $BE, $BE, $BE
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_CharOrderDestination:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
-	dc.b	$26, $26, $98, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $99, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $9A, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $9B, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE
-	
-WinArt_CharList2:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_MapTechList:
-	dc.b	$B4, $B5
-	dc.b	$A7, $A3, $AE, $AB, $B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-loc_1598C:
-	dc.b	$B4, $B5, $A7, $A3
-	dc.b	$AE, $AB, $B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26
-	dc.b	$26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_StrngHPTP:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $A4, $A9, $26, $26, $26, $97, $B2, $26, $26, $97, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $AB, $A9, $26, $26, $26, $97, $B2, $26
-	dc.b	$26, $97, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_StrngStats:
-	dc.b	$B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $36, $28, $4E, $5A, $2E, $26, $26, $26, $26
-	dc.b	$26, $97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $34, $28, $32
-	dc.b	$56, $4E, $5A, $2E, $26, $26, $26, $97, $26, $5B, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $33, $40, $4A, $31, $26, $26, $26, $26, $26, $26, $97, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $30, $29, $29, $56, $26, $26, $26
-	dc.b	$26, $26, $26, $97, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $2D
-	dc.b	$4C, $29, $31, $26, $26, $26, $26, $26, $26, $97, $26, $26, $5B, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $30, $29, $2F, $2D, $4E, $5A, $2E, $26, $26, $26, $97
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $32, $59, $41, $4E, $5A
-	dc.b	$2E, $26, $26, $26, $26, $97, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE
-	
-WinArt_StrngEquip:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $27
-	dc.b	$36, $45, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $46, $2D, $39
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $41, $36, $4E, $39, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $2C, $4D, $36, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $27, $32, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15692
+PlaneMap_WinMenuItemList:
+	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
 
-WinArt_StrngLVEXP:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $26, $97, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $A3, $AE, $A9, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE
-	
-loc_15BE5:
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26
-	
-WinArt_EquipStats:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $26, $33
-	dc.b	$40, $4A, $31, $26, $26, $26, $26, $26, $26, $26, $26, $26, $5B, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $30, $29, $2F, $2D, $4E, $5A, $2E, $26, $26, $26, $26
-	dc.b	$26, $26, $5B, $26, $26, $26, $26, $26, $26, $26, $26, $32, $59, $41, $4E, $5A
-	dc.b	$2E, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE
-	
-WinArt_FullTechList:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+; loc_1577C
+PlaneMap_WinMenuCharStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$A4, $A9, $26, $26, $26, $76, $26, $A4, $A9, $26, $26, $26, $76, $26
+	dc.b	$A4, $A9, $26, $26, $26, $76, $26, $A4, $A9, $26, $26, $26, $76
+	dc.b	$AB, $A9, $26, $26, $26, $76, $26, $AB, $A9, $26, $26, $26, $76, $26
+	dc.b	$AB, $A9, $26, $26, $26, $76, $26, $AB, $A9, $26, $26, $26, $76
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15839
+PlaneMap_WinIndividualCharStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$2E, $36, $26, $26, $26, $76, $64, $26, $26, $76	; HP
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$3A, $36, $26, $26, $26, $76, $64, $26, $26, $76	; TP
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$32, $3C, $26, $76, $26, $26, $26, $26, $26, $BE
+; -----------------------------------------------------------------------
+; loc_15875
+PlaneMap_WinMeseta:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"MST       0"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15896
+PlaneMap_WinCharOrderDestination:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$98, $26, $26, $26, $26, $26	; 1
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$99, $26, $26, $26, $26, $26	; 2
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$9A, $26, $26, $26, $26, $26	; 3
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$9B, $26, $26, $26, $26, $26	; 4
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_158D2
+PlaneMap_WinCharList2:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_1590E
+PlaneMap_WinMapTechList:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_SaveSlots:
+; -----------------------------------------------------------------------
+loc_1598C:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15A0A
+PlaneMap_WinStrngHPTP:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$2E, $36, $26, $26, $26, $76, $64, $26, $26, $76	; HP
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$3A, $36, $26, $26, $26, $76, $64, $26, $26, $76	; TP
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15A3C
+PlaneMap_WinStrngStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"STRNGTH   0"
+	dc.b	"           "
+	dc.b	"MENTAL    0"
+	dc.b	"           "
+	dc.b	"AGILITY   0"
+	dc.b	"           "
+	dc.b	"LUCK      0"
+	dc.b	"           "
+	dc.b	"DEXTRTY   0"
+	dc.b	"           "
+	dc.b	"ATTACK    0"
+	dc.b	"           "
+	dc.b	"DEFENSE   0"
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15AE1
+PlaneMap_WinStrngEquip:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"               "
+	dc.b	"HEAD           "
+	dc.b	"               "
+	dc.b	"RGHT           "
+	dc.b	"               "
+	dc.b	"LEFT           "
+	dc.b	"               "
+	dc.b	"BODY           "
+	dc.b	"               "
+	dc.b	"LEGS           "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15B95
+PlaneMap_WinStrngLVEXP:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"          "
+	dc.b	"LV 0      "
+	dc.b	"          "
+	dc.b	"          "
+	dc.b	"          "
+	dc.b	"EXP       "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+loc_15BE5:
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+; -----------------------------------------------------------------------
+; loc_15BF9
+PlaneMap_WinEquipStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"           "
+	dc.b	"AGILITY    "
+	dc.b	"           "
+	dc.b	"ATTACK     "
+	dc.b	"           "
+	dc.b	"DEFENSE    "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15C51
+PlaneMap_WinFullTechList:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15D17
+PlaneMap_WinSaveSlots:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC, $98, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $99, $B4, $B5, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $9A, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $A5, $AC, $9B
-	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE
-	
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$98, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$99, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$9A, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $A5, $AC
+	dc.b	$9B, $B4, $B5, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
 	even
 
-WinArt_StoreInventory:
-	dc.b	$B9, $B9, $49, $2E, $51, $2E, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_ProfileCharList:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_RegroupCharList:
+; loc_15D72
+PlaneMap_WinStoreInventory:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15E6E
+PlaneMap_WinProfileCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_RegroupSelectedChar:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $BE, $BE, $BE, $BE
-	
-WinArt_BattleCharStats:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $A4, $A9, $26, $26
-	dc.b	$26, $97, $AB, $A9, $26, $26, $26, $97, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_BattleCharName:
-	dc.b	$B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
-	
-loc_15F8A:
-	dc.b	$B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $BE, $BE, $BE, $BE
-	
-WinArt_EnemyGroups:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_BattleItemUsed:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
 	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_BattleTechUsed:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE
-
-WinArt_BattleTechList:
-	dc.b	$B4, $B5, $A7, $A3, $AE, $AB
-	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-
-WinArt_BattleItemList:
-	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $B4
-	dc.b	$B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	dc.b	$BE, $BE
-	
-WinArt_EnemyNames:
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_EnemyInfo:
-	dc.b	$B9, $B9, $B9, $B9, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE
-	
-WinArt_TeleportPlaceNames:
+; -----------------------------------------------------------------------
+; loc_15EDA
+PlaneMap_WinRegroupCharList:
 	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
-	dc.b	$B9, $26, $26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
-WinArt_UstvestiaSoundtracks:
-	dc.b	$B9, $B9
-	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
-	dc.b	$26, $26, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
-	
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15F2E
+PlaneMap_WinRegroupSelectedChar:
+    dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15F56
+PlaneMap_WinBattleCharStats:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	"HP   0"
+	dc.b	"TP   0"
+	dc.b	"      "
+	dc.b	"      "
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15F7A
+PlaneMap_WinBattleCharName:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; Probably unused?
+loc_15F8A:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15F96
+PlaneMap_WinEnemyGroups:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_15FDE
+PlaneMap_WinBattleItemUsed:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_16006
+PlaneMap_WinBattleTechUsed:
+	dc.b	$B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_1601A
+PlaneMap_WinBattleTechList:
+	dc.b	$B4, $B5, $A7, $A3, $AE, $AB, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_16060
+PlaneMap_WinBattleItemList:
+	dc.b	$B9, $B4, $B5, $A7, $A3, $AE, $AB, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $B4, $B5, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_160E2
+PlaneMap_WinEnemyNames:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_1610A
+PlaneMap_WinEnemyInfo:
+	dc.b	$B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26
+	dc.b	$26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_1611A
+PlaneMap_WinTeleportPlaceNames:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26
+	dc.b	$B4, $B5, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE
+; -----------------------------------------------------------------------
+; loc_1616E
+PlaneMap_WinUstvestiaSoundtracks:
+	dc.b	$B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9, $B9
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26, $26
+	dc.b	$BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE, $BE
+
 DynamicWindowsEnd:
 
 	even
+
+	charset
+
 	endif
 
 ; =============================================================================
@@ -36759,7 +39157,283 @@ ShirExpTable:
 ; All enemy names
 ; ==============================================================
 EnemyNames:
-	if revision>0
+	if revision=0
+	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$9B, $57, $68, $82, $8E, $56, $82, $69, $C4, $00
+	dc.b	$56, $A5, $75, $9A, $56, $82, $69, $C4, $00, $00
+	dc.b	$9F, $82, $67, $83, $56, $82, $69, $C4, $00, $00
+	dc.b	$77, $62, $5C, $A5, $69, $C4, $00, $00, $00, $00
+	dc.b	$8D, $8C, $77, $62, $5C, $A5, $69, $C4, $00, $00
+	dc.b	$8E, $7B, $82, $77, $62, $5C, $A5, $69, $C4, $00
+	dc.b	$62, $A0, $6B, $82, $62, $71, $84, $56, $C4, $00
+	dc.b	$71, $83, $82, $61, $62, $71, $84, $56, $C4, $00
+	dc.b	$9C, $92, $8B, $82, $62, $71, $84, $56, $C4, $00
+	dc.b	$71, $86, $82, $60, $A5, $C4, $00, $00, $00, $00
+	dc.b	$73, $62, $65, $71, $86, $82, $60, $A5, $C4, $00
+	dc.b	$59, $75, $90, $71, $86, $82, $60, $A5, $C4, $00
+	dc.b	$A2, $57, $93, $6A, $A5, $C4, $00, $00, $00, $00
+	dc.b	$A2, $57, $93, $82, $9A, $56, $7F, $A5, $C4, $00
+	dc.b	$A2, $57, $93, $82, $71, $83, $82, $8E, $C4, $00
+	dc.b	$71, $7B, $57, $82, $8E, $54, $9A, $7B, $C4, $00
+	dc.b	$63, $82, $66, $54, $9A, $7B, $C4, $00, $00, $00
+	dc.b	$8E, $7C, $99, $84, $54, $9A, $7B, $C4, $00, $00
+	dc.b	$7C, $88, $5B, $A5, $C4, $00, $00, $00, $00, $00
+	dc.b	$71, $86, $57, $62, $7C, $88, $5B, $A5, $C4, $00
+	dc.b	$62, $5B, $7D, $7C, $88, $5B, $A5, $C4, $00, $00
+	dc.b	$5C, $89, $7C, $56, $C4, $00, $00, $00, $00, $00
+	dc.b	$66, $8B, $A5, $5C, $82, $7F, $88, $69, $C4, $00
+	dc.b	$7B, $62, $69, $7F, $88, $69, $C4, $00, $00, $00
+	dc.b	$72, $57, $88, $62, $7D, $C4, $00, $00, $00, $00
+	dc.b	$57, $82, $71, $87, $A5, $73, $A5, $C4, $00, $00
+	dc.b	$69, $7E, $A5, $60, $A5, $C4, $00, $00, $00, $00
+	dc.b	$8E, $7B, $62, $5C, $7B, $A5, $C4, $00, $00, $00
+	dc.b	$8E, $7B, $62, $56, $60, $88, $61, $82, $C4, $00
+	dc.b	$8E, $7B, $62, $62, $7F, $A5, $65, $7B, $C4, $00
+	dc.b	$56, $76, $9E, $57, $99, $C4, $00, $00, $00, $00
+	dc.b	$61, $8A, $7B, $57, $75, $94, $7E, $C4, $00, $00
+	dc.b	$74, $5C, $60, $76, $A5, $4F, $C4, $00, $00, $00
+	dc.b	$A2, $7C, $67, $83, $57, $C4, $00, $00, $00, $00
+	dc.b	$A2, $7C, $67, $83, $57, $AC, $B9, $C4, $00, $00
+	dc.b	$A2, $7C, $67, $83, $57, $B5, $B5, $C4, $00, $00
+	dc.b	$70, $7D, $9A, $C4, $00, $00, $00, $00, $00, $00
+	dc.b	$4F, $7C, $88, $66, $7C, $A5, $66, $C4, $00, $00
+	dc.b	$9E, $74, $68, $82, $8E, $7C, $A5, $66, $C4, $00
+	dc.b	$61, $61, $7B, $C4, $00, $00, $00, $00, $00, $00
+	dc.b	$5D, $7C, $64, $9F, $C4, $00, $00, $00, $00, $00
+	dc.b	$27, $76, $7F, $9C, $62, $C4, $00, $00, $00, $00
+	dc.b	$9B, $62, $5B, $9B, $A5, $C4, $00, $00, $00, $00
+	dc.b	$73, $82, $5B, $9B, $A5, $C4, $00, $00, $00, $00
+	dc.b	$A1, $7B, $6D, $88, $69, $5B, $9B, $A5, $C4, $00
+	dc.b	$99, $88, $9A, $58, $88, $9A, $C4, $00, $00, $00
+	dc.b	$9D, $7F, $88, $5D, $27, $88, $9A, $C4, $00, $00
+	dc.b	$71, $86, $57, $7C, $56, $C4, $00, $00, $00, $00
+	dc.b	$9D, $7C, $91, $A5, $96, $C4, $00, $00, $00, $00
+	dc.b	$9B, $A5, $82, $58, $7D, $71, $C4, $00, $00, $00
+	dc.b	$71, $7E, $56, $58, $7D, $71, $C4, $00, $00, $00
+	dc.b	$61, $A5, $61, $91, $A5, $93, $C4, $00, $00, $00
+	dc.b	$61, $A5, $61, $56, $C4, $00, $00, $00, $00, $00
+	dc.b	$61, $A5, $61, $56, $7F, $A5, $9A, $C4, $00, $00
+	dc.b	$62, $65, $A5, $71, $84, $88, $61, $8A, $C4, $00
+	dc.b	$62, $A0, $6B, $82, $62, $65, $A5, $C4, $00, $00
+	dc.b	$64, $A5, $57, $82, $8E, $62, $65, $A5, $C4, $00
+	dc.b	$99, $72, $C4, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$72, $93, $57, $69, $99, $72, $C4, $00, $00, $00
+	dc.b	$57, $88, $A2, $99, $72, $C4, $00, $00, $00, $00
+	dc.b	$5B, $57, $69, $5B, $57, $82, $9A, $C4, $00, $00
+	dc.b	$7E, $A1, $65, $57, $7D, $5B, $57, $69, $C4, $00
+	dc.b	$5B, $57, $69, $9A, $7B, $90, $82, $C4, $00, $00
+	dc.b	$6D, $5A, $5B, $57, $69, $6B, $56, $C4, $00, $00
+	dc.b	$6D, $5A, $6B, $7D, $64, $6B, $56, $C4, $00, $00
+	dc.b	$6D, $5A, $4F, $6D, $68, $84, $68, $62, $C4, $00
+	dc.b	$56, $57, $7D, $A5, $7F, $62, $C4, $00, $00, $00
+	dc.b	$7C, $8A, $82, $5D, $62, $C4, $00, $00, $00, $00
+	dc.b	$9F, $82, $68, $A5, $7B, $C4, $00, $00, $00, $00
+	dc.b	$60, $88, $69, $73, $82, $C4, $00, $00, $00, $00
+	dc.b	$60, $88, $69, $9E, $A5, $57, $C4, $00, $00, $00
+	dc.b	$60, $88, $69, $60, $88, $69, $C4, $00, $00, $00
+	dc.b	$74, $95, $7B, $82, $8C, $82, $73, $C4, $00, $00
+	dc.b	$74, $95, $7B, $82, $61, $8E, $73, $C4, $00, $00
+	dc.b	$74, $95, $7B, $82, $5A, $76, $8C, $C4, $00, $00
+	dc.b	$9B, $82, $9D, $A5, $C4, $00, $00, $00, $00, $00
+	dc.b	$9B, $82, $9D, $A5, $69, $58, $84, $8E, $C4, $00
+	dc.b	$9B, $82, $9D, $A5, $9A, $A5, $7D, $C4, $00, $00
+	dc.b	$5D, $A5, $7C, $A5, $07, $02, $C4, $00, $00, $00
+	dc.b	$60, $9E, $5C, $89, $88, $A1, $C4, $00, $00, $00
+	dc.b	$74, $6D, $7B, $7F, $92, $62, $69, $C4, $00, $00
+	dc.b	$56, $57, $64, $A5, $7D, $C4, $00, $00, $00, $00
+	dc.b	$27, $9C, $A5, $64, $7D, $92, $89, $A5, $C4, $00
+	dc.b	$8E, $7B, $82, $9B, $62, $65, $A5, $C4, $00, $00
+	dc.b	$56, $A5, $74, $A5, $56, $57, $C4, $00, $00, $00
+	dc.b	$69, $7E, $A5, $60, $4F, $A5, $62, $C4, $00, $00
+	dc.b	$A2, $7C, $82, $62, $54, $5D, $65, $A5, $C4, $00
+	dc.b	$9B, $82, $C4, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$9B, $82, $7C, $A5, $96, $A5, $C4, $00, $00, $00
+	dc.b	$56, $57, $7E, $68, $84, $A5, $56, $C4, $00, $00
+	dc.b	$6F, $82, $8E, $7C, $A5, $59, $57, $A1, $C4, $00
+	dc.b	$7B, $62, $5B, $7D, $77, $82, $5C, $A5, $C4, $00
+	dc.b	$9A, $7F, $A5, $7D, $77, $82, $5C, $A5, $C4, $00
+	dc.b	$6D, $5A, $73, $82, $77, $62, $C4, $00, $00, $00
+	dc.b	$6D, $5A, $9C, $88, $8E, $6E, $A5, $93, $C4, $00
+	dc.b	$99, $95, $7C, $56, $73, $82, $77, $62, $C4, $00
+	dc.b	$56, $58, $7D, $99, $95, $7C, $56, $C4, $00, $00
+	dc.b	$62, $5B, $57, $68, $84, $56, $A5, $7B, $C4, $00
+	dc.b	$73, $7E, $71, $84, $88, $5D, $56, $57, $C4, $00
+	dc.b	$96, $A5, $68, $84, $56, $82, $90, $7B, $C4, $00
+	dc.b	$62, $A2, $57, $7D, $7B, $9C, $88, $69, $C4, $00
+	dc.b	$62, $6B, $71, $84, $7B, $9C, $88, $69, $C4, $00
+	dc.b	$75, $64, $5A, $7D, $C4, $00, $00, $00, $00, $00
+	dc.b	$60, $5F, $71, $C4, $00, $00, $00, $00, $00, $00
+	dc.b	$77, $64, $7F, $71, $C4, $00, $00, $00, $00, $00
+	dc.b	$7C, $9C, $82, $8E, $9D, $7E, $A5, $9A, $C4, $00
+	dc.b	$5D, $7B, $57, $9D, $7C, $82, $8C, $A5, $C4, $00
+	dc.b	$99, $62, $7F, $58, $6A, $A5, $C4, $00, $00, $00
+	dc.b	$96, $A5, $5D, $60, $57, $9A, $C4, $00, $00, $00
+	dc.b	$99, $62, $57, $82, $9B, $A5, $65, $A5, $C4, $00
+	dc.b	$61, $86, $57, $9A, $61, $71, $65, $A5, $C4, $00
+	dc.b	$5B, $5A, $62, $64, $A5, $60, $7B, $A5, $C4, $00
+	dc.b	$57, $7C, $8A, $92, $8A, $6B, $62, $69, $C4, $00
+	dc.b	$57, $73, $92, $5A, $76, $57, $92, $C4, $00, $00
+	dc.b	$56, $A5, $5C, $9A, $7B, $90, $82, $C4, $00, $00
+	dc.b	$9A, $7B, $90, $82, $96, $58, $69, $C4, $00, $00
+	dc.b	$9A, $7B, $90, $82, $27, $57, $69, $C4, $00, $00
+	dc.b	$71, $83, $57, $56, $7E, $75, $7E, $62, $C4, $00
+	dc.b	$62, $69, $A5, $75, $7E, $75, $7E, $62, $C4, $00
+	dc.b	$5C, $82, $8E, $7E, $75, $7E, $62, $C4, $00, $00
+	dc.b	$96, $AB, $5E, $75, $7D, $AB, $7B, $A5, $C4, $00
+	dc.b	$7D, $82, $AB, $71, $84, $82, $AB, $8C, $C4, $00
+	dc.b	$8D, $AB, $7D, $AB, $91, $A5, $5D, $C4, $00, $00
+	dc.b	$6D, $57, $AB, $71, $83, $A5, $62, $69, $C4, $00
+	dc.b	$96, $A5, $5D, $71, $83, $7D, $62, $C4, $00, $00
+	dc.b	$73, $91, $A5, $9D, $7E, $57, $82, $C4, $00, $00
+	
+	elseif revision=3
+	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
+	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
+	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
+	charset	' ', 0
+	charset	',', $3F
+	charset	'.', $40
+	charset	';', $41
+	charset	'"', $42
+	charset	'?', $43
+	charset	'!', $44
+	charset	39, $45	; apostrophe
+	charset	'-', $46
+	charset	':', $77
+
+
+	dc.b	$C4, "         "
+	dc.b	"CHAX     ", $C4
+	dc.b	"GOULES   ", $C4
+	dc.b	"XESBETH  ", $C4
+	dc.b	"DUPPY    ", $C4
+	dc.b	"LUMERETTE", $C4
+	dc.b	"XAMA     ", $C4
+	dc.b	"KOBAL    ", $C4
+	dc.b	"XAPHAN   ", $C4
+	dc.b	"RAUM     ", $C4
+	dc.b	"DYBBUK   ", $C4
+	dc.b	"MELCHOM  ", $C4
+	dc.b	"SEDDIM   ", $C4
+	dc.b	"ASPIDE   ", $C4
+	dc.b	"BOIUNA   ", $C4
+	dc.b	"HIDRA    ", $C4
+	dc.b	"UPHIR    ", $C4
+	dc.b	"LUTINCETRO"
+	dc.b	"BROWNIES ", $C4
+	dc.b	"RAS      ", $C4
+	dc.b	"SAPO     ", $C4
+	dc.b	"PUCK     ", $C4
+	dc.b	"HADES    ", $C4
+	dc.b	"TYPHON   ", $C4
+	dc.b	"ROBIN    ", $C4
+	dc.b	"TROLLS   ", $C4
+	dc.b	"EFIATES  ", $C4
+	dc.b	"GADREL   ", $C4
+	dc.b	"MAZZIKIN ", $C4
+	dc.b	"VERDELET ", $C4
+	dc.b	"FANBITE  ", $C4
+	dc.b	"AMEBA    ", $C4
+	dc.b	"WADA     ", $C4
+	dc.b	"VESTIS   ", $C4
+	dc.b	"CURETES  ", $C4
+	dc.b	"COULOBRE ", $C4
+	dc.b	"CARON    ", $C4
+	dc.b	"LEVIATA  ", $C4
+	dc.b	"THAMUZ   ", $C4
+	dc.b	"PAITUNARE", $C4
+	dc.b	"S        ", $C4
+	dc.b	"K        ", $C4
+	dc.b	"H        ", $C4
+	dc.b	"HERMES   ", $C4
+	dc.b	"RAHAH    ", $C4
+	dc.b	"CARIAPEMBA"
+	dc.b	"PAZUZU   ", $C4
+	dc.b	"BALOI    ", $C4
+	dc.b	"BANSHEE  ", $C4
+	dc.b	"XACAL    ", $C4
+	dc.b	"FURFUR   ", $C4
+	dc.b	"MOTOCU   ", $C4
+	dc.b	"STRIX    ", $C4
+	dc.b	"RONWE    ", $C4
+	dc.b	"RAVAN    ", $C4
+	dc.b	"S        ", $C4
+	dc.b	"S        ", $C4
+	dc.b	"S        ", $C4
+	dc.b	"ASMEDAY  ", $C4
+	dc.b	"AZIDAHAKA", $C4
+	dc.b	"BALAN    ", $C4
+	dc.b	"EBATIA   ", $C4
+	dc.b	"LEON     ", $C4
+	dc.b	"LESTAT   ", $C4
+	dc.b	"VAFAVIA  ", $C4
+	dc.b	"ANAAN    ", $C4
+	dc.b	"APER     ", $C4
+	dc.b	"ERINOMO  ", $C4
+	dc.b	"GRIFO    ", $C4
+	dc.b	"KERRIGHED", $C4
+	dc.b	"MECHOMAN ", $C4
+	dc.b	"SONOMECH ", $C4
+	dc.b	"ATTMECH  ", $C4
+	dc.b	"MAZGAMMA ", $C4
+	dc.b	"FIRGAMMA ", $C4
+	dc.b	"KILGAMMA ", $C4
+	dc.b	"MET MAN  ", $C4
+	dc.b	"TWIG MAN ", $C4
+	dc.b	"TWIGTALL ", $C4
+	dc.b	"COOLEY61 ", $C4
+	dc.b	"ABADOM   ", $C4
+	dc.b	"APOLIOM  ", $C4
+	dc.b	"ABIGOR   ", $C4
+	dc.b	"HVYSOLID ", $C4
+	dc.b	"GUN BUST ", $C4
+	dc.b	"AGAURES  ", $C4
+	dc.b	"ALLOCER  ", $C4
+	dc.b	"ADRAMELECH"
+	dc.b	"ALIJENU  ", $C4
+	dc.b	"ALLATOU  ", $C4
+	dc.b	"TANQUE   ", $C4
+	dc.b	"OCELOTL  ", $C4
+	dc.b	"RABBATS  ", $C4
+	dc.b	"SEMIAZAS ", $C4
+	dc.b	"BEHEMOTH ", $C4
+	dc.b	"ENPUSA   ", $C4
+	dc.b	"DACTILOS ", $C4
+	dc.b	"GOLEM    ", $C4
+	dc.b	"AYPEROS  ", $C4
+	dc.b	"MINGUSOTO", $C4
+	dc.b	"MAPIGUARI", $C4
+	dc.b	"MARTINET ", $C4
+	dc.b	"MASTEMA  ", $C4
+	dc.b	"OGRE     ", $C4
+	dc.b	"YABAL    ", $C4
+	dc.b	"SHABRIRI ", $C4
+	dc.b	"UKOBACH  ", $C4
+	dc.b	"URIAN    ", $C4
+	dc.b	"WILL     ", $C4
+	dc.b	"ASTAROTE ", $C4
+	dc.b	"KHAIB    ", $C4
+	dc.b	"MANES    ", $C4
+	dc.b	"PERSEFONE", $C4
+	dc.b	"STREGA   ", $C4
+	dc.b	"TARARUCU ", $C4
+	dc.b	"SOTRE    ", $C4
+	dc.b	"BELZEBU  ", $C4
+	dc.b	"LAMASHTU ", $C4
+	dc.b	"ELFO     ", $C4
+	dc.b	"NERGAL   ", $C4
+	dc.b	"NISROCK  ", $C4
+	dc.b	"ANKOU    ", $C4
+	dc.b	"CAPEONE  ", $C4
+	dc.b	"DEMONIA  ", $C4
+	dc.b	"NEI 1    ", $C4
+	dc.b	"F NEGRA  ", $C4
+	dc.b	"CEREBRO M", $C4
+
+	charset
+	
+	else
+
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -36910,137 +39584,6 @@ EnemyNames:
 	dc.b	"MOMBRAIN", $C4, " "
 
 	charset
-	
-	else
-	
-	dc.b	$C4, $00, $00, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$9B, $57, $68, $82, $8E, $56, $82, $69, $C4, $00
-	dc.b	$56, $A5, $75, $9A, $56, $82, $69, $C4, $00, $00
-	dc.b	$9F, $82, $67, $83, $56, $82, $69, $C4, $00, $00
-	dc.b	$77, $62, $5C, $A5, $69, $C4, $00, $00, $00, $00
-	dc.b	$8D, $8C, $77, $62, $5C, $A5, $69, $C4, $00, $00
-	dc.b	$8E, $7B, $82, $77, $62, $5C, $A5, $69, $C4, $00
-	dc.b	$62, $A0, $6B, $82, $62, $71, $84, $56, $C4, $00
-	dc.b	$71, $83, $82, $61, $62, $71, $84, $56, $C4, $00
-	dc.b	$9C, $92, $8B, $82, $62, $71, $84, $56, $C4, $00
-	dc.b	$71, $86, $82, $60, $A5, $C4, $00, $00, $00, $00
-	dc.b	$73, $62, $65, $71, $86, $82, $60, $A5, $C4, $00
-	dc.b	$59, $75, $90, $71, $86, $82, $60, $A5, $C4, $00
-	dc.b	$A2, $57, $93, $6A, $A5, $C4, $00, $00, $00, $00
-	dc.b	$A2, $57, $93, $82, $9A, $56, $7F, $A5, $C4, $00
-	dc.b	$A2, $57, $93, $82, $71, $83, $82, $8E, $C4, $00
-	dc.b	$71, $7B, $57, $82, $8E, $54, $9A, $7B, $C4, $00
-	dc.b	$63, $82, $66, $54, $9A, $7B, $C4, $00, $00, $00
-	dc.b	$8E, $7C, $99, $84, $54, $9A, $7B, $C4, $00, $00
-	dc.b	$7C, $88, $5B, $A5, $C4, $00, $00, $00, $00, $00
-	dc.b	$71, $86, $57, $62, $7C, $88, $5B, $A5, $C4, $00
-	dc.b	$62, $5B, $7D, $7C, $88, $5B, $A5, $C4, $00, $00
-	dc.b	$5C, $89, $7C, $56, $C4, $00, $00, $00, $00, $00
-	dc.b	$66, $8B, $A5, $5C, $82, $7F, $88, $69, $C4, $00
-	dc.b	$7B, $62, $69, $7F, $88, $69, $C4, $00, $00, $00
-	dc.b	$72, $57, $88, $62, $7D, $C4, $00, $00, $00, $00
-	dc.b	$57, $82, $71, $87, $A5, $73, $A5, $C4, $00, $00
-	dc.b	$69, $7E, $A5, $60, $A5, $C4, $00, $00, $00, $00
-	dc.b	$8E, $7B, $62, $5C, $7B, $A5, $C4, $00, $00, $00
-	dc.b	$8E, $7B, $62, $56, $60, $88, $61, $82, $C4, $00
-	dc.b	$8E, $7B, $62, $62, $7F, $A5, $65, $7B, $C4, $00
-	dc.b	$56, $76, $9E, $57, $99, $C4, $00, $00, $00, $00
-	dc.b	$61, $8A, $7B, $57, $75, $94, $7E, $C4, $00, $00
-	dc.b	$74, $5C, $60, $76, $A5, $4F, $C4, $00, $00, $00
-	dc.b	$A2, $7C, $67, $83, $57, $C4, $00, $00, $00, $00
-	dc.b	$A2, $7C, $67, $83, $57, $AC, $B9, $C4, $00, $00
-	dc.b	$A2, $7C, $67, $83, $57, $B5, $B5, $C4, $00, $00
-	dc.b	$70, $7D, $9A, $C4, $00, $00, $00, $00, $00, $00
-	dc.b	$4F, $7C, $88, $66, $7C, $A5, $66, $C4, $00, $00
-	dc.b	$9E, $74, $68, $82, $8E, $7C, $A5, $66, $C4, $00
-	dc.b	$61, $61, $7B, $C4, $00, $00, $00, $00, $00, $00
-	dc.b	$5D, $7C, $64, $9F, $C4, $00, $00, $00, $00, $00
-	dc.b	$27, $76, $7F, $9C, $62, $C4, $00, $00, $00, $00
-	dc.b	$9B, $62, $5B, $9B, $A5, $C4, $00, $00, $00, $00
-	dc.b	$73, $82, $5B, $9B, $A5, $C4, $00, $00, $00, $00
-	dc.b	$A1, $7B, $6D, $88, $69, $5B, $9B, $A5, $C4, $00
-	dc.b	$99, $88, $9A, $58, $88, $9A, $C4, $00, $00, $00
-	dc.b	$9D, $7F, $88, $5D, $27, $88, $9A, $C4, $00, $00
-	dc.b	$71, $86, $57, $7C, $56, $C4, $00, $00, $00, $00
-	dc.b	$9D, $7C, $91, $A5, $96, $C4, $00, $00, $00, $00
-	dc.b	$9B, $A5, $82, $58, $7D, $71, $C4, $00, $00, $00
-	dc.b	$71, $7E, $56, $58, $7D, $71, $C4, $00, $00, $00
-	dc.b	$61, $A5, $61, $91, $A5, $93, $C4, $00, $00, $00
-	dc.b	$61, $A5, $61, $56, $C4, $00, $00, $00, $00, $00
-	dc.b	$61, $A5, $61, $56, $7F, $A5, $9A, $C4, $00, $00
-	dc.b	$62, $65, $A5, $71, $84, $88, $61, $8A, $C4, $00
-	dc.b	$62, $A0, $6B, $82, $62, $65, $A5, $C4, $00, $00
-	dc.b	$64, $A5, $57, $82, $8E, $62, $65, $A5, $C4, $00
-	dc.b	$99, $72, $C4, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$72, $93, $57, $69, $99, $72, $C4, $00, $00, $00
-	dc.b	$57, $88, $A2, $99, $72, $C4, $00, $00, $00, $00
-	dc.b	$5B, $57, $69, $5B, $57, $82, $9A, $C4, $00, $00
-	dc.b	$7E, $A1, $65, $57, $7D, $5B, $57, $69, $C4, $00
-	dc.b	$5B, $57, $69, $9A, $7B, $90, $82, $C4, $00, $00
-	dc.b	$6D, $5A, $5B, $57, $69, $6B, $56, $C4, $00, $00
-	dc.b	$6D, $5A, $6B, $7D, $64, $6B, $56, $C4, $00, $00
-	dc.b	$6D, $5A, $4F, $6D, $68, $84, $68, $62, $C4, $00
-	dc.b	$56, $57, $7D, $A5, $7F, $62, $C4, $00, $00, $00
-	dc.b	$7C, $8A, $82, $5D, $62, $C4, $00, $00, $00, $00
-	dc.b	$9F, $82, $68, $A5, $7B, $C4, $00, $00, $00, $00
-	dc.b	$60, $88, $69, $73, $82, $C4, $00, $00, $00, $00
-	dc.b	$60, $88, $69, $9E, $A5, $57, $C4, $00, $00, $00
-	dc.b	$60, $88, $69, $60, $88, $69, $C4, $00, $00, $00
-	dc.b	$74, $95, $7B, $82, $8C, $82, $73, $C4, $00, $00
-	dc.b	$74, $95, $7B, $82, $61, $8E, $73, $C4, $00, $00
-	dc.b	$74, $95, $7B, $82, $5A, $76, $8C, $C4, $00, $00
-	dc.b	$9B, $82, $9D, $A5, $C4, $00, $00, $00, $00, $00
-	dc.b	$9B, $82, $9D, $A5, $69, $58, $84, $8E, $C4, $00
-	dc.b	$9B, $82, $9D, $A5, $9A, $A5, $7D, $C4, $00, $00
-	dc.b	$5D, $A5, $7C, $A5, $07, $02, $C4, $00, $00, $00
-	dc.b	$60, $9E, $5C, $89, $88, $A1, $C4, $00, $00, $00
-	dc.b	$74, $6D, $7B, $7F, $92, $62, $69, $C4, $00, $00
-	dc.b	$56, $57, $64, $A5, $7D, $C4, $00, $00, $00, $00
-	dc.b	$27, $9C, $A5, $64, $7D, $92, $89, $A5, $C4, $00
-	dc.b	$8E, $7B, $82, $9B, $62, $65, $A5, $C4, $00, $00
-	dc.b	$56, $A5, $74, $A5, $56, $57, $C4, $00, $00, $00
-	dc.b	$69, $7E, $A5, $60, $4F, $A5, $62, $C4, $00, $00
-	dc.b	$A2, $7C, $82, $62, $54, $5D, $65, $A5, $C4, $00
-	dc.b	$9B, $82, $C4, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$9B, $82, $7C, $A5, $96, $A5, $C4, $00, $00, $00
-	dc.b	$56, $57, $7E, $68, $84, $A5, $56, $C4, $00, $00
-	dc.b	$6F, $82, $8E, $7C, $A5, $59, $57, $A1, $C4, $00
-	dc.b	$7B, $62, $5B, $7D, $77, $82, $5C, $A5, $C4, $00
-	dc.b	$9A, $7F, $A5, $7D, $77, $82, $5C, $A5, $C4, $00
-	dc.b	$6D, $5A, $73, $82, $77, $62, $C4, $00, $00, $00
-	dc.b	$6D, $5A, $9C, $88, $8E, $6E, $A5, $93, $C4, $00
-	dc.b	$99, $95, $7C, $56, $73, $82, $77, $62, $C4, $00
-	dc.b	$56, $58, $7D, $99, $95, $7C, $56, $C4, $00, $00
-	dc.b	$62, $5B, $57, $68, $84, $56, $A5, $7B, $C4, $00
-	dc.b	$73, $7E, $71, $84, $88, $5D, $56, $57, $C4, $00
-	dc.b	$96, $A5, $68, $84, $56, $82, $90, $7B, $C4, $00
-	dc.b	$62, $A2, $57, $7D, $7B, $9C, $88, $69, $C4, $00
-	dc.b	$62, $6B, $71, $84, $7B, $9C, $88, $69, $C4, $00
-	dc.b	$75, $64, $5A, $7D, $C4, $00, $00, $00, $00, $00
-	dc.b	$60, $5F, $71, $C4, $00, $00, $00, $00, $00, $00
-	dc.b	$77, $64, $7F, $71, $C4, $00, $00, $00, $00, $00
-	dc.b	$7C, $9C, $82, $8E, $9D, $7E, $A5, $9A, $C4, $00
-	dc.b	$5D, $7B, $57, $9D, $7C, $82, $8C, $A5, $C4, $00
-	dc.b	$99, $62, $7F, $58, $6A, $A5, $C4, $00, $00, $00
-	dc.b	$96, $A5, $5D, $60, $57, $9A, $C4, $00, $00, $00
-	dc.b	$99, $62, $57, $82, $9B, $A5, $65, $A5, $C4, $00
-	dc.b	$61, $86, $57, $9A, $61, $71, $65, $A5, $C4, $00
-	dc.b	$5B, $5A, $62, $64, $A5, $60, $7B, $A5, $C4, $00
-	dc.b	$57, $7C, $8A, $92, $8A, $6B, $62, $69, $C4, $00
-	dc.b	$57, $73, $92, $5A, $76, $57, $92, $C4, $00, $00
-	dc.b	$56, $A5, $5C, $9A, $7B, $90, $82, $C4, $00, $00
-	dc.b	$9A, $7B, $90, $82, $96, $58, $69, $C4, $00, $00
-	dc.b	$9A, $7B, $90, $82, $27, $57, $69, $C4, $00, $00
-	dc.b	$71, $83, $57, $56, $7E, $75, $7E, $62, $C4, $00
-	dc.b	$62, $69, $A5, $75, $7E, $75, $7E, $62, $C4, $00
-	dc.b	$5C, $82, $8E, $7E, $75, $7E, $62, $C4, $00, $00
-	dc.b	$96, $AB, $5E, $75, $7D, $AB, $7B, $A5, $C4, $00
-	dc.b	$7D, $82, $AB, $71, $84, $82, $AB, $8C, $C4, $00
-	dc.b	$8D, $AB, $7D, $AB, $91, $A5, $5D, $C4, $00, $00
-	dc.b	$6D, $57, $AB, $71, $83, $A5, $62, $69, $C4, $00
-	dc.b	$96, $A5, $5D, $71, $83, $7D, $62, $C4, $00, $00
-	dc.b	$73, $91, $A5, $9D, $7E, $57, $82, $C4, $00, $00
-
 	
 	endif
 
@@ -37303,8 +39846,32 @@ PlaneMap_SceneLutz:	binclude "scene/mappings/lutz.bin"
 
 
 SoundtrackCharArray:
-	if revision>0
+	if revision=0
+	dc.b	$71, $83, $82, $65, $61, $A5, $00, $62, $A1, $7E, $57, $69
+	dc.b	$7E, $62, $69, $7E, $57, $61, $8B, $82, $00, $00, $00, $00
+	dc.b	$A1, $7E, $92, $89, $A5, $00, $62, $69, $7C, $A5, $75, $00
+	dc.b	$56, $9A, $9B, $82, $62, $69, $00, $A2, $92, $61, $8B, $82
+	dc.b	$62, $68, $88, $A1, $00, $56, $88, $A1, $00, $00, $00, $00
+	dc.b	$9D, $7B, $88, $5C, $A5, $00, $6B, $8A, $A5, $62, $00, $00
+	dc.b	$73, $57, $00, $72, $A5, $75, $00, $00, $00, $00, $00, $00
+	dc.b	$A1, $7E, $88, $61, $89, $A5, $00, $00, $00, $00, $00, $00
+	dc.b	$A1, $7F, $7F, $A5, $8E, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$7B, $57, $93, $00, $5A, $56, $00, $71, $87, $A5, $7D, $00
+	dc.b	$75, $A5, $9D, $76, $82, $69, $00, $00, $00, $00, $00, $00
+	dc.b	$5A, $A5, $C2, $83, $A5, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$61, $A5, $5D, $7E, $88, $69, $00, $58, $86, $57, $93, $00
+	dc.b	$A1, $7F, $73, $57, $93, $9A, $00, $74, $62, $68, $7C, $A5
+	dc.b	$91, $00, $A1, $7E, $57, $62, $00, $5A, $9D, $00, $99, $62
+	dc.b	$60, $57, $7E, $82, $69, $00, $95, $A5, $82, $00, $00, $00
+	dc.b	$59, $5C, $60, $57, $68, $84, $82, $8E, $00, $65, $58, $82
+	dc.b	$9B, $57, $5A, $7E, $57, $61, $8B, $82, $00, $00, $00, $00
+	dc.b	$9F, $80, $A5, $00, $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$56, $82, $96, $A5, $00, $00, $00, $00, $00, $00, $00, $00
+	dc.b	$59, $5D, $62, $5D, $7B, $57, $75, $00, $00, $00, $00, $00
+	dc.b	$6D, $9B, $A5, $9A, $7C, $A5, $74, $82, $8E, $00, $00, $00
 	
+	elseif revision=3
+
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	' ', 0
@@ -37336,28 +39903,32 @@ SoundtrackCharArray:
 	
 	else
 
-	dc.b	$71, $83, $82, $65, $61, $A5, $00, $62, $A1, $7E, $57, $69
-	dc.b	$7E, $62, $69, $7E, $57, $61, $8B, $82, $00, $00, $00, $00
-	dc.b	$A1, $7E, $92, $89, $A5, $00, $62, $69, $7C, $A5, $75, $00
-	dc.b	$56, $9A, $9B, $82, $62, $69, $00, $A2, $92, $61, $8B, $82
-	dc.b	$62, $68, $88, $A1, $00, $56, $88, $A1, $00, $00, $00, $00
-	dc.b	$9D, $7B, $88, $5C, $A5, $00, $6B, $8A, $A5, $62, $00, $00
-	dc.b	$73, $57, $00, $72, $A5, $75, $00, $00, $00, $00, $00, $00
-	dc.b	$A1, $7E, $88, $61, $89, $A5, $00, $00, $00, $00, $00, $00
-	dc.b	$A1, $7F, $7F, $A5, $8E, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$7B, $57, $93, $00, $5A, $56, $00, $71, $87, $A5, $7D, $00
-	dc.b	$75, $A5, $9D, $76, $82, $69, $00, $00, $00, $00, $00, $00
-	dc.b	$5A, $A5, $C2, $83, $A5, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$61, $A5, $5D, $7E, $88, $69, $00, $58, $86, $57, $93, $00
-	dc.b	$A1, $7F, $73, $57, $93, $9A, $00, $74, $62, $68, $7C, $A5
-	dc.b	$91, $00, $A1, $7E, $57, $62, $00, $5A, $9D, $00, $99, $62
-	dc.b	$60, $57, $7E, $82, $69, $00, $95, $A5, $82, $00, $00, $00
-	dc.b	$59, $5C, $60, $57, $68, $84, $82, $8E, $00, $65, $58, $82
-	dc.b	$9B, $57, $5A, $7E, $57, $61, $8B, $82, $00, $00, $00, $00
-	dc.b	$9F, $80, $A5, $00, $00, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$56, $82, $96, $A5, $00, $00, $00, $00, $00, $00, $00, $00
-	dc.b	$59, $5D, $62, $5D, $7B, $57, $75, $00, $00, $00, $00, $00
-	dc.b	$6D, $9B, $A5, $9A, $7C, $A5, $74, $82, $8E, $00, $00, $00
+	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
+	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
+	charset	' ', 0
+	
+	dc.b	"Phantasy    "
+	dc.b	"Restration  "
+	dc.b	"Pleasure    "
+	dc.b	"Advanced    "
+	dc.b	"Step Up     "
+	dc.b	"Bracky News "
+	dc.b	"My Home     "
+	dc.b	"Pressure    "
+	dc.b	"a Prologue  "
+	dc.b	"Rise or Fall"
+	dc.b	"Movement    "
+	dc.b	"Over        "
+	dc.b	"Secret Ways "
+	dc.b	"Mystery     "
+	dc.b	"Death Place "
+	dc.b	"Silent Zone "
+	dc.b	"Excite Town "
+	dc.b	"Violation   "
+	dc.b	"Power       "
+	dc.b	"Under       "
+	dc.b	"Exclaim     "
+	dc.b	"Never Dream "
 	
 	endif
 ; ========================================================================================
@@ -37463,7 +40034,116 @@ GameScriptPtrs:
 	dc.l	Script_Miscellaneous	; $19
 ; =================================================================
 
-	if revision>0
+	if revision=0
+Script_ItemAction:	include "script/ja/item.asm"
+	even
+Script_TechAction:	include "script/ja/tech.asm"
+	even
+Script_EquipAction:	include "script/ja/equip.asm"
+	even
+Script_DataMemory:	include "script/ja/data_memory.asm"
+	even
+Script_CloneLabs:	include "script/ja/clone_labs.asm"
+	even
+Script_Hospital:	include "script/ja/hospital.asm"
+	even
+Script_WeaponStore:	include "script/ja/weapon_store.asm"
+	even
+Script_ArmorStore:	include "script/ja/armor_store.asm"
+	even
+Script_ItemStore:	include "script/ja/item_store.asm"
+	even
+Script_RolfHouse:	include "script/ja/rolf_house.asm"
+	even
+Script_UstvestiaHouse:	include "script/ja/ustvestia.asm"
+	even
+Script_InventorHouse:	include "script/ja/inventor.asm"
+	even
+Script_TeleportStation:	include "script/ja/teleport.asm"
+	even
+Script_CentralTower:	include "script/ja/central_tower.asm"
+	even
+Script_StorageRoom:	include "script/ja/storage_room.asm"
+	even
+Script_Roof:	include "script/ja/roof.asm"
+	even
+Script_Library:	include "script/ja/library.asm"
+	even
+Script_Governor:	include "script/ja/governor.asm"
+	even
+Script_Battle:	include "script/ja/battle.asm"
+	even
+Script_IntroScreen:	include "script/ja/intro_screen.asm"
+	even
+Script_Opening:	include "script/ja/opening.asm"
+	even
+Script_GameStart:	include "script/ja/game_start.asm"
+	even
+Script_NPC:	include "script/ja/NPC.asm"
+	even
+Script_MapActions:	include "script/ja/map_actions.asm"
+	even
+Script_MapEvents:	include "script/ja/map_events.asm"
+	even
+Script_Miscellaneous:	include "script/ja/misc.asm"
+	even
+
+	align0 $1000
+	
+	elseif revision=3
+	
+	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
+	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
+	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
+	charset	' ', 0
+	charset	',', $3F
+	charset	'.', $40
+	charset	';', $41
+	charset	'"', $42
+	charset	'?', $43
+	charset	'!', $44
+	charset	39, $45	; apostrophe
+	charset	'-', $46
+	charset	':', $77
+
+Script_ItemAction:	include "script/pt/item.asm"
+Script_TechAction:	include "script/pt/tech.asm"
+Script_EquipAction:	include "script/pt/equip.asm"
+Script_DataMemory:	include "script/pt/data_memory.asm"
+Script_CloneLabs:	include "script/pt/clone_labs.asm"
+Script_Hospital:	include "script/pt/hospital.asm"
+Script_WeaponStore:	include "script/pt/weapon_store.asm"
+Script_ArmorStore:	include "script/pt/armor_store.asm"
+Script_ItemStore:	include "script/pt/item_store.asm"
+Script_RolfHouse:	include "script/pt/rolf_house.asm"
+Script_UstvestiaHouse:	include "script/pt/ustvestia.asm"
+Script_InventorHouse:	include "script/pt/inventor.asm"
+Script_TeleportStation:	include "script/pt/teleport.asm"
+Script_CentralTower:	include "script/pt/central_tower.asm"
+Script_StorageRoom:	include "script/pt/storage_room.asm"
+Script_Roof:	include "script/pt/roof.asm"
+Script_Library:	include "script/pt/library.asm"
+Script_Governor:	include "script/pt/governor.asm"
+Script_Battle:	include "script/pt/battle.asm"
+Script_IntroScreen:	include "script/pt/intro_screen.asm"
+Script_Opening:	include "script/pt/opening.asm"
+Script_GameStart:	include "script/pt/game_start.asm"
+Script_NPC:	include "script/pt/NPC.asm"
+Script_MapActions:	include "script/pt/map_actions.asm"
+Script_MapEvents:	include "script/pt/map_events.asm"
+Script_Miscellaneous:	include "script/pt/misc.asm"
+
+	charset
+; ---------------------------------------------------------------------------------
+; filler free space
+
+	rept $2A8
+	dc.b	0                                   
+	endm
+; ---------------------------------------------------------------------------------
+
+	else
+	
 	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
 	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
 	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
@@ -37539,63 +40219,6 @@ Script_Miscellaneous:	include "script/en/misc.asm"
 	dc.b	0
 	endm
 ; ---------------------------------------------------------------------------------
-
-	else
-	
-Script_ItemAction:	include "script/jp/item.asm"
-	even
-Script_TechAction:	include "script/jp/tech.asm"
-	even
-Script_EquipAction:	include "script/jp/equip.asm"
-	even
-Script_DataMemory:	include "script/jp/data_memory.asm"
-	even
-Script_CloneLabs:	include "script/jp/clone_labs.asm"
-	even
-Script_Hospital:	include "script/jp/hospital.asm"
-	even
-Script_WeaponStore:	include "script/jp/weapon_store.asm"
-	even
-Script_ArmorStore:	include "script/jp/armor_store.asm"
-	even
-Script_ItemStore:	include "script/jp/item_store.asm"
-	even
-Script_RolfHouse:	include "script/jp/rolf_house.asm"
-	even
-Script_UstvestiaHouse:	include "script/jp/ustvestia.asm"
-	even
-Script_InventorHouse:	include "script/jp/inventor.asm"
-	even
-Script_TeleportStation:	include "script/jp/teleport.asm"
-	even
-Script_CentralTower:	include "script/jp/central_tower.asm"
-	even
-Script_StorageRoom:	include "script/jp/storage_room.asm"
-	even
-Script_Roof:	include "script/jp/roof.asm"
-	even
-Script_Library:	include "script/jp/library.asm"
-	even
-Script_Governor:	include "script/jp/governor.asm"
-	even
-Script_Battle:	include "script/jp/battle.asm"
-	even
-Script_IntroScreen:	include "script/jp/intro_screen.asm"
-	even
-Script_Opening:	include "script/jp/opening.asm"
-	even
-Script_GameStart:	include "script/jp/game_start.asm"
-	even
-Script_NPC:	include "script/jp/NPC.asm"
-	even
-Script_MapActions:	include "script/jp/map_actions.asm"
-	even
-Script_MapEvents:	include "script/jp/map_events.asm"
-	even
-Script_Miscellaneous:	include "script/jp/misc.asm"
-	even
-
-	align0 $1000
 	
 	endif
 
@@ -48876,11 +51499,16 @@ loc_29E16:
 	dc.b	$00, $00, $00, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F ;0x0 (0x00029E94-0x00029EB8, Entry count: 0x00000024) [Unknown data]
 	dc.b	$0F, $0F, $0F, $0F ;0x20
 
-	if revision>0
-Art_Font:	binclude "general/art/font.bin"
+	
+Art_Font:
+	if revision=0
+	binclude "general/art/font_ja.bin"
+	elseif revision=3
+	binclude "general/art/font_pt.bin"
 	else
-Art_Font:	binclude "general/art/font_jp.bin"	
+	binclude "general/art/font.bin"
 	endif
+	
 	even
 
 
@@ -49607,15 +52235,25 @@ Art_SceneKain: binclude "scene/art/kain.bin"
 Art_SceneShir: binclude "scene/art/shir.bin"
 	even
 
-	if revision>0
-Art_SceneGraph: binclude "scene/art/graph.bin"
+	
+Art_SceneGraph:
+	if revision=0
+	binclude "scene/art/graph_ja.bin"
+	elseif revision=3
+	binclude "scene/art/graph_pt.bin"
 	else
-Art_SceneGraph: binclude "scene/art/graph_jp.bin"	
+	binclude "scene/art/graph.bin"
 	endif
 	even
 
-Art_SceneRadar: binclude "scene/art/radar.bin"
+	
+Art_SceneRadar:
+	if revision=3
+	binclude "scene/art/radar_pt.bin"
+	else
+	binclude "scene/art/radar.bin"
 	even
+	endif
 	
 Art_SceneMotaTeleportEmployee: binclude "scene/art/mota_teleport_employee.bin"
 	even
@@ -49639,32 +52277,40 @@ loc_39E9C:
 	dc.b	$FA, $01, $FF, $FF, $FF, $FF, $F7, $F8, $FF ;0x0 (0x00039EBD-0x00039EC6, Entry count: 0x00000009)
 	endif
 
-	if revision>0
-ArtNem_Mota:	binclude "map/mota/art/nemesis/tiles.bin"
+ArtNem_Mota:
+	if revision=0
+	binclude "map/mota/art/ja/tiles.bin"
 	else
-ArtNem_Mota:	binclude "map/mota/art/jp/tiles.bin"	
+	binclude "map/mota/art/nemesis/tiles.bin"
 	endif
+
 	even
 
-	if revision>0
-ArtNem_Dezo:	binclude "map/dezo/art/nemesis/tiles.bin"
+ArtNem_Dezo:
+	if revision=0
+	binclude "map/dezo/art/ja/tiles.bin"
 	else
-ArtNem_Dezo:	binclude "map/dezo/art/jp/tiles.bin"	
+	binclude "map/dezo/art/nemesis/tiles.bin"	
 	endif
+
 	even
 
-	if revision>0
-ArtNem_Town:	binclude "map/towns/art/nemesis/tiles.bin"
+ArtNem_Town:
+	if revision=0
+	binclude "map/towns/art/ja/tiles.bin"
 	else
-ArtNem_Town:	binclude "map/towns/art/jp/tiles.bin"
+	binclude "map/towns/art/nemesis/tiles.bin"
 	endif
+
 	even
 
-	if revision>0
-ArtNem_IslandPassage:	binclude "map/islands and passageways/art/nemesis/tiles.bin"
+ArtNem_IslandPassage:
+	if revision=0
+	binclude "map/islands and passageways/art/ja/tiles.bin"
 	else
-ArtNem_IslandPassage:	binclude "map/islands and passageways/art/jp/tiles.bin"	
+	binclude "map/islands and passageways/art/nemesis/tiles.bin"
 	endif
+	
 	even
 
 loc_412F8:
@@ -49697,11 +52343,12 @@ loc_412F8:
 
 	even
 
-	if revision>0
-ArtNem_MotaDungeon:	binclude "map/mota dungeons/art/nemesis/tiles.bin"
-	even
+ArtNem_MotaDungeon:
+	if revision=0
+	binclude "map/mota dungeons/art/ja/tiles.bin"
 	else
-ArtNem_MotaDungeon:	binclude "map/mota dungeons/art/jp/tiles.bin"
+	binclude "map/mota dungeons/art/nemesis/tiles.bin"
+	even
 	endif
 
 	if revision=0
@@ -49712,12 +52359,14 @@ loc_39E9C:
 	
 	even
 	endif
-	
-	if revision>0
-ArtNem_DezoDungeon:	binclude "map/dezo dungeons/art/nemesis/tiles.bin"
+
+ArtNem_DezoDungeon:
+	if revision=0
+	binclude "map/dezo dungeons/art/ja/tiles.bin"
 	else
-ArtNem_DezoDungeon:	binclude "map/dezo dungeons/art/jp/tiles.bin"
+	binclude "map/dezo dungeons/art/nemesis/tiles.bin"
 	endif
+	
 	even
 
 loc_44F2A:
@@ -61716,6 +64365,39 @@ PlaneMap_TitleFG:	binclude "title/mappings/foreground_tiles.bin"
 ; -----------------------------------------------------------------
 ; Mappings
 ; -----------------------------------------------------------------
+
+	if revision=3
+
+loc_6D75A:
+	dc.w	loc_6D75E-loc_6D75A
+	dc.w	loc_6D76E-loc_6D75A
+
+loc_6D75E:
+	dc.b	$03
+	dc.b	$00, $00, $00, $00, $00
+	dc.b	$00, $0C, $00, $01, $10
+	dc.b	$00, $0C, $00, $05, $38
+
+loc_6D76E:
+	dc.b	$0F
+	dc.b	$00, $00, $00, $09, $E0
+	dc.b	$00, $00, $00, $0A, $E8
+	dc.b	$00, $00, $00, $0B, $F0
+	dc.b	$00, $00, $00, $0C, $F8
+	dc.b	$00, $00, $00, $0C, $00
+	dc.b	$00, $00, $00, $0D, $08
+	dc.b	$00, $00, $00, $0E, $10
+	dc.b	$00, $00, $00, $0F, $18
+	dc.b	$00, $00, $00, $0B, $20
+	dc.b	$00, $00, $00, $0C, $30
+	dc.b	$00, $00, $00, $10, $38
+	dc.b	$00, $00, $00, $11, $40
+	dc.b	$00, $00, $00, $0A, $48
+	dc.b	$00, $00, $00, $10, $50
+	dc.b	$00, $00, $00, $12, $58
+
+	else
+
 loc_6D75A:
 	dc.w	loc_6D75E-loc_6D75A
 	dc.w	loc_6D76E-loc_6D75A
@@ -61746,6 +64428,7 @@ loc_6D76E:
 
 ; ==================================================
 
+	endif
 
 loc_6D7BA:
 	dc.b	$01, $88, $FF, $FF, $FF, $FF, $01, $88, $FF, $FF, $EE, $CC, $86, $66, $86, $34
@@ -74877,16 +77560,7 @@ z80ptr	function addr, ((addr-SoundDriverBase)<<8)&$FF00|(addr-SoundDriverBase)>>
 	dc.w	z80ptr(SFXPtrs)
 
 SoundPriorities:
-	if revision>0
-	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
-	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
-	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $50, $70
-	dc.b	$70, $70, $70, $70, $70, $70, $60, $70, $70, $70, $70
-	dc.b	$00, $70, $70, $40, $70, $50, $50, $50, $50, $50, $50
-	dc.b	$50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $60
-	dc.b	$60, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50
-	dc.b	$50, $50, $60, $50, $50, $50, $70, $80, $80, $70, $00
-	else
+	if revision=0
 	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
 	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
 	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $50, $70
@@ -74895,6 +77569,15 @@ SoundPriorities:
 	dc.b	$50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $60
 	dc.b	$60, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50
 	dc.b	$50, $50, $50, $50, $50, $50, $50, $80, $80, $70, $00
+	else
+	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
+	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $81, $81
+	dc.b	$81, $81, $81, $81, $81, $81, $81, $81, $81, $50, $70
+	dc.b	$70, $70, $70, $70, $70, $70, $60, $70, $70, $70, $70
+	dc.b	$00, $70, $70, $40, $70, $50, $50, $50, $50, $50, $50
+	dc.b	$50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $60
+	dc.b	$60, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50
+	dc.b	$50, $50, $60, $50, $50, $50, $70, $80, $80, $70, $00
 	endif
 
 MusicTempo:
@@ -75493,504 +78176,7 @@ Music_Null:
 	dc.b	$00
 
 FMInsPtrs:
-	if revision>0
-	dc.w	z80ptr(loc_B863A)
-	dc.w	z80ptr(loc_B8654)
-	dc.w	z80ptr(loc_B866E)
-	dc.w	z80ptr(loc_B8688)
-	dc.w	z80ptr(loc_B86A2)
-	dc.w	z80ptr(loc_B86BC)
-	dc.w	z80ptr(loc_B86D6)
-	dc.w	z80ptr(loc_B86F0)
-	dc.w	z80ptr(loc_B870A)
-	dc.w	z80ptr(loc_B8724)
-	dc.w	z80ptr(loc_B873E)
-	dc.w	z80ptr(loc_B8758)
-	dc.w	z80ptr(loc_B8772)
-	dc.w	z80ptr(loc_B878C)
-	dc.w	z80ptr(loc_B87A6)
-	dc.w	z80ptr(loc_B87C0)
-	dc.w	z80ptr(loc_B87DA)
-	dc.w	z80ptr(loc_B87F4)
-	dc.w	z80ptr(loc_B880E)
-	dc.w	z80ptr(loc_B8828)
-	dc.w	z80ptr(loc_B8842)
-	dc.w	z80ptr(loc_B885C)
-	dc.w	z80ptr(loc_B8876)
-	dc.w	z80ptr(loc_B8890)
-	dc.w	z80ptr(loc_B88AA)
-	dc.w	z80ptr(loc_B88C4)
-	dc.w	z80ptr(loc_B88DE)
-	dc.w	z80ptr(loc_B88F8)
-	dc.w	z80ptr(loc_B8912)
-	dc.w	z80ptr(loc_B892C)
-	dc.w	z80ptr(loc_B8946)
-	dc.w	z80ptr(loc_B8960)
-	dc.w	z80ptr(loc_B897A)
-	dc.w	z80ptr(loc_B8994)
-	dc.w	z80ptr(loc_B89AE)
-	dc.w	z80ptr(loc_B89C8)
-	dc.w	z80ptr(loc_B89E2)
-	dc.w	z80ptr(loc_B89FC)
-	dc.w	z80ptr(loc_B8A16)
-	dc.w	z80ptr(loc_B8A30)
-	dc.w	z80ptr(loc_B8A4A)
-	dc.w	z80ptr(loc_B8A64)
-	dc.w	z80ptr(loc_B8A7E)
-	dc.w	z80ptr(loc_B8A98)
-	dc.w	z80ptr(loc_B8AB2)
-	dc.w	z80ptr(loc_B8ACC)
-	dc.w	z80ptr(loc_B8AE6)
-	dc.w	z80ptr(loc_B8B00)
-	dc.w	z80ptr(loc_B8B1A)
-	dc.w	z80ptr(loc_B8B34)
-	dc.w	z80ptr(loc_B8B4E)
-	dc.w	z80ptr(loc_B8B68)
-	dc.w	z80ptr(loc_B8B82)
-	dc.w	z80ptr(loc_B8B9C)
-	dc.w	z80ptr(loc_B8BB6)
-	dc.w	z80ptr(loc_B8BD0)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8BEA)
-	dc.w	z80ptr(loc_B8C04)
-	dc.w	z80ptr(loc_B8C1E)
-	dc.w	z80ptr(loc_B8C38)
-	dc.w	z80ptr(loc_B8C52)
-	dc.w	z80ptr(loc_B8C6C)
-	dc.w	z80ptr(loc_B8C86)
-	dc.w	z80ptr(loc_B8C9C)
-	dc.w	z80ptr(loc_B8CB6)
-	dc.w	z80ptr(loc_B8CD0)
-	dc.w	z80ptr(loc_B8CEA)
-	dc.w	z80ptr(loc_B8D04)
-	dc.w	z80ptr(loc_B8D1E)
-	dc.w	z80ptr(loc_B8D38)
-	dc.w	z80ptr(loc_B8D52)
-	dc.w	z80ptr(loc_B8D6C)
-	dc.w	z80ptr(loc_B8D86)
-	dc.w	z80ptr(loc_B8DA0)
-	dc.w	z80ptr(loc_B8DBA)
-	dc.w	z80ptr(loc_B8DD4)
-	dc.w	z80ptr(loc_B8DEE)
-	dc.w	z80ptr(loc_B8E08)
-	dc.w	z80ptr(loc_B8E22)
-	dc.w	z80ptr(loc_B8E3C)
-	dc.w	z80ptr(loc_B8E56)
-	dc.w	z80ptr(loc_B8E70)
-	dc.w	z80ptr(loc_B8E8A)
-	dc.w	z80ptr(loc_B8EA4)
-	dc.w	z80ptr(loc_B8EBE)
-	dc.w	z80ptr(loc_B8ED8)
-	dc.w	z80ptr(loc_B8EF2)
-	dc.w	z80ptr(loc_B8F0C)
-	dc.w	z80ptr(loc_B8F26)
-	dc.w	z80ptr(loc_B8F40)
-	dc.w	z80ptr(loc_B8F5A)
-	dc.w	z80ptr(loc_B8F74)
-	dc.w	z80ptr(loc_B8F8E)
-	dc.w	z80ptr(loc_B8FA8)
-	dc.w	z80ptr(loc_B8FC2)
-	dc.w	z80ptr(loc_B8FDC)
-	dc.w	z80ptr(loc_B8FF2)
-
-loc_B863A:
-	dc.b	$13, $C0, $30, $30, $30, $00, $08, $16, $06, $02, $10, $1F, $1F, $1F, $01, $01
-	dc.b	$00, $00, $0B, $00, $05, $09, $1F, $8F, $3F, $8F
-
-loc_B8654:
-	dc.b	$3C, $C0, $1E, $02, $05, $02, $67, $43, $32, $72, $1F, $1F, $1F, $1F, $00, $00
-	dc.b	$00, $00, $16, $15, $12, $14, $11, $13, $15, $17
-
-loc_B866E:
-	dc.b	$24, $C0, $38, $00, $1A, $00, $06, $04, $0F, $04, $97, $1B, $9F, $1F, $09, $0D
-	dc.b	$00, $0D, $00, $06, $00, $00, $2F, $AF, $0F, $AF
-
-loc_B8688:
-	dc.b	$F5, $C0, $01, $00, $00, $00, $11, $01, $20, $61, $15, $1B, $1F, $14, $12, $06
-	dc.b	$00, $00, $04, $0A, $30, $02, $14, $16, $16, $46
-
-loc_B86A2:
-	dc.b	$17, $C0, $00, $00, $00, $00, $44, $42, $53, $10, $1A, $9E, $9F, $5F, $1F, $1F
-	dc.b	$1F, $1B, $13, $12, $93, $10, $6F, $4F, $8F, $4F
-
-loc_B86BC:
-	dc.b	$04, $C0, $60, $00, $60, $00, $0C, $0F, $0C, $08, $1F, $1F, $1F, $1F, $00, $00
-	dc.b	$00, $00, $00, $06, $00, $0E, $0F, $EF, $0F, $BF
-
-loc_B86D6:
-	dc.b	$05, $C0, $0E, $00, $00, $00, $37, $61, $72, $01, $1F, $1F, $1F, $1E, $00, $02
-	dc.b	$15, $00, $02, $80, $65, $07, $0F, $0F, $BF, $0F
-
-loc_B86F0:
-	dc.b	$21, $F6, $07, $00, $12, $00, $B2, $1A, $3B, $43, $69, $85, $42, $0C, $89, $A2
-	dc.b	$00, $0F, $04, $0B, $71, $10, $4F, $77, $24, $98
-
-loc_B870A:
-	dc.b	$14, $C0, $10, $00, $10, $00, $52, $B1, $41, $60, $04, $0C, $16, $4E, $05, $08
-	dc.b	$08, $00, $0A, $04, $05, $03, $7C, $79, $0A, $59
-
-loc_B8724:
-	dc.b	$97, $C0, $10, $03, $03, $10, $02, $21, $61, $36, $10, $0B, $09, $10, $02, $01
-	dc.b	$80, $80, $03, $21, $13, $82, $1C, $4C, $8C, $5D
-
-loc_B873E:
-	dc.b	$4C, $C0, $30, $00, $30, $00, $02, $22, $61, $36, $1F, $18, $1F, $16, $00, $02
-	dc.b	$00, $01, $03, $21, $13, $82, $1F, $4F, $8F, $5F
-
-loc_B8758:
-	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
-	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
-
-loc_B8772:
-	dc.b	$3A, $C0, $00, $00, $00, $00, $71, $51, $62, $54, $10, $10, $10, $0F, $00, $00
-	dc.b	$04, $29, $80, $00, $C1, $80, $24, $29, $1F, $78
-
-loc_B878C:
-	dc.b	$3C, $C0, $13, $03, $15, $03, $13, $53, $62, $51, $14, $11, $1A, $B5, $04, $04
-	dc.b	$04, $22, $52, $59, $34, $39, $1F, $8F, $1F, $8F
-
-loc_B87A6:
-	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
-	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
-
-loc_B87C0:
-	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
-	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
-
-loc_B87DA:
-	dc.b	$02, $C0, $04, $0D, $08, $03, $71, $82, $70, $51, $1F, $1F, $1F, $1F, $58, $44
-	dc.b	$0D, $09, $17, $0B, $65, $07, $07, $17, $08, $09
-
-loc_B87F4:
-	dc.b	$05, $C0, $05, $07, $06, $04, $45, $53, $51, $62, $03, $0B, $0E, $09, $06, $09
-	dc.b	$08, $02, $05, $05, $01, $09, $0F, $0F, $0A, $0F
-
-loc_B880E:
-	dc.b	$1B, $C0, $05, $05, $1A, $00, $6C, $4F, $0A, $8E, $1F, $1C, $18, $1F, $19, $10
-	dc.b	$1A, $00, $0E, $30, $40, $00, $3F, $FF, $AF, $1F
-
-loc_B8828:
-	dc.b	$00, $C0, $01, $01, $00, $00, $91, $35, $30, $00, $0F, $9F, $C9, $1F, $48, $3A
-	dc.b	$08, $08, $65, $20, $80, $02, $F4, $6D, $3E, $4B
-
-loc_B8842:
-	dc.b	$02, $C0, $24, $08, $07, $03, $03, $02, $02, $02, $1F, $1F, $1F, $1F, $14, $14
-	dc.b	$0D, $19, $19, $0A, $15, $08, $1A, $1F, $1F, $0F
-
-loc_B885C:
-	dc.b	$3B, $C0, $10, $20, $10, $00, $15, $30, $32, $41, $1F, $1C, $18, $0F, $09, $20
-	dc.b	$0A, $0F, $04, $00, $00, $11, $08, $F4, $A4, $17
-
-loc_B8876:
-	dc.b	$1D, $C0, $0D, $00, $00, $00, $54, $44, $64, $11, $15, $1F, $57, $5C, $06, $05
-	dc.b	$0C, $01, $86, $05, $0C, $01, $6F, $1F, $5F, $8F
-
-loc_B8890:
-	dc.b	$05, $C0, $18, $00, $00, $00, $24, $71, $50, $40, $1F, $1F, $1C, $13, $04, $0B
-	dc.b	$1C, $0B, $04, $82, $0E, $1E, $9F, $6F, $2F, $5F
-
-loc_B88AA:
-	dc.b	$05, $C0, $18, $00, $00, $00, $23, $27, $50, $41, $15, $1F, $1C, $0B, $04, $0B
-	dc.b	$1C, $0B, $04, $82, $0E, $1E, $9F, $6F, $2F, $5F
-
-loc_B88C4:
-	dc.b	$1D, $C0, $09, $00, $00, $00, $63, $30, $33, $60, $10, $1F, $1F, $1F, $08, $0E
-	dc.b	$12, $10, $04, $08, $0A, $0E, $1F, $1F, $1F, $1F
-
-loc_B88DE:
-	dc.b	$03, $C0, $10, $20, $0C, $00, $23, $63, $73, $70, $1F, $1F, $1F, $1F, $0F, $01
-	dc.b	$00, $03, $08, $09, $08, $0C, $5F, $3F, $3F, $4F
-
-loc_B88F8:
-	dc.b	$39, $C0, $18, $10, $08, $00, $1B, $30, $31, $40, $D3, $D3, $D4, $0E, $09, $00
-	dc.b	$00, $17, $2C, $40, $62, $26, $04, $15, $64, $07
-
-loc_B8912:
-	dc.b	$05, $C0, $30, $00, $00, $00, $63, $30, $AC, $42, $08, $0C, $0D, $0E, $0A, $00
-	dc.b	$05, $00, $09, $04, $04, $07, $4F, $6F, $7F, $6F
-
-loc_B892C:
-	dc.b	$1D, $C0, $10, $00, $00, $00, $66, $32, $30, $60, $10, $1F, $1F, $1F, $08, $0E
-	dc.b	$12, $10, $04, $08, $0A, $0C, $1F, $1F, $1F, $1F
-
-loc_B8946:
-	dc.b	$3D, $C0, $12, $00, $0C, $00, $24, $48, $55, $40, $15, $0A, $0C, $12, $1A, $1B
-	dc.b	$1C, $0B, $04, $1A, $17, $1E, $0F, $1F, $3F, $5F
-
-loc_B8960:
-	dc.b	$3D, $C0, $10, $02, $1C, $05, $75, $40, $57, $43, $15, $0A, $0C, $11, $1A, $1B
-	dc.b	$2C, $0B, $06, $2A, $27, $1E, $0E, $28, $38, $5E
-
-loc_B897A:
-	dc.b	$3C, $C0, $02, $00, $1F, $05, $71, $90, $50, $72, $10, $1F, $10, $1F, $0D, $04
-	dc.b	$44, $49, $88, $58, $08, $24, $44, $38, $46, $E9
-
-loc_B8994:
-	dc.b	$34, $C0, $04, $00, $02, $05, $70, $90, $51, $A0, $10, $1A, $10, $19, $04, $06
-	dc.b	$F4, $1F, $31, $28, $08, $2C, $74, $5B, $26, $1A
-
-loc_B89AE:
-	dc.b	$24, $C0, $1D, $07, $20, $07, $3F, $54, $67, $74, $1F, $58, $1F, $1F, $13, $08
-	dc.b	$0E, $08, $04, $05, $05, $05, $55, $17, $62, $17
-
-loc_B89C8:
-	dc.b	$3C, $C0, $20, $04, $00, $00, $65, $43, $36, $78, $1F, $0E, $1F, $0E, $10, $00
-	dc.b	$00, $00, $16, $15, $12, $12, $14, $13, $15, $12
-
-loc_B89E2:
-	dc.b	$34, $C0, $03, $00, $00, $03, $70, $7F, $31, $5F, $19, $0F, $72, $0B, $14, $01
-	dc.b	$01, $58, $43, $01, $00, $04, $20, $26, $F4, $C4
-
-loc_B89FC:
-	dc.b	$3B, $C0, $0F, $13, $0F, $00, $05, $0B, $00, $02, $1F, $0F, $13, $17, $02, $02
-	dc.b	$06, $02, $0F, $0A, $0C, $09, $24, $26, $26, $89
-
-loc_B8A16:
-	dc.b	$34, $C0, $14, $13, $0A, $00, $60, $51, $20, $10, $1F, $95, $9C, $54, $01, $02
-	dc.b	$0E, $04, $00, $01, $00, $01, $34, $07, $D8, $17
-
-loc_B8A30:
-	dc.b	$03, $C0, $10, $18, $10, $00, $17, $1F, $70, $71, $1F, $18, $18, $1F, $01, $05
-	dc.b	$03, $00, $00, $03, $00, $00, $0F, $1F, $0F, $1F
-
-loc_B8A4A:
-	dc.b	$03, $C0, $28, $16, $15, $00, $20, $20, $75, $72, $1F, $08, $1F, $1F, $0F, $02
-	dc.b	$0A, $06, $00, $01, $00, $0C, $0F, $1F, $0F, $1F
-
-loc_B8A64:
-	dc.b	$22, $C0, $28, $2E, $16, $00, $18, $3F, $38, $06, $15, $0E, $8C, $8B, $02, $00
-	dc.b	$00, $0E, $01, $00, $00, $06, $4F, $6F, $FF, $0F
-
-loc_B8A7E:
-	dc.b	$3B, $C0, $12, $00, $10, $00, $71, $00, $02, $31, $1F, $0E, $1F, $1F, $05, $01
-	dc.b	$01, $01, $00, $02, $01, $03, $0F, $1F, $0F, $4F
-
-loc_B8A98:
-	dc.b	$1C, $C0, $20, $00, $18, $00, $65, $72, $79, $10, $15, $9B, $9B, $5F, $04, $02
-	dc.b	$0A, $04, $06, $01, $06, $04, $6F, $5F, $8F, $8F
-
-loc_B8AB2:
-	dc.b	$1A, $C0, $10, $00, $00, $00, $16, $32, $38, $19, $55, $9E, $9C, $1F, $03, $09
-	dc.b	$04, $08, $04, $03, $02, $06, $5F, $2F, $3F, $3F
-
-loc_B8ACC:
-	dc.b	$19, $C0, $20, $20, $10, $00, $31, $3B, $77, $17, $1F, $13, $1F, $1F, $0E, $05
-	dc.b	$00, $00, $16, $04, $01, $00, $8F, $2F, $8F, $EF
-
-loc_B8AE6:
-	dc.b	$1C, $C0, $00, $00, $00, $00, $66, $7F, $72, $16, $07, $0F, $45, $0F, $04, $01
-	dc.b	$04, $00, $00, $04, $0F, $04, $2F, $2F, $2F, $2F
-
-loc_B8B00:
-	dc.b	$38, $C0, $1D, $17, $0D, $00, $03, $01, $00, $00, $1F, $0E, $1A, $1F, $04, $00
-	dc.b	$04, $06, $02, $02, $02, $02, $28, $27, $27, $33
-
-loc_B8B1A:
-	dc.b	$18, $C0, $10, $18, $0F, $06, $01, $00, $00, $00, $1B, $1F, $1F, $1F, $04, $04
-	dc.b	$04, $06, $08, $08, $08, $0C, $24, $26, $26, $24
-
-loc_B8B34:
-	dc.b	$1C, $C0, $16, $09, $08, $00, $70, $75, $70, $1E, $04, $0E, $5A, $15, $08, $02
-	dc.b	$01, $08, $00, $01, $00, $04, $2F, $7F, $FF, $2F
-
-loc_B8B4E:
-	dc.b	$34, $C0, $07, $0C, $03, $0D, $35, $76, $20, $56, $14, $0C, $0D, $11, $08, $04
-	dc.b	$07, $03, $00, $09, $00, $02, $4B, $1F, $1F, $7F
-
-loc_B8B68:
-	dc.b	$1D, $C0, $0C, $00, $00, $00, $32, $63, $32, $34, $0A, $18, $18, $0E, $00, $0A
-	dc.b	$0A, $0A, $08, $01, $02, $04, $1F, $6F, $4F, $6F
-
-loc_B8B82:
-	dc.b	$39, $C0, $12, $24, $0F, $00, $32, $00, $01, $30, $10, $10, $10, $18, $06, $02
-	dc.b	$06, $02, $08, $05, $01, $01, $B9, $67, $44, $46
-
-loc_B8B9C:
-	dc.b	$34, $C0, $03, $00, $00, $03, $70, $7F, $31, $5F, $19, $0F, $52, $0B, $25, $01
-	dc.b	$01, $58, $43, $01, $00, $04, $2F, $2F, $FF, $CF
-
-loc_B8BB6:
-	dc.b	$3A, $C0, $2A, $16, $44, $00, $01, $03, $01, $51, $0F, $9F, $0F, $13, $1F, $0E
-	dc.b	$1F, $1F, $00, $00, $00, $00, $08, $F8, $08, $08
-
-loc_B8BD0:
-	dc.b	$24, $C0, $15, $00, $23, $00, $04, $02, $04, $04, $1F, $1F, $1F, $1F, $00, $00
-	dc.b	$00, $0D, $00, $00, $00, $00, $0F, $0F, $0F, $0F
-
-loc_B8BEA:
-	dc.b	$1F, $C0, $00, $00, $00, $00, $73, $72, $11, $71, $1F, $1F, $1F, $1F, $0D, $1F
-	dc.b	$1F, $1F, $01, $01, $01, $01, $FB, $0A, $0A, $0A
-
-loc_B8C04:
-	dc.b	$04, $C0, $20, $00, $20, $00, $03, $00, $41, $40, $1C, $17, $1C, $17, $1B, $0D
-	dc.b	$17, $05, $F0, $01, $80, $85, $F3, $0A, $5A, $5A
-
-loc_B8C1E:
-	dc.b	$04, $C0, $08, $08, $10, $00, $02, $01, $41, $01, $1F, $1F, $24, $49, $1F, $45
-	dc.b	$03, $00, $0C, $0B, $01, $0F, $19, $48, $8B, $E8
-
-loc_B8C38:
-	dc.b	$33, $C0, $10, $20, $20, $00, $22, $06, $02, $04, $88, $3C, $5F, $1F, $01, $08
-	dc.b	$1F, $0F, $03, $08, $04, $00, $65, $68, $05, $08
-
-loc_B8C52:
-	dc.b	$21, $C0, $20, $30, $28, $00, $01, $01, $71, $31, $1F, $14, $14, $10, $02, $03
-	dc.b	$04, $04, $04, $02, $02, $03, $2F, $2F, $2F, $2F
-
-loc_B8C6C:
-	dc.b	$1F, $C0, $20, $08, $28, $00, $33, $31, $73, $31, $9F, $1C, $9F, $9F, $0B, $1C
-	dc.b	$10, $10, $05, $00, $00, $00, $9F, $0F, $0F, $0F
-
-loc_B8C86:
-	dc.b	$07, $C0, $00, $0A, $00, $00, $02, $39, $31, $60, $05, $C5, $88, $8C, $03, $00
-	dc.b	$05, $00, $0F, $0F, $2F, $0F
-
-loc_B8C9C:
-	dc.b	$27, $C0, $10, $15, $10, $10, $02, $00, $71, $31, $12, $12, $12, $12, $00, $00
-	dc.b	$00, $00, $00, $00, $00, $00, $0F, $0F, $0F, $0F
-
-loc_B8CB6:
-	dc.b	$3C, $C0, $38, $00, $1D, $00, $30, $01, $0F, $04, $8D, $52, $9F, $1F, $09, $00
-	dc.b	$00, $0D, $00, $00, $00, $00, $2F, $0F, $0F, $FF
-
-loc_B8CD0:
-	dc.b	$39, $C0, $1C, $22, $1F, $00, $01, $51, $00, $00, $1F, $5F, $5F, $5F, $10, $11
-	dc.b	$09, $09, $07, $00, $00, $00, $CF, $FF, $FF, $FF
-
-loc_B8CEA:
-	dc.b	$28, $C0, $17, $32, $14, $00, $39, $53, $02, $12, $DF, $DF, $81, $9F, $0C, $07
-	dc.b	$0A, $0A, $07, $07, $07, $09, $2F, $1F, $1F, $FF
-
-loc_B8D04:
-	dc.b	$3C, $C0, $28, $08, $39, $00, $32, $71, $3F, $71, $4F, $55, $96, $9B, $03, $01
-	dc.b	$0C, $04, $01, $01, $08, $01, $1F, $1F, $4F, $5F
-
-loc_B8D1E:
-	dc.b	$38, $C0, $20, $20, $20, $00, $01, $03, $53, $00, $1B, $1F, $1F, $1F, $14, $14
-	dc.b	$14, $14, $00, $00, $00, $07, $FF, $FF, $FF, $8F
-
-loc_B8D38:
-	dc.b	$16, $C0, $50, $00, $08, $00, $51, $C1, $41, $42, $5F, $5A, $58, $0F, $07, $05
-	dc.b	$07, $04, $06, $02, $03, $09, $EF, $4F, $6F, $3F
-
-loc_B8D52:
-	dc.b	$3C, $C0, $10, $00, $10, $00, $44, $42, $61, $01, $10, $5F, $18, $1F, $0F, $0A
-	dc.b	$14, $10, $05, $0D, $11, $0F, $8F, $CF, $4F, $6F
-
-loc_B8D6C:
-	dc.b	$32, $C0, $26, $24, $20, $00, $12, $17, $13, $11, $1B, $15, $1A, $16, $02, $0A
-	dc.b	$04, $0E, $06, $04, $05, $07, $1F, $2F, $FF, $7F
-
-loc_B8D86:
-	dc.b	$3D, $C0, $1F, $12, $27, $04, $01, $02, $02, $02, $14, $1F, $59, $1E, $08, $0E
-	dc.b	$08, $0B, $00, $09, $09, $09, $1F, $4F, $4F, $4F
-
-loc_B8DA0:
-	dc.b	$3D, $C0, $1F, $08, $08, $07, $02, $01, $02, $02, $1F, $08, $8A, $0A, $08, $08
-	dc.b	$08, $08, $00, $01, $00, $00, $0F, $1F, $1F, $1F
-
-loc_B8DBA:
-	dc.b	$3C, $C0, $1E, $00, $1F, $00, $01, $02, $01, $02, $CF, $0F, $CF, $0F, $00, $07
-	dc.b	$00, $08, $00, $03, $00, $00, $0F, $3F, $0F, $3F
-
-loc_B8DD4:
-	dc.b	$3A, $C0, $18, $1F, $17, $00, $50, $60, $30, $00, $9F, $89, $5B, $4B, $09, $09
-	dc.b	$1F, $03, $00, $00, $00, $00, $1F, $FF, $0F, $0F
-
-loc_B8DEE:
-	dc.b	$03, $C0, $12, $16, $1C, $00, $18, $71, $01, $01, $9B, $DF, $5F, $4E, $0C, $12
-	dc.b	$0B, $08, $00, $01, $0B, $0D, $CF, $2F, $2F, $FF
-
-loc_B8E08:
-	dc.b	$3E, $C0, $40, $00, $00, $08, $70, $42, $81, $61, $1F, $1F, $16, $18, $13, $08
-	dc.b	$09, $0A, $07, $0A, $03, $05, $8F, $8F, $4F, $4F
-
-loc_B8E22:
-	dc.b	$04, $C0, $00, $00, $1C, $00, $22, $26, $62, $04, $1F, $1F, $1F, $1F, $09, $0D
-	dc.b	$0D, $0D, $05, $09, $11, $11, $AF, $5F, $9F, $BF
-
-loc_B8E3C:
-	dc.b	$0C, $C0, $18, $10, $21, $00, $58, $02, $20, $01, $1F, $1F, $05, $1F, $0A, $0B
-	dc.b	$04, $02, $01, $04, $00, $00, $5F, $6F, $5F, $9F
-
-loc_B8E56:
-	dc.b	$0C, $C0, $18, $08, $21, $00, $58, $02, $20, $01, $1F, $1F, $05, $1F, $0A, $0B
-	dc.b	$04, $06, $01, $04, $00, $00, $5F, $6F, $5F, $6F
-
-loc_B8E70:
-	dc.b	$3C, $C0, $1C, $05, $22, $00, $21, $51, $31, $21, $59, $4A, $59, $4A, $03, $05
-	dc.b	$03, $05, $00, $00, $00, $00, $2F, $2F, $2F, $2F
-
-loc_B8E8A:
-	dc.b	$3C, $C0, $1C, $05, $28, $00, $21, $51, $31, $21, $59, $4A, $59, $4A, $03, $05
-	dc.b	$03, $05, $00, $00, $00, $00, $2F, $2F, $2F, $2F
-
-loc_B8EA4:
-	dc.b	$20, $C0, $30, $37, $20, $00, $36, $35, $30, $31, $DF, $DF, $9F, $9F, $07, $06
-	dc.b	$09, $06, $07, $06, $06, $08, $2F, $1F, $1F, $FF
-
-loc_B8EBE:
-	dc.b	$38, $C0, $20, $11, $21, $00, $31, $51, $31, $71, $17, $18, $1A, $1F, $17, $16
-	dc.b	$0B, $07, $00, $00, $00, $00, $1F, $1F, $0F, $3F
-
-loc_B8ED8:
-	dc.b	$3C, $C0, $20, $00, $20, $00, $28, $51, $54, $32, $13, $1E, $1F, $0C, $0F, $02
-	dc.b	$1F, $00, $00, $00, $00, $00, $2F, $0F, $0F, $0F
-
-loc_B8EF2:
-	dc.b	$3C, $C0, $20, $00, $30, $00, $34, $52, $52, $32, $1F, $1F, $1F, $1F, $10, $10
-	dc.b	$17, $0C, $01, $03, $07, $0A, $1F, $2F, $6F, $6F
-
-loc_B8F0C:
-	dc.b	$50, $C0, $20, $20, $20, $00, $1A, $34, $30, $30, $1E, $19, $1C, $1D, $1E, $1F
-	dc.b	$04, $08, $03, $03, $03, $05, $4F, $5F, $6F, $7F
-
-loc_B8F26:
-	dc.b	$6D, $C0, $20, $00, $00, $00, $72, $79, $A2, $81, $10, $1A, $59, $17, $02, $10
-	dc.b	$01, $0A, $03, $18, $02, $05, $1F, $7F, $8F, $2F
-
-loc_B8F40:
-	dc.b	$55, $C0, $10, $00, $00, $00, $81, $22, $51, $52, $19, $1F, $1F, $1F, $00, $10
-	dc.b	$07, $07, $00, $06, $0B, $0B, $8F, $BF, $8F, $AF
-
-loc_B8F5A:
-	dc.b	$22, $C0, $10, $10, $20, $00, $03, $02, $01, $01, $1F, $1F, $1F, $1F, $17, $16
-	dc.b	$0B, $0F, $10, $10, $10, $05, $2F, $3F, $3F, $4F
-
-loc_B8F74:
-	dc.b	$3C, $C0, $28, $00, $14, $00, $33, $30, $51, $00, $0F, $0B, $0F, $0B, $04, $1F
-	dc.b	$04, $1F, $00, $02, $00, $03, $1F, $0F, $1F, $0F
-
-loc_B8F8E:
-	dc.b	$36, $C0, $18, $00, $00, $00, $14, $01, $01, $02, $8F, $1F, $1F, $14, $1F, $1F
-	dc.b	$0B, $3D, $09, $08, $07, $00, $0F, $0F, $0F, $7F
-
-loc_B8FA8:
-	dc.b	$2C, $C0, $17, $00, $19, $05, $70, $74, $32, $34, $19, $14, $19, $14, $01, $08
-	dc.b	$02, $05, $01, $01, $02, $01, $1F, $8F, $1F, $3F
-
-loc_B8FC2:
-	dc.b	$24, $C0, $17, $00, $17, $00, $70, $74, $31, $33, $19, $14, $19, $14, $01, $08
-	dc.b	$01, $08, $01, $01, $01, $01, $1F, $3F, $1F, $3F
-
-loc_B8FDC:
-	dc.b	$07, $C0, $00, $00, $00, $00, $02, $41, $31, $60, $05, $03, $08, $09, $03, $05
-	dc.b	$05, $00, $2F, $2F, $2F, $0F
-
-loc_B8FF2:
-	dc.b	$AA, $C0, $08, $10, $10, $00, $52, $31, $31, $51, $1F, $1F, $1F, $1F, $10, $00
-	dc.b	$10, $05, $08, $00, $00, $01, $5F, $0F, $5F, $5F
-; =================================================================
-	
-	else
-	
+	if revision=0
 	dc.w	z80ptr(loc_B85FA)
 	dc.w	z80ptr(loc_B862F)
 	dc.w	z80ptr(loc_B8664)
@@ -76584,11 +78770,730 @@ loc_B99FF:
 	dc.b	$44, $10, $4C, $00, $50, $1F, $58, $1F, $54, $1F, $5C, $1F, $60, $10, $68, $00
 	dc.b	$64, $10, $6C, $05, $70, $08, $78, $00, $74, $00, $7C, $01, $80, $55, $88, $0A
 	dc.b	$84, $55, $8C, $5A, $83
+		
+	else
+	
+	dc.w	z80ptr(loc_B863A)
+	dc.w	z80ptr(loc_B8654)
+	dc.w	z80ptr(loc_B866E)
+	dc.w	z80ptr(loc_B8688)
+	dc.w	z80ptr(loc_B86A2)
+	dc.w	z80ptr(loc_B86BC)
+	dc.w	z80ptr(loc_B86D6)
+	dc.w	z80ptr(loc_B86F0)
+	dc.w	z80ptr(loc_B870A)
+	dc.w	z80ptr(loc_B8724)
+	dc.w	z80ptr(loc_B873E)
+	dc.w	z80ptr(loc_B8758)
+	dc.w	z80ptr(loc_B8772)
+	dc.w	z80ptr(loc_B878C)
+	dc.w	z80ptr(loc_B87A6)
+	dc.w	z80ptr(loc_B87C0)
+	dc.w	z80ptr(loc_B87DA)
+	dc.w	z80ptr(loc_B87F4)
+	dc.w	z80ptr(loc_B880E)
+	dc.w	z80ptr(loc_B8828)
+	dc.w	z80ptr(loc_B8842)
+	dc.w	z80ptr(loc_B885C)
+	dc.w	z80ptr(loc_B8876)
+	dc.w	z80ptr(loc_B8890)
+	dc.w	z80ptr(loc_B88AA)
+	dc.w	z80ptr(loc_B88C4)
+	dc.w	z80ptr(loc_B88DE)
+	dc.w	z80ptr(loc_B88F8)
+	dc.w	z80ptr(loc_B8912)
+	dc.w	z80ptr(loc_B892C)
+	dc.w	z80ptr(loc_B8946)
+	dc.w	z80ptr(loc_B8960)
+	dc.w	z80ptr(loc_B897A)
+	dc.w	z80ptr(loc_B8994)
+	dc.w	z80ptr(loc_B89AE)
+	dc.w	z80ptr(loc_B89C8)
+	dc.w	z80ptr(loc_B89E2)
+	dc.w	z80ptr(loc_B89FC)
+	dc.w	z80ptr(loc_B8A16)
+	dc.w	z80ptr(loc_B8A30)
+	dc.w	z80ptr(loc_B8A4A)
+	dc.w	z80ptr(loc_B8A64)
+	dc.w	z80ptr(loc_B8A7E)
+	dc.w	z80ptr(loc_B8A98)
+	dc.w	z80ptr(loc_B8AB2)
+	dc.w	z80ptr(loc_B8ACC)
+	dc.w	z80ptr(loc_B8AE6)
+	dc.w	z80ptr(loc_B8B00)
+	dc.w	z80ptr(loc_B8B1A)
+	dc.w	z80ptr(loc_B8B34)
+	dc.w	z80ptr(loc_B8B4E)
+	dc.w	z80ptr(loc_B8B68)
+	dc.w	z80ptr(loc_B8B82)
+	dc.w	z80ptr(loc_B8B9C)
+	dc.w	z80ptr(loc_B8BB6)
+	dc.w	z80ptr(loc_B8BD0)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8BEA)
+	dc.w	z80ptr(loc_B8C04)
+	dc.w	z80ptr(loc_B8C1E)
+	dc.w	z80ptr(loc_B8C38)
+	dc.w	z80ptr(loc_B8C52)
+	dc.w	z80ptr(loc_B8C6C)
+	dc.w	z80ptr(loc_B8C86)
+	dc.w	z80ptr(loc_B8C9C)
+	dc.w	z80ptr(loc_B8CB6)
+	dc.w	z80ptr(loc_B8CD0)
+	dc.w	z80ptr(loc_B8CEA)
+	dc.w	z80ptr(loc_B8D04)
+	dc.w	z80ptr(loc_B8D1E)
+	dc.w	z80ptr(loc_B8D38)
+	dc.w	z80ptr(loc_B8D52)
+	dc.w	z80ptr(loc_B8D6C)
+	dc.w	z80ptr(loc_B8D86)
+	dc.w	z80ptr(loc_B8DA0)
+	dc.w	z80ptr(loc_B8DBA)
+	dc.w	z80ptr(loc_B8DD4)
+	dc.w	z80ptr(loc_B8DEE)
+	dc.w	z80ptr(loc_B8E08)
+	dc.w	z80ptr(loc_B8E22)
+	dc.w	z80ptr(loc_B8E3C)
+	dc.w	z80ptr(loc_B8E56)
+	dc.w	z80ptr(loc_B8E70)
+	dc.w	z80ptr(loc_B8E8A)
+	dc.w	z80ptr(loc_B8EA4)
+	dc.w	z80ptr(loc_B8EBE)
+	dc.w	z80ptr(loc_B8ED8)
+	dc.w	z80ptr(loc_B8EF2)
+	dc.w	z80ptr(loc_B8F0C)
+	dc.w	z80ptr(loc_B8F26)
+	dc.w	z80ptr(loc_B8F40)
+	dc.w	z80ptr(loc_B8F5A)
+	dc.w	z80ptr(loc_B8F74)
+	dc.w	z80ptr(loc_B8F8E)
+	dc.w	z80ptr(loc_B8FA8)
+	dc.w	z80ptr(loc_B8FC2)
+	dc.w	z80ptr(loc_B8FDC)
+	dc.w	z80ptr(loc_B8FF2)
+
+loc_B863A:
+	dc.b	$13, $C0, $30, $30, $30, $00, $08, $16, $06, $02, $10, $1F, $1F, $1F, $01, $01
+	dc.b	$00, $00, $0B, $00, $05, $09, $1F, $8F, $3F, $8F
+
+loc_B8654:
+	dc.b	$3C, $C0, $1E, $02, $05, $02, $67, $43, $32, $72, $1F, $1F, $1F, $1F, $00, $00
+	dc.b	$00, $00, $16, $15, $12, $14, $11, $13, $15, $17
+
+loc_B866E:
+	dc.b	$24, $C0, $38, $00, $1A, $00, $06, $04, $0F, $04, $97, $1B, $9F, $1F, $09, $0D
+	dc.b	$00, $0D, $00, $06, $00, $00, $2F, $AF, $0F, $AF
+
+loc_B8688:
+	dc.b	$F5, $C0, $01, $00, $00, $00, $11, $01, $20, $61, $15, $1B, $1F, $14, $12, $06
+	dc.b	$00, $00, $04, $0A, $30, $02, $14, $16, $16, $46
+
+loc_B86A2:
+	dc.b	$17, $C0, $00, $00, $00, $00, $44, $42, $53, $10, $1A, $9E, $9F, $5F, $1F, $1F
+	dc.b	$1F, $1B, $13, $12, $93, $10, $6F, $4F, $8F, $4F
+
+loc_B86BC:
+	dc.b	$04, $C0, $60, $00, $60, $00, $0C, $0F, $0C, $08, $1F, $1F, $1F, $1F, $00, $00
+	dc.b	$00, $00, $00, $06, $00, $0E, $0F, $EF, $0F, $BF
+
+loc_B86D6:
+	dc.b	$05, $C0, $0E, $00, $00, $00, $37, $61, $72, $01, $1F, $1F, $1F, $1E, $00, $02
+	dc.b	$15, $00, $02, $80, $65, $07, $0F, $0F, $BF, $0F
+
+loc_B86F0:
+	dc.b	$21, $F6, $07, $00, $12, $00, $B2, $1A, $3B, $43, $69, $85, $42, $0C, $89, $A2
+	dc.b	$00, $0F, $04, $0B, $71, $10, $4F, $77, $24, $98
+
+loc_B870A:
+	dc.b	$14, $C0, $10, $00, $10, $00, $52, $B1, $41, $60, $04, $0C, $16, $4E, $05, $08
+	dc.b	$08, $00, $0A, $04, $05, $03, $7C, $79, $0A, $59
+
+loc_B8724:
+	dc.b	$97, $C0, $10, $03, $03, $10, $02, $21, $61, $36, $10, $0B, $09, $10, $02, $01
+	dc.b	$80, $80, $03, $21, $13, $82, $1C, $4C, $8C, $5D
+
+loc_B873E:
+	dc.b	$4C, $C0, $30, $00, $30, $00, $02, $22, $61, $36, $1F, $18, $1F, $16, $00, $02
+	dc.b	$00, $01, $03, $21, $13, $82, $1F, $4F, $8F, $5F
+
+loc_B8758:
+	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
+	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
+
+loc_B8772:
+	dc.b	$3A, $C0, $00, $00, $00, $00, $71, $51, $62, $54, $10, $10, $10, $0F, $00, $00
+	dc.b	$04, $29, $80, $00, $C1, $80, $24, $29, $1F, $78
+
+loc_B878C:
+	dc.b	$3C, $C0, $13, $03, $15, $03, $13, $53, $62, $51, $14, $11, $1A, $B5, $04, $04
+	dc.b	$04, $22, $52, $59, $34, $39, $1F, $8F, $1F, $8F
+
+loc_B87A6:
+	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
+	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
+
+loc_B87C0:
+	dc.b	$3D, $C0, $12, $00, $0C, $00, $2A, $64, $73, $40, $13, $0A, $0A, $0A, $1A, $0B
+	dc.b	$0C, $0B, $23, $23, $07, $0E, $08, $68, $09, $56
+
+loc_B87DA:
+	dc.b	$02, $C0, $04, $0D, $08, $03, $71, $82, $70, $51, $1F, $1F, $1F, $1F, $58, $44
+	dc.b	$0D, $09, $17, $0B, $65, $07, $07, $17, $08, $09
+
+loc_B87F4:
+	dc.b	$05, $C0, $05, $07, $06, $04, $45, $53, $51, $62, $03, $0B, $0E, $09, $06, $09
+	dc.b	$08, $02, $05, $05, $01, $09, $0F, $0F, $0A, $0F
+
+loc_B880E:
+	dc.b	$1B, $C0, $05, $05, $1A, $00, $6C, $4F, $0A, $8E, $1F, $1C, $18, $1F, $19, $10
+	dc.b	$1A, $00, $0E, $30, $40, $00, $3F, $FF, $AF, $1F
+
+loc_B8828:
+	dc.b	$00, $C0, $01, $01, $00, $00, $91, $35, $30, $00, $0F, $9F, $C9, $1F, $48, $3A
+	dc.b	$08, $08, $65, $20, $80, $02, $F4, $6D, $3E, $4B
+
+loc_B8842:
+	dc.b	$02, $C0, $24, $08, $07, $03, $03, $02, $02, $02, $1F, $1F, $1F, $1F, $14, $14
+	dc.b	$0D, $19, $19, $0A, $15, $08, $1A, $1F, $1F, $0F
+
+loc_B885C:
+	dc.b	$3B, $C0, $10, $20, $10, $00, $15, $30, $32, $41, $1F, $1C, $18, $0F, $09, $20
+	dc.b	$0A, $0F, $04, $00, $00, $11, $08, $F4, $A4, $17
+
+loc_B8876:
+	dc.b	$1D, $C0, $0D, $00, $00, $00, $54, $44, $64, $11, $15, $1F, $57, $5C, $06, $05
+	dc.b	$0C, $01, $86, $05, $0C, $01, $6F, $1F, $5F, $8F
+
+loc_B8890:
+	dc.b	$05, $C0, $18, $00, $00, $00, $24, $71, $50, $40, $1F, $1F, $1C, $13, $04, $0B
+	dc.b	$1C, $0B, $04, $82, $0E, $1E, $9F, $6F, $2F, $5F
+
+loc_B88AA:
+	dc.b	$05, $C0, $18, $00, $00, $00, $23, $27, $50, $41, $15, $1F, $1C, $0B, $04, $0B
+	dc.b	$1C, $0B, $04, $82, $0E, $1E, $9F, $6F, $2F, $5F
+
+loc_B88C4:
+	dc.b	$1D, $C0, $09, $00, $00, $00, $63, $30, $33, $60, $10, $1F, $1F, $1F, $08, $0E
+	dc.b	$12, $10, $04, $08, $0A, $0E, $1F, $1F, $1F, $1F
+
+loc_B88DE:
+	dc.b	$03, $C0, $10, $20, $0C, $00, $23, $63, $73, $70, $1F, $1F, $1F, $1F, $0F, $01
+	dc.b	$00, $03, $08, $09, $08, $0C, $5F, $3F, $3F, $4F
+
+loc_B88F8:
+	dc.b	$39, $C0, $18, $10, $08, $00, $1B, $30, $31, $40, $D3, $D3, $D4, $0E, $09, $00
+	dc.b	$00, $17, $2C, $40, $62, $26, $04, $15, $64, $07
+
+loc_B8912:
+	dc.b	$05, $C0, $30, $00, $00, $00, $63, $30, $AC, $42, $08, $0C, $0D, $0E, $0A, $00
+	dc.b	$05, $00, $09, $04, $04, $07, $4F, $6F, $7F, $6F
+
+loc_B892C:
+	dc.b	$1D, $C0, $10, $00, $00, $00, $66, $32, $30, $60, $10, $1F, $1F, $1F, $08, $0E
+	dc.b	$12, $10, $04, $08, $0A, $0C, $1F, $1F, $1F, $1F
+
+loc_B8946:
+	dc.b	$3D, $C0, $12, $00, $0C, $00, $24, $48, $55, $40, $15, $0A, $0C, $12, $1A, $1B
+	dc.b	$1C, $0B, $04, $1A, $17, $1E, $0F, $1F, $3F, $5F
+
+loc_B8960:
+	dc.b	$3D, $C0, $10, $02, $1C, $05, $75, $40, $57, $43, $15, $0A, $0C, $11, $1A, $1B
+	dc.b	$2C, $0B, $06, $2A, $27, $1E, $0E, $28, $38, $5E
+
+loc_B897A:
+	dc.b	$3C, $C0, $02, $00, $1F, $05, $71, $90, $50, $72, $10, $1F, $10, $1F, $0D, $04
+	dc.b	$44, $49, $88, $58, $08, $24, $44, $38, $46, $E9
+
+loc_B8994:
+	dc.b	$34, $C0, $04, $00, $02, $05, $70, $90, $51, $A0, $10, $1A, $10, $19, $04, $06
+	dc.b	$F4, $1F, $31, $28, $08, $2C, $74, $5B, $26, $1A
+
+loc_B89AE:
+	dc.b	$24, $C0, $1D, $07, $20, $07, $3F, $54, $67, $74, $1F, $58, $1F, $1F, $13, $08
+	dc.b	$0E, $08, $04, $05, $05, $05, $55, $17, $62, $17
+
+loc_B89C8:
+	dc.b	$3C, $C0, $20, $04, $00, $00, $65, $43, $36, $78, $1F, $0E, $1F, $0E, $10, $00
+	dc.b	$00, $00, $16, $15, $12, $12, $14, $13, $15, $12
+
+loc_B89E2:
+	dc.b	$34, $C0, $03, $00, $00, $03, $70, $7F, $31, $5F, $19, $0F, $72, $0B, $14, $01
+	dc.b	$01, $58, $43, $01, $00, $04, $20, $26, $F4, $C4
+
+loc_B89FC:
+	dc.b	$3B, $C0, $0F, $13, $0F, $00, $05, $0B, $00, $02, $1F, $0F, $13, $17, $02, $02
+	dc.b	$06, $02, $0F, $0A, $0C, $09, $24, $26, $26, $89
+
+loc_B8A16:
+	dc.b	$34, $C0, $14, $13, $0A, $00, $60, $51, $20, $10, $1F, $95, $9C, $54, $01, $02
+	dc.b	$0E, $04, $00, $01, $00, $01, $34, $07, $D8, $17
+
+loc_B8A30:
+	dc.b	$03, $C0, $10, $18, $10, $00, $17, $1F, $70, $71, $1F, $18, $18, $1F, $01, $05
+	dc.b	$03, $00, $00, $03, $00, $00, $0F, $1F, $0F, $1F
+
+loc_B8A4A:
+	dc.b	$03, $C0, $28, $16, $15, $00, $20, $20, $75, $72, $1F, $08, $1F, $1F, $0F, $02
+	dc.b	$0A, $06, $00, $01, $00, $0C, $0F, $1F, $0F, $1F
+
+loc_B8A64:
+	dc.b	$22, $C0, $28, $2E, $16, $00, $18, $3F, $38, $06, $15, $0E, $8C, $8B, $02, $00
+	dc.b	$00, $0E, $01, $00, $00, $06, $4F, $6F, $FF, $0F
+
+loc_B8A7E:
+	dc.b	$3B, $C0, $12, $00, $10, $00, $71, $00, $02, $31, $1F, $0E, $1F, $1F, $05, $01
+	dc.b	$01, $01, $00, $02, $01, $03, $0F, $1F, $0F, $4F
+
+loc_B8A98:
+	dc.b	$1C, $C0, $20, $00, $18, $00, $65, $72, $79, $10, $15, $9B, $9B, $5F, $04, $02
+	dc.b	$0A, $04, $06, $01, $06, $04, $6F, $5F, $8F, $8F
+
+loc_B8AB2:
+	dc.b	$1A, $C0, $10, $00, $00, $00, $16, $32, $38, $19, $55, $9E, $9C, $1F, $03, $09
+	dc.b	$04, $08, $04, $03, $02, $06, $5F, $2F, $3F, $3F
+
+loc_B8ACC:
+	dc.b	$19, $C0, $20, $20, $10, $00, $31, $3B, $77, $17, $1F, $13, $1F, $1F, $0E, $05
+	dc.b	$00, $00, $16, $04, $01, $00, $8F, $2F, $8F, $EF
+
+loc_B8AE6:
+	dc.b	$1C, $C0, $00, $00, $00, $00, $66, $7F, $72, $16, $07, $0F, $45, $0F, $04, $01
+	dc.b	$04, $00, $00, $04, $0F, $04, $2F, $2F, $2F, $2F
+
+loc_B8B00:
+	dc.b	$38, $C0, $1D, $17, $0D, $00, $03, $01, $00, $00, $1F, $0E, $1A, $1F, $04, $00
+	dc.b	$04, $06, $02, $02, $02, $02, $28, $27, $27, $33
+
+loc_B8B1A:
+	dc.b	$18, $C0, $10, $18, $0F, $06, $01, $00, $00, $00, $1B, $1F, $1F, $1F, $04, $04
+	dc.b	$04, $06, $08, $08, $08, $0C, $24, $26, $26, $24
+
+loc_B8B34:
+	dc.b	$1C, $C0, $16, $09, $08, $00, $70, $75, $70, $1E, $04, $0E, $5A, $15, $08, $02
+	dc.b	$01, $08, $00, $01, $00, $04, $2F, $7F, $FF, $2F
+
+loc_B8B4E:
+	dc.b	$34, $C0, $07, $0C, $03, $0D, $35, $76, $20, $56, $14, $0C, $0D, $11, $08, $04
+	dc.b	$07, $03, $00, $09, $00, $02, $4B, $1F, $1F, $7F
+
+loc_B8B68:
+	dc.b	$1D, $C0, $0C, $00, $00, $00, $32, $63, $32, $34, $0A, $18, $18, $0E, $00, $0A
+	dc.b	$0A, $0A, $08, $01, $02, $04, $1F, $6F, $4F, $6F
+
+loc_B8B82:
+	dc.b	$39, $C0, $12, $24, $0F, $00, $32, $00, $01, $30, $10, $10, $10, $18, $06, $02
+	dc.b	$06, $02, $08, $05, $01, $01, $B9, $67, $44, $46
+
+loc_B8B9C:
+	dc.b	$34, $C0, $03, $00, $00, $03, $70, $7F, $31, $5F, $19, $0F, $52, $0B, $25, $01
+	dc.b	$01, $58, $43, $01, $00, $04, $2F, $2F, $FF, $CF
+
+loc_B8BB6:
+	dc.b	$3A, $C0, $2A, $16, $44, $00, $01, $03, $01, $51, $0F, $9F, $0F, $13, $1F, $0E
+	dc.b	$1F, $1F, $00, $00, $00, $00, $08, $F8, $08, $08
+
+loc_B8BD0:
+	dc.b	$24, $C0, $15, $00, $23, $00, $04, $02, $04, $04, $1F, $1F, $1F, $1F, $00, $00
+	dc.b	$00, $0D, $00, $00, $00, $00, $0F, $0F, $0F, $0F
+
+loc_B8BEA:
+	dc.b	$1F, $C0, $00, $00, $00, $00, $73, $72, $11, $71, $1F, $1F, $1F, $1F, $0D, $1F
+	dc.b	$1F, $1F, $01, $01, $01, $01, $FB, $0A, $0A, $0A
+
+loc_B8C04:
+	dc.b	$04, $C0, $20, $00, $20, $00, $03, $00, $41, $40, $1C, $17, $1C, $17, $1B, $0D
+	dc.b	$17, $05, $F0, $01, $80, $85, $F3, $0A, $5A, $5A
+
+loc_B8C1E:
+	dc.b	$04, $C0, $08, $08, $10, $00, $02, $01, $41, $01, $1F, $1F, $24, $49, $1F, $45
+	dc.b	$03, $00, $0C, $0B, $01, $0F, $19, $48, $8B, $E8
+
+loc_B8C38:
+	dc.b	$33, $C0, $10, $20, $20, $00, $22, $06, $02, $04, $88, $3C, $5F, $1F, $01, $08
+	dc.b	$1F, $0F, $03, $08, $04, $00, $65, $68, $05, $08
+
+loc_B8C52:
+	dc.b	$21, $C0, $20, $30, $28, $00, $01, $01, $71, $31, $1F, $14, $14, $10, $02, $03
+	dc.b	$04, $04, $04, $02, $02, $03, $2F, $2F, $2F, $2F
+
+loc_B8C6C:
+	dc.b	$1F, $C0, $20, $08, $28, $00, $33, $31, $73, $31, $9F, $1C, $9F, $9F, $0B, $1C
+	dc.b	$10, $10, $05, $00, $00, $00, $9F, $0F, $0F, $0F
+
+loc_B8C86:
+	dc.b	$07, $C0, $00, $0A, $00, $00, $02, $39, $31, $60, $05, $C5, $88, $8C, $03, $00
+	dc.b	$05, $00, $0F, $0F, $2F, $0F
+
+loc_B8C9C:
+	dc.b	$27, $C0, $10, $15, $10, $10, $02, $00, $71, $31, $12, $12, $12, $12, $00, $00
+	dc.b	$00, $00, $00, $00, $00, $00, $0F, $0F, $0F, $0F
+
+loc_B8CB6:
+	dc.b	$3C, $C0, $38, $00, $1D, $00, $30, $01, $0F, $04, $8D, $52, $9F, $1F, $09, $00
+	dc.b	$00, $0D, $00, $00, $00, $00, $2F, $0F, $0F, $FF
+
+loc_B8CD0:
+	dc.b	$39, $C0, $1C, $22, $1F, $00, $01, $51, $00, $00, $1F, $5F, $5F, $5F, $10, $11
+	dc.b	$09, $09, $07, $00, $00, $00, $CF, $FF, $FF, $FF
+
+loc_B8CEA:
+	dc.b	$28, $C0, $17, $32, $14, $00, $39, $53, $02, $12, $DF, $DF, $81, $9F, $0C, $07
+	dc.b	$0A, $0A, $07, $07, $07, $09, $2F, $1F, $1F, $FF
+
+loc_B8D04:
+	dc.b	$3C, $C0, $28, $08, $39, $00, $32, $71, $3F, $71, $4F, $55, $96, $9B, $03, $01
+	dc.b	$0C, $04, $01, $01, $08, $01, $1F, $1F, $4F, $5F
+
+loc_B8D1E:
+	dc.b	$38, $C0, $20, $20, $20, $00, $01, $03, $53, $00, $1B, $1F, $1F, $1F, $14, $14
+	dc.b	$14, $14, $00, $00, $00, $07, $FF, $FF, $FF, $8F
+
+loc_B8D38:
+	dc.b	$16, $C0, $50, $00, $08, $00, $51, $C1, $41, $42, $5F, $5A, $58, $0F, $07, $05
+	dc.b	$07, $04, $06, $02, $03, $09, $EF, $4F, $6F, $3F
+
+loc_B8D52:
+	dc.b	$3C, $C0, $10, $00, $10, $00, $44, $42, $61, $01, $10, $5F, $18, $1F, $0F, $0A
+	dc.b	$14, $10, $05, $0D, $11, $0F, $8F, $CF, $4F, $6F
+
+loc_B8D6C:
+	dc.b	$32, $C0, $26, $24, $20, $00, $12, $17, $13, $11, $1B, $15, $1A, $16, $02, $0A
+	dc.b	$04, $0E, $06, $04, $05, $07, $1F, $2F, $FF, $7F
+
+loc_B8D86:
+	dc.b	$3D, $C0, $1F, $12, $27, $04, $01, $02, $02, $02, $14, $1F, $59, $1E, $08, $0E
+	dc.b	$08, $0B, $00, $09, $09, $09, $1F, $4F, $4F, $4F
+
+loc_B8DA0:
+	dc.b	$3D, $C0, $1F, $08, $08, $07, $02, $01, $02, $02, $1F, $08, $8A, $0A, $08, $08
+	dc.b	$08, $08, $00, $01, $00, $00, $0F, $1F, $1F, $1F
+
+loc_B8DBA:
+	dc.b	$3C, $C0, $1E, $00, $1F, $00, $01, $02, $01, $02, $CF, $0F, $CF, $0F, $00, $07
+	dc.b	$00, $08, $00, $03, $00, $00, $0F, $3F, $0F, $3F
+
+loc_B8DD4:
+	dc.b	$3A, $C0, $18, $1F, $17, $00, $50, $60, $30, $00, $9F, $89, $5B, $4B, $09, $09
+	dc.b	$1F, $03, $00, $00, $00, $00, $1F, $FF, $0F, $0F
+
+loc_B8DEE:
+	dc.b	$03, $C0, $12, $16, $1C, $00, $18, $71, $01, $01, $9B, $DF, $5F, $4E, $0C, $12
+	dc.b	$0B, $08, $00, $01, $0B, $0D, $CF, $2F, $2F, $FF
+
+loc_B8E08:
+	dc.b	$3E, $C0, $40, $00, $00, $08, $70, $42, $81, $61, $1F, $1F, $16, $18, $13, $08
+	dc.b	$09, $0A, $07, $0A, $03, $05, $8F, $8F, $4F, $4F
+
+loc_B8E22:
+	dc.b	$04, $C0, $00, $00, $1C, $00, $22, $26, $62, $04, $1F, $1F, $1F, $1F, $09, $0D
+	dc.b	$0D, $0D, $05, $09, $11, $11, $AF, $5F, $9F, $BF
+
+loc_B8E3C:
+	dc.b	$0C, $C0, $18, $10, $21, $00, $58, $02, $20, $01, $1F, $1F, $05, $1F, $0A, $0B
+	dc.b	$04, $02, $01, $04, $00, $00, $5F, $6F, $5F, $9F
+
+loc_B8E56:
+	dc.b	$0C, $C0, $18, $08, $21, $00, $58, $02, $20, $01, $1F, $1F, $05, $1F, $0A, $0B
+	dc.b	$04, $06, $01, $04, $00, $00, $5F, $6F, $5F, $6F
+
+loc_B8E70:
+	dc.b	$3C, $C0, $1C, $05, $22, $00, $21, $51, $31, $21, $59, $4A, $59, $4A, $03, $05
+	dc.b	$03, $05, $00, $00, $00, $00, $2F, $2F, $2F, $2F
+
+loc_B8E8A:
+	dc.b	$3C, $C0, $1C, $05, $28, $00, $21, $51, $31, $21, $59, $4A, $59, $4A, $03, $05
+	dc.b	$03, $05, $00, $00, $00, $00, $2F, $2F, $2F, $2F
+
+loc_B8EA4:
+	dc.b	$20, $C0, $30, $37, $20, $00, $36, $35, $30, $31, $DF, $DF, $9F, $9F, $07, $06
+	dc.b	$09, $06, $07, $06, $06, $08, $2F, $1F, $1F, $FF
+
+loc_B8EBE:
+	dc.b	$38, $C0, $20, $11, $21, $00, $31, $51, $31, $71, $17, $18, $1A, $1F, $17, $16
+	dc.b	$0B, $07, $00, $00, $00, $00, $1F, $1F, $0F, $3F
+
+loc_B8ED8:
+	dc.b	$3C, $C0, $20, $00, $20, $00, $28, $51, $54, $32, $13, $1E, $1F, $0C, $0F, $02
+	dc.b	$1F, $00, $00, $00, $00, $00, $2F, $0F, $0F, $0F
+
+loc_B8EF2:
+	dc.b	$3C, $C0, $20, $00, $30, $00, $34, $52, $52, $32, $1F, $1F, $1F, $1F, $10, $10
+	dc.b	$17, $0C, $01, $03, $07, $0A, $1F, $2F, $6F, $6F
+
+loc_B8F0C:
+	dc.b	$50, $C0, $20, $20, $20, $00, $1A, $34, $30, $30, $1E, $19, $1C, $1D, $1E, $1F
+	dc.b	$04, $08, $03, $03, $03, $05, $4F, $5F, $6F, $7F
+
+loc_B8F26:
+	dc.b	$6D, $C0, $20, $00, $00, $00, $72, $79, $A2, $81, $10, $1A, $59, $17, $02, $10
+	dc.b	$01, $0A, $03, $18, $02, $05, $1F, $7F, $8F, $2F
+
+loc_B8F40:
+	dc.b	$55, $C0, $10, $00, $00, $00, $81, $22, $51, $52, $19, $1F, $1F, $1F, $00, $10
+	dc.b	$07, $07, $00, $06, $0B, $0B, $8F, $BF, $8F, $AF
+
+loc_B8F5A:
+	dc.b	$22, $C0, $10, $10, $20, $00, $03, $02, $01, $01, $1F, $1F, $1F, $1F, $17, $16
+	dc.b	$0B, $0F, $10, $10, $10, $05, $2F, $3F, $3F, $4F
+
+loc_B8F74:
+	dc.b	$3C, $C0, $28, $00, $14, $00, $33, $30, $51, $00, $0F, $0B, $0F, $0B, $04, $1F
+	dc.b	$04, $1F, $00, $02, $00, $03, $1F, $0F, $1F, $0F
+
+loc_B8F8E:
+	dc.b	$36, $C0, $18, $00, $00, $00, $14, $01, $01, $02, $8F, $1F, $1F, $14, $1F, $1F
+	dc.b	$0B, $3D, $09, $08, $07, $00, $0F, $0F, $0F, $7F
+
+loc_B8FA8:
+	dc.b	$2C, $C0, $17, $00, $19, $05, $70, $74, $32, $34, $19, $14, $19, $14, $01, $08
+	dc.b	$02, $05, $01, $01, $02, $01, $1F, $8F, $1F, $3F
+
+loc_B8FC2:
+	dc.b	$24, $C0, $17, $00, $17, $00, $70, $74, $31, $33, $19, $14, $19, $14, $01, $08
+	dc.b	$01, $08, $01, $01, $01, $01, $1F, $3F, $1F, $3F
+
+loc_B8FDC:
+	dc.b	$07, $C0, $00, $00, $00, $00, $02, $41, $31, $60, $05, $03, $08, $09, $03, $05
+	dc.b	$05, $00, $2F, $2F, $2F, $0F
+
+loc_B8FF2:
+	dc.b	$AA, $C0, $08, $10, $10, $00, $52, $31, $31, $51, $1F, $1F, $1F, $1F, $10, $00
+	dc.b	$10, $05, $08, $00, $00, $01, $5F, $0F, $5F, $5F
+
 
 	endif
 ; =================================================================
 
-	if revision>0
+	if revision=0
+
+SFX_Selection:
+	dc.b	$01, $80, $05, $01, $3E, $1A, $00, $00, $00, $08, $EF, $00, $E3, $01, $01, $A5
+	dc.b	$08, $80, $02, $F2
+SFX_LevelUp:
+	dc.b	$02, $80, $04, $01, $5B, $1A, $00, $01, $01, $00, $80, $05, $01, $5B, $1A, $00
+	dc.b	$00, $01, $00, $EF, $01, $E3, $01, $01, $A9, $04, $B1, $B5, $B8, $BA, $BD, $F2
+SFX_ItemReceived:
+	dc.b	$02, $80, $04, $01, $7B, $1A, $03, $01, $02, $00, $80, $05, $01, $7B, $1A, $03
+	dc.b	$01, $02, $00, $EF, $02, $B0, $03, $B3, $20, $F2
+SFX_Explosion:
+	dc.b	$02, $A0, $02, $01, $95, $1A, $00, $00, $03, $00, $A0, $05, $01, $9A, $1A, $00
+	dc.b	$00, $03, $08, $FE, $03, $02, $01, $00, $EF, $03, $8D, $00, $D0, $03, $A5, $00
+	dc.b	$10, $06, $BB, $00, $D0, $08, $EC, $08, $F7, $00, $05, $F6, $FF, $F2
+SFX_MapChanged:
+	dc.b	$01, $80, $02, $01, $BA, $1A, $00, $00, $04, $00, $EF, $04, $FE, $01, $01, $01
+	dc.b	$00, $A4, $10, $10, $10, $20, $F2
+SFX_FellInHole:
+	dc.b	$02, $A0, $04, $02, $DA, $1A, $2A, $00, $05, $00, $A0, $05, $02, $DA, $1A, $0B
+	dc.b	$00, $05, $00, $EF, $05, $BC, $04, $F6, $2A, $80, $00, $F1, $10, $F2
+SFX_Revived:
+	dc.b	$02, $A0, $04, $01, $F8, $1A, $00, $00, $06, $08, $A0, $05, $01, $F8, $1A, $00
+	dc.b	$00, $06, $08, $EF, $06, $E3, $01, $01, $98, $00, $07, $03, $F7, $00, $02, $F8
+	dc.b	$FF, $9D, $00, $09, $20, $F2
+SFX_PoisonCured:
+	dc.b	$02, $A0, $04, $01, $1E, $1B, $00, $01, $07, $00, $A0, $05, $01, $1E, $1B, $00
+	dc.b	$00, $07, $00, $EF, $07, $E3, $01, $01, $9D, $F0, $49, $05, $99, $E0, $56, $0E
+	dc.b	$80, $00, $00, $05, $F2
+SFX_Alarm:
+	dc.b	$01, $80, $02, $01, $3A, $1B, $F0, $00, $08, $00, $EF, $08, $E3, $01, $01, $FE
+	dc.b	$00, $00, $01, $00, $81, $2E, $F2
+SFX_Hidapipe:
+	dc.b	$02, $80, $04, $02, $5A, $1B, $01, $01, $09, $0C, $80, $05, $02, $64, $1B, $01
+	dc.b	$00, $09, $0C, $E0, $00, $80, $01, $F8, $08, $00, $E0, $01, $F2, $F8, $02, $00
+	dc.b	$F2, $EF, $09, $E3, $01, $01, $B5, $12, $B1, $06, $30, $B8, $06, $B6, $0C, $B5
+	dc.b	$06, $B3, $06, $B5, $0C, $B1, $06, $B1, $B3, $0C, $B5, $06, $B3, $24, $80, $0C
+	dc.b	$F9
+SFX_Teleport:
+	dc.b	$02, $A0, $04, $02, $9B, $1B, $FD, $01, $0A, $00, $A0, $05, $02, $9B, $1B, $F9
+	dc.b	$00, $0A, $00, $EF, $0A, $E3, $01, $01, $9C, $00, $F0, $03, $FB, $01, $F7, $00
+	dc.b	$09, $F6, $FF, $F2
+SFX_DoorOpen:
+	dc.b	$02, $A0, $05, $01, $BF, $1B, $FD, $00, $0B, $00, $A0, $05, $01, $BF, $1B, $FE
+	dc.b	$00, $0B, $00, $EF, $0B, $A5, $00, $00, $07, $A5, $F6, $27, $0B, $80, $00, $00
+	dc.b	$20, $F2
+SFX_DamOpened:
+	dc.b	$03, $A0, $02, $01, $EA, $1B, $05, $00, $0C, $00, $A0, $04, $01, $EA, $1B, $00
+	dc.b	$00, $0C, $00, $A0, $05, $01, $EA, $1B, $F9, $00, $0C, $00, $EF, $0C, $E3, $01
+	dc.b	$01, $FE, $00, $01, $00, $00, $99, $00, $00, $08, $A0, $05, $ED, $7A, $80, $00
+	dc.b	$00, $01, $F2
+SFX_JetScooter:
+	dc.b	$01, $A0, $02, $01, $0B, $1C, $00, $00, $0D, $10, $FE, $00, $03, $00, $01, $EF
+	dc.b	$0D, $81, $E6, $50, $06, $F6, $F8, $FF
+SFX_SpaceshipDeparted:
+	dc.b	$02, $80, $02, $02, $2C, $1C, $FD, $00, $0E, $00, $80, $05, $01, $3F, $1C, $00
+	dc.b	$00, $0E, $00, $EF, $0E, $E3, $01, $01, $FE, $01, $01, $00, $00, $99, $05, $FC
+	dc.b	$01, $99, $F5, $1D, $20, $F2, $EF, $0E, $E3, $01, $01, $99, $05, $FC, $01, $99
+	dc.b	$F5, $1D, $20, $FC, $00, $80, $10, $F2
+SFX_SpaceshipLanded:
+	dc.b	$02, $80, $02, $02, $64, $1C, $03, $00, $0F, $00, $80, $05, $02, $7F, $1C, $00
+	dc.b	$00, $0F, $05, $EF, $0F, $FE, $00, $00, $00, $00, $B1, $05, $FC, $01, $B1, $06
+	dc.b	$E9, $20, $FC, $00, $89, $02, $80, $02, $F7, $00, $05, $F8, $FF, $F2, $EF, $0F
+	dc.b	$B1, $05, $FC, $01, $B1, $06, $E9, $20, $FC, $00, $89, $02, $80, $02, $F7, $00
+	dc.b	$05, $F8, $FF, $F2
+SFX_DangerousFloor:
+	dc.b	$01, $80, $05, $01, $9F, $1C, $02, $00, $10, $00, $EF, $10, $A0, $04, $AE, $F2
+SFX_Musik:
+	dc.b	$02, $80, $04, $02, $B8, $1C, $02, $00, $11, $03, $80, $05, $02, $CB, $1C, $02
+	dc.b	$00, $11, $06, $E0, $00, $EF, $11, $B5, $1B, $B4, $12, $B5, $09, $B6, $09, $AE
+	dc.b	$B0, $B1, $1B, $E0, $01, $F2, $EF, $11, $99, $09, $A0, $A0, $99, $A0, $A0, $9E
+	dc.b	$A5, $A7, $A9, $1B, $F2
+SFX_Boomerang:
+	dc.b	$02, $A0, $04, $01, $ED, $1C, $FD, $00, $12, $00, $A0, $05, $01, $ED, $1C, $FD
+	dc.b	$00, $12, $00, $EF, $12, $B1, $00, $E0, $04, $B1, $00, $E0, $08, $B1, $00, $1F
+	dc.b	$0B, $F2
+SFX_Sword:
+	dc.b	$02, $80, $02, $01, $0F, $1D, $FF, $00, $13, $00, $80, $05, $01, $0F, $1D, $FF
+	dc.b	$00, $13, $00, $EF, $13, $FE, $00, $00, $01, $01, $A5, $05, $B3, $08, $F2
+SFX_Claw:
+	dc.b	$02, $80, $04, $01, $2E, $1D, $09, $00, $14, $00, $80, $05, $01, $2E, $1D, $09
+	dc.b	$00, $14, $00, $EF, $14, $A5, $03, $FC, $01, $A5, $06, $E1, $05, $F2
+SFX_Slasher:
+	dc.b	$01, $A0, $04, $02, $4C, $1D, $00, $01, $15, $00, $A0, $05, $02, $4C, $1D, $00
+	dc.b	$01, $15, $00, $EF, $15, $E3, $02, $02, $B0, $03, $00, $01, $E3, $03, $02, $B6
+	dc.b	$03, $D4, $0A, $F2
+SFX_Shotgun:
+	dc.b	$02, $A0, $02, $01, $70, $1D, $00, $00, $16, $00, $A0, $05, $01, $70, $1D, $03
+	dc.b	$01, $16, $00, $EF, $16, $95, $00, $E0, $06, $A0, $00, $38, $10, $F2
+SFX_StrongGun:
+	dc.b	$02, $A0, $04, $01, $8E, $1D, $00, $00, $17, $00, $A0, $05, $01, $8E, $1D, $F8
+	dc.b	$01, $17, $00, $EF, $17, $E3, $01, $01, $A0, $06, $FC, $01, $A6, $03, $EA, $0A
+	dc.b	$FB, $FF, $EC, $10, $F7, $00, $03, $F4, $FF, $F2
+SFX_B8:
+	dc.b	$02, $80, $04, $01, $B8, $1D, $00, $00, $18, $01, $80, $05, $01, $B8, $1D, $06
+	dc.b	$00, $18, $01, $EF, $18, $E3, $01, $01, $A0, $06, $A0, $06, $FC, $01, $A6, $03
+	dc.b	$E8, $1A, $F2
+SFX_B9:
+	dc.b	$02, $A0, $02, $01, $DB, $1D, $FD, $00, $19, $02, $A0, $05, $01, $F3, $1D, $00
+	dc.b	$00, $19, $00, $EF, $19, $E3, $01, $01, $FE, $00, $00, $02, $01, $A8, $00, $6E
+	dc.b	$03, $F7, $00, $05, $F8, $FF, $AA, $04, $D3, $0B, $F2, $EF, $19, $E3, $01, $01
+	dc.b	$A0, $00, $10, $10, $F2
+SFX_DamageRedScreen:
+	dc.b	$03, $A0, $02, $01, $19, $1E, $1A, $00, $1A, $03, $A0, $04, $01, $1D, $1E, $1A
+	dc.b	$00, $1A, $03, $A0, $05, $01, $21, $1E, $10, $00, $1A, $03, $80, $00, $00, $01
+	dc.b	$80, $00, $00, $01, $EF, $1A, $E3, $01, $01, $85, $00, $10, $05, $85, $00, $30
+	dc.b	$05, $E3, $02, $01, $A0, $00, $F0, $01, $FB, $FF, $F7, $00, $18, $F3, $FF, $F2
+SFX_Foi:
+	dc.b	$02, $80, $02, $01, $50, $1E, $00, $00, $1B, $00, $80, $05, $01, $57, $1E, $00
+	dc.b	$00, $1B, $00, $FE, $00, $00, $01, $02, $8D, $01, $EF, $1B, $88, $06, $FC, $01
+	dc.b	$87, $00, $14, $04, $8A, $00, $50, $0C, $80, $00, $00, $0C, $F2
+SFX_Zan:
+	dc.b	$02, $A0, $04, $01, $81, $1E, $00, $00, $1C, $00, $A0, $05, $01, $81, $1E, $00
+	dc.b	$00, $1C, $00, $80, $00, $00, $01, $EF, $1C, $E3, $01, $01, $C2, $00, $30, $15
+	dc.b	$96, $00, $FB, $03, $FB, $01, $F7, $00, $08, $F6, $FF, $B6, $00, $68, $0B, $F2
+SFX_Vol:
+	dc.b	$02, $A0, $04, $01, $AD, $1E, $03, $00, $1D, $00, $A0, $05, $01, $B3, $1E, $03
+	dc.b	$00, $1D, $00, $E3, $03, $04, $F6, $04, $00, $E3, $04, $04, $EF, $1C, $C2, $00
+	dc.b	$30, $15, $EF, $1D, $86, $00, $A0, $02, $A8, $00, $A0, $02, $B6, $06, $E0, $10
+	dc.b	$F2
+SFX_Tsu:
+	dc.b	$01, $A0, $05, $01, $D5, $1E, $03, $00, $1E, $00, $EF, $1E, $85, $0C, $66, $01
+	dc.b	$A8, $0A, $1F, $14, $F2
+SFX_Shinb:
+	dc.b	$01, $A0, $05, $01, $EA, $1E, $00, $00, $1F, $00, $EF, $1F, $A5, $FC, $22, $10
+	dc.b	$EC, $05, $FB, $FD, $F7, $00, $03, $F4, $FF, $F2
+SFX_Eijia:
+	dc.b	$03, $A0, $02, $01, $16, $1F, $00, $00, $20, $00, $A0, $04, $01, $16, $1F, $00
+	dc.b	$00, $20, $00, $A0, $05, $01, $16, $1F, $00, $00, $20, $00, $FE, $01, $00, $00
+	dc.b	$00, $EF, $1C, $E3, $01, $01, $C2, $00, $30, $15, $EF, $20, $81, $F6, $3A, $03
+	dc.b	$F7, $00, $06, $F6, $FF, $AB, $FD, $B9, $0D, $F2
+SFX_Gaj:
+	dc.b	$03, $80, $02, $01, $50, $1F, $05, $00, $21, $00, $80, $04, $01, $50, $1F, $05
+	dc.b	$00, $21, $00, $A0, $05, $01, $64, $1F, $05, $00, $21, $00, $FE, $00, $00, $01
+	dc.b	$03, $EF, $21, $83, $04, $FC, $01, $96, $E0, $9A, $02, $A0, $17, $CE, $1A, $F2
+	dc.b	$EF, $21, $83, $0C, $84, $15, $F2
+SFX_Deban:
+	dc.b	$02, $80, $04, $01, $7E, $1F, $FD, $00, $22, $00, $80, $05, $01, $8B, $1F, $F5
+	dc.b	$00, $22, $00, $EF, $22, $A9, $03, $A5, $FB, $01, $F7, $00, $05, $F7, $FF, $F2
+	dc.b	$EF, $22, $80, $01, $A9, $03, $A5, $FB, $01, $F7, $00, $05, $F7, $FF, $F2
+SFX_Healed:
+	dc.b	$01, $A0, $05, $01, $A4, $1F, $01, $00, $23, $00, $EF, $23, $A9, $FE, $1C, $0A
+	dc.b	$EC, $0B, $F7, $00, $05, $F6, $FF, $F2
+SFX_C4:
+	dc.b	$02, $80, $02, $01, $C5, $1F, $00, $00, $24, $00, $80, $05, $01, $CC, $1F, $06
+	dc.b	$00, $24, $00, $EF, $24, $FE, $03, $00, $00, $00, $EF, $24, $A3, $08, $AE, $02
+	dc.b	$F7, $00, $0C, $FA, $FF, $F2
+SFX_NeifirstAttack:
+	dc.b	$01, $A0, $05, $01, $E2, $1F, $0E, $00, $00, $00, $EF, $25, $88, $A7, $53, $03
+	dc.b	$EE, $01, $A7, $3D, $57, $03, $90, $CE, $97, $01, $EE, $00, $80, $00, $00, $08
+	dc.b	$F2
+SFX_Whip:
+	dc.b	$02, $A0, $04, $01, $0C, $20, $00, $00, $26, $00, $A0, $05, $01, $0C, $20, $00
+	dc.b	$00, $26, $00, $EF, $26, $A8, $96, $8E, $08, $90, $FE, $00, $08, $F2
+SFX_WhistleAttack:
+	dc.b	$02, $A0, $04, $01, $2A, $20, $03, $00, $27, $00, $A0, $05, $01, $2A, $20, $00
+	dc.b	$00, $27, $00, $EF, $27, $E3, $01, $01, $91, $C7, $23, $04, $F7, $00, $03, $F8
+	dc.b	$FF, $D4, $30, $00, $0D, $80, $00, $00, $08, $F2
+SFX_PoleziAttack:
+	dc.b	$02, $A0, $04, $01, $54, $20, $00, $00, $28, $00, $A0, $05, $01, $54, $20, $00
+	dc.b	$00, $00, $00, $EF, $28, $8F, $B4, $CD, $03, $9B, $1F, $92, $02, $F7, $00, $06
+	dc.b	$F4, $FF, $80, $00, $00, $08, $F2
+SFX_PulserAttack:
+	dc.b	$02, $A0, $02, $01, $7B, $20, $00, $00, $29, $00, $A0, $05, $01, $7B, $20, $00
+	dc.b	$00, $29, $00, $FE, $03, $03, $00, $00, $EF, $29, $A0, $02, $FC, $01, $9D, $E3
+	dc.b	$A1, $03, $A3, $30, $EC, $02, $F7, $00, $06, $F0, $FF, $F2
+SFX_TerakiteAttack:
+	dc.b	$02, $A0, $02, $01, $A7, $20, $00, $00, $2A, $00, $A0, $05, $01, $A7, $20, $04
+	dc.b	$00, $2A, $00, $FE, $01, $03, $02, $00, $EF, $2A, $93, $00, $40, $06, $A0, $32
+	dc.b	$AB, $03, $9D, $02, $F0, $20, $80, $00, $00, $02, $F2
+SFX_FireAntAttack:
+	dc.b	$02, $A8, $04, $01, $D2, $20, $10, $00, $2B, $00, $A8, $05, $01, $D2, $20, $15
+	dc.b	$00, $2B, $00, $EF, $2B, $10, $20, $F0, $06, $FB, $60, $F7, $00, $05, $F6, $FF
+	dc.b	$20, $80, $F0, $10, $F2
+SFX_BeeAttack:
+	dc.b	$02, $A8, $04, $01, $F7, $20, $00, $00, $2C, $00, $A8, $05, $01, $F7, $20, $0A
+	dc.b	$00, $2C, $00, $EF, $2C, $20, $90, $F0, $07, $F7, $00, $02, $F8, $FF, $36, $80
+	dc.b	$F0, $20, $F2
+SFX_AmoebaAttack:
+	dc.b	$02, $A8, $04, $01, $1A, $21, $02, $00, $2D, $18, $A8, $05, $01, $1A, $21, $00
+	dc.b	$00, $2D, $18, $EF, $2D, $E3, $02, $01, $20, $60, $10, $02, $EC, $FF, $FB, $10
+	dc.b	$F7, $00, $06, $F4, $FF, $E3, $01, $01, $20, $60, $12, $0B, $F2
+SFX_BlasterAttack:
+	dc.b	$02, $A0, $04, $01, $47, $21, $F9, $00, $2E, $00, $A0, $05, $01, $47, $21, $EE
+	dc.b	$00, $2E, $00, $EF, $2E, $A5, $F8, $25, $08, $FB, $01, $F7, $00, $05, $F6, $FF
+	dc.b	$99, $00, $20, $10, $F2
+SFX_VanAttack:
+	dc.b	$02, $80, $04, $01, $6C, $21, $FA, $00, $2F, $03, $80, $05, $01, $79, $21, $04
+	dc.b	$00, $30, $04, $EF, $2F, $8B, $05, $8F, $04, $80, $02, $96, $12, $80, $30, $F2
+	dc.b	$EF, $30, $83, $03, $FC, $01, $8D, $E9, $68, $09, $FC, $00, $EE, $01, $8E, $18
+	dc.b	$EE, $00, $80, $10, $F2
+SFX_SpinnerAttack:
+	dc.b	$02, $A8, $04, $01, $A1, $21, $00, $00, $31, $00, $A8, $05, $01, $A1, $21, $0A
+	dc.b	$00, $31, $00, $EF, $31, $E3, $01, $01, $20, $00, $04, $50, $F2
+SFX_MosquitoAttack:
+	dc.b	$02, $A0, $04, $01, $BE, $21, $00, $00, $32, $00, $A0, $05, $01, $BE, $21, $00
+	dc.b	$00, $32, $00, $EF, $32, $B8, $9C, $4D, $02, $B1, $6B, $8F, $02, $AD, $CD, $7E
+	dc.b	$02, $A9, $49, $02, $02, $A6, $1D, $AA, $02, $A2, $17, $67, $01, $9E, $EF, $3D
+	dc.b	$01, $9B, $3A, $06, $01, $97, $FF, $D8, $01, $93, $B4, $BB, $01, $90, $0C, $A6
+	dc.b	$05, $80, $00, $00, $05, $F2
+SFX_LocustAttack:
+	dc.b	$01, $A0, $02, $01, $FB, $21, $00, $00, $33, $00, $FE, $03, $03, $00, $00, $EF
+	dc.b	$33, $E3, $01, $01, $98, $00, $20, $03, $A8, $00, $E8, $10, $F2
+SFX_ArmyEyeAttack:
+	dc.b	$02, $A0, $04, $01, $21, $22, $03, $00, $33, $00, $A0, $05, $01, $21, $22, $00
+	dc.b	$00, $34, $00, $EF, $33, $92, $00, $10, $03, $9A, $00, $EF, $02, $A0, $00, $F0
+	dc.b	$0A, $EC, $08, $F7, $00, $0A, $F6, $FF, $F2
+SFX_EnemyKilled:
+	dc.b	$02, $A0, $04, $01, $4A, $22, $00, $00, $35, $00, $A0, $05, $01, $4E, $22, $03
+	dc.b	$00, $00, $00, $80, $00, $00, $02, $EF, $35, $8D, $00, $F0, $05, $99, $00, $F0
+	dc.b	$02, $99, $00, $F0, $06, $A5, $00, $10, $20, $B1, $00, $F0, $02, $F2
+SFX_Pause:
+	dc.b	$02, $80, $04, $01, $78, $22, $00, $01, $36, $00, $80, $05, $01, $91, $22, $00
+	dc.b	$00, $00, $00, $F8, $23, $00, $E8, $01, $F2
+SFX_Unpause:
+	dc.b	$02, $80, $04, $01, $91, $22, $00, $01, $36, $00, $80, $05, $01, $97, $22, $00
+	dc.b	$00, $00, $00, $80, $02, $F8, $08, $00, $F2, $F8, $04, $00, $E8, $00, $F2, $EF
+	dc.b	$36, $E3, $02, $01, $BD, $03, $BC, $03, $B8, $06, $BD, $08, $80, $08, $F9
+
+SFX_Null:
+	dc.b	$00
+
+	else
 
 SFX_Selection:
 	dc.b	$01, $80, $05, $01, $16, $10, $00, $00, $00, $08, $EF, $00, $E3, $01, $01, $A5
@@ -77191,228 +80096,6 @@ SFX_Unpause:
 	dc.b	$80
 	dc.b	$08 ;0x0 (0x000B9883-0x000B9884, Entry count: 0x00000001) [Unknown data]
 	dc.b	$F9
-
-SFX_Null:
-	dc.b	$00
-	
-	else
-
-SFX_Selection:
-	dc.b	$01, $80, $05, $01, $3E, $1A, $00, $00, $00, $08, $EF, $00, $E3, $01, $01, $A5
-	dc.b	$08, $80, $02, $F2
-SFX_LevelUp:
-	dc.b	$02, $80, $04, $01, $5B, $1A, $00, $01, $01, $00, $80, $05, $01, $5B, $1A, $00
-	dc.b	$00, $01, $00, $EF, $01, $E3, $01, $01, $A9, $04, $B1, $B5, $B8, $BA, $BD, $F2
-SFX_ItemReceived:
-	dc.b	$02, $80, $04, $01, $7B, $1A, $03, $01, $02, $00, $80, $05, $01, $7B, $1A, $03
-	dc.b	$01, $02, $00, $EF, $02, $B0, $03, $B3, $20, $F2
-SFX_Explosion:
-	dc.b	$02, $A0, $02, $01, $95, $1A, $00, $00, $03, $00, $A0, $05, $01, $9A, $1A, $00
-	dc.b	$00, $03, $08, $FE, $03, $02, $01, $00, $EF, $03, $8D, $00, $D0, $03, $A5, $00
-	dc.b	$10, $06, $BB, $00, $D0, $08, $EC, $08, $F7, $00, $05, $F6, $FF, $F2
-SFX_MapChanged:
-	dc.b	$01, $80, $02, $01, $BA, $1A, $00, $00, $04, $00, $EF, $04, $FE, $01, $01, $01
-	dc.b	$00, $A4, $10, $10, $10, $20, $F2
-SFX_FellInHole:
-	dc.b	$02, $A0, $04, $02, $DA, $1A, $2A, $00, $05, $00, $A0, $05, $02, $DA, $1A, $0B
-	dc.b	$00, $05, $00, $EF, $05, $BC, $04, $F6, $2A, $80, $00, $F1, $10, $F2
-SFX_Revived:
-	dc.b	$02, $A0, $04, $01, $F8, $1A, $00, $00, $06, $08, $A0, $05, $01, $F8, $1A, $00
-	dc.b	$00, $06, $08, $EF, $06, $E3, $01, $01, $98, $00, $07, $03, $F7, $00, $02, $F8
-	dc.b	$FF, $9D, $00, $09, $20, $F2
-SFX_PoisonCured:
-	dc.b	$02, $A0, $04, $01, $1E, $1B, $00, $01, $07, $00, $A0, $05, $01, $1E, $1B, $00
-	dc.b	$00, $07, $00, $EF, $07, $E3, $01, $01, $9D, $F0, $49, $05, $99, $E0, $56, $0E
-	dc.b	$80, $00, $00, $05, $F2
-SFX_Alarm:
-	dc.b	$01, $80, $02, $01, $3A, $1B, $F0, $00, $08, $00, $EF, $08, $E3, $01, $01, $FE
-	dc.b	$00, $00, $01, $00, $81, $2E, $F2
-SFX_Hidapipe:
-	dc.b	$02, $80, $04, $02, $5A, $1B, $01, $01, $09, $0C, $80, $05, $02, $64, $1B, $01
-	dc.b	$00, $09, $0C, $E0, $00, $80, $01, $F8, $08, $00, $E0, $01, $F2, $F8, $02, $00
-	dc.b	$F2, $EF, $09, $E3, $01, $01, $B5, $12, $B1, $06, $30, $B8, $06, $B6, $0C, $B5
-	dc.b	$06, $B3, $06, $B5, $0C, $B1, $06, $B1, $B3, $0C, $B5, $06, $B3, $24, $80, $0C
-	dc.b	$F9
-SFX_Teleport:
-	dc.b	$02, $A0, $04, $02, $9B, $1B, $FD, $01, $0A, $00, $A0, $05, $02, $9B, $1B, $F9
-	dc.b	$00, $0A, $00, $EF, $0A, $E3, $01, $01, $9C, $00, $F0, $03, $FB, $01, $F7, $00
-	dc.b	$09, $F6, $FF, $F2
-SFX_DoorOpen:
-	dc.b	$02, $A0, $05, $01, $BF, $1B, $FD, $00, $0B, $00, $A0, $05, $01, $BF, $1B, $FE
-	dc.b	$00, $0B, $00, $EF, $0B, $A5, $00, $00, $07, $A5, $F6, $27, $0B, $80, $00, $00
-	dc.b	$20, $F2
-SFX_DamOpened:
-	dc.b	$03, $A0, $02, $01, $EA, $1B, $05, $00, $0C, $00, $A0, $04, $01, $EA, $1B, $00
-	dc.b	$00, $0C, $00, $A0, $05, $01, $EA, $1B, $F9, $00, $0C, $00, $EF, $0C, $E3, $01
-	dc.b	$01, $FE, $00, $01, $00, $00, $99, $00, $00, $08, $A0, $05, $ED, $7A, $80, $00
-	dc.b	$00, $01, $F2
-SFX_JetScooter:
-	dc.b	$01, $A0, $02, $01, $0B, $1C, $00, $00, $0D, $10, $FE, $00, $03, $00, $01, $EF
-	dc.b	$0D, $81, $E6, $50, $06, $F6, $F8, $FF
-SFX_SpaceshipDeparted:
-	dc.b	$02, $80, $02, $02, $2C, $1C, $FD, $00, $0E, $00, $80, $05, $01, $3F, $1C, $00
-	dc.b	$00, $0E, $00, $EF, $0E, $E3, $01, $01, $FE, $01, $01, $00, $00, $99, $05, $FC
-	dc.b	$01, $99, $F5, $1D, $20, $F2, $EF, $0E, $E3, $01, $01, $99, $05, $FC, $01, $99
-	dc.b	$F5, $1D, $20, $FC, $00, $80, $10, $F2
-SFX_SpaceshipLanded:
-	dc.b	$02, $80, $02, $02, $64, $1C, $03, $00, $0F, $00, $80, $05, $02, $7F, $1C, $00
-	dc.b	$00, $0F, $05, $EF, $0F, $FE, $00, $00, $00, $00, $B1, $05, $FC, $01, $B1, $06
-	dc.b	$E9, $20, $FC, $00, $89, $02, $80, $02, $F7, $00, $05, $F8, $FF, $F2, $EF, $0F
-	dc.b	$B1, $05, $FC, $01, $B1, $06, $E9, $20, $FC, $00, $89, $02, $80, $02, $F7, $00
-	dc.b	$05, $F8, $FF, $F2
-SFX_DangerousFloor:
-	dc.b	$01, $80, $05, $01, $9F, $1C, $02, $00, $10, $00, $EF, $10, $A0, $04, $AE, $F2
-SFX_Musik:
-	dc.b	$02, $80, $04, $02, $B8, $1C, $02, $00, $11, $03, $80, $05, $02, $CB, $1C, $02
-	dc.b	$00, $11, $06, $E0, $00, $EF, $11, $B5, $1B, $B4, $12, $B5, $09, $B6, $09, $AE
-	dc.b	$B0, $B1, $1B, $E0, $01, $F2, $EF, $11, $99, $09, $A0, $A0, $99, $A0, $A0, $9E
-	dc.b	$A5, $A7, $A9, $1B, $F2
-SFX_Boomerang:
-	dc.b	$02, $A0, $04, $01, $ED, $1C, $FD, $00, $12, $00, $A0, $05, $01, $ED, $1C, $FD
-	dc.b	$00, $12, $00, $EF, $12, $B1, $00, $E0, $04, $B1, $00, $E0, $08, $B1, $00, $1F
-	dc.b	$0B, $F2
-SFX_Sword:
-	dc.b	$02, $80, $02, $01, $0F, $1D, $FF, $00, $13, $00, $80, $05, $01, $0F, $1D, $FF
-	dc.b	$00, $13, $00, $EF, $13, $FE, $00, $00, $01, $01, $A5, $05, $B3, $08, $F2
-SFX_Claw:
-	dc.b	$02, $80, $04, $01, $2E, $1D, $09, $00, $14, $00, $80, $05, $01, $2E, $1D, $09
-	dc.b	$00, $14, $00, $EF, $14, $A5, $03, $FC, $01, $A5, $06, $E1, $05, $F2
-SFX_Slasher:
-	dc.b	$01, $A0, $04, $02, $4C, $1D, $00, $01, $15, $00, $A0, $05, $02, $4C, $1D, $00
-	dc.b	$01, $15, $00, $EF, $15, $E3, $02, $02, $B0, $03, $00, $01, $E3, $03, $02, $B6
-	dc.b	$03, $D4, $0A, $F2
-SFX_Shotgun:
-	dc.b	$02, $A0, $02, $01, $70, $1D, $00, $00, $16, $00, $A0, $05, $01, $70, $1D, $03
-	dc.b	$01, $16, $00, $EF, $16, $95, $00, $E0, $06, $A0, $00, $38, $10, $F2
-SFX_StrongGun:
-	dc.b	$02, $A0, $04, $01, $8E, $1D, $00, $00, $17, $00, $A0, $05, $01, $8E, $1D, $F8
-	dc.b	$01, $17, $00, $EF, $17, $E3, $01, $01, $A0, $06, $FC, $01, $A6, $03, $EA, $0A
-	dc.b	$FB, $FF, $EC, $10, $F7, $00, $03, $F4, $FF, $F2
-SFX_B8:
-	dc.b	$02, $80, $04, $01, $B8, $1D, $00, $00, $18, $01, $80, $05, $01, $B8, $1D, $06
-	dc.b	$00, $18, $01, $EF, $18, $E3, $01, $01, $A0, $06, $A0, $06, $FC, $01, $A6, $03
-	dc.b	$E8, $1A, $F2
-SFX_B9:
-	dc.b	$02, $A0, $02, $01, $DB, $1D, $FD, $00, $19, $02, $A0, $05, $01, $F3, $1D, $00
-	dc.b	$00, $19, $00, $EF, $19, $E3, $01, $01, $FE, $00, $00, $02, $01, $A8, $00, $6E
-	dc.b	$03, $F7, $00, $05, $F8, $FF, $AA, $04, $D3, $0B, $F2, $EF, $19, $E3, $01, $01
-	dc.b	$A0, $00, $10, $10, $F2
-SFX_DamageRedScreen:
-	dc.b	$03, $A0, $02, $01, $19, $1E, $1A, $00, $1A, $03, $A0, $04, $01, $1D, $1E, $1A
-	dc.b	$00, $1A, $03, $A0, $05, $01, $21, $1E, $10, $00, $1A, $03, $80, $00, $00, $01
-	dc.b	$80, $00, $00, $01, $EF, $1A, $E3, $01, $01, $85, $00, $10, $05, $85, $00, $30
-	dc.b	$05, $E3, $02, $01, $A0, $00, $F0, $01, $FB, $FF, $F7, $00, $18, $F3, $FF, $F2
-SFX_Foi:
-	dc.b	$02, $80, $02, $01, $50, $1E, $00, $00, $1B, $00, $80, $05, $01, $57, $1E, $00
-	dc.b	$00, $1B, $00, $FE, $00, $00, $01, $02, $8D, $01, $EF, $1B, $88, $06, $FC, $01
-	dc.b	$87, $00, $14, $04, $8A, $00, $50, $0C, $80, $00, $00, $0C, $F2
-SFX_Zan:
-	dc.b	$02, $A0, $04, $01, $81, $1E, $00, $00, $1C, $00, $A0, $05, $01, $81, $1E, $00
-	dc.b	$00, $1C, $00, $80, $00, $00, $01, $EF, $1C, $E3, $01, $01, $C2, $00, $30, $15
-	dc.b	$96, $00, $FB, $03, $FB, $01, $F7, $00, $08, $F6, $FF, $B6, $00, $68, $0B, $F2
-SFX_Vol:
-	dc.b	$02, $A0, $04, $01, $AD, $1E, $03, $00, $1D, $00, $A0, $05, $01, $B3, $1E, $03
-	dc.b	$00, $1D, $00, $E3, $03, $04, $F6, $04, $00, $E3, $04, $04, $EF, $1C, $C2, $00
-	dc.b	$30, $15, $EF, $1D, $86, $00, $A0, $02, $A8, $00, $A0, $02, $B6, $06, $E0, $10
-	dc.b	$F2
-SFX_Tsu:
-	dc.b	$01, $A0, $05, $01, $D5, $1E, $03, $00, $1E, $00, $EF, $1E, $85, $0C, $66, $01
-	dc.b	$A8, $0A, $1F, $14, $F2
-SFX_Shinb:
-	dc.b	$01, $A0, $05, $01, $EA, $1E, $00, $00, $1F, $00, $EF, $1F, $A5, $FC, $22, $10
-	dc.b	$EC, $05, $FB, $FD, $F7, $00, $03, $F4, $FF, $F2
-SFX_Eijia:
-	dc.b	$03, $A0, $02, $01, $16, $1F, $00, $00, $20, $00, $A0, $04, $01, $16, $1F, $00
-	dc.b	$00, $20, $00, $A0, $05, $01, $16, $1F, $00, $00, $20, $00, $FE, $01, $00, $00
-	dc.b	$00, $EF, $1C, $E3, $01, $01, $C2, $00, $30, $15, $EF, $20, $81, $F6, $3A, $03
-	dc.b	$F7, $00, $06, $F6, $FF, $AB, $FD, $B9, $0D, $F2
-SFX_Gaj:
-	dc.b	$03, $80, $02, $01, $50, $1F, $05, $00, $21, $00, $80, $04, $01, $50, $1F, $05
-	dc.b	$00, $21, $00, $A0, $05, $01, $64, $1F, $05, $00, $21, $00, $FE, $00, $00, $01
-	dc.b	$03, $EF, $21, $83, $04, $FC, $01, $96, $E0, $9A, $02, $A0, $17, $CE, $1A, $F2
-	dc.b	$EF, $21, $83, $0C, $84, $15, $F2
-SFX_Deban:
-	dc.b	$02, $80, $04, $01, $7E, $1F, $FD, $00, $22, $00, $80, $05, $01, $8B, $1F, $F5
-	dc.b	$00, $22, $00, $EF, $22, $A9, $03, $A5, $FB, $01, $F7, $00, $05, $F7, $FF, $F2
-	dc.b	$EF, $22, $80, $01, $A9, $03, $A5, $FB, $01, $F7, $00, $05, $F7, $FF, $F2
-SFX_Healed:
-	dc.b	$01, $A0, $05, $01, $A4, $1F, $01, $00, $23, $00, $EF, $23, $A9, $FE, $1C, $0A
-	dc.b	$EC, $0B, $F7, $00, $05, $F6, $FF, $F2
-SFX_C4:
-	dc.b	$02, $80, $02, $01, $C5, $1F, $00, $00, $24, $00, $80, $05, $01, $CC, $1F, $06
-	dc.b	$00, $24, $00, $EF, $24, $FE, $03, $00, $00, $00, $EF, $24, $A3, $08, $AE, $02
-	dc.b	$F7, $00, $0C, $FA, $FF, $F2
-SFX_NeifirstAttack:
-	dc.b	$01, $A0, $05, $01, $E2, $1F, $0E, $00, $00, $00, $EF, $25, $88, $A7, $53, $03
-	dc.b	$EE, $01, $A7, $3D, $57, $03, $90, $CE, $97, $01, $EE, $00, $80, $00, $00, $08
-	dc.b	$F2
-SFX_Whip:
-	dc.b	$02, $A0, $04, $01, $0C, $20, $00, $00, $26, $00, $A0, $05, $01, $0C, $20, $00
-	dc.b	$00, $26, $00, $EF, $26, $A8, $96, $8E, $08, $90, $FE, $00, $08, $F2
-SFX_WhistleAttack:
-	dc.b	$02, $A0, $04, $01, $2A, $20, $03, $00, $27, $00, $A0, $05, $01, $2A, $20, $00
-	dc.b	$00, $27, $00, $EF, $27, $E3, $01, $01, $91, $C7, $23, $04, $F7, $00, $03, $F8
-	dc.b	$FF, $D4, $30, $00, $0D, $80, $00, $00, $08, $F2
-SFX_PoleziAttack:
-	dc.b	$02, $A0, $04, $01, $54, $20, $00, $00, $28, $00, $A0, $05, $01, $54, $20, $00
-	dc.b	$00, $00, $00, $EF, $28, $8F, $B4, $CD, $03, $9B, $1F, $92, $02, $F7, $00, $06
-	dc.b	$F4, $FF, $80, $00, $00, $08, $F2
-SFX_PulserAttack:
-	dc.b	$02, $A0, $02, $01, $7B, $20, $00, $00, $29, $00, $A0, $05, $01, $7B, $20, $00
-	dc.b	$00, $29, $00, $FE, $03, $03, $00, $00, $EF, $29, $A0, $02, $FC, $01, $9D, $E3
-	dc.b	$A1, $03, $A3, $30, $EC, $02, $F7, $00, $06, $F0, $FF, $F2
-SFX_TerakiteAttack:
-	dc.b	$02, $A0, $02, $01, $A7, $20, $00, $00, $2A, $00, $A0, $05, $01, $A7, $20, $04
-	dc.b	$00, $2A, $00, $FE, $01, $03, $02, $00, $EF, $2A, $93, $00, $40, $06, $A0, $32
-	dc.b	$AB, $03, $9D, $02, $F0, $20, $80, $00, $00, $02, $F2
-SFX_FireAntAttack:
-	dc.b	$02, $A8, $04, $01, $D2, $20, $10, $00, $2B, $00, $A8, $05, $01, $D2, $20, $15
-	dc.b	$00, $2B, $00, $EF, $2B, $10, $20, $F0, $06, $FB, $60, $F7, $00, $05, $F6, $FF
-	dc.b	$20, $80, $F0, $10, $F2
-SFX_BeeAttack:
-	dc.b	$02, $A8, $04, $01, $F7, $20, $00, $00, $2C, $00, $A8, $05, $01, $F7, $20, $0A
-	dc.b	$00, $2C, $00, $EF, $2C, $20, $90, $F0, $07, $F7, $00, $02, $F8, $FF, $36, $80
-	dc.b	$F0, $20, $F2
-SFX_AmoebaAttack:
-	dc.b	$02, $A8, $04, $01, $1A, $21, $02, $00, $2D, $18, $A8, $05, $01, $1A, $21, $00
-	dc.b	$00, $2D, $18, $EF, $2D, $E3, $02, $01, $20, $60, $10, $02, $EC, $FF, $FB, $10
-	dc.b	$F7, $00, $06, $F4, $FF, $E3, $01, $01, $20, $60, $12, $0B, $F2
-SFX_BlasterAttack:
-	dc.b	$02, $A0, $04, $01, $47, $21, $F9, $00, $2E, $00, $A0, $05, $01, $47, $21, $EE
-	dc.b	$00, $2E, $00, $EF, $2E, $A5, $F8, $25, $08, $FB, $01, $F7, $00, $05, $F6, $FF
-	dc.b	$99, $00, $20, $10, $F2
-SFX_VanAttack:
-	dc.b	$02, $80, $04, $01, $6C, $21, $FA, $00, $2F, $03, $80, $05, $01, $79, $21, $04
-	dc.b	$00, $30, $04, $EF, $2F, $8B, $05, $8F, $04, $80, $02, $96, $12, $80, $30, $F2
-	dc.b	$EF, $30, $83, $03, $FC, $01, $8D, $E9, $68, $09, $FC, $00, $EE, $01, $8E, $18
-	dc.b	$EE, $00, $80, $10, $F2
-SFX_SpinnerAttack:
-	dc.b	$02, $A8, $04, $01, $A1, $21, $00, $00, $31, $00, $A8, $05, $01, $A1, $21, $0A
-	dc.b	$00, $31, $00, $EF, $31, $E3, $01, $01, $20, $00, $04, $50, $F2
-SFX_MosquitoAttack:
-	dc.b	$02, $A0, $04, $01, $BE, $21, $00, $00, $32, $00, $A0, $05, $01, $BE, $21, $00
-	dc.b	$00, $32, $00, $EF, $32, $B8, $9C, $4D, $02, $B1, $6B, $8F, $02, $AD, $CD, $7E
-	dc.b	$02, $A9, $49, $02, $02, $A6, $1D, $AA, $02, $A2, $17, $67, $01, $9E, $EF, $3D
-	dc.b	$01, $9B, $3A, $06, $01, $97, $FF, $D8, $01, $93, $B4, $BB, $01, $90, $0C, $A6
-	dc.b	$05, $80, $00, $00, $05, $F2
-SFX_LocustAttack:
-	dc.b	$01, $A0, $02, $01, $FB, $21, $00, $00, $33, $00, $FE, $03, $03, $00, $00, $EF
-	dc.b	$33, $E3, $01, $01, $98, $00, $20, $03, $A8, $00, $E8, $10, $F2
-SFX_ArmyEyeAttack:
-	dc.b	$02, $A0, $04, $01, $21, $22, $03, $00, $33, $00, $A0, $05, $01, $21, $22, $00
-	dc.b	$00, $34, $00, $EF, $33, $92, $00, $10, $03, $9A, $00, $EF, $02, $A0, $00, $F0
-	dc.b	$0A, $EC, $08, $F7, $00, $0A, $F6, $FF, $F2
-SFX_EnemyKilled:
-	dc.b	$02, $A0, $04, $01, $4A, $22, $00, $00, $35, $00, $A0, $05, $01, $4E, $22, $03
-	dc.b	$00, $00, $00, $80, $00, $00, $02, $EF, $35, $8D, $00, $F0, $05, $99, $00, $F0
-	dc.b	$02, $99, $00, $F0, $06, $A5, $00, $10, $20, $B1, $00, $F0, $02, $F2
-SFX_Pause:
-	dc.b	$02, $80, $04, $01, $78, $22, $00, $01, $36, $00, $80, $05, $01, $91, $22, $00
-	dc.b	$00, $00, $00, $F8, $23, $00, $E8, $01, $F2
-SFX_Unpause:
-	dc.b	$02, $80, $04, $01, $91, $22, $00, $01, $36, $00, $80, $05, $01, $97, $22, $00
-	dc.b	$00, $00, $00, $80, $02, $F8, $08, $00, $F2, $F8, $04, $00, $E8, $00, $F2, $EF
-	dc.b	$36, $E3, $02, $01, $BD, $03, $BC, $03, $B8, $06, $BD, $08, $80, $08, $F9
 
 SFX_Null:
 	dc.b	$00
@@ -78297,10 +80980,10 @@ loc_BA1FA:
 cfF3_NoiseMode:
 	move.b	(a4)+, d0
 	andi.b	#$E0, d0	; broken, should be ori.b
-	if revision>0
-	move.b	d0, PSG_input
-	else
+	if revision=0
 	move.b	d0, $00A08011
+	else
+	move.b	d0, PSG_input
 	endif
 	rts
 cfF4_ModType:
@@ -78719,18 +81402,18 @@ FadeOutMusic:
 	subq.w	#1, d6
 	lea	Music_tracks+$C0, a1
 loc_BA6FE:
-	if revision>0
-	move.b	$20(a0), $20(a1)	; copy Algorithm
-	move.b	$1C(a0), $1C(a1)	; copy TL Operator values 1-4
-	move.b	$27(a0), $27(a1)
-	move.b	$1E(a0), $1E(a1)
-	move.b	$1F(a0), $1F(a1)
-	else
+	if revision=0
 	move.b	$1C(a0), $1C(a1)
 	move.b	$1D(a0), $1D(a1)
 	move.b	$1E(a0), $1E(a1)
 	move.b	$1F(a0), $1F(a1)
 	move.b	$20(a0), $20(a1)
+	else
+	move.b	$20(a0), $20(a1)	; copy Algorithm
+	move.b	$1C(a0), $1C(a1)	; copy TL Operator values 1-4
+	move.b	$27(a0), $27(a1)
+	move.b	$1E(a0), $1E(a1)
+	move.b	$1F(a0), $1F(a1)
 	endif
 	adda.w	#$30, a1
 	dbf	d6, loc_BA6FE
@@ -78805,16 +81488,16 @@ SilenceFM:
 	rts
 SilencePSG:
 	lea	(PSGMuteVals).l, a0
-	if revision>0
-	move.b	(a0)+, $00C00011
-	move.b	(a0)+, $00C00011
-	move.b	(a0)+, $00C00011
-	move.b	(a0)+, $00C00011
+	if revision=0
+	move.b	(a0)+, $00A08011
+	move.b	(a0)+, $00A08011
+	move.b	(a0)+, $00A08011
+	move.b	(a0)+, $00A08011
 	else
-	move.b	(a0)+, $00A08011
-	move.b	(a0)+, $00A08011
-	move.b	(a0)+, $00A08011
-	move.b	(a0)+, $00A08011
+	move.b	(a0)+, $00C00011
+	move.b	(a0)+, $00C00011
+	move.b	(a0)+, $00C00011
+	move.b	(a0)+, $00C00011
 	endif
 	rts
 
@@ -78823,7 +81506,146 @@ PSGMuteVals:
 	dc.b	$9F, $BF, $DF, $FF
 ; ===============================
 
-	if revision>0
+	if revision=0
+SetFMIns:
+	move.b	(a0)+, d0
+	cmpi.b	#$83, d0
+	beq.w	loc_BB1F8
+	cmpi.b	#$B0, d0
+	beq.w	loc_BA88A	; B0 - Algorithm
+	cmpi.b	#$40, d0
+	beq.w	loc_BA890	; 40 - Total Level Op 1
+	cmpi.b	#$48, d0
+	beq.w	loc_BA896	; 48 - Total Level Op 2
+	cmpi.b	#$44, d0
+	beq.w	loc_BA89C	; 44 - Total Level Op 3
+	cmpi.b	#$4C, d0
+	beq.w	loc_BA8A2	; 4C - Total Level Op 4
+	cmpi.b	#$B4, d0
+	beq.w	loc_BA8A8	; B4 - Pan/AMS/FMS
+	move.b	(a0)+, d1
+loc_BA866:
+	bsr.w	WriteFMIorII
+	bra.s	SetFMIns
+
+loc_BB1F8:
+	move.b	8(a3), d3	; load Track Volume
+	beq.w	+
+	bra.w	RefreshVolume
++
+	rts
+
+loc_BA88A:
+	move.b	(a0)+, d1
+	move.b	d1, $1C(a3)
+	bra.s	loc_BA866
+loc_BA890:
+	move.b	(a0)+, d1
+	move.b	d1, $1D(a3)
+	bra.s	loc_BA866
+loc_BA896:
+	move.b	(a0)+, d1
+	move.b	d1, $1E(a3)
+	bra.s	loc_BA866
+loc_BA89C:
+	move.b	(a0)+, d1
+	move.b	d1, $1F(a3)
+	bra.s	loc_BA866
+loc_BA8A2:
+	move.b	(a0)+, d1
+	move.b	d1, $20(a3)
+	bra.s	loc_BA866
+loc_BA8A8:
+	move.b	(a0)+, d1
+	move.b	d1, $17(a3)
+	bra.s	loc_BA866
+RefreshVolume:
+	move.b	$1C(a3), d5
+	andi.w	#7, d5
+	lsl.w	#2, d5
+	jsr	loc_BA8BC(pc,d5.w)
+
+; ==========================
+loc_BA8BC:
+	bra.w	loc_BA906	; Algo 00 (Output Op. 4)
+	bra.w	loc_BA906	; Algo 01 (Output Op. 4)
+	bra.w	loc_BA906	; Algo 02 (Output Op. 4)
+	bra.w	loc_BA906	; Algo 03 (Output Op. 4)
+	bra.w	loc_BA8F8	; Algo 04 (Output Op. 2-4)
+	bra.w	loc_BA8EA	; Algo 05 (Output Op. 2-4)
+	bra.w	loc_BA8EA	; Algo 06 (Output Op. 2-3-4)
+	bra.w	loc_BA8DC	; Algo 07 (Output Op. 1-2-3-4)
+; ==========================
+
+loc_BA8DC:
+	move.b	#$40, d0
+	move.b	d3, d1
+	add.b	$1D(a3), d1
+	bsr.w	WriteFMIorII
+loc_BA8EA:
+	move.b	#$44, d0
+	move.b	d3, d1
+	add.b	$1F(a3), d1
+	bsr.w	WriteFMIorII
+loc_BA8F8:
+	move.b	#$48, d0
+	move.b	d3, d1
+	add.b	$1E(a3), d1
+	bsr.w	WriteFMIorII
+loc_BA906:
+	move.b	#$4C, d0
+	move.b	d3, d1
+	add.b	$20(a3), d1
+	bsr.w	WriteFMIorII
+	rts
+
+DoNoteOn_A:
+	_btst	#1, 0(a3)
+	bne.w	loc_BA952
+	move.w	#0, d6
+	move.b	$21(a3), d6	; get Chord Mode track count
+	beq.w	DoNoteOn	; disabled - do	once
+	subq.b	#1, d6
+	movea.l	a3, a5
+-
+	bsr.w	DoNoteOn
+	adda.w	#$30, a3
+	dbf	d6, -
+	movea.l	a5, a3
+	rts
+DoNoteOn:
+	move.b	#$28, d0
+	move.b	1(a3), d1
+	ori.b	#$F0, d1
+	bsr.w	WriteFM1Main
+	rts
+loc_BA952:
+	rts
+DoNoteOff_A:
+	_btst	#1, 0(a3)	; is in	'Hold Mode'?
+	bne.w	loc_BA98A	; if so, return
+	move.w	#0, d6
+	move.b	$21(a3), d6	; get Chord Mode track count
+	beq.w	FMNoteOff	; disabled - jump (execute once)
+	subq.b	#1, d6		; loop TrkRAM[21h] times
+	movea.l	a3, a5
+loc_BA96E:
+	bsr.w	FMNoteOff
+	adda.w	#$30, a3
+	dbf	d6, loc_BA96E
+
+	movea.l	a5, a3
+	rts
+
+FMNoteOff:
+	move.b	#$28, d0
+	move.b	1(a3), d1
+	bsr.w	WriteFM1Main
+loc_BA98A:
+	rts
+	
+	else
+
 loc_BA818:
 	dc.b	$B0, $B4, $40, $48, $44, $4C, $30, $38, $34, $3C, $50, $58, $54, $5C, $60, $68
 	dc.b	$64, $6C, $70, $78, $74, $7C, $80, $88, $84, $8C ;0x0 (0x000BA818-0x000BA832, Entry count: 0x0000001A)
@@ -78989,145 +81811,6 @@ loc_BA9D8:
 	btst	#7, d2
 	bne.s	loc_BA9D8
 	move.b	d1, $A04003
-	rts
-	
-	else
-
-SetFMIns:
-	move.b	(a0)+, d0
-	cmpi.b	#$83, d0
-	beq.w	loc_BB1F8
-	cmpi.b	#$B0, d0
-	beq.w	loc_BA88A	; B0 - Algorithm
-	cmpi.b	#$40, d0
-	beq.w	loc_BA890	; 40 - Total Level Op 1
-	cmpi.b	#$48, d0
-	beq.w	loc_BA896	; 48 - Total Level Op 2
-	cmpi.b	#$44, d0
-	beq.w	loc_BA89C	; 44 - Total Level Op 3
-	cmpi.b	#$4C, d0
-	beq.w	loc_BA8A2	; 4C - Total Level Op 4
-	cmpi.b	#$B4, d0
-	beq.w	loc_BA8A8	; B4 - Pan/AMS/FMS
-	move.b	(a0)+, d1
-loc_BA866:
-	bsr.w	WriteFMIorII
-	bra.s	SetFMIns
-
-loc_BB1F8:
-	move.b	8(a3), d3	; load Track Volume
-	beq.w	+
-	bra.w	RefreshVolume
-+
-	rts
-
-loc_BA88A:
-	move.b	(a0)+, d1
-	move.b	d1, $1C(a3)
-	bra.s	loc_BA866
-loc_BA890:
-	move.b	(a0)+, d1
-	move.b	d1, $1D(a3)
-	bra.s	loc_BA866
-loc_BA896:
-	move.b	(a0)+, d1
-	move.b	d1, $1E(a3)
-	bra.s	loc_BA866
-loc_BA89C:
-	move.b	(a0)+, d1
-	move.b	d1, $1F(a3)
-	bra.s	loc_BA866
-loc_BA8A2:
-	move.b	(a0)+, d1
-	move.b	d1, $20(a3)
-	bra.s	loc_BA866
-loc_BA8A8:
-	move.b	(a0)+, d1
-	move.b	d1, $17(a3)
-	bra.s	loc_BA866
-RefreshVolume:
-	move.b	$1C(a3), d5
-	andi.w	#7, d5
-	lsl.w	#2, d5
-	jsr	loc_BA8BC(pc,d5.w)
-
-; ==========================
-loc_BA8BC:
-	bra.w	loc_BA906	; Algo 00 (Output Op. 4)
-	bra.w	loc_BA906	; Algo 01 (Output Op. 4)
-	bra.w	loc_BA906	; Algo 02 (Output Op. 4)
-	bra.w	loc_BA906	; Algo 03 (Output Op. 4)
-	bra.w	loc_BA8F8	; Algo 04 (Output Op. 2-4)
-	bra.w	loc_BA8EA	; Algo 05 (Output Op. 2-4)
-	bra.w	loc_BA8EA	; Algo 06 (Output Op. 2-3-4)
-	bra.w	loc_BA8DC	; Algo 07 (Output Op. 1-2-3-4)
-; ==========================
-
-loc_BA8DC:
-	move.b	#$40, d0
-	move.b	d3, d1
-	add.b	$1D(a3), d1
-	bsr.w	WriteFMIorII
-loc_BA8EA:
-	move.b	#$44, d0
-	move.b	d3, d1
-	add.b	$1F(a3), d1
-	bsr.w	WriteFMIorII
-loc_BA8F8:
-	move.b	#$48, d0
-	move.b	d3, d1
-	add.b	$1E(a3), d1
-	bsr.w	WriteFMIorII
-loc_BA906:
-	move.b	#$4C, d0
-	move.b	d3, d1
-	add.b	$20(a3), d1
-	bsr.w	WriteFMIorII
-	rts
-
-DoNoteOn_A:
-	_btst	#1, 0(a3)
-	bne.w	loc_BA952
-	move.w	#0, d6
-	move.b	$21(a3), d6	; get Chord Mode track count
-	beq.w	DoNoteOn	; disabled - do	once
-	subq.b	#1, d6
-	movea.l	a3, a5
--
-	bsr.w	DoNoteOn
-	adda.w	#$30, a3
-	dbf	d6, -
-	movea.l	a5, a3
-	rts
-DoNoteOn:
-	move.b	#$28, d0
-	move.b	1(a3), d1
-	ori.b	#$F0, d1
-	bsr.w	WriteFM1Main
-	rts
-loc_BA952:
-	rts
-DoNoteOff_A:
-	_btst	#1, 0(a3)	; is in	'Hold Mode'?
-	bne.w	loc_BA98A	; if so, return
-	move.w	#0, d6
-	move.b	$21(a3), d6	; get Chord Mode track count
-	beq.w	FMNoteOff	; disabled - jump (execute once)
-	subq.b	#1, d6		; loop TrkRAM[21h] times
-	movea.l	a3, a5
-loc_BA96E:
-	bsr.w	FMNoteOff
-	adda.w	#$30, a3
-	dbf	d6, loc_BA96E
-
-	movea.l	a5, a3
-	rts
-
-FMNoteOff:
-	move.b	#$28, d0
-	move.b	1(a3), d1
-	bsr.w	WriteFM1Main
-loc_BA98A:
 	rts
 	
 	endif
@@ -79927,8 +82610,8 @@ loc_BB001:
 	dc.b	$F9
 
 loc_BB12E:
-	if revision>0
-	dc.b	$EF, $48, $E6, $30, $E6, $30, $E6, $2A, $C2, $06 ;0x0 (0x000BB12D-0x000BB138, Entry count: 0x0000000B) [Unknown data]
+	if revision=0
+	dc.b	$EF, $48, $80, $30, $E6, $30, $E6, $2A, $C2, $06 ;0x0 (0x000BB12D-0x000BB138, Entry count: 0x0000000B) [Unknown data]
 	dc.b	$E6
 	dc.b	$06
 	dc.b	$BD
@@ -80054,7 +82737,7 @@ loc_BB12E:
 	dc.b	$2F ;0x0 (0x000BB1FE-0x000BB1FF, Entry count: 0x00000001) [Unknown data]
 	dc.b	$FF
 	else
-	dc.b	$EF, $48, $80, $30, $E6, $30, $E6, $2A, $C2, $06 ;0x0 (0x000BB12D-0x000BB138, Entry count: 0x0000000B) [Unknown data]
+	dc.b	$EF, $48, $E6, $30, $E6, $30, $E6, $2A, $C2, $06 ;0x0 (0x000BB12D-0x000BB138, Entry count: 0x0000000B) [Unknown data]
 	dc.b	$E6
 	dc.b	$06
 	dc.b	$BD
@@ -84433,6 +87116,41 @@ PCMDrums:
 	padding off	; padding is not restored, so we need to set the flag again
 	!org (PCMDrums+PCMDrumsEnd-PCMDrumsStart)		; PC must be set to the correct value, so it's the whole code up until the PCMDrums label + the whole z80 code
 
+	if revision=3
+	align $100
+LoadTitleCopyrightUncomp:
+	lea	(ArtUncomp_TitleCopyright).l, a0
+	lea	(VDP_data_port).l, a1
+	move.l	#0, d0
+	move.w	#(ArtUncomp_TitleCopyright_End-ArtUncomp_TitleCopyright)/2, d0
+-
+	move.w	(a0)+, (a1)
+	dbf	d0, -
+	jmp	(loc_73C0).w
+
+	align $40
+	
+Inventor_PatchDialogue:
+	move.w	#WinID_ScriptMessage2, (Window_index&$FFFFFF).l
+	moveq	#ItemID_MruraGum, d2
+	jsr	(CheckItemExistInventory).l
+	beq.s	+
+	addq.w	#1, (Event_routine&$FFFFFF).l
+	move.w	#$B01, (Script_ID&$FFFFFF).l
+	rts
++
+	addq.w	#1, (Event_routine_2&$FFFFFF).l
+	move.w	#$B08, (Script_ID&$FFFFFF).l
+	rts
+	org $BF800
+
+ArtUncomp_TitleCopyright:
+	binclude "title/art/uncompressed/copyright.bin"
+ArtUncomp_TitleCopyright_End:
+
+	align0 $200	
+	
+	endif
 
 	while (*) < $C0000
 		dc.b	$FF

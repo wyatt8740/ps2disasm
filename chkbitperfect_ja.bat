@@ -5,7 +5,7 @@ call build %1
 
 REM  // run fc
 echo -------------------------------------------------------------
-IF EXIST ps2built.bin ( fc /b ps2built.bin ps2original_jap.bin
+IF EXIST ps2built.bin ( fc /b ps2built.bin ps2original_ja.bin
 ) ELSE echo ps2built.bin does not exist, probably due to an assembly error
 
 REM // clean up after us
