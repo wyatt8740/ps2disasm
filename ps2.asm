@@ -6176,6 +6176,7 @@ loc_381A:
 ; Fix
 	if bugfixes=1
 	andi.w	#$8000, (Joypad_ctrl).w
+	andi.w	#$F00, d0
 	or.w	d0, (Joypad_ctrl).w
 	else
 	move.w	d0, (Joypad_ctrl).w
