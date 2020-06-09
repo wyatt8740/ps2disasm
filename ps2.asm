@@ -4618,10 +4618,26 @@ CheckEnemyAlive:
 	move.w	#0, 2(a1)			; force enemy's HP to 0 (enemy dead)
 	bset	#5, 3(a2)
 	moveq	#0, d1
+	
+	; EXP and meseta have a limit of six digit length when written in the victory message
+	if bugfixes=1
+	move.w	$C(a1), d1			; get experience points of enemy which was killed
+	add.l	d1, (Enemy_total_EXP).w	; add them to the total
+	cmpi.l	#999999, (Enemy_total_EXP).w
+	bcs.s	Enemy_CheckMaxMoney
+	move.l	#999999, (Enemy_total_EXP).w
+Enemy_CheckMaxMoney:
+	move.w	$A(a1), d1		; get meseta value
+	add.l	d1, (Enemy_total_meseta).w	; add it to the total
+	cmpi.l	#999999, (Enemy_total_meseta).w
+	bcs.s	+
+	move.l	#999999, (Enemy_total_meseta).w
+	else
 	move.w	$C(a1), d1			; get experience points of enemy which was killed
 	add.l	d1, (Enemy_total_EXP).w	; add them to the total
 	move.w	$A(a1), d1		; get meseta value
 	add.l	d1, (Enemy_total_meseta).w	; add it to the total
+	endif
 +
 	rts
 ; -----------------------------------------------------------------
@@ -13753,7 +13769,7 @@ loc_8A08:
 	move.w	#0, (Party_members_num).w
 	move.w	#0, (Party_members_joined).w
 	move.w	#1, (Party_member_join_next).w
-	move.l	#$C8, (Current_money).w		; start with 200 meseta
+	move.l	#200, (Current_money).w		; start with 200 meseta
 	move.l	#$80808080, ($FFFFC790).w		; this makes the treasure chests in Shure locked
 	move.w	#$101, (Treasure_chest_flags+Chest_Prism).w
 
@@ -20535,9 +20551,14 @@ NeiEquipmentArrayEnd:
 
 AddToCurrentMoney:
 	add.l	d0, (Current_money).w
-	cmpi.l	#$5F5E0FF, d0
+	; fix: it should check Current_money, not d0
+	if bugfixes=1
+	cmpi.l	#99999999, (Current_money).w
+	else
+	cmpi.l	#99999999, d0
+	endif
 	bcs.s	loc_D01A
-	move.l	#$5F5E0FF, (Current_money).w	; cap at 99,999,999
+	move.l	#99999999, (Current_money).w	; cap at 99,999,999
 loc_D01A:
 	rts
 
@@ -24038,9 +24059,9 @@ loc_F2A4:
 	tst.w	2(a2)
 	beq.s	+			; dead characters don't get EXP
 	add.l	d0, $C(a2)	; add the EXP just got to the total EXP
-	cmpi.l	#$98967F, $C(a2)	; is the total EXP 9,999,999?
+	cmpi.l	#9999999, $C(a2)	; is the total EXP 9,999,999?
 	bcs.s	+					; if not, branch
-	move.l	#$98967F, $C(a2)	; otherwise force value to 9,999,999
+	move.l	#9999999, $C(a2)	; otherwise force value to 9,999,999
 +
 	dbf	d1, -
 
@@ -24050,7 +24071,12 @@ loc_F302:
 loc_F308:
 	move.w	#$1213, (Script_ID).w
 	move.l	(Enemy_total_meseta).w, d0	; get enemy's total meseta
+	; fix: add money with cap check
+	if bugfixes=1
+	bsr.w	AddToCurrentMoney
+	else
 	add.l	d0, (Current_money).w			; add it to your money
+	endif
 	move.l	d0, (Meseta_value).w		; move it so that it's displayed later in the victory message
 	move.w	#0, ($FFFFC602).w
 	addq.w	#1, (Event_routine).w
