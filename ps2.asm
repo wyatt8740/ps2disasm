@@ -369,8 +369,8 @@ loc_3E4:
 +
 	move.w	d0, $E(a0)
 
-; Improve sprite render logic
-	if 1=0
+; Fix sprite rendering when at the edge of the screen
+	if bugfixes=1
 	move.w	x_pos(a0), d0
 	btst	#4, render_flags(a0)
 	bne.s	++
