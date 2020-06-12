@@ -24,8 +24,8 @@
 zeroOffsetOptimization = 0
 
 bugfixes = 0			; if 1, include bug fixes
-walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
+walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
 
@@ -24046,8 +24046,22 @@ loc_F2A4:
 	beq.s	loc_F302
 	move.l	(Enemy_total_EXP).w, d0	; get EXP
 	divu.w	d2, d0		; divide the EXP by the number of characters alive
+	
+	; round up only when there's a remainder
+	if 1=0
+	swap	d0
+	move.w	d0, d1
+	swap	d0
 	andi.l	#$FFFF, d0
-	addq.l	#1, d0
+	tst.w	d1
+	beq.s	+
+	addq.l	#1, d0	; round up
++
+	else
+	andi.l	#$FFFF, d0
+	addq.l	#1, d0		; round up
+	endif
+	
 	move.l	d0, (EXP_points_buffer).w	; save the exp points got from enemies
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d1
