@@ -68,6 +68,10 @@ art_tile = 8	; word
 x_pos = $A	; longword
 y_pos = $E	; longword
 routine = $22	; word
+
+child_mappings = mappings+object_size
+
+parent_mappings = -(object_size-mappings)
 ; ---------------------------------------------------------------------------
 
 
@@ -101,7 +105,6 @@ battle_target = $2C	; word
 hit_timer = $30	; word
 fighter_id = $36	; word
 
-child_mappings = 4+object_size	; longword
 child_battle_anim = $16+object_size	; word
 child_battle_anim_frame = $1A+object_size	; word
 child_attack_x_offset = $1C+object_size	; word

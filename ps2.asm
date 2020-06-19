@@ -6726,7 +6726,7 @@ FollowingCharacter_Init:
 	move.w	#1, $22(a0)
 ; --------------------------------------------------------------
 FollowingCharacter_Main:
-	move.l	-$3C(a0), 4(a0)		; get same sprite mappings as leading character
+	move.l	parent_mappings(a0), mappings(a0)		; get same sprite mappings as leading character
 	if walk_speed>0
 	lea	(Character_pos_table).w, a2
 	move.w	(Character_pos_table_index).w, d0
@@ -6754,75 +6754,75 @@ FollowingCharacter_Main:
 	; Fix: If not moving, don't animate
 	if bugfixes=1
 	moveq	#0, d3
-	cmp.w	$E(a0), d1
+	cmp.w	y_pos(a0), d1
 	beq.s	loc_3B56
 	bhi.s	loc_3B64
 	move.w	#0, d2
 	bra.s	loc_3B64
 loc_3B56:
 	moveq	#9, d2
-	cmp.w	$A(a0), d0
+	cmp.w	x_pos(a0), d0
 	beq.s	loc_3B68
 	bhi.s	loc_3B64
 	move.w	#6, d2
 loc_3B64:
 	moveq	#1, d3
-	move.w	d2, $2A(a0)
+	move.w	d2, facing_dir(a0)
 loc_3B68:
-	move.w	d0, $A(a0)
-	move.w	d1, $E(a0)
-	tst.w	($FFFFE414).w
+	move.w	d0, x_pos(a0)
+	move.w	d1, y_pos(a0)
+	tst.w	(Characters_RAM+x_move_steps).w
 	bne.s	loc_3B7C
-	tst.w	($FFFFE418).w
+	tst.w	(Characters_RAM+y_move_steps).w
 	beq.s	loc_3BB2
 loc_3B7C:
-	tst.w	($FFFFE428).w
+	tst.w	(Characters_RAM+step_duration).w
 	beq.s	loc_3BB0
 	tst.w	d3
 	beq.s	loc_3BB0	; return if position didn't change
-	subq.w	#1, $26(a0)
+	subq.w	#1, anim_frame_timer(a0)
 	bpl.s	loc_3BB0
 	else
-	cmp.w	$E(a0), d1
+	cmp.w	y_pos(a0), d1
 	beq.s	loc_3B56
 	bhi.s	loc_3B64
 	move.w	#0, d2
 	bra.s	loc_3B64
 loc_3B56:
 	moveq	#9, d2
-	cmp.w	$A(a0), d0
+	cmp.w	x_pos(a0), d0
 	beq.s	loc_3B68
 	bhi.s	loc_3B64
 	move.w	#6, d2
 loc_3B64:
-	move.w	d2, $2A(a0)
+	move.w	d2, facing_dir(a0)
 loc_3B68:
-	move.w	d0, $A(a0)
-	move.w	d1, $E(a0)
-	tst.w	($FFFFE414).w
+	move.w	d0, x_pos(a0)
+	move.w	d1, y_pos(a0)
+	tst.w	(Characters_RAM+x_move_steps).w
 	bne.s	loc_3B7C
-	tst.w	($FFFFE418).w
+	tst.w	(Characters_RAM+y_move_steps).w
 	beq.s	loc_3BB2
 loc_3B7C:
-	tst.w	($FFFFE428).w
+	tst.w	(Characters_RAM+step_duration).w
 	beq.s	loc_3BB0
-	subq.w	#1, $26(a0)
+	subq.w	#1, anim_frame_timer(a0)
 	bpl.w	loc_3BB0
 	endif
-	move.w	#7, $26(a0)
-	move.w	$32(a0), d0
-	addq.w	#1, $32(a0)
-	andi.w	#3, $32(a0)
+	move.w	#7, anim_frame_timer(a0)
+	move.w	anim_frame(a0), d0
+	addq.w	#1, anim_frame(a0)
+	andi.w	#3, anim_frame(a0)
 	lea	(Map_SpriteMappingsArray).l, a1
 	adda.w	d0, a1
 	move.b	(a1), d0
-	add.w	$2A(a0), d0
-	move.w	d0, $24(a0)
+	add.w	facing_dir(a0), d0
+	move.w	d0, mapping_frame(a0)
 loc_3BB0:
 	rts
 	
 loc_3BB2:
-	move.w	$2A(a0), $24(a0)
+	move.w	facing_dir(a0), mapping_frame(a0)
 ; --------------------------------------------------------------
 FollowingCharacter_Return:
 	rts
