@@ -2309,7 +2309,7 @@ cfJumpTable:
 	bra.w	cfE1_TrkEnd2
 	bra.w	cfE2_PlaySnd
 	bra.w	cfE3_PanAnim
-	bra.w	cfEF_SetTempo
+	bra.w	cfE4_SetTempo
 	bra.w	cfE5_ChordMode
 	bra.w	cfE6_HoldOn
 	bra.w	cfE7_ChordStop
@@ -2385,7 +2385,7 @@ cfE3_PanAnim:
 	move.b	(a4)+, $18(a3)	; set Pan Anim:	Type
 	move.b	(a4)+, $19(a3)	; set Pan Anim:	Initial	Timeout
 	rts
-cfEF_SetTempo:
+cfE4_SetTempo:
 	move.b	(a4), Init_tempo_value	; set Timeout Reset
 	move.b	(a4)+, Tempo_timeout	; set current Timeout value
 	rts
