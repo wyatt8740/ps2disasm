@@ -1716,6 +1716,8 @@ SFX_Unpause:
 
 SFX_Null:
 	dc.b	$00
+	
+	even
 
 SoundDriverInput:
 	btst	#6, $FFFFF8		; test if NTSC or PAL
