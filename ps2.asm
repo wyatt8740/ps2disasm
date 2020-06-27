@@ -15184,7 +15184,7 @@ loc_9730:
 	beq.s	loc_9746
 	subi.w	#$80, d0
 loc_9746:
-	lea	(DecimalDigitNumbers+$14).l, a1
+	lea	(DecimalDigitData+$14).l, a1
 	moveq	#2, d1
 	moveq	#0, d4
 loc_9750:
@@ -24885,11 +24885,11 @@ loc_FACE:
 	suba.w	#$1A, a1
 	endif
 	move.w	(a3), d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$18, a1
 	addq.w	#4, a3
 	move.w	(a3), d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	suba.w	#$6A, a1
 	dbf	d5, loc_FA94
 
@@ -25125,7 +25125,7 @@ loc_FD26:
 	addq.w	#8, a3
 	lea	(Window_art_buffer+PlaneMap_WinIndividualCharStats-DynamicWindowsStart+$34).w, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_11364
+	bsr.w	DrawDec2Digits
 	addq.w	#1, a1
 	adda.w	#$30, a3
 	move.l	(a3), (a1)	; WARNING: a1 can point to an odd address if the dynamic windows are resized. Split the move.l into multiple move.b instructions and change the code accordingly
@@ -25138,16 +25138,16 @@ loc_FD50:
 	lsl.w	#6, d1
 	adda.w	d1, a3
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	addq.w	#1, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$D, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	addq.w	#1, a1
 	move.w	(a3), d0
-	bra.w	loc_1135A
+	bra.w	DrawDec3Digits
 ; ----------------------------------------
 ; loc_FD78
 Win_MenuMeseta:
@@ -25160,7 +25160,7 @@ Win_MenuMeseta:
 loc_FD8C:
 	lea	(Window_art_buffer+PlaneMap_WinMeseta-DynamicWindowsStart+$E).w, a1
 	move.l	(Current_money).w, d0
-	bra.w	Meseta_ConvertToDecimal
+	bra.w	DrawDec8Digits
 ; ----------------------------------------
 ; loc_FD98
 Win_CharOrderDestination:
@@ -25412,26 +25412,26 @@ loc_10000:
 	lsl.w	#6, d1
 	adda.w	d1, a3
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	addq.w	#2, a3
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bra.w	loc_1135A
+	bra.w	DrawDec3Digits
 ; ----------------------------------------
 ; loc_1004C
 Win_StrngEquip:
@@ -25493,7 +25493,7 @@ Win_StrngLVEXP:
 	suba.w	#$36, a3
 	suba.w	#8, a1
 	move.w	(a3)+, d0
-	bsr.w	loc_11364
+	bsr.w	DrawDec2Digits
 	lea	(loc_11456).l, a2
 	move.w	(Character_index).w, d1
 	if revision=0
@@ -25512,7 +25512,7 @@ Win_StrngLVEXP:
 	move.l	(a2)+, (a1)+	; same as above
 	adda.w	#$E, a1
 	move.l	(a3), d0
-	bra.w	Exp_ConvertToDecimal
+	bra.w	DrawDec7Digits
 
 ; --------------------------------------------------
 ; loc_100FC
@@ -25527,14 +25527,14 @@ loc_10110:
 	lsl.w	#6, d1
 	adda.w	d1, a3
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	addq.w	#6, a3
 	move.w	(a3)+, d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	adda.w	#$13, a1
 	move.w	(a3)+, d0
-	bra.w	loc_1135A
+	bra.w	DrawDec3Digits
 ; ---------------------------------------
 ; loc_10134
 Win_ItemList2:
@@ -25781,7 +25781,7 @@ loc_1038A:
 Win_StoreMeseta:
 	lea	(Window_art_buffer+PlaneMap_WinMeseta-DynamicWindowsStart+$E).w, a1
 	move.l	(Current_money).w, d0
-	bsr.w	Meseta_ConvertToDecimal
+	bsr.w	DrawDec8Digits
 	move.w	#0, (Window_index_saved).w
 	rts
 ; -------------------------------------------
@@ -25919,7 +25919,7 @@ loc_104F8:
 	addq.w	#2, a2
 	move.b	(a2), d0
 	addq.w	#2, a2
-	bsr.w	loc_11364
+	bsr.w	DrawDec2Digits
 	addq.w	#3, a1
 	adda.w	#$800, a0
 	dbf	d5, loc_104F8
@@ -26018,9 +26018,9 @@ loc_105DC:
 	adda.w	d0, a2
 	move.w	(a2), d0
 	bsr.w	CheckIfDoublePrice
-	lea	(DecimalDigitNumbers+8).l, a2
+	lea	(DecimalDigitData+8).l, a2
 	moveq	#5, d1	; six digits
-	bsr.w	StartDecimalConversion2
+	bsr.w	DrawDecimalNumber2
 	addq.w	#2, a1
 	addq.w	#1, a0
 	dbf	d5, loc_105DC
@@ -26431,11 +26431,11 @@ loc_1099C:
 	subq.w	#3, a1
 	endif
 	move.w	(a3), d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	addq.w	#4, a3
 	addq.w	#3, a1
 	move.w	(a3), d0
-	bsr.w	loc_1135A
+	bsr.w	DrawDec3Digits
 	lea	(loc_114DA).l, a2
 	lsl.w	#2, d5
 	adda.w	d5, a2
@@ -26941,7 +26941,7 @@ loc_10EF0:
 	lea	(loc_11506).l, a3
 	tst.w	d0
 	beq.s	loc_10F02
-	bpl.w	loc_11350
+	bpl.w	DrawDec4Digits
 	addq.w	#4, a3
 loc_10F02:
 	move.l	(a3), (a1)+
@@ -27277,7 +27277,7 @@ LoadScript_ChkMesetaValue:
 	cmpi.b	#$C0, d0
 	bne.w	loc_11232
 	move.l	(Meseta_value).w, d0
-	lea	(DecimalDigitNumbers+8).l, a3
+	lea	(DecimalDigitData+8).l, a3
 	moveq	#5, d1
 	moveq	#0, d4		; unset flag
 LoadDigitInRAMLoop:
@@ -27432,21 +27432,21 @@ LoadCursorInWindows:
 	move.w	d2, $E(a0)
 	rts
 
-loc_11350:
-	lea	(DecimalDigitNumbers+$10).l, a2
+DrawDec4Digits:
+	lea	(DecimalDigitData+$10).l, a2
 	moveq	#3, d1	; 4 digits
-	bra.s	StartDecimalConversion
-loc_1135A:
-	lea	(DecimalDigitNumbers+$14).l, a2
+	bra.s	DrawDecimalNumber
+DrawDec3Digits:
+	lea	(DecimalDigitData+$14).l, a2
 	moveq	#2, d1		; 3 digits
-	bra.s	StartDecimalConversion
-loc_11364:
-	lea	(DecimalDigitNumbers+$18).l, a2
+	bra.s	DrawDecimalNumber
+DrawDec2Digits:
+	lea	(DecimalDigitData+$18).l, a2
 	moveq	#1, d1		; 2 digits
 
-StartDecimalConversion:
+DrawDecimalNumber:
 	moveq	#0, d4	; unset flag for digit start place
-DrawDigitInVRAMLoop:
+DrawDecimalNumberLoop:
 	tst.b	d1
 	bne.s	+			; branch if we are not in the one's place yet
 	move.b	#1, d4		; if we get here, we are at the last iteration of the loop, thus placing the unit digit. We need to display at least the unit digit,
@@ -27469,27 +27469,27 @@ DrawDigitInVRAMLoop:
 loc_11390:
 	addi.b	#$97, d2	; number offset in VRAM (start from 0)
 	move.b	d2, (a1)+	; pick character from digit counter
-	dbf	d1, DrawDigitInVRAMLoop	; next place value
+	dbf	d1, DrawDecimalNumberLoop	; next place value
 	rts
 loc_1139C:
 	move.b	#$26, (a1)+			; space character
-	dbf	d1, DrawDigitInVRAMLoop
+	dbf	d1, DrawDecimalNumberLoop
 	rts
 
 
-Meseta_ConvertToDecimal:
-	lea	(DecimalDigitNumbers).l, a2
+DrawDec8Digits:
+	lea	(DecimalDigitData).l, a2
 	moveq	#7, d1		; eight digits
-	bra.s	StartDecimalConversion2
+	bra.s	DrawDecimalNumber2
 
-Exp_ConvertToDecimal:
-	lea	(DecimalDigitNumbers+4).l, a2
+DrawDec7Digits:
+	lea	(DecimalDigitData+4).l, a2
 	moveq	#6, d1		;  seven digits
 
 ; seems to be a copy of the above - I think just the code above would've been enough, but anyway...
-StartDecimalConversion2:
+DrawDecimalNumber2:
 	moveq	#0, d4	; unset flag for digit start place
-DrawDigitInVRAMLoop2:
+DrawDecimalNumberLoop2:
 	tst.b	d1
 	bne.s	+			; branch if we are not in the one's place yet
 	move.b	#1, d4		; if we get here, we are at the last iteration of the loop, thus placing the unit digit. We need to display at least the unit digit,
@@ -27512,18 +27512,18 @@ DrawDigitInVRAMLoop2:
 loc_113DC:
 	addi.b	#$97, d2	; number offset in VRAM (start from 0)
 	move.b	d2, (a1)+	; pick character from digit counter
-	dbf	d1, DrawDigitInVRAMLoop2	; next place value
+	dbf	d1, DrawDecimalNumberLoop2	; next place value
 
 	rts
 
 loc_113E8:
 	move.b	#$26, (a1)+		; space character
-	dbf	d1, DrawDigitInVRAMLoop2
+	dbf	d1, DrawDecimalNumberLoop2
 
 	rts
 
 ; ====================================
-DecimalDigitNumbers:
+DecimalDigitData:
 	dc.l	10000000
 	dc.l	1000000
 	dc.l	100000
