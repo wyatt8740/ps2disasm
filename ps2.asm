@@ -28,6 +28,8 @@ dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
 walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
+cross_remove = 0		; Set this to 1 to replace the green cross sign with an H and remove the red cross sign, just like
+						; the Virtual Console version
 
 	cpu 68000
 	include "ps2.macrosetup.asm"
@@ -51579,7 +51581,13 @@ Art_SceneLibrarian: binclude "scene/art/librarian.bin"
 Art_SceneMotaSaveEmployee: binclude "scene/art/mota_save_employee.bin"
 	even
 
-Art_SceneMotaDoctor: binclude "scene/art/mota_doctor.bin"
+Art_SceneMotaDoctor:
+	if cross_remove=1
+	binclude "scene/art/mota_doctor_no_cross.bin"
+	else
+	binclude "scene/art/mota_doctor.bin"
+	endif
+
 	even
 
 Art_SceneCloneLabGrandma: binclude "scene/art/clone_lab_grandma.bin"
@@ -51701,9 +51709,21 @@ ArtNem_Dezo:
 
 ArtNem_Town:
 	if revision=0
+	
+	if cross_remove=1
+	binclude "map/towns/art/ja/tiles_no_cross.bin"
+	else
 	binclude "map/towns/art/ja/tiles.bin"
+	endif
+	
+	else
+	
+	if cross_remove=1
+	binclude "map/towns/art/nemesis/tiles_no_cross.bin"
 	else
 	binclude "map/towns/art/nemesis/tiles.bin"
+	endif
+	
 	endif
 
 	even
