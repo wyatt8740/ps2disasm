@@ -28769,169 +28769,236 @@ loc_11978:
 ; ===========================================================
 PalettePtrs:
 
+					; 0
 PtrPal_Sega:		dc.l	Pal_Sega
 					dc.w	$FB00, (Pal_SegaEnd-Pal_Sega)/4-1
-PtrPal_Title:	dc.l	Pal_Title
+					; 1
+PtrPal_Title:		dc.l	Pal_Title
 					dc.w	$FB00, (Pal_TitleScrEnd-Pal_Title)/4-1
-
-					dc.l	loc_11D04
+					; 2
+					dc.l	Pal_Party
 					dc.w	$FB00, $F
-					dc.l	loc_11DC4
+					; 3
+					dc.l	Pal_MotaOverworld
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011998-0x0001199C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11E04
+					; 4
+					dc.l	Pal_DezolisSkure
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119A0-0x000119A4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11E44
+					; 5
+					dc.l	Pal_MotaTown
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119A8-0x000119AC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11E84
+					; 6
+					dc.l	Pal_Uzo
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119B0-0x000119B4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11EC4
+					; 7
+					dc.l	Pal_UnderwaterPassage
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119B8-0x000119BC, Entry count: 0x00000004) [Unknown data]
+					; 8
 					dc.l	loc_11F04
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119C0-0x000119C4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11F44
+					; 9
+					dc.l	Pal_Tube
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119C8-0x000119CC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11F84
+					; $A
+					dc.l	Pal_BlueDam
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119D0-0x000119D4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_11FC4
+					; $B
+					dc.l	Pal_YellowDam
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119D8-0x000119DC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12004
+					; $C
+					dc.l	Pal_GreenDam
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119E0-0x000119E4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12044
+					; $D
+					dc.l	Pal_RedDam
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119E8-0x000119EC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12084
+					; $E
+					dc.l	Pal_ShureNido
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119F0-0x000119F4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_120C4
+					; $F
+					dc.l	Pal_Climatrol
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119F8-0x000119FC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12104
+					; $10
+					dc.l	Pal_Roron
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011A00-0x00011A04, Entry count: 0x00000004) [Unknown data]
-
+					; $11
 PtrPal_RolfPort:	dc.l	Pal_RolfPortrait
 					dc.w	$FB20, (Pal_RolfPortraitEnd-Pal_RolfPortrait)/4-1
-
+					; $12
 PtrPal_NeiPort:		dc.l	Pal_NeiPortrait
 					dc.w	$FB40, (Pal_NeiPortraitEnd-Pal_NeiPortrait)/4-1
-
+					; $13
 PtrPal_RudoPort:	dc.l	Pal_RudoPortrait
 					dc.w	$FB40, (Pal_RudoPortraitEnd-Pal_RudoPortrait)/4-1
-
+					; $14
 PtrPal_AmyPort:		dc.l	Pal_AmyPortrait
 					dc.w	$FB40, (Pal_AmyPortraitEnd-Pal_AmyPortrait)/4-1
-
+					; $15
 PtrPal_HughPort:	dc.l	Pal_HughPortrait
 					dc.w	$FB40, (Pal_HughPortraitEnd-Pal_HughPortrait)/4-1
-
+					; $16
 PtrPal_AnnaPort:	dc.l	Pal_AnnaPortrait
 					dc.w	$FB40, (Pal_AnnaPortraitEnd-Pal_AnnaPortrait)/4-1
-
+					; $17
 PtrPal_KainPort:	dc.l	Pal_KainPortrait
 					dc.w	$FB40, (Pal_KainPortraitEnd-Pal_KainPortrait)/4-1
-
+					; $18
 PtrPal_ShirPort:	dc.l	Pal_ShirPortrait
 					dc.w	$FB40, (Pal_ShirPortraitEnd-Pal_ShirPortrait)/4-1
-
+					; $19
 PtrPal_LibrPort:	dc.l	Pal_LibrarianPortrait
 					dc.b	$FB, $40, $00, $07
+					; $1A
 PtrPal_MotSvEmPort:	dc.l	Pal_MotSaveEmpPort
 					dc.b	$FB, $40, $00, $07
+					; $1B
 PtrPal_MotDocPort:	dc.l	Pal_MotDocPortrait
 					dc.b	$FB, $40, $00, $07
+					; $1C
 PtrPal_GrandmaPort:	dc.l	Pal_GrandmaPortrait
 					dc.b	$FB, $40, $00, $07
+					; $1D
 PtrPal_MtImSllPort:	dc.l	Pal_MotItemSellerPort
 					dc.b	$FB, $40, $00, $07
+					; $1E
 PtrPal_MtWpnSlPort:	dc.l	Pal_MotWpnSellerPort
 					dc.b	$FB, $40, $00, $07
+					; $1F
 PtrPal_MtArmSlPort: dc.l	Pal_MotArmorSellPort
 					dc.b	$FB, $40, $00, $07
+					; $20
 PtrPal_UstvesPort:	dc.l	Pal_UstvestiaPortrait
 					dc.b	$FB, $40, $00, $07
+					; $21
 PtrPal_Misc1Port:	dc.l	Pal_Misc1Portrait
 					dc.b	$FB, $40, $00, $07
+					; $22
 PtrPal_Misc2Port:	dc.l	Pal_Misc2Portrait
 					dc.b	$FB, $40, $00, $07
+					; $23
 PtrPal_Misc3Port:	dc.l	Pal_Misc3Portrait
 					dc.b	$FB, $40, $00, $07
+					; $24
 PtrPal_Misc4Port:	dc.l	Pal_Misc4Portrait
 					dc.b	$FB, $40, $00, $07
+					; $25
 PtrPal_ItmKprPort:	dc.l	Pal_ItemKeeperPort
 					dc.b	$FB, $40, $00, $07
+					; $26
 PtrPal_CTwOut1Port:	dc.l	Pal_CentTow1Port
 					dc.b	$FB, $40, $00, $07
+					; $27
 					dc.l	Pal_CentTow1Port
 					dc.b	$FB, $40, $00, $07
+					; $28
 PtrPal_GvrnPort:	dc.l	Pal_GovernorPortrait
 					dc.b	$FB, $40, $00, $07
+					; $29
 PtrPal_RoofPort:	dc.l	Pal_RoofPortrait
 					dc.b	$FB, $40, $00, $07
+					; $2A
 PtrPal_CTwOut2Port:	dc.l	Pal_CentTow2Port
 					dc.b	$FB, $40, $00, $0F
+					; $2B
 PtrPal_GraphPort:	dc.l	Pal_GraphPortrait
 					dc.b	$FB, $20, $00, $07
+					; $2C
 PtrPal_RadarPort:	dc.l	Pal_RadarPortrait
 					dc.b	$FB, $40, $00, $07
+					; $2D
 PtrPal_CTwOut3Port:	dc.l	Pal_RadarPortrait
 					dc.b	$FB, $40, $00, $07
+					; $2E
 					dc.l	Pal_RadarPortrait
 					dc.b	$FB, $40, $00, $07
-					dc.l	loc_11D44
+					; $2F
+					dc.l	Pal_Battle
 					dc.b	$FB, $00, $00, $1F
-					dc.l	loc_11CE4
+					; $30
+					dc.l	Pal_GameStart
 					dc.b	$FB, $60, $00, $07
+					; $31
 PtrPal_TeleEmpPort: dc.l	Pal_TeleEmpPort
 					dc.b	$FB, $40, $00, $07
-					dc.l	loc_12744
+					; $32
+					dc.l	Pal_Graph
 					dc.b	$FB, $20, $00, $07
-					dc.l	loc_12144
+					; $33
+					dc.l	Pal_BiosystemsLab
 					dc.b	$FB, $40, $00, $0F
-					dc.l	loc_12184
+					; $34
+					dc.l	Pal_ControlTower
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B20-0x00011B24, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12784
+					; $35
+					dc.l	Pal_NeiDeath
 					dc.b	$FB, $20, $00, $07 ;0x0 (0x00011B28-0x00011B2C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_127A4
+					; $36
+					dc.l	Pal_NeiDeath2
 					dc.b	$FB, $20, $00, $07 ;0x0 (0x00011B30-0x00011B34, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_121C4
+					; $37
+					dc.l	Pal_Crevice
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B38-0x00011B3C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12204
+					; $38
+					dc.l	Pal_Gaira
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B40-0x00011B44, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_127C4
+					; $39
+					dc.l	Pal_PlanetMota
 					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B48-0x00011B4C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_127E4
+					; $3A
+					dc.l	Pal_PlanetDezo
 					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B50-0x00011B54, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12824
+					; $3B
+					dc.l	Pal_SceneLutz
 					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B58-0x00011B5C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12804
+					; $3C
+					dc.l	Pal_SpaceTravel
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011B60-0x00011B64, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12244
+					; $3D
+					dc.l	Pal_EsperMansion
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B68-0x00011B6C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12284
+					; $3E
+					dc.l	Pal_Noah
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B70-0x00011B74, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_122C4
+					; $3F
+					dc.l	Pal_Naval
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B78-0x00011B7C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12304
+					; $40
+					dc.l	Pal_Menobe
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B80-0x00011B84, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12344
+					; $41
+					dc.l	Pal_Ikuto
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B88-0x00011B8C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12384
+					; $42
+					dc.l	Pal_Guaron
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B90-0x00011B94, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12884
+					; $43
+					dc.l	Pal_EndingRudo
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011B98-0x00011B9C, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12884
+					; $44
+					dc.l	Pal_EndingRudo
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BA0-0x00011BA4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_128A4
+					; $45
+					dc.l	Pal_EndingAmy
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BA8-0x00011BAC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_128C4
+					; $46
+					dc.l	Pal_EndingKain
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BB0-0x00011BB4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_128E4
+					; $47
+					dc.l	Pal_EndingShir
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BB8-0x00011BBC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12904
+					; $48
+					dc.l	Pal_EndingHugh
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BC0-0x00011BC4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12924
+					; $49
+					dc.l	Pal_EndingAnna
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BC8-0x00011BCC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12944
+					; $4A
+					dc.l	Pal_EndingRolf
 					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BD0-0x00011BD4, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_12964
+					; $4B
+					dc.l	Pal_Credits
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011BD8-0x00011BDC, Entry count: 0x00000004) [Unknown data]
-					dc.l	loc_123C4
+					; $4C
+					dc.l	Pal_DezoTown
 					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011BE0-0x00011BE4, Entry count: 0x00000004) [Unknown data]
 
 ; ===========================================================
@@ -29011,7 +29078,7 @@ Pal_TitleScrEnd:
 ; --------------------------------
 
 ; --------------------------------
-loc_11CE4:
+Pal_GameStart:
 	dc.l	$00000000
 	dc.l	$0EEE0EE8
 	dc.l	$0EE00EC0
@@ -29023,80 +29090,80 @@ loc_11CE4:
 ; --------------------------------
 
 ; --------------------------------
-loc_11D04:
+Pal_Party:
 	dc.l	$00000EEE, $00000AAE, $088E0AAA, $0888008E, $000E000A, $0C000800, $02EE02AA, $0E880E66, $00000EEE, $00000AAE, $088E0AAA, $08880048, $06C00280, $000E000A, $0EC00A80, $0E0A0804 ;0x0 (0x00011D04-0x00011D44, Entry count: 0x00000040)
 ; --------------------------------
 
 ; --------------------------------
-loc_11D44:
+Pal_Battle:
 	dc.l	$02000EEE, $00000AAE, $088E0AAA, $0444008E, $000E000A, $0C000800, $02EE02AA, $0E880E66, $00000EEE, $00000AAE
 	dc.l	$088E0AAA, $08880048, $06C00280, $000E000A, $0EC00A80, $0E0A0804, $00000000, $00000000, $00000000, $00000000
 	dc.l	$00000000, $00000000, $00000000, $00000000, $00000EEE, $00EE00AE, $006E002E, $000E0008, $00000000, $00000000, $00000000, $00000000 ;0x0 (0x00011D44-0x00011DC4, Entry count: 0x00000080)
 ; --------------------------------
 
 ; --------------------------------
-loc_11DC4:
+Pal_MotaOverworld:
 	dc.l	$000002C6, $02A40282, $00600CA8, $0A220800, $06000420, $0CA80864, $0000006A, $00480026, $000000EE, $0A400468, $00E00EEA, $0CC80AA6, $08840442, $0EEE020A, $0000006A, $00480026 ;0x0 (0x00011DC4-0x00011E04, Entry count: 0x00000040)
 ; --------------------------------
 
 ; --------------------------------
-loc_11E04:
+Pal_DezolisSkure:
 	dc.l	$00000000, $0EEE0EEC, $0ECA0CA8, $0A860864, $06420420, $02000CEC, $0ACA08A8, $0686000E, $00000000, $04A00EEC, $0ECA0CA8, $0008002E, $0EEE0AAA, $08880666, $00460068, $04800460 ;0x0 (0x00011E04-0x00011E44, Entry count: 0x00000040)
 ; --------------------------------
 
 ; --------------------------------
-loc_11E44:
+Pal_MotaTown:
 	dc.l	$00000000, $0EEE0AA4, $08600640, $04200060, $088E066E, $000E0008, $0AAA0888, $04440222, $00000EEE, $02C602A2, $00400020, $04440080, $00680046, $0024084E, $0EA00E60, $0A200000 ;0x0 (0x00011E44-0x00011E84, Entry count: 0x00000040)
 ; --------------------------------
 
-loc_11E84:
+Pal_Uzo:
 	dc.l	$00000E80, $0AEE08CE, $06AC048A, $02680246, $00240002, $00000ECA, $0EC20CA0, $0A800860, $00000E80, $06AC048A, $02680246, $00240002, $000008C6, $06A40482, $02600040, $0AEE08CE ;0x0 (0x00011E84-0x00011EC4, Entry count: 0x00000040)
-loc_11EC4:
+Pal_UnderwaterPassage:
 	dc.l	$0000004A, $0CC00CC0, $0AA00880, $06600440, $022000CE, $00AE008E, $026E004E, $00000000, $00000E80, $08E006C0, $04A00280, $00600040, $00600EEE, $0CA60C80, $0C600A20, $08000000 ;0x0 (0x00011EC4-0x00011F04, Entry count: 0x00000040)
 loc_11F04:
 	dc.b	$00, $00, $0E, $64, $0E, $CE, $0C, $AC, $0A, $8A, $08, $68, $06, $46, $04, $24
 	dc.b	$0E, $EC, $0C, $CA, $0A, $A8, $08, $86, $06, $64, $04, $42, $02, $20, $00, $00 ;0x0 (0x00011F04-0x00011F44, Entry count: 0x00000040) [Unknown data]
 	dc.b	$00, $00, $0E, $EE, $0E, $EC, $0E, $CA, $04, $A0, $04, $80, $04, $60, $00, $46
 	dc.b	$08, $CE, $04, $8E, $00, $4C, $0A, $AA, $08, $88, $06, $66, $02, $20, $00, $00 ;0x20
-loc_11F44:
+Pal_Tube:
 	dc.l	$00000000, $0CA80A86, $08640642, $0CCA0AA8, $08860664, $04420220, $022E066E, $044E008E, $00000000, $06AA0488, $02660044, $04840462, $02400020, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011F44-0x00011F84, Entry count: 0x00000040)
-loc_11F84:
+Pal_BlueDam:
 	dc.l	$00000000, $0CAA0A88, $08660644, $0CA00A80, $08600640, $04200000, $022E066E, $044E008E, $00000000, $06860464, $02420020, $0A8C0648, $04260204, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011F84-0x00011FC4, Entry count: 0x00000040)
-loc_11FC4:
+Pal_YellowDam:
 	dc.l	$00000000, $0AAC088A, $06680446, $04AA0288, $00660044, $00220000, $022E066E, $044E008E, $00000000, $0AAA0888, $06660444, $0A860864, $06420420, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011FC4-0x00012004, Entry count: 0x00000040)
-loc_12004:
+Pal_GreenDam:
 	dc.l	$00000000, $06AA0488, $02660044, $06A60484, $02620040, $00200000, $022E066E, $044E008E, $00000000, $06AA0488, $02660044, $0A880866, $06440422, $000E00AC, $08E80CA0, $0A800860 ;0x0 (0x00012004-0x00012044, Entry count: 0x00000040)
-loc_12044:
+Pal_RedDam:
 	dc.l	$00000000, $0CAC0A8A, $08680646, $088E066C, $044A0228, $00060000, $022E066E, $044E008E, $00000000, $06860464, $02420020, $06680446, $02240002, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012044-0x00012084, Entry count: 0x00000040)
-loc_12084:
+Pal_ShureNido:
 	dc.l	$00000000, $068A0468, $02460024, $088A0668, $04460224, $00020000, $022E066E, $044E008E, $00000000, $02880066, $00440022, $04660244, $00220000, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012084-0x000120C4, Entry count: 0x00000040)
-loc_120C4:
+Pal_Climatrol:
 	dc.l	$00000000, $0CAC0A8A, $08680646, $0CAA0A88, $08660644, $04220200, $022E066E ;0x0 (0x000120C4-0x000120E0, Entry count: 0x0000001C)
 	dc.l	$044E008E, $00000000, $08A60484, $04620240, $06AA0488, $02660044, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x000120E0-0x00012104, Entry count: 0x00000024)
-loc_12104:
+Pal_Roron:
 	dc.l	$00000000, $08AA0688, $04660244, $068A0468, $02460024, $00020000, $00000000, $044E008E, $00000000, $08A80686, $04640242, $06660444, $02220000, $000E00AC, $08E80CA0, $00000000 ;0x0 (0x00012104-0x00012144, Entry count: 0x00000040)
-loc_12144:
+Pal_BiosystemsLab:
 	dc.l	$00000000, $0AAA0888, $06660444, $08A80686, $04640242, $00200000, $022E066E, $044E008E, $00000000, $0AAA0888, $06660444, $08860664, $04420220, $022E00AC, $08E80CA0, $0A800860 ;0x0 (0x00012144-0x00012184, Entry count: 0x00000040)
-loc_12184:
+Pal_ControlTower:
 	dc.l	$00000000, $0CCA0AA8, $08860664, $0AAA0888, $06660444, $02220000, $022E066E, $044E008E, $00000000, $08680646, $04240202, $06860464, $02420020, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012184-0x000121C4, Entry count: 0x00000040)
-loc_121C4:
+Pal_Crevice:
 	dc.l	$00000000, $0EEC0EEC, $0ECA0CA8, $0A860864, $06420420, $00000000, $00000000, $00000000, $00000000, $0EEC0ECA, $0CA80A86, $08640642, $08640000, $00000000, $00000000, $00000000 ;0x0 (0x000121C4-0x00012204, Entry count: 0x00000040)
-loc_12204:
+Pal_Gaira:
 	dc.l	$00000000, $08860664, $04420220, $0AAA0888, $06660444, $02220000, $00000000, $044E008E, $00000000, $0EEE0CAA, $08660000, $00000000, $00000000, $00000000, $00000000, $00000000 ;0x0 (0x00012204-0x00012244, Entry count: 0x00000040)
-loc_12244:
+Pal_EsperMansion:
 	dc.l	$00000E64, $0EEE0EEE, $0CCC0AAA, $08880666, $0EEA0EC8, $0EA60E84, $0E620C20 ;0x0 (0x00012244-0x00012260, Entry count: 0x0000001C)
 	dc.l	$04440000, $00000EEE, $0EEC0ECA, $04A00480, $04600046, $00000000, $00000AAA, $08880666, $000E0000 ;0x0 (0x00012260-0x00012284, Entry count: 0x00000024)
-loc_12284:
+Pal_Noah:
 	dc.l	$00000E64, $0ECE0CAC, $0A8A0868, $06460424, $0EEC0CCA, $0AA80886, $06640442, $02020000, $00000AAE, $088E0888, $0666000E, $000A0C00, $000002EE, $00000EEC, $0CCA0AA8, $08860000 ;0x0 (0x00012284-0x000122C4, Entry count: 0x00000040)
-loc_122C4:
+Pal_Naval:
 	dc.l	$00000E64, $0CEC0ACA, $08A80686, $04640242, $0CEE0ACC, $08AA0688, $04660244, $00220000, $00000EEE, $0EEC0ECA, $00000000, $00000000, $08CE048E, $004C0000, $00000000, $00000000 ;0x0 (0x000122C4-0x00012304, Entry count: 0x00000040)
-loc_12304:
+Pal_Menobe:
 	dc.l	$00000E64, $0CCE0AAC, $088A0668, $04460224, $0CEC0ACA, $08A80686, $04640242, $00020000, $00000EEE, $0EEC0ECA, $0CCA0AA8, $08860666, $00000000, $00000AAA, $08880666, $00000000 ;0x0 (0x00012304-0x00012344, Entry count: 0x00000040)
-loc_12344:
+Pal_Ikuto:
 	dc.l	$00000E64, $0CEE0ACC, $08AA0688, $04660244, $0ECC0CAA, $0A880866, $06440422, $00220000, $00000EEE, $0EEC0ECA, $00000000, $00000000, $0AAE066E, $022C0000, $00000000, $00000000 ;0x0 (0x00012344-0x00012384, Entry count: 0x00000040)
-loc_12384:
+Pal_Guaron:
 	dc.l	$00000E64, $0ECC0EAA, $0C880A66, $08440622, $0CCE0AAC, $088A0668, $04460224, $00220000, $00000EEE, $0EEC0ECA, $0CCA0AA8, $08860666, $00000000, $00000AAA, $08880666, $00000000 ;0x0 (0x00012384-0x000123C4, Entry count: 0x00000040)
-loc_123C4:
+Pal_DezoTown:
 	dc.l	$00000000, $0EEE0AA4, $08600640, $04200060, $088E066E, $000E0008, $0AAA0888, $04440222, $00000EEE, $02C602A2, $00400020, $04440080, $00680046, $0024084E, $0EE80CC6, $0AA40000 ;0x0 (0x000123C4-0x00012404, Entry count: 0x00000040)
 
 ; --------------------------------
@@ -29240,39 +29307,39 @@ Pal_RoofPortrait:
 	dc.l	$00000000, $0EEE0EEC, $0EEA0EE4, $0CCC0AAA, $08880666, $04440000, $02000CA8, $08640642 ;0x0 (0x00012704-0x00012724, Entry count: 0x00000020)
 Pal_GraphPortrait:
 	dc.l	$00000EEE, $062200EE, $0A220622, $0EAA0E66, $06220EEE, $06220622, $0A220A22, $0A220000 ;0x0 (0x00012724-0x00012744, Entry count: 0x00000020)
-loc_12744:
+Pal_Graph:
 	dc.l	$00000EEE, $062200EE, $0A22042E, $0EAA0E66, $0EA00EEE, $0EEE0E4C, $0EA0042E, $0EEE0000 ;0x0 (0x00012744-0x00012764, Entry count: 0x00000020)
 Pal_RadarPortrait:
 	dc.l	$00000EEE, $062200EE, $0A22042E, $0EAA0E66, $0CA40280, $044204A2, $08600000, $06660AAA ;0x0 (0x00012764-0x00012784, Entry count: 0x00000020)
-loc_12784:
+Pal_NeiDeath:
 	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080804, $044E0006, $0AAA020E, $0A8E0EEE, $020E020E ;0x0 (0x00012784-0x000127A4, Entry count: 0x00000020)
-loc_127A4:
+Pal_NeiDeath2:
 	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080804, $044E0006, $0AAA0EEE, $0A000A00, $0E880A00 ;0x0 (0x000127A4-0x000127C4, Entry count: 0x00000020)
-loc_127C4:
+Pal_PlanetMota:
 	dc.l	$00000000, $0EEE0EC8, $0EA00E60, $0E400C20, $0C000A00, $08000600, $04000200, $068A0246 ;0x0 (0x000127C4-0x000127E4, Entry count: 0x00000020)
-loc_127E4:
+Pal_PlanetDezo:
 	dc.l	$00000000, $0EEE0CEA, $0AE606E2, $00E002C0, $00C000A0, $00800060, $00400020, $06CC04AA ;0x0 (0x000127E4-0x00012804, Entry count: 0x00000020)
-loc_12804:
+Pal_SpaceTravel:
 	dc.l	$00000000, $02200442, $06640886, $0AA80CCA, $0EEC0EEE, $08EE00CE, $008E006E, $00000000 ;0x0 (0x00012804-0x00012824, Entry count: 0x00000020)
-loc_12824:
+Pal_SceneLutz:
 	dc.l	$00000EEE, $0ACE08AE, $068E0C64, $0EA60E84, $0ECA000E, $000A00AC, $00EE0AC8, $046C0666 ;0x0 (0x00012824-0x00012844, Entry count: 0x00000020)
 Pal_CentTow2Port:
 	dc.l	$00000000, $0ACE08AC, $068A0EEE, $08EE00EE, $0EEA0CC8, $0AA60884, $0AAA0888, $06660444, $00000EEE, $0AAA0888, $06660A62, $08420620, $04000ECC, $0EAA0C88, $0EEE06EE, $008C000E ;0x0 (0x00012844-0x00012884, Entry count: 0x00000040)
-loc_12884:
+Pal_EndingRudo:
 	dc.l	$00000EEE, $08AE068E, $046C02EE, $02AA0AAA, $08880444, $000E0000, $008E06A0, $04800000 ;0x0 (0x00012884-0x000128A4, Entry count: 0x00000020)
-loc_128A4:
+Pal_EndingAmy:
 	dc.l	$00000EEE, $0ACE08AE, $068E022E, $00080EE8, $0CC00880, $02EE02AA, $0EC00CA0, $0A800860 ;0x0 (0x000128A4-0x000128C4, Entry count: 0x00000020)
-loc_128C4:
+Pal_EndingKain:
 	dc.l	$00000EEE, $0ACE08AE, $068E0E88, $0E66022E, $00080AAA, $00000000, $08C006A0, $04800260 ;0x0 (0x000128C4-0x000128E4, Entry count: 0x00000020)
-loc_128E4:
+Pal_EndingShir:
 	dc.l	$00000EEE, $0ACE08AE, $068E02EE, $04A00AAA, $08880444, $000E08E0, $008E0EC0, $0A800000 ;0x0 (0x000128E4-0x00012904, Entry count: 0x00000020)
-loc_12904:
+Pal_EndingHugh:
 	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080888, $06C00280, $000E0008, $08EE05CC, $04AA0288 ;0x0 (0x00012904-0x00012924, Entry count: 0x00000020)
-loc_12924:
+Pal_EndingAnna:
 	dc.l	$00000EEE, $0ACE08AE, $068E0C00, $080006EE, $02AA0AAA, $08880444, $0E660E44, $0E220A00 ;0x0 (0x00012924-0x00012944, Entry count: 0x00000020)
-loc_12944:
+Pal_EndingRolf:
 	dc.l	$00000EEE, $0ACE08AE, $068E0E66, $0C000AAA, $08880666, $02EE02AA, $000E0EEE, $00000000 ;0x0 (0x00012944-0x00012964, Entry count: 0x00000020)
-loc_12964:
+Pal_Credits:
 	dc.l	$00000000, $02220444, $06660888, $0AAA0CCC, $0EEE0000, $00000000, $00000000, $00000000, $00000400, $06000800, $0A200C42, $0E640E86, $0E640000, $00000000, $00000C42, $06200000 ;0x0 (0x00012964-0x000129A4, Entry count: 0x00000040)
 
 ; ---------------------------------------------------------------------------------
