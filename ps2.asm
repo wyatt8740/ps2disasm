@@ -20606,31 +20606,52 @@ loc_D064:
 ProcessStealItem:
 	if dezo_steal_fix=1
 	tst.w	(planet_index).w
-	bne.s	+
+	bne.s	ProcessStealItem_Return
 	endif
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d0
 -
 	cmpi.w	#CharID_Shir, (a1)+
 	beq.s	ProcessStealItem_Continue	; if Shir is in the party, continue with this routine
-	dbf	d0, -	; loop until we find Shir
+	dbf	d0, -
 
-/
+ProcessStealItem_Return:
 	rts
 
 ProcessStealItem_Continue:
 	cmpi.w	#StealItemArray_Room-StealItemArray, d2
-	bne.s	+			; if we didn't get out of Central Tower Room, branch (don't bother checking Shir's level)
+	bne.s	+			; if we didn't get out of Central Tower Room, branch
 	cmpi.w	#$A, ($FFFFC1CA).w
-	bcs.s	-			; if Shir's level is lower than 10, return
+	bcs.s	ProcessStealItem_Return			; if Shir's level is lower than 10, return
 +
 	tst.w	($FFFFC1C2).w
-	beq.s	-			; return if Shir is dead
+	beq.s	ProcessStealItem_Return			; return if Shir is dead
 	cmpi.b	#$10, ($FFFFC1E7).w	; return if Shir's inventory is full
-	beq.s	-
+	beq.s	ProcessStealItem_Return
+	
+	; Fix: make sure you don't steal if Shir's the only one alive
+	if bugfixes=1
+	lea	(Party_member_ID).w, a0
+	lea	(Character_stats).w, a1
+	moveq	#0, d0
+	moveq	#0, d3
+	moveq	#0, d7
+	move.w	(Party_members_num).w, d7
+-
+	move.w	(a0)+, d0
+	lsl.w	#6, d0
+	tst.w	curr_hp(a1,d0.w)
+	beq.s	+
+	addq.w	#1, d3
++
+	dbf	d7, -
+	cmpi.w	#1, d3
+	bls.s	ProcessStealItem_Return
+	endif
+	
 	bsr.w	UpdateRNGSeed
 	andi.w	#$F, d0
-	bne.s	-				; return if random-generated number was not 0
+	bne.s	ProcessStealItem_Return				; return if random-generated number was not 0
 	bsr.w	UpdateRNGSeed
 	andi.w	#7, d0
 	add.w	d0, d2
@@ -20641,7 +20662,7 @@ ProcessStealItem_Continue:
 	move.l	#0, ($FFFFC610).w
 	lea	(Party_member_ID).w, a1
 -
-	cmpi.w	#CharID_Shir, (a1)+		; Get Shir because we want to remove her from the party
+	cmpi.w	#CharID_Shir, (a1)+
 	bne.s	-
 	move.w	(a1), -(a1)
 	addq.w	#4, a1
