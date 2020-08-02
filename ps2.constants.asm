@@ -378,44 +378,87 @@ PortraitID_CentralTowerOutside3_Copy  =  id(PtrPortrait_CentralTowerOutside3_Cop
 PortraitID_MotaTeleportEmployer  =  id(PtrPortrait_MotaTeleportEmployer)	; $1E
 
 ; Palettes
-pal_id_sega =  (PtrPal_Sega-PalettePtrs)/8
-pal_id_title =  (PtrPal_Title-PalettePtrs)/8
+offset	:=	PalettePtrs
+ptrsize	:=	8
+idstart	:=	0
 
-pal_id_rolf_port =  (PtrPal_RolfPort-PalettePtrs)/8
-pal_id_nei_port =  (PtrPal_NeiPort-PalettePtrs)/8
-pal_id_rudo_port =  (PtrPal_RudoPort-PalettePtrs)/8
-pal_id_amy_port =  (PtrPal_AmyPort-PalettePtrs)/8
-pal_id_hugh_port =  (PtrPal_HughPort-PalettePtrs)/8
-pal_id_anna_port =  (PtrPal_AnnaPort-PalettePtrs)/8
-pal_id_kain_port =  (PtrPal_KainPort-PalettePtrs)/8
-pal_id_shir_port =  (PtrPal_ShirPort-PalettePtrs)/8
-
-pal_id_libr_port =  (PtrPal_LibrPort-PalettePtrs)/8
-pal_id_mot_save_emp_port =  (PtrPal_MotSvEmPort-PalettePtrs)/8
-pal_id_mot_doc_port =  (PtrPal_MotDocPort-PalettePtrs)/8
-pal_id_cl_grandma_port =  (PtrPal_GrandmaPort-PalettePtrs)/8
-pal_id_mot_item_sell_port =  (PtrPal_MtImSllPort-PalettePtrs)/8
-pal_id_mot_wpn_sell_port =  (PtrPal_MtWpnSlPort-PalettePtrs)/8
-pal_id_mot_arm_sell_port =  (PtrPal_MtArmSlPort-PalettePtrs)/8
-pal_id_ustves_port =  (PtrPal_UstvesPort-PalettePtrs)/8
-
-pal_id_misc1_port =  (PtrPal_Misc1Port-PalettePtrs)/8
-pal_id_misc2_port =  (PtrPal_Misc2Port-PalettePtrs)/8
-pal_id_misc3_port =  (PtrPal_Misc3Port-PalettePtrs)/8
-pal_id_misc4_port =  (PtrPal_Misc4Port-PalettePtrs)/8
-
-pal_id_item_keeper_port =  (PtrPal_ItmKprPort-PalettePtrs)/8
-pal_id_cent_tow_out1_port =  (PtrPal_CTwOut1Port-PalettePtrs)/8
-pal_id_governor_port =  (PtrPal_GvrnPort-PalettePtrs)/8
-pal_id_cent_tow_roof_port =  (PtrPal_RoofPort-PalettePtrs)/8
-pal_id_cent_tow_out2_port =  (PtrPal_CTwOut2Port-PalettePtrs)/8
-pal_id_graph_port =  (PtrPal_GraphPort-PalettePtrs)/8
-
-pal_id_radar_port =  (PtrPal_RadarPort-PalettePtrs)/8
-
-pal_id_cent_tow_out3_port =  (PtrPal_CTwOut3Port-PalettePtrs)/8
-
-pal_id_tele_empl_port =  (PtrPal_TeleEmpPort-PalettePtrs)/8
+PalID_Sega =  id(PtrPal_Sega)		; 0
+PalID_Title =  id(PtrPal_Title)		; 1
+PalID_Party =  id(PtrPal_Party)		; 2
+PalID_MotaOverworld =  id(PtrPal_MotaOverworld)		; 3
+PalID_DezolisSkure =  id(PtrPal_DezolisSkure)		; 4
+PalID_MotaTown =  id(PtrPal_MotaTown)		; 5
+PalID_Uzo =  id(PtrPal_Uzo)		; 6
+PalID_UnderwaterPassage =  id(PtrPal_UnderwaterPassage)		; 7
+PalID_Unknown =  id(PtrPal_Unknown)		; 8
+PalID_Tube =  id(PtrPal_Tube)		; 9
+PalID_BlueDam =  id(PtrPal_BlueDam)		; $A
+PalID_YellowDam =  id(PtrPal_YellowDam)		; $B
+PalID_GreenDam =  id(PtrPal_GreenDam)		; $C
+PalID_RedDam =  id(PtrPal_RedDam)		; $D
+PalID_ShureNido =  id(PtrPal_ShureNido)		; $E
+PalID_Climatrol =  id(PtrPal_Climatrol)		; $F
+PalID_Roron =  id(PtrPal_Roron)		; 10
+PalID_RolfPortrait =  id(PtrPal_RolfPort)		; $11
+PalID_NeiPortrait =  id(PtrPal_NeiPort)		; $12
+PalID_RudoPortrait =  id(PtrPal_RudoPort)		; $13
+PalID_AmyPortrait =  id(PtrPal_AmyPort)		; $14
+PalID_HughPortrait =  id(PtrPal_HughPort)		; $15
+PalID_AnnaPortrait =  id(PtrPal_AnnaPort)		; $16
+PalID_KainPortrait =  id(PtrPal_KainPort)		; $17
+PalID_ShirPortrait =  id(PtrPal_ShirPort)		; $18
+PalID_LibrarianPortrait =  id(PtrPal_LibrPort)		; $19
+PalID_MotaSaveEmplPortrait =  id(PtrPal_MotSvEmPort)		; $1A
+PalID_MotaDoctorPortrait =  id(PtrPal_MotDocPort)		; $1B
+PalID_GrandmaPortrait =  id(PtrPal_GrandmaPort)		; $1C
+PalID_MotaItemSellerPortrait =  id(PtrPal_MtImSllPort)		; $1D
+PalID_MotaWpnSellerPortrait =  id(PtrPal_MtWpnSlPort)		; $1E
+PalID_MotaArmorSellerPortrait =  id(PtrPal_MtArmSlPort)		; $1F
+PalID_UstvestiaPortrait =  id(PtrPal_UstvesPort)		; $20
+PalID_Dezolian1Portrait =  id(PtrPal_Dezolian1Portrait)		; $21
+PalID_Dezolian2Portrait =  id(PtrPal_Dezolian2Portrait)		; $22
+PalID_Dezolian3Portrait =  id(PtrPal_Dezolian3Portrait)		; $23
+PalID_Dezolian4Portrait =  id(PtrPal_Dezolian4Portrait)		; $24
+PalID_ItemKeeperPortrait =  id(PtrPal_ItmKprPort)		; $25
+PalID_CentTowerOutsidePortrait =  id(PtrPal_CTwOut1Port)		; $26
+PalID_CentTowerOutsidePortrait_Copy =  id(PtrPal_CTwOut1Port_Copy)		; $27
+PalID_GovernorPortrait =  id(PtrPal_GvrnPort)		; $28
+PalID_SpaceshipPortrait =  id(PtrPal_RoofPort)		; $29
+PalID_CentTowerOutside2Portrait =  id(PtrPal_CTwOut2Port)		; $2A
+PalID_LibraryGraphPortrait =  id(PtrPal_GraphPort)		; $2B
+PalID_RadarPortrait =  id(PtrPal_RadarPort)		; $2C
+PalID_CentTowerOutside3Portrait =  id(PtrPal_CTwOut3Port)		; $2D
+PalID_CentTowerOutside3Portrait_Copy =  id(PtrPal_CTwOut3Port_Copy)		; $2E
+PalID_Battle =  id(PtrPal_Battle)		; $2F
+PalID_GameStart =  id(PtrPal_GameStart)		; $30
+PalID_MotaTeleportEmplPortrait =  id(PtrPal_TeleEmpPort)		; $31
+PalID_Graph =  id(PtrPal_Graph)		; $32
+PalID_BiosystemsLab =  id(PtrPal_BiosystemsLab)		; $33
+PalID_ControlTower =  id(PtrPal_ControlTower)		; $34
+PalID_NeiDeath =  id(PtrPal_NeiDeath)		; $35
+PalID_NeiDeath2 =  id(PtrPal_NeiDeath2)		; $36
+PalID_Crevice =  id(PtrPal_Crevice)		; $37
+PalID_Gaira =  id(PtrPal_Gaira)		; $38
+PalID_PlanetMota =  id(PtrPal_PlanetMota)		; $39
+PalID_PlanetDezo =  id(PtrPal_PlanetDezo)		; $3A
+PalID_SceneLutz =  id(PtrPal_SceneLutz)		; $3B
+PalID_SpaceTravel =  id(PtrPal_SpaceTravel)		; $3C
+PalID_EsperMansion =  id(PtrPal_EsperMansion)		; $3D
+PalID_Noah =  id(PtrPal_Noah)		; $3E
+PalID_Naval =  id(PtrPal_Naval)		; $3F
+PalID_Menobe =  id(PtrPal_Menobe)		; $40
+PalID_Ikuto =  id(PtrPal_Ikuto)		; $41
+PalID_Guaron =  id(PtrPal_Guaron)		; $42
+PalID_EndingRudo_Unused =  id(PtrPal_EndingRudo_Unused)		; $43
+PalID_EndingRudo =  id(PtrPal_EndingRudo)		; $44
+PalID_EndingAmy =  id(PtrPal_EndingAmy)		; $45
+PalID_EndingKain =  id(PtrPal_EndingKain)		; $46
+PalID_EndingShir =  id(PtrPal_EndingShir)		; $47
+PalID_EndingHugh =  id(PtrPal_EndingHugh)		; $48
+PalID_EndingAnna =  id(PtrPal_EndingAnna)		; $49
+PalID_EndingRolf =  id(PtrPal_EndingRolf)		; $4A
+PalID_Credits =  id(PtrPal_Credits)		; $4B
+PalID_DezoTown =  id(PtrPal_DezoTown)		; $4C
 
 
 ; Inventory
@@ -1385,6 +1428,9 @@ Decom_queue_destination =  ramaddr($FFFFF7C6)
 Sprite_table_buffer =  ramaddr($FFFFF800)
 
 Palette_table_buffer =  ramaddr($FFFFFB00)
+Palette_line_2 =  ramaddr($FFFFFB20)
+Palette_line_3 =  ramaddr($FFFFFB40)
+Palette_line_4 =  ramaddr($FFFFFB60)
 
 System_stack =  ramaddr($FFFFFE00)
 

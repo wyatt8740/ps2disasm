@@ -11834,7 +11834,7 @@ GameMode_Sega:
 	moveq	#3, d2			; 4 cells tall
 	bsr.w	PlaneMapToVRAM
 
-	moveq	#pal_id_sega, d0
+	moveq	#PalID_Sega, d0
 	bsr.w	PaletteLoad1
 	move.w	#$28,($FFFFF632).w		; set palette cycle timer
 	move.w	#$12C,(General_timer).w		; set timer
@@ -11909,7 +11909,7 @@ loc_73C0:
 	moveq	#$1B, d2
 	bsr.w	PlaneMapToVRAM
 
-	moveq	#pal_id_title, d0
+	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
 	move.b	#$81, d0		; Phantasy music
 	bsr.w	UpdateSoundQueue
@@ -12077,7 +12077,7 @@ loc_764C:
 	move.l	d7, (a6)+
 	dbf	d6, loc_764C
 
-	moveq	#pal_id_title, d0
+	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
 	lea	($FFFFFBE0).w, a0
 	moveq	#0, d0
@@ -12102,7 +12102,7 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
 	move.w	#$182A, (Script_ID).w
-	moveq	#$44, d0
+	moveq	#PalID_EndingRudo, d0
 	move.l	#$200000, d2
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF61C).w
@@ -12112,7 +12112,7 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$4584, d1
 	move.w	#$182B, (Script_ID).w
-	moveq	#$45, d0
+	moveq	#PalID_EndingAmy, d0
 	moveq	#$20, d2
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF620).w
@@ -12123,7 +12123,7 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
 	move.w	#$182C, (Script_ID).w
-	moveq	#$46, d0
+	moveq	#PalID_EndingKain, d0
 	move.l	#$200020, d2
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF620).w
@@ -12133,7 +12133,7 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
 	move.w	#$182D, (Script_ID).w
-	moveq	#$47, d0
+	moveq	#PalID_EndingShir, d0
 	move.l	#$200000, d2
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF61C).w
@@ -12143,7 +12143,7 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$4584, d1
 	move.w	#$182E, (Script_ID).w
-	moveq	#$48, d0
+	moveq	#PalID_EndingHugh, d0
 	move.l	#$FFE0, d2
 	bsr.w	loc_7932
 	move.w	#$120, ($FFFFF620).w
@@ -12154,11 +12154,11 @@ loc_7660:
 	bsr.w	loc_7914
 	move.w	#$45AC, d1
 	move.w	#$182F, (Script_ID).w
-	moveq	#$49, d0
+	moveq	#PalID_EndingAnna, d0
 	move.l	#$200020, d2
 	bsr.w	loc_7932
 	bsr.w	loc_79EA
-	moveq	#$4A, d0
+	moveq	#PalID_EndingRolf, d0
 	bsr.w	PaletteLoad2
 	moveq	#$30, d3
 	moveq	#6, d5
@@ -12175,7 +12175,7 @@ loc_77B2:
 	move.b	#$E0, d0
 	bsr.w	UpdateSoundQueue
 	bsr.w	loc_634E
-	moveq	#$4B, d0
+	moveq	#PalID_Credits, d0
 	bsr.w	PaletteLoad1
 	move.w	#$A44, ($FFFFFBA2).w
 	bsr.w	loc_799A
@@ -12772,7 +12772,7 @@ EventLoad_NeiDeath:
 	move	#$2500, sr
 	lea	(loc_AED00).l, a0
 	bsr.w	DecompressToVDP
-	moveq	#$35, d0
+	moveq	#PalID_NeiDeath, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, ($FFFFDE70).w
@@ -12801,7 +12801,7 @@ EventLoad_NeifirstDeath:
 	move	#$2500, sr
 	lea	(loc_AED00).l, a0
 	bsr.w	DecompressToVDP
-	moveq	#$36, d0
+	moveq	#PalID_NeiDeath2, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, ($FFFFDE70).w
@@ -13178,7 +13178,7 @@ loc_829E:
 	move.w	#$8500, ($FFFFF72C).w
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, ($FFFFDE00).w
-	moveq	#2, d0
+	moveq	#PalID_Party, d0
 	bsr.w	PaletteLoad1
 	move.l	#$54000002, (VDP_control_port).l
 	cmpi.w	#SceneID_Library, (Scene_index).w
@@ -13192,14 +13192,14 @@ loc_829E:
 
 	lea	(Art_SceneRolf).l, a0
 	bsr.w	DecompressToVDP
-	moveq	#pal_id_rolf_port, d0
+	moveq	#PalID_RolfPortrait, d0
 	bsr.w	PaletteLoad1
 	bra.w	loc_8396
 
 loc_8304:
 	lea	(Art_SceneGraph).l, a0
 	bsr.w	DecompressToVDP
-	moveq	#pal_id_graph_port, d0
+	moveq	#PalID_LibraryGraphPortrait, d0
 	bsr.w	PaletteLoad1
 	bra.w	loc_8396
 
@@ -13224,7 +13224,7 @@ loc_834C:
 	bne.s	loc_834C
 	move.w	#$8F02, (a6)
 	addq.w	#1, (Event_routine).w
-	moveq	#pal_id_title, d0
+	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
 	bra.s	loc_839A
 
@@ -13238,7 +13238,7 @@ loc_8364:
 	moveq	#$D, d2
 	bsr.w	PlaneMapToVRAM
 	addq.w	#1, (Event_routine).w
-	moveq	#$3B, d0
+	moveq	#PalID_SceneLutz, d0
 	bsr.w	PaletteLoad1
 
 loc_8396:
@@ -13300,36 +13300,36 @@ loc_843E:
 ; ===============================================================
 PortraitTable:
 
-PtrPortrait_Nei:	dc.l	(pal_id_nei_port<<$18)|Art_SceneNei
-PtrPortrait_Rudo:	dc.l	(pal_id_rudo_port<<$18)|Art_SceneRudo
-PtrPortrait_Amy:	dc.l	(pal_id_amy_port<<$18)|Art_SceneAmy
-PtrPortrait_Hugh:	dc.l	(pal_id_hugh_port<<$18)|Art_SceneHugh
-PtrPortrait_Anna:	dc.l	(pal_id_anna_port<<$18)|Art_SceneAnna
-PtrPortrait_Kain:	dc.l	(pal_id_kain_port<<$18)|Art_SceneKain
-PtrPortrait_Shir:	dc.l	(pal_id_shir_port<<$18)|Art_SceneShir
-PtrPortrait_Librarian:	dc.l	(pal_id_libr_port<<$18)|Art_SceneLibrarian			; Librarian portrait
-PtrPortrait_MotaSaveEmployer:	dc.l	(pal_id_mot_save_emp_port<<$18)|Art_SceneMotaSaveEmployee	; Motavia game save employer portrait
-PtrPortrait_MotaDoctor:	dc.l	(pal_id_mot_doc_port<<$18)|Art_SceneMotaDoctor	; Motavia doctor portrait
-PtrPortrait_CloneLabGrandma:	dc.l	(pal_id_cl_grandma_port<<$18)|Art_SceneCloneLabGrandma	; Clone Labs Grandma portrait
-PtrPortrait_MotaItemSeller:	dc.l	(pal_id_mot_item_sell_port<<$18)|Art_SceneMotaItemSeller	; Motavia item seller portrait
-PtrPortrait_MotaWeaponSeller:	dc.l	(pal_id_mot_wpn_sell_port<<$18)|Art_SceneMotaWeaponSeller	; Motavia weapon seller portrait
-PtrPortrait_MotaArmorSeller:	dc.l	(pal_id_mot_arm_sell_port<<$18)|Art_SceneMotaArmorSeller	; Motavia armor seller portrait
-PtrPortrait_Ustvestia:	dc.l	(pal_id_ustves_port<<$18)|Art_SceneUstvestia	; Ustvestia portrait
-PtrPortrait_Dezolian1:	dc.l	(pal_id_misc1_port<<$18)|Art_SceneDezolian	; Dezolis game save employer, armor seller (Aukba), item seller (Ryuon), doctor (Ryuon) portrait
-PtrPortrait_Dezolian2:	dc.l	(pal_id_misc2_port<<$18)|Art_SceneDezolian	; Doctor (Aukba, Zosa), weapon seller (Aukba), armor seller (Zosa) portrait
-PtrPortrait_Dezolian3:	dc.l	(pal_id_misc3_port<<$18)|Art_SceneDezolian	; Item seller (Zosa), armor seller (Ryuon) portrait
-PtrPortrait_Dezolian4:	dc.l	(pal_id_misc4_port<<$18)|Art_SceneDezolian	; Dezolis teleport service employer, item seller (Aukba), weapon seller (Zosa, Ryuon) portrait
-PtrPortrait_ItemKeeper:	dc.l	(pal_id_item_keeper_port<<$18)|Art_SceneItemKeeper	; Room item keeper portrait
-PtrPortrait_CentralTowerOutside:	dc.l	(pal_id_cent_tow_out1_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
-PtrPortrait_CentralTowerOutside_Copy:	dc.l	(pal_id_cent_tow_out1_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
-PtrPortrait_Governor:	dc.l	(pal_id_governor_port<<$18)|Art_SceneGovernor	; Governor portrait
-PtrPortrait_Spaceship:	dc.l	(pal_id_cent_tow_roof_port<<$18)|Art_SceneRoof	; Spaceship on Central Tower roof
-PtrPortrait_CentralTowerOutside2:	dc.l	(pal_id_cent_tow_out2_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_LibraryGraph:	dc.l	(pal_id_graph_port<<$18)|Art_SceneGraph	; Graph showing up after turning Recorder in - seems to be never referenced in this table
-PtrPortrait_Radar:	dc.l	(pal_id_radar_port<<$18)|Art_SceneRadar	; Radar portrait (showing up in Gaira from control panel)
-PtrPortrait_CentralTowerOutside3:	dc.l	(pal_id_cent_tow_out3_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_CentralTowerOutside3_Copy:	dc.l	(pal_id_cent_tow_out3_port<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
-PtrPortrait_MotaTeleportEmployer:	dc.l	(pal_id_tele_empl_port<<$18)|Art_SceneMotaTeleportEmployee	; Motavia teleport service employer portrait
+PtrPortrait_Nei:	dc.l	(PalID_NeiPortrait<<$18)|Art_SceneNei
+PtrPortrait_Rudo:	dc.l	(PalID_RudoPortrait<<$18)|Art_SceneRudo
+PtrPortrait_Amy:	dc.l	(PalID_AmyPortrait<<$18)|Art_SceneAmy
+PtrPortrait_Hugh:	dc.l	(PalID_HughPortrait<<$18)|Art_SceneHugh
+PtrPortrait_Anna:	dc.l	(PalID_AnnaPortrait<<$18)|Art_SceneAnna
+PtrPortrait_Kain:	dc.l	(PalID_KainPortrait<<$18)|Art_SceneKain
+PtrPortrait_Shir:	dc.l	(PalID_ShirPortrait<<$18)|Art_SceneShir
+PtrPortrait_Librarian:	dc.l	(PalID_LibrarianPortrait<<$18)|Art_SceneLibrarian			; Librarian portrait
+PtrPortrait_MotaSaveEmployer:	dc.l	(PalID_MotaSaveEmplPortrait<<$18)|Art_SceneMotaSaveEmployee	; Motavia game save employer portrait
+PtrPortrait_MotaDoctor:	dc.l	(PalID_MotaDoctorPortrait<<$18)|Art_SceneMotaDoctor	; Motavia doctor portrait
+PtrPortrait_CloneLabGrandma:	dc.l	(PalID_GrandmaPortrait<<$18)|Art_SceneCloneLabGrandma	; Clone Labs Grandma portrait
+PtrPortrait_MotaItemSeller:	dc.l	(PalID_MotaItemSellerPortrait<<$18)|Art_SceneMotaItemSeller	; Motavia item seller portrait
+PtrPortrait_MotaWeaponSeller:	dc.l	(PalID_MotaWpnSellerPortrait<<$18)|Art_SceneMotaWeaponSeller	; Motavia weapon seller portrait
+PtrPortrait_MotaArmorSeller:	dc.l	(PalID_MotaArmorSellerPortrait<<$18)|Art_SceneMotaArmorSeller	; Motavia armor seller portrait
+PtrPortrait_Ustvestia:	dc.l	(PalID_UstvestiaPortrait<<$18)|Art_SceneUstvestia	; Ustvestia portrait
+PtrPortrait_Dezolian1:	dc.l	(PalID_Dezolian1Portrait<<$18)|Art_SceneDezolian	; Dezolis game save employer, armor seller (Aukba), item seller (Ryuon), doctor (Ryuon) portrait
+PtrPortrait_Dezolian2:	dc.l	(PalID_Dezolian2Portrait<<$18)|Art_SceneDezolian	; Doctor (Aukba, Zosa), weapon seller (Aukba), armor seller (Zosa) portrait
+PtrPortrait_Dezolian3:	dc.l	(PalID_Dezolian3Portrait<<$18)|Art_SceneDezolian	; Item seller (Zosa), armor seller (Ryuon) portrait
+PtrPortrait_Dezolian4:	dc.l	(PalID_Dezolian4Portrait<<$18)|Art_SceneDezolian	; Dezolis teleport service employer, item seller (Aukba), weapon seller (Zosa, Ryuon) portrait
+PtrPortrait_ItemKeeper:	dc.l	(PalID_ItemKeeperPortrait<<$18)|Art_SceneItemKeeper	; Room item keeper portrait
+PtrPortrait_CentralTowerOutside:	dc.l	(PalID_CentTowerOutsidePortrait<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
+PtrPortrait_CentralTowerOutside_Copy:	dc.l	(PalID_CentTowerOutsidePortrait<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait
+PtrPortrait_Governor:	dc.l	(PalID_GovernorPortrait<<$18)|Art_SceneGovernor	; Governor portrait
+PtrPortrait_Spaceship:	dc.l	(PalID_SpaceshipPortrait<<$18)|Art_SceneRoof	; Spaceship on Central Tower roof
+PtrPortrait_CentralTowerOutside2:	dc.l	(PalID_CentTowerOutside2Portrait<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_LibraryGraph:	dc.l	(PalID_LibraryGraphPortrait<<$18)|Art_SceneGraph	; Graph showing up after turning Recorder in - seems to be never referenced in this table
+PtrPortrait_Radar:	dc.l	(PalID_RadarPortrait<<$18)|Art_SceneRadar	; Radar portrait (showing up in Gaira from control panel)
+PtrPortrait_CentralTowerOutside3:	dc.l	(PalID_CentTowerOutside3Portrait<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_CentralTowerOutside3_Copy:	dc.l	(PalID_CentTowerOutside3Portrait<<$18)|Art_SceneCentralTowerOutside	; Central Tower outside portrait (different palette) - seems unused
+PtrPortrait_MotaTeleportEmployer:	dc.l	(PalID_MotaTeleportEmplPortrait<<$18)|Art_SceneMotaTeleportEmployee	; Motavia teleport service employer portrait
 ; ===============================================================
 
 
@@ -13401,7 +13401,7 @@ loc_850C:
 	moveq	#$27, d1
 	moveq	#$F, d2
 	bsr.w	PlaneMapToVRAM
-	moveq	#$2F, d0
+	moveq	#PalID_Battle, d0
 	bsr.w	PaletteLoad1
 	cmpi.w	#$103, (Enemy_formation).w
 	bne.s	loc_8594		; branch if we are not in Mother Brain boss battle
@@ -13604,7 +13604,7 @@ GameOver:
 	moveq	#$1B, d2
 	bsr.w	PlaneMapToVRAM
 	move	#$2500, sr
-	moveq	#pal_id_title, d0
+	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
 	move.w	#$4514, d0
 	move.w	d0, (Text_plane_offset).w
@@ -13701,7 +13701,7 @@ loc_8950:
 	move.l	d7, (a6)+
 	dbf	d6, -
 
-	moveq	#pal_id_title, d0
+	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
 	lea	($FFFFDE00).w, a6
 	moveq	#0, d7
@@ -14707,7 +14707,7 @@ loc_91F2:
 	move.w	d0, (Camera_Y_step_counter).w
 	move.w	d0, (Camera_X_step_counter).w
 	move.l	d0, ($FFFFF728).w
-	move.w	#2, d0
+	move.w	#PalID_Party, d0
 	bsr.w	PaletteLoad1
 	move.w	($FFFFF710).w, d0
 	cmpi.w	#1, d0
@@ -19435,7 +19435,7 @@ loc_C4A6:
 	addq.w	#1, (Event_routine).w
 	rts
 loc_C4B2:
-	moveq	#$32, d0
+	moveq	#PalID_Graph, d0
 	bsr.w	PaletteLoad2
 	addq.w	#1, (Event_routine).w
 	rts
@@ -19546,13 +19546,13 @@ loc_C58A:
 	moveq	#5, d2
 	bsr.w	PlaneMapToVRAM
 	move.w	#ObjID_Spaceship, ($FFFFEC00).w
-	moveq	#$39, d0
+	moveq	#PalID_PlanetMota, d0
 	cmpi.w	#MapID_DezolisSkure, (Map_index).w
 	beq.s	loc_C5EA
-	addq.w	#1, d0
+	addq.w	#1, d0	; PalID_PlanetDezo
 loc_C5EA:
 	bsr.w	PaletteLoad1
-	moveq	#$3C, d0
+	moveq	#PalID_SpaceTravel, d0
 	bsr.w	PaletteLoad1
 	move.w	#$78, (General_timer).w		; timer for spaceship travel
 	move.w	(VDP_reg1_values).w, d0		; VDP reg #1 values
@@ -20261,9 +20261,9 @@ loc_CD4E:
 loc_CD50:
 	bsr.w	loc_CC3E
 	bne.w	loc_CDDC
-	moveq	#$2A, d0
+	moveq	#PalID_CentTowerOutside2Portrait, d0
 	bsr.w	PaletteLoad1
-	moveq	#$2A, d0
+	moveq	#PalID_CentTowerOutside2Portrait, d0
 	bsr.w	PaletteLoad2
 	lea	(VDP_data_port).l, a3
 	move.l	#$410C0003, (VDP_control_port).l
@@ -21123,7 +21123,7 @@ loc_D59C:
 	lea	(loc_6FF22).l, a0
 	bsr.w	DecompressToVDP
 	move	#$2500, sr
-	moveq	#$30, d0
+	moveq	#PalID_GameStart, d0
 	bsr.w	PaletteLoad1
 	move.l	#$60000F, ($FFFFF626).w
 	bsr.w	loc_61F4
@@ -28790,578 +28790,458 @@ loc_11978:
 ; ===========================================================
 PalettePtrs:
 
-					; 0
-PtrPal_Sega:		dc.l	Pal_Sega
-					dc.w	$FB00, (Pal_SegaEnd-Pal_Sega)/4-1
-					; 1
-PtrPal_Title:		dc.l	Pal_Title
-					dc.w	$FB00, (Pal_TitleScrEnd-Pal_Title)/4-1
-					; 2
-					dc.l	Pal_Party
-					dc.w	$FB00, $F
-					; 3
-					dc.l	Pal_MotaOverworld
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011998-0x0001199C, Entry count: 0x00000004) [Unknown data]
-					; 4
-					dc.l	Pal_DezolisSkure
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119A0-0x000119A4, Entry count: 0x00000004) [Unknown data]
-					; 5
-					dc.l	Pal_MotaTown
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119A8-0x000119AC, Entry count: 0x00000004) [Unknown data]
-					; 6
-					dc.l	Pal_Uzo
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119B0-0x000119B4, Entry count: 0x00000004) [Unknown data]
-					; 7
-					dc.l	Pal_UnderwaterPassage
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119B8-0x000119BC, Entry count: 0x00000004) [Unknown data]
-					; 8
-					dc.l	loc_11F04
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119C0-0x000119C4, Entry count: 0x00000004) [Unknown data]
-					; 9
-					dc.l	Pal_Tube
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119C8-0x000119CC, Entry count: 0x00000004) [Unknown data]
-					; $A
-					dc.l	Pal_BlueDam
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119D0-0x000119D4, Entry count: 0x00000004) [Unknown data]
-					; $B
-					dc.l	Pal_YellowDam
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119D8-0x000119DC, Entry count: 0x00000004) [Unknown data]
-					; $C
-					dc.l	Pal_GreenDam
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119E0-0x000119E4, Entry count: 0x00000004) [Unknown data]
-					; $D
-					dc.l	Pal_RedDam
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119E8-0x000119EC, Entry count: 0x00000004) [Unknown data]
-					; $E
-					dc.l	Pal_ShureNido
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119F0-0x000119F4, Entry count: 0x00000004) [Unknown data]
-					; $F
-					dc.l	Pal_Climatrol
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x000119F8-0x000119FC, Entry count: 0x00000004) [Unknown data]
-					; $10
-					dc.l	Pal_Roron
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011A00-0x00011A04, Entry count: 0x00000004) [Unknown data]
-					; $11
-PtrPal_RolfPort:	dc.l	Pal_RolfPortrait
-					dc.w	$FB20, (Pal_RolfPortraitEnd-Pal_RolfPortrait)/4-1
-					; $12
-PtrPal_NeiPort:		dc.l	Pal_NeiPortrait
-					dc.w	$FB40, (Pal_NeiPortraitEnd-Pal_NeiPortrait)/4-1
-					; $13
-PtrPal_RudoPort:	dc.l	Pal_RudoPortrait
-					dc.w	$FB40, (Pal_RudoPortraitEnd-Pal_RudoPortrait)/4-1
-					; $14
-PtrPal_AmyPort:		dc.l	Pal_AmyPortrait
-					dc.w	$FB40, (Pal_AmyPortraitEnd-Pal_AmyPortrait)/4-1
-					; $15
-PtrPal_HughPort:	dc.l	Pal_HughPortrait
-					dc.w	$FB40, (Pal_HughPortraitEnd-Pal_HughPortrait)/4-1
-					; $16
-PtrPal_AnnaPort:	dc.l	Pal_AnnaPortrait
-					dc.w	$FB40, (Pal_AnnaPortraitEnd-Pal_AnnaPortrait)/4-1
-					; $17
-PtrPal_KainPort:	dc.l	Pal_KainPortrait
-					dc.w	$FB40, (Pal_KainPortraitEnd-Pal_KainPortrait)/4-1
-					; $18
-PtrPal_ShirPort:	dc.l	Pal_ShirPortrait
-					dc.w	$FB40, (Pal_ShirPortraitEnd-Pal_ShirPortrait)/4-1
-					; $19
-PtrPal_LibrPort:	dc.l	Pal_LibrarianPortrait
-					dc.b	$FB, $40, $00, $07
-					; $1A
-PtrPal_MotSvEmPort:	dc.l	Pal_MotSaveEmpPort
-					dc.b	$FB, $40, $00, $07
-					; $1B
-PtrPal_MotDocPort:	dc.l	Pal_MotDocPortrait
-					dc.b	$FB, $40, $00, $07
-					; $1C
-PtrPal_GrandmaPort:	dc.l	Pal_GrandmaPortrait
-					dc.b	$FB, $40, $00, $07
-					; $1D
-PtrPal_MtImSllPort:	dc.l	Pal_MotItemSellerPort
-					dc.b	$FB, $40, $00, $07
-					; $1E
-PtrPal_MtWpnSlPort:	dc.l	Pal_MotWpnSellerPort
-					dc.b	$FB, $40, $00, $07
-					; $1F
-PtrPal_MtArmSlPort: dc.l	Pal_MotArmorSellPort
-					dc.b	$FB, $40, $00, $07
-					; $20
-PtrPal_UstvesPort:	dc.l	Pal_UstvestiaPortrait
-					dc.b	$FB, $40, $00, $07
-					; $21
-PtrPal_Misc1Port:	dc.l	Pal_Misc1Portrait
-					dc.b	$FB, $40, $00, $07
-					; $22
-PtrPal_Misc2Port:	dc.l	Pal_Misc2Portrait
-					dc.b	$FB, $40, $00, $07
-					; $23
-PtrPal_Misc3Port:	dc.l	Pal_Misc3Portrait
-					dc.b	$FB, $40, $00, $07
-					; $24
-PtrPal_Misc4Port:	dc.l	Pal_Misc4Portrait
-					dc.b	$FB, $40, $00, $07
-					; $25
-PtrPal_ItmKprPort:	dc.l	Pal_ItemKeeperPort
-					dc.b	$FB, $40, $00, $07
-					; $26
-PtrPal_CTwOut1Port:	dc.l	Pal_CentTow1Port
-					dc.b	$FB, $40, $00, $07
-					; $27
-					dc.l	Pal_CentTow1Port
-					dc.b	$FB, $40, $00, $07
-					; $28
-PtrPal_GvrnPort:	dc.l	Pal_GovernorPortrait
-					dc.b	$FB, $40, $00, $07
-					; $29
-PtrPal_RoofPort:	dc.l	Pal_RoofPortrait
-					dc.b	$FB, $40, $00, $07
-					; $2A
-PtrPal_CTwOut2Port:	dc.l	Pal_CentTow2Port
-					dc.b	$FB, $40, $00, $0F
-					; $2B
-PtrPal_GraphPort:	dc.l	Pal_GraphPortrait
-					dc.b	$FB, $20, $00, $07
-					; $2C
-PtrPal_RadarPort:	dc.l	Pal_RadarPortrait
-					dc.b	$FB, $40, $00, $07
-					; $2D
-PtrPal_CTwOut3Port:	dc.l	Pal_RadarPortrait
-					dc.b	$FB, $40, $00, $07
-					; $2E
-					dc.l	Pal_RadarPortrait
-					dc.b	$FB, $40, $00, $07
-					; $2F
-					dc.l	Pal_Battle
-					dc.b	$FB, $00, $00, $1F
-					; $30
-					dc.l	Pal_GameStart
-					dc.b	$FB, $60, $00, $07
-					; $31
-PtrPal_TeleEmpPort: dc.l	Pal_TeleEmpPort
-					dc.b	$FB, $40, $00, $07
-					; $32
-					dc.l	Pal_Graph
-					dc.b	$FB, $20, $00, $07
-					; $33
-					dc.l	Pal_BiosystemsLab
-					dc.b	$FB, $40, $00, $0F
-					; $34
-					dc.l	Pal_ControlTower
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B20-0x00011B24, Entry count: 0x00000004) [Unknown data]
-					; $35
-					dc.l	Pal_NeiDeath
-					dc.b	$FB, $20, $00, $07 ;0x0 (0x00011B28-0x00011B2C, Entry count: 0x00000004) [Unknown data]
-					; $36
-					dc.l	Pal_NeiDeath2
-					dc.b	$FB, $20, $00, $07 ;0x0 (0x00011B30-0x00011B34, Entry count: 0x00000004) [Unknown data]
-					; $37
-					dc.l	Pal_Crevice
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B38-0x00011B3C, Entry count: 0x00000004) [Unknown data]
-					; $38
-					dc.l	Pal_Gaira
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B40-0x00011B44, Entry count: 0x00000004) [Unknown data]
-					; $39
-					dc.l	Pal_PlanetMota
-					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B48-0x00011B4C, Entry count: 0x00000004) [Unknown data]
-					; $3A
-					dc.l	Pal_PlanetDezo
-					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B50-0x00011B54, Entry count: 0x00000004) [Unknown data]
-					; $3B
-					dc.l	Pal_SceneLutz
-					dc.b	$FB, $60, $00, $07 ;0x0 (0x00011B58-0x00011B5C, Entry count: 0x00000004) [Unknown data]
-					; $3C
-					dc.l	Pal_SpaceTravel
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011B60-0x00011B64, Entry count: 0x00000004) [Unknown data]
-					; $3D
-					dc.l	Pal_EsperMansion
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B68-0x00011B6C, Entry count: 0x00000004) [Unknown data]
-					; $3E
-					dc.l	Pal_Noah
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B70-0x00011B74, Entry count: 0x00000004) [Unknown data]
-					; $3F
-					dc.l	Pal_Naval
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B78-0x00011B7C, Entry count: 0x00000004) [Unknown data]
-					; $40
-					dc.l	Pal_Menobe
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B80-0x00011B84, Entry count: 0x00000004) [Unknown data]
-					; $41
-					dc.l	Pal_Ikuto
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B88-0x00011B8C, Entry count: 0x00000004) [Unknown data]
-					; $42
-					dc.l	Pal_Guaron
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011B90-0x00011B94, Entry count: 0x00000004) [Unknown data]
-					; $43
-					dc.l	Pal_EndingRudo
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011B98-0x00011B9C, Entry count: 0x00000004) [Unknown data]
-					; $44
-					dc.l	Pal_EndingRudo
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BA0-0x00011BA4, Entry count: 0x00000004) [Unknown data]
-					; $45
-					dc.l	Pal_EndingAmy
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BA8-0x00011BAC, Entry count: 0x00000004) [Unknown data]
-					; $46
-					dc.l	Pal_EndingKain
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BB0-0x00011BB4, Entry count: 0x00000004) [Unknown data]
-					; $47
-					dc.l	Pal_EndingShir
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BB8-0x00011BBC, Entry count: 0x00000004) [Unknown data]
-					; $48
-					dc.l	Pal_EndingHugh
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BC0-0x00011BC4, Entry count: 0x00000004) [Unknown data]
-					; $49
-					dc.l	Pal_EndingAnna
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BC8-0x00011BCC, Entry count: 0x00000004) [Unknown data]
-					; $4A
-					dc.l	Pal_EndingRolf
-					dc.b	$FB, $40, $00, $07 ;0x0 (0x00011BD0-0x00011BD4, Entry count: 0x00000004) [Unknown data]
-					; $4B
-					dc.l	Pal_Credits
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011BD8-0x00011BDC, Entry count: 0x00000004) [Unknown data]
-					; $4C
-					dc.l	Pal_DezoTown
-					dc.b	$FB, $40, $00, $0F ;0x0 (0x00011BE0-0x00011BE4, Entry count: 0x00000004) [Unknown data]
-
+PtrPal_Sega:
+	dc.l	Pal_Sega
+	dc.w	Palette_table_buffer, (Pal_SegaEnd-Pal_Sega)/4-1
+PtrPal_Title:
+	dc.l	Pal_Title
+	dc.w	Palette_table_buffer, (Pal_TitleEnd-Pal_Title)/4-1
+PtrPal_Party:
+	dc.l	Pal_Party
+	dc.w	Palette_table_buffer, (Pal_PartyEnd-Pal_Party)/4-1
+PtrPal_MotaOverworld:
+	dc.l	Pal_MotaOverworld
+	dc.w	Palette_line_3, (Pal_MotaOverworldEnd-Pal_MotaOverworld)/4-1
+PtrPal_DezolisSkure:
+	dc.l	Pal_DezolisSkure
+	dc.w	Palette_line_3, (Pal_DezolisSkureEnd-Pal_DezolisSkure)/4-1
+PtrPal_MotaTown:
+	dc.l	Pal_MotaTown
+	dc.w	Palette_line_3, (Pal_MotaTownEnd-Pal_MotaTown)/4-1
+PtrPal_Uzo:
+	dc.l	Pal_Uzo
+	dc.w	Palette_line_3, (Pal_UzoEnd-Pal_Uzo)/4-1
+PtrPal_UnderwaterPassage:
+	dc.l	Pal_UnderwaterPassage
+	dc.w	Palette_line_3, (Pal_UnderwaterPassageEnd-Pal_UnderwaterPassage)/4-1
+PtrPal_Unknown:
+	dc.l	Pal_Unknown
+	dc.w	Palette_line_3, (Pal_UnknownEnd-Pal_Unknown)/4-1
+PtrPal_Tube:
+	dc.l	Pal_Tube
+	dc.w	Palette_line_3, (Pal_TubeEnd-Pal_Tube)/4-1
+PtrPal_BlueDam:
+	dc.l	Pal_BlueDam
+	dc.w	Palette_line_3, (Pal_BlueDamEnd-Pal_BlueDam)/4-1
+PtrPal_YellowDam:
+	dc.l	Pal_YellowDam
+	dc.w	Palette_line_3, (Pal_YellowDamEnd-Pal_YellowDam)/4-1
+PtrPal_GreenDam:
+	dc.l	Pal_GreenDam
+	dc.w	Palette_line_3, (Pal_GreenDamEnd-Pal_GreenDam)/4-1
+PtrPal_RedDam:
+	dc.l	Pal_RedDam
+	dc.w	Palette_line_3, (Pal_RedDamEnd-Pal_RedDam)/4-1
+PtrPal_ShureNido:
+	dc.l	Pal_ShureNido
+	dc.w	Palette_line_3, (Pal_ShureNidoEnd-Pal_ShureNido)/4-1
+PtrPal_Climatrol:
+	dc.l	Pal_Climatrol
+	dc.w	Palette_line_3, (Pal_ClimatrolEnd-Pal_Climatrol)/4-1
+PtrPal_Roron:
+	dc.l	Pal_Roron
+	dc.w	Palette_line_3, (Pal_RoronEnd-Pal_Roron)/4-1
+PtrPal_RolfPort:
+	dc.l	Pal_RolfPortrait
+	dc.w	Palette_line_2, (Pal_RolfPortraitEnd-Pal_RolfPortrait)/4-1
+PtrPal_NeiPort:
+	dc.l	Pal_NeiPortrait
+	dc.w	Palette_line_3, (Pal_NeiPortraitEnd-Pal_NeiPortrait)/4-1
+PtrPal_RudoPort:
+	dc.l	Pal_RudoPortrait
+	dc.w	Palette_line_3, (Pal_RudoPortraitEnd-Pal_RudoPortrait)/4-1
+PtrPal_AmyPort:
+	dc.l	Pal_AmyPortrait
+	dc.w	Palette_line_3, (Pal_AmyPortraitEnd-Pal_AmyPortrait)/4-1
+PtrPal_HughPort:
+	dc.l	Pal_HughPortrait
+	dc.w	Palette_line_3, (Pal_HughPortraitEnd-Pal_HughPortrait)/4-1
+PtrPal_AnnaPort:
+	dc.l	Pal_AnnaPortrait
+	dc.w	Palette_line_3, (Pal_AnnaPortraitEnd-Pal_AnnaPortrait)/4-1
+PtrPal_KainPort:
+	dc.l	Pal_KainPortrait
+	dc.w	Palette_line_3, (Pal_KainPortraitEnd-Pal_KainPortrait)/4-1
+PtrPal_ShirPort:
+	dc.l	Pal_ShirPortrait
+	dc.w	Palette_line_3, (Pal_ShirPortraitEnd-Pal_ShirPortrait)/4-1
+PtrPal_LibrPort:
+	dc.l	Pal_LibrarianPortrait
+	dc.w	Palette_line_3, (Pal_LibrarianPortraitEnd-Pal_LibrarianPortrait)/4-1
+PtrPal_MotSvEmPort:
+	dc.l	Pal_MotSaveEmpPort
+	dc.w	Palette_line_3, (Pal_MotSaveEmpPortEnd-Pal_MotSaveEmpPort)/4-1
+PtrPal_MotDocPort:
+	dc.l	Pal_MotDocPortrait
+	dc.w	Palette_line_3, (Pal_MotDocPortraitEnd-Pal_MotDocPortrait)/4-1
+PtrPal_GrandmaPort:
+	dc.l	Pal_GrandmaPortrait
+	dc.w	Palette_line_3, (Pal_GrandmaPortraitEnd-Pal_GrandmaPortrait)/4-1
+PtrPal_MtImSllPort:
+	dc.l	Pal_MotItemSellerPort
+	dc.w	Palette_line_3, (Pal_MotItemSellerPortEnd-Pal_MotItemSellerPort)/4-1
+PtrPal_MtWpnSlPort:
+	dc.l	Pal_MotWpnSellerPort
+	dc.w	Palette_line_3, (Pal_MotWpnSellerPortEnd-Pal_MotWpnSellerPort)/4-1
+PtrPal_MtArmSlPort:
+	dc.l	Pal_MotArmorSellPort
+	dc.w	Palette_line_3, (Pal_MotArmorSellPortEnd-Pal_MotArmorSellPort)/4-1
+PtrPal_UstvesPort:
+	dc.l	Pal_UstvestiaPortrait
+	dc.w	Palette_line_3, (Pal_UstvestiaPortraitEnd-Pal_UstvestiaPortrait)/4-1
+PtrPal_Dezolian1Portrait:
+	dc.l	Pal_Dezolian1Portrait
+	dc.w	Palette_line_3, (Pal_Dezolian1PortraitEnd-Pal_Dezolian1Portrait)/4-1
+PtrPal_Dezolian2Portrait:
+	dc.l	Pal_Dezolian2Portrait
+	dc.w	Palette_line_3, (Pal_Dezolian2PortraitEnd-Pal_Dezolian2Portrait)/4-1
+PtrPal_Dezolian3Portrait:
+	dc.l	Pal_Dezolian3Portrait
+	dc.w	Palette_line_3, (Pal_Dezolian3PortraitEnd-Pal_Dezolian3Portrait)/4-1
+PtrPal_Dezolian4Portrait:
+	dc.l	Pal_Dezolian4Portrait
+	dc.w	Palette_line_3, (Pal_Dezolian4PortraitEnd-Pal_Dezolian4Portrait)/4-1
+PtrPal_ItmKprPort:
+	dc.l	Pal_ItemKeeperPort
+	dc.w	Palette_line_3, (Pal_ItemKeeperPortEnd-Pal_ItemKeeperPort)/4-1
+PtrPal_CTwOut1Port:
+	dc.l	Pal_CentTow1Port
+	dc.w	Palette_line_3, (Pal_CentTow1PortEnd-Pal_CentTow1Port)/4-1
+PtrPal_CTwOut1Port_Copy:
+	dc.l	Pal_CentTow1Port
+	dc.w	Palette_line_3, (Pal_CentTow1PortEnd-Pal_CentTow1Port)/4-1
+PtrPal_GvrnPort:
+	dc.l	Pal_GovernorPortrait
+	dc.w	Palette_line_3, (Pal_GovernorPortraitEnd-Pal_GovernorPortrait)/4-1
+PtrPal_RoofPort:
+	dc.l	Pal_RoofPortrait
+	dc.w	Palette_line_3, (Pal_RoofPortraitEnd-Pal_RoofPortrait)/4-1
+PtrPal_CTwOut2Port:
+	dc.l	Pal_CentTow2Port
+	dc.w	Palette_line_3, (Pal_CentTow2PortEnd-Pal_CentTow2Port)/4-1
+PtrPal_GraphPort:
+	dc.l	Pal_GraphPortrait
+	dc.w	Palette_line_2, (Pal_GraphPortraitEnd-Pal_GraphPortrait)/4-1
+PtrPal_RadarPort:
+	dc.l	Pal_RadarPortrait
+	dc.w	Palette_line_3, (Pal_RadarPortraitEnd-Pal_RadarPortrait)/4-1
+PtrPal_CTwOut3Port:
+	dc.l	Pal_RadarPortrait
+	dc.w	Palette_line_3, (Pal_RadarPortraitEnd-Pal_RadarPortrait)/4-1
+PtrPal_CTwOut3Port_Copy:
+	dc.l	Pal_RadarPortrait
+	dc.w	Palette_line_3, (Pal_RadarPortraitEnd-Pal_RadarPortrait)/4-1
+PtrPal_Battle:
+	dc.l	Pal_Battle
+	dc.w	Palette_table_buffer, (Pal_BattleEnd-Pal_Battle)/4-1
+PtrPal_GameStart:
+	dc.l	Pal_GameStart
+	dc.w	Palette_line_4, (Pal_GameStartEnd-Pal_GameStart)/4-1
+PtrPal_TeleEmpPort:
+	dc.l	Pal_TeleEmpPort
+	dc.w	Palette_line_3, (Pal_TeleEmpPortEnd-Pal_TeleEmpPort)/4-1
+PtrPal_Graph:
+	dc.l	Pal_Graph
+	dc.w	Palette_line_2, (Pal_GraphEnd-Pal_Graph)/4-1
+PtrPal_BiosystemsLab:
+	dc.l	Pal_BiosystemsLab
+	dc.w	Palette_line_3, (Pal_BiosystemsLabEnd-Pal_BiosystemsLab)/4-1
+PtrPal_ControlTower:
+	dc.l	Pal_ControlTower
+	dc.w	Palette_line_3, (Pal_ControlTowerEnd-Pal_ControlTower)/4-1
+PtrPal_NeiDeath:
+	dc.l	Pal_NeiDeath
+	dc.w	Palette_line_2, (Pal_NeiDeathEnd-Pal_NeiDeath)/4-1
+PtrPal_NeiDeath2:
+	dc.l	Pal_NeiDeath2
+	dc.w	Palette_line_2, (Pal_NeiDeath2End-Pal_NeiDeath2)/4-1
+PtrPal_Crevice:
+	dc.l	Pal_Crevice
+	dc.w	Palette_line_3, (Pal_CreviceEnd-Pal_Crevice)/4-1
+PtrPal_Gaira:
+	dc.l	Pal_Gaira
+	dc.w	Palette_line_3, (Pal_GairaEnd-Pal_Gaira)/4-1
+PtrPal_PlanetMota:
+	dc.l	Pal_PlanetMota
+	dc.w	Palette_line_4, (Pal_PlanetMotaEnd-Pal_PlanetMota)/4-1
+PtrPal_PlanetDezo:
+	dc.l	Pal_PlanetDezo
+	dc.w	Palette_line_4, (Pal_PlanetDezoEnd-Pal_PlanetDezo)/4-1
+PtrPal_SceneLutz:
+	dc.l	Pal_SceneLutz
+	dc.w	Palette_line_4, (Pal_SceneLutzEnd-Pal_SceneLutz)/4-1
+PtrPal_SpaceTravel:
+	dc.l	Pal_SpaceTravel
+	dc.w	Palette_line_3, (Pal_SpaceTravelEnd-Pal_SpaceTravel)/4-1
+PtrPal_EsperMansion:
+	dc.l	Pal_EsperMansion
+	dc.w	Palette_line_3, (Pal_EsperMansionEnd-Pal_EsperMansion)/4-1
+PtrPal_Noah:
+	dc.l	Pal_Noah
+	dc.w	Palette_line_3, (Pal_NoahEnd-Pal_Noah)/4-1
+PtrPal_Naval:
+	dc.l	Pal_Naval
+	dc.w	Palette_line_3, (Pal_NavalEnd-Pal_Naval)/4-1
+PtrPal_Menobe:
+	dc.l	Pal_Menobe
+	dc.w	Palette_line_3, (Pal_MenobeEnd-Pal_Menobe)/4-1
+PtrPal_Ikuto:
+	dc.l	Pal_Ikuto
+	dc.w	Palette_line_3, (Pal_IkutoEnd-Pal_Ikuto)/4-1
+PtrPal_Guaron:
+	dc.l	Pal_Guaron
+	dc.w	Palette_line_3, (Pal_GuaronEnd-Pal_Guaron)/4-1
+PtrPal_EndingRudo_Unused:
+	dc.l	Pal_EndingRudo
+	dc.w	Palette_line_3, (Pal_EndingRudoEnd-Pal_EndingRudo)/4-1
+PtrPal_EndingRudo:
+	dc.l	Pal_EndingRudo
+	dc.w	Palette_line_3, (Pal_EndingRudoEnd-Pal_EndingRudo)/4-1
+PtrPal_EndingAmy:
+	dc.l	Pal_EndingAmy
+	dc.w	Palette_line_3, (Pal_EndingAmyEnd-Pal_EndingAmy)/4-1
+PtrPal_EndingKain:
+	dc.l	Pal_EndingKain
+	dc.w	Palette_line_3, (Pal_EndingKainEnd-Pal_EndingKain)/4-1
+PtrPal_EndingShir:
+	dc.l	Pal_EndingShir
+	dc.w	Palette_line_3, (Pal_EndingShirEnd-Pal_EndingShir)/4-1
+PtrPal_EndingHugh:
+	dc.l	Pal_EndingHugh
+	dc.w	Palette_line_3, (Pal_EndingHughEnd-Pal_EndingHugh)/4-1
+PtrPal_EndingAnna:
+	dc.l	Pal_EndingAnna
+	dc.w	Palette_line_3, (Pal_EndingAnnaEnd-Pal_EndingAnna)/4-1
+PtrPal_EndingRolf:
+	dc.l	Pal_EndingRolf
+	dc.w	Palette_line_3, (Pal_EndingRolfEnd-Pal_EndingRolf)/4-1
+PtrPal_Credits:
+	dc.l	Pal_Credits
+	dc.w	Palette_line_3, (Pal_CreditsEnd-Pal_Credits)/4-1
+PtrPal_DezoTown:
+	dc.l	Pal_DezoTown
+	dc.w	Palette_line_3, (Pal_DezoTownEnd-Pal_DezoTown)/4-1
 ; ===========================================================
 
-; --------------------------------
-Pal_Sega:
-	dc.l	$00000EEE
-	dc.l	$0EC00EA0
-	dc.l	$0E800E60
-	dc.l	$0E400E20
-	dc.l	$0E000C00
-	dc.l	$0A000800
-	dc.l	$06000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
+
+Pal_Sega:	binclude "general/palettes/sega.bin"
 Pal_SegaEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_Title:
-	dc.l	$00000EEE
-	dc.l	$00000AAE
-	dc.l	$088E0AAA
-	dc.l	$0888008E
-	dc.l	$000E000A
-	dc.l	$0C000800
-	dc.l	$02EE02AA
-	dc.l	$0E880E66
-	dc.l	$00000EC8
-	dc.l	$0AC806A0
-	dc.l	$04800260
-	dc.l	$02400A60
-	dc.l	$0A400820
-	dc.l	$06200420
-	dc.l	$0CA40862
-	dc.l	$06400EEE
-	dc.l	$00000000
-	dc.l	$0AEE00CE
-	dc.l	$008E006E
-	dc.l	$004E000C
-	dc.l	$000A0028
-	dc.l	$0006004A
-	dc.l	$0026006A
-	dc.l	$008C0000
-	dc.l	$00000EEE
-	dc.l	$0CCE0AAC
-	dc.l	$088A0668
-	dc.l	$04460224
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-Pal_TitleScrEnd:
-; --------------------------------
+Pal_Title:	binclude "general/palettes/title.bin"
+Pal_TitleEnd:
 
-; --------------------------------
-Pal_GameStart:
-	dc.l	$00000000
-	dc.l	$0EEE0EE8
-	dc.l	$0EE00EC0
-	dc.l	$0CA00A80
-	dc.l	$08600640
-	dc.l	$04200200
-	dc.l	$00000000
-	dc.l	$00000000
-; --------------------------------
+Pal_GameStart:	binclude "general/palettes/game_start.bin"
+Pal_GameStartEnd:
 
-; --------------------------------
-Pal_Party:
-	dc.l	$00000EEE, $00000AAE, $088E0AAA, $0888008E, $000E000A, $0C000800, $02EE02AA, $0E880E66, $00000EEE, $00000AAE, $088E0AAA, $08880048, $06C00280, $000E000A, $0EC00A80, $0E0A0804 ;0x0 (0x00011D04-0x00011D44, Entry count: 0x00000040)
-; --------------------------------
+Pal_Party:	binclude "general/palettes/party.bin"
+Pal_PartyEnd:
 
-; --------------------------------
-Pal_Battle:
-	dc.l	$02000EEE, $00000AAE, $088E0AAA, $0444008E, $000E000A, $0C000800, $02EE02AA, $0E880E66, $00000EEE, $00000AAE
-	dc.l	$088E0AAA, $08880048, $06C00280, $000E000A, $0EC00A80, $0E0A0804, $00000000, $00000000, $00000000, $00000000
-	dc.l	$00000000, $00000000, $00000000, $00000000, $00000EEE, $00EE00AE, $006E002E, $000E0008, $00000000, $00000000, $00000000, $00000000 ;0x0 (0x00011D44-0x00011DC4, Entry count: 0x00000080)
-; --------------------------------
+Pal_Battle:	binclude "general/palettes/battle.bin"
+Pal_BattleEnd:
 
-; --------------------------------
-Pal_MotaOverworld:
-	dc.l	$000002C6, $02A40282, $00600CA8, $0A220800, $06000420, $0CA80864, $0000006A, $00480026, $000000EE, $0A400468, $00E00EEA, $0CC80AA6, $08840442, $0EEE020A, $0000006A, $00480026 ;0x0 (0x00011DC4-0x00011E04, Entry count: 0x00000040)
-; --------------------------------
+Pal_MotaOverworld:	binclude "general/palettes/mota_overworld.bin"
+Pal_MotaOverworldEnd:
 
-; --------------------------------
-Pal_DezolisSkure:
-	dc.l	$00000000, $0EEE0EEC, $0ECA0CA8, $0A860864, $06420420, $02000CEC, $0ACA08A8, $0686000E, $00000000, $04A00EEC, $0ECA0CA8, $0008002E, $0EEE0AAA, $08880666, $00460068, $04800460 ;0x0 (0x00011E04-0x00011E44, Entry count: 0x00000040)
-; --------------------------------
+Pal_DezolisSkure:	binclude "general/palettes/dezo_skure.bin"
+Pal_DezolisSkureEnd:
 
-; --------------------------------
-Pal_MotaTown:
-	dc.l	$00000000, $0EEE0AA4, $08600640, $04200060, $088E066E, $000E0008, $0AAA0888, $04440222, $00000EEE, $02C602A2, $00400020, $04440080, $00680046, $0024084E, $0EA00E60, $0A200000 ;0x0 (0x00011E44-0x00011E84, Entry count: 0x00000040)
-; --------------------------------
+Pal_MotaTown:	binclude "general/palettes/mota_town.bin"
+Pal_MotaTownEnd:
 
-Pal_Uzo:
-	dc.l	$00000E80, $0AEE08CE, $06AC048A, $02680246, $00240002, $00000ECA, $0EC20CA0, $0A800860, $00000E80, $06AC048A, $02680246, $00240002, $000008C6, $06A40482, $02600040, $0AEE08CE ;0x0 (0x00011E84-0x00011EC4, Entry count: 0x00000040)
-Pal_UnderwaterPassage:
-	dc.l	$0000004A, $0CC00CC0, $0AA00880, $06600440, $022000CE, $00AE008E, $026E004E, $00000000, $00000E80, $08E006C0, $04A00280, $00600040, $00600EEE, $0CA60C80, $0C600A20, $08000000 ;0x0 (0x00011EC4-0x00011F04, Entry count: 0x00000040)
-loc_11F04:
-	dc.b	$00, $00, $0E, $64, $0E, $CE, $0C, $AC, $0A, $8A, $08, $68, $06, $46, $04, $24
-	dc.b	$0E, $EC, $0C, $CA, $0A, $A8, $08, $86, $06, $64, $04, $42, $02, $20, $00, $00 ;0x0 (0x00011F04-0x00011F44, Entry count: 0x00000040) [Unknown data]
-	dc.b	$00, $00, $0E, $EE, $0E, $EC, $0E, $CA, $04, $A0, $04, $80, $04, $60, $00, $46
-	dc.b	$08, $CE, $04, $8E, $00, $4C, $0A, $AA, $08, $88, $06, $66, $02, $20, $00, $00 ;0x20
-Pal_Tube:
-	dc.l	$00000000, $0CA80A86, $08640642, $0CCA0AA8, $08860664, $04420220, $022E066E, $044E008E, $00000000, $06AA0488, $02660044, $04840462, $02400020, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011F44-0x00011F84, Entry count: 0x00000040)
-Pal_BlueDam:
-	dc.l	$00000000, $0CAA0A88, $08660644, $0CA00A80, $08600640, $04200000, $022E066E, $044E008E, $00000000, $06860464, $02420020, $0A8C0648, $04260204, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011F84-0x00011FC4, Entry count: 0x00000040)
-Pal_YellowDam:
-	dc.l	$00000000, $0AAC088A, $06680446, $04AA0288, $00660044, $00220000, $022E066E, $044E008E, $00000000, $0AAA0888, $06660444, $0A860864, $06420420, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00011FC4-0x00012004, Entry count: 0x00000040)
-Pal_GreenDam:
-	dc.l	$00000000, $06AA0488, $02660044, $06A60484, $02620040, $00200000, $022E066E, $044E008E, $00000000, $06AA0488, $02660044, $0A880866, $06440422, $000E00AC, $08E80CA0, $0A800860 ;0x0 (0x00012004-0x00012044, Entry count: 0x00000040)
-Pal_RedDam:
-	dc.l	$00000000, $0CAC0A8A, $08680646, $088E066C, $044A0228, $00060000, $022E066E, $044E008E, $00000000, $06860464, $02420020, $06680446, $02240002, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012044-0x00012084, Entry count: 0x00000040)
-Pal_ShureNido:
-	dc.l	$00000000, $068A0468, $02460024, $088A0668, $04460224, $00020000, $022E066E, $044E008E, $00000000, $02880066, $00440022, $04660244, $00220000, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012084-0x000120C4, Entry count: 0x00000040)
-Pal_Climatrol:
-	dc.l	$00000000, $0CAC0A8A, $08680646, $0CAA0A88, $08660644, $04220200, $022E066E ;0x0 (0x000120C4-0x000120E0, Entry count: 0x0000001C)
-	dc.l	$044E008E, $00000000, $08A60484, $04620240, $06AA0488, $02660044, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x000120E0-0x00012104, Entry count: 0x00000024)
-Pal_Roron:
-	dc.l	$00000000, $08AA0688, $04660244, $068A0468, $02460024, $00020000, $00000000, $044E008E, $00000000, $08A80686, $04640242, $06660444, $02220000, $000E00AC, $08E80CA0, $00000000 ;0x0 (0x00012104-0x00012144, Entry count: 0x00000040)
-Pal_BiosystemsLab:
-	dc.l	$00000000, $0AAA0888, $06660444, $08A80686, $04640242, $00200000, $022E066E, $044E008E, $00000000, $0AAA0888, $06660444, $08860664, $04420220, $022E00AC, $08E80CA0, $0A800860 ;0x0 (0x00012144-0x00012184, Entry count: 0x00000040)
-Pal_ControlTower:
-	dc.l	$00000000, $0CCA0AA8, $08860664, $0AAA0888, $06660444, $02220000, $022E066E, $044E008E, $00000000, $08680646, $04240202, $06860464, $02420020, $000A00AC, $08E80CA0, $0A800860 ;0x0 (0x00012184-0x000121C4, Entry count: 0x00000040)
-Pal_Crevice:
-	dc.l	$00000000, $0EEC0EEC, $0ECA0CA8, $0A860864, $06420420, $00000000, $00000000, $00000000, $00000000, $0EEC0ECA, $0CA80A86, $08640642, $08640000, $00000000, $00000000, $00000000 ;0x0 (0x000121C4-0x00012204, Entry count: 0x00000040)
-Pal_Gaira:
-	dc.l	$00000000, $08860664, $04420220, $0AAA0888, $06660444, $02220000, $00000000, $044E008E, $00000000, $0EEE0CAA, $08660000, $00000000, $00000000, $00000000, $00000000, $00000000 ;0x0 (0x00012204-0x00012244, Entry count: 0x00000040)
-Pal_EsperMansion:
-	dc.l	$00000E64, $0EEE0EEE, $0CCC0AAA, $08880666, $0EEA0EC8, $0EA60E84, $0E620C20 ;0x0 (0x00012244-0x00012260, Entry count: 0x0000001C)
-	dc.l	$04440000, $00000EEE, $0EEC0ECA, $04A00480, $04600046, $00000000, $00000AAA, $08880666, $000E0000 ;0x0 (0x00012260-0x00012284, Entry count: 0x00000024)
-Pal_Noah:
-	dc.l	$00000E64, $0ECE0CAC, $0A8A0868, $06460424, $0EEC0CCA, $0AA80886, $06640442, $02020000, $00000AAE, $088E0888, $0666000E, $000A0C00, $000002EE, $00000EEC, $0CCA0AA8, $08860000 ;0x0 (0x00012284-0x000122C4, Entry count: 0x00000040)
-Pal_Naval:
-	dc.l	$00000E64, $0CEC0ACA, $08A80686, $04640242, $0CEE0ACC, $08AA0688, $04660244, $00220000, $00000EEE, $0EEC0ECA, $00000000, $00000000, $08CE048E, $004C0000, $00000000, $00000000 ;0x0 (0x000122C4-0x00012304, Entry count: 0x00000040)
-Pal_Menobe:
-	dc.l	$00000E64, $0CCE0AAC, $088A0668, $04460224, $0CEC0ACA, $08A80686, $04640242, $00020000, $00000EEE, $0EEC0ECA, $0CCA0AA8, $08860666, $00000000, $00000AAA, $08880666, $00000000 ;0x0 (0x00012304-0x00012344, Entry count: 0x00000040)
-Pal_Ikuto:
-	dc.l	$00000E64, $0CEE0ACC, $08AA0688, $04660244, $0ECC0CAA, $0A880866, $06440422, $00220000, $00000EEE, $0EEC0ECA, $00000000, $00000000, $0AAE066E, $022C0000, $00000000, $00000000 ;0x0 (0x00012344-0x00012384, Entry count: 0x00000040)
-Pal_Guaron:
-	dc.l	$00000E64, $0ECC0EAA, $0C880A66, $08440622, $0CCE0AAC, $088A0668, $04460224, $00220000, $00000EEE, $0EEC0ECA, $0CCA0AA8, $08860666, $00000000, $00000AAA, $08880666, $00000000 ;0x0 (0x00012384-0x000123C4, Entry count: 0x00000040)
-Pal_DezoTown:
-	dc.l	$00000000, $0EEE0AA4, $08600640, $04200060, $088E066E, $000E0008, $0AAA0888, $04440222, $00000EEE, $02C602A2, $00400020, $04440080, $00680046, $0024084E, $0EE80CC6, $0AA40000 ;0x0 (0x000123C4-0x00012404, Entry count: 0x00000040)
+Pal_Uzo:	binclude "general/palettes/uzo.bin"
+Pal_UzoEnd:
 
-; --------------------------------
-Pal_RolfPortrait:
-	dc.l	$0000000E
-	dc.l	$0EEE0ACE
-	dc.l	$08AE068E
-	dc.l	$0E880E66
-	dc.l	$0C000800
-	dc.l	$0CCC0AAA
-	dc.l	$08880666
-	dc.l	$02EE02AA
+Pal_UnderwaterPassage:	binclude "general/palettes/underwater_passage.bin"
+Pal_UnderwaterPassageEnd:
+
+Pal_Unknown:	binclude "general/palettes/unknown.bin"
+Pal_UnknownEnd:
+
+Pal_Tube:	binclude "general/palettes/tube.bin"
+Pal_TubeEnd:
+
+Pal_BlueDam:	binclude "general/palettes/blue_dam.bin"
+Pal_BlueDamEnd:
+
+Pal_YellowDam:	binclude "general/palettes/yellow_dam.bin"
+Pal_YellowDamEnd:
+
+Pal_GreenDam:	binclude "general/palettes/green_dam.bin"
+Pal_GreenDamEnd:
+
+Pal_RedDam:	binclude "general/palettes/red_dam.bin"
+Pal_RedDamEnd:
+
+Pal_ShureNido:	binclude "general/palettes/shure_nido.bin"
+Pal_ShureNidoEnd:
+
+Pal_Climatrol:	binclude "general/palettes/climatrol.bin"
+Pal_ClimatrolEnd:
+
+Pal_Roron:	binclude "general/palettes/roron.bin"
+Pal_RoronEnd:
+
+Pal_BiosystemsLab:	binclude "general/palettes/biosystems_lab.bin"
+Pal_BiosystemsLabEnd:
+
+Pal_ControlTower:	binclude "general/palettes/control_tower.bin"
+Pal_ControlTowerEnd:
+
+Pal_Crevice:	binclude "general/palettes/crevice.bin"
+Pal_CreviceEnd:
+
+Pal_Gaira:	binclude "general/palettes/gaira.bin"
+Pal_GairaEnd:
+
+Pal_EsperMansion:	binclude "general/palettes/esper_mansion.bin"
+Pal_EsperMansionEnd:
+
+Pal_Noah:	binclude "general/palettes/noah.bin"
+Pal_NoahEnd:
+
+Pal_Naval:	binclude "general/palettes/naval.bin"
+Pal_NavalEnd:
+
+Pal_Menobe:	binclude "general/palettes/menobe.bin"
+Pal_MenobeEnd:
+
+Pal_Ikuto:	binclude "general/palettes/ikuto.bin"
+Pal_IkutoEnd:
+
+Pal_Guaron:	binclude "general/palettes/guaron.bin"
+Pal_GuaronEnd:
+
+Pal_DezoTown:	binclude "general/palettes/dezo_town.bin"
+Pal_DezoTownEnd:
+
+Pal_RolfPortrait:	binclude "general/palettes/rolf_portrait.bin"
 Pal_RolfPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_NeiPortrait:
-	dc.l	$00000000
-	dc.l	$0EEE0ACE
-	dc.l	$08AE068E
-	dc.l	$0E0C0C08
-	dc.l	$080406EE
-	dc.l	$0000044E
-	dc.l	$00060CCC
-	dc.l	$0AAA0888
+Pal_NeiPortrait:	binclude "general/palettes/nei_portrait.bin"
 Pal_NeiPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_RudoPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E046C
-	dc.l	$08EE0E44
-	dc.l	$02EE000E
-	dc.l	$0CCC0AAA
-	dc.l	$08880666
-	dc.l	$044402AA
+Pal_RudoPortrait:	binclude "general/palettes/rudo_portrait.bin"
 Pal_RudoPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_AmyPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E0CC0
-	dc.l	$022E0008
-	dc.l	$08800EE8
-	dc.l	$080402AA
-	dc.l	$0CCC0AAA
-	dc.l	$08880666
+Pal_AmyPortrait:	binclude "general/palettes/amy_portrait.bin"
 Pal_AmyPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_HughPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E0E0C
-	dc.l	$0C080804
-	dc.l	$022E0008
-	dc.l	$066606C0
-	dc.l	$02800CCC
-	dc.l	$0AAA0888
+Pal_HughPortrait:	binclude "general/palettes/hugh_portrait.bin"
 Pal_HughPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_AnnaPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E0C00
-	dc.l	$080006EE
-	dc.l	$02AA0CCC
-	dc.l	$0AAA0888
-	dc.l	$0AA00000
-	dc.l	$0EEA0EE4
+Pal_AnnaPortrait:	binclude "general/palettes/anna_portrait.bin"
 Pal_AnnaPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_KainPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E0EAA
-	dc.l	$0E880E66
-	dc.l	$08000EEA
-	dc.l	$022E0008
-	dc.l	$0CCC0AAA
-	dc.l	$08880EE4
+Pal_KainPortrait:	binclude "general/palettes/kain_portrait.bin"
 Pal_KainPortraitEnd:
-; --------------------------------
 
-; --------------------------------
-Pal_ShirPortrait:
-	dc.l	$00000EEE
-	dc.l	$0ACE08AE
-	dc.l	$068E0EE4
-	dc.l	$08E004A0
-	dc.l	$0EC00A80
-	dc.l	$0CCC0AAA
-	dc.l	$08880000
-	dc.l	$0EEA044E
+Pal_ShirPortrait:	binclude "general/palettes/shir_portrait.bin"
 Pal_ShirPortraitEnd:
-; --------------------------------
 
+Pal_LibrarianPortrait:	binclude "general/palettes/librarian_portrait.bin"
+Pal_LibrarianPortraitEnd:
 
-Pal_LibrarianPortrait:
-	dc.l	$00000000, $06660888, $0AAA0EEE, $0ACE08AE, $068E0EEA, $0EC40408, $080C00EE, $0A400000 ;0x0 (0x00012504-0x00012524, Entry count: 0x00000020)
-Pal_MotSaveEmpPort:
-	dc.l	$00000000, $06660888, $0AAA0EEE, $0ACE08AE, $068E008C, $006A0EEA, $0EC800EE, $0A800CEE ;0x0 (0x00012524-0x00012544, Entry count: 0x00000020)
-Pal_MotDocPortrait:
-	dc.l	$00000000, $0EEC0CCA, $0AA80886, $06640EEE, $0EEC0ECA, $068A08AC, $0ACE000E, $06660468 ;0x0 (0x00012544-0x00012564, Entry count: 0x00000020)
-Pal_GrandmaPortrait:
-	dc.l	$00000EEE, $0EEC0EEA, $0EC80000, $0000080C, $06040A46, $08CC06AA, $04880266, $04EE0044 ;0x0 (0x00012564-0x00012584, Entry count: 0x00000020)
-Pal_MotItemSellerPort:
-	dc.l	$00000000, $0ACE08AE, $068E0EEE, $000C04CC, $08000400, $000A0EEA, $0CC80AA6, $08840662 ;0x0 (0x00012584-0x000125A4, Entry count: 0x00000020)
-Pal_MotWpnSellerPort:
-	dc.l	$00000000, $0ACE08AE, $068E0EEE, $00CE008E, $000E000A, $0E000800, $0AAA0888, $06660444 ;0x0 (0x000125A4-0x000125C4, Entry count: 0x00000020)
-Pal_MotArmorSellPort:
-	dc.l	$00000000, $0ACE08AC, $068A0EEE, $00CE0EC8, $0AEE00AE, $0A0C080A, $0AAA0888, $06660444 ;0x0 (0x000125C4-0x000125E4, Entry count: 0x00000020)
-Pal_UstvestiaPortrait:
-	dc.l	$00000000, $0ACE08AE, $068E0EEE, $00CE0EEC, $000E000A, $04440666, $0AAA0864, $0A840888 ;0x0 (0x000125E4-0x00012604, Entry count: 0x00000020)
-Pal_Misc1Portrait:
-	dc.l	$00000000, $08CC06AA, $04880EEE, $0EEC0000, $0ACE08AC, $008C006A, $0CC80AA6, $08840662 ;0x0 (0x00012604-0x00012624, Entry count: 0x00000020)
-Pal_Misc2Portrait:
-	dc.l	$00000000, $08CC06AA, $04880EEE, $0EEC0000, $0ACE08AC, $000C0008, $0CC80AA6, $08840662 ;0x0 (0x00012624-0x00012644, Entry count: 0x00000020)
-Pal_Misc3Portrait:
-	dc.l	$00000000, $08CC06AA, $04880EEE, $0EEC0000, $0ACE08AC, $06A00480, $0CC80AA6, $08840662 ;0x0 (0x00012644-0x00012664, Entry count: 0x00000020)
-Pal_Misc4Portrait:
-	dc.l	$00000000, $08CC06AA, $04880EEE, $0EEC0000, $0ACE08AC, $0A660844, $0CC80AA6, $08840662 ;0x0 (0x00012664-0x00012684, Entry count: 0x00000020)
-Pal_ItemKeeperPort:
-	dc.l	$00000000, $0ACE08AC, $068A0EEE, $08000C80, $08CC06AA, $04880CCC, $0AAA0888, $06660444 ;0x0 (0x00012684-0x000126A4, Entry count: 0x00000020)
-Pal_TeleEmpPort:
-	dc.l	$00000000, $06660888, $0AAA0EEE, $0ACE08AE, $068E0EEA, $00EE0CAE, $086C028A, $0A40000E ;0x0 (0x000126A4-0x000126C4, Entry count: 0x00000020)
-Pal_CentTow1Port:
-	dc.l	$00000000, $0ACE08AC, $068A0EEE, $0EEC0EEA, $0EE4068E, $04A00480, $0CCC0AAA, $08880666 ;0x0 (0x000126C4-0x000126E4, Entry count: 0x00000020)
-Pal_GovernorPortrait:
-	dc.l	$00000000, $0ACE08AC, $068A0EEE, $00000AAA, $08880666, $044400CE, $00AC000E, $0E000800 ;0x0 (0x000126E4-0x00012704, Entry count: 0x00000020)
-Pal_RoofPortrait:
-	dc.l	$00000000, $0EEE0EEC, $0EEA0EE4, $0CCC0AAA, $08880666, $04440000, $02000CA8, $08640642 ;0x0 (0x00012704-0x00012724, Entry count: 0x00000020)
-Pal_GraphPortrait:
-	dc.l	$00000EEE, $062200EE, $0A220622, $0EAA0E66, $06220EEE, $06220622, $0A220A22, $0A220000 ;0x0 (0x00012724-0x00012744, Entry count: 0x00000020)
-Pal_Graph:
-	dc.l	$00000EEE, $062200EE, $0A22042E, $0EAA0E66, $0EA00EEE, $0EEE0E4C, $0EA0042E, $0EEE0000 ;0x0 (0x00012744-0x00012764, Entry count: 0x00000020)
-Pal_RadarPortrait:
-	dc.l	$00000EEE, $062200EE, $0A22042E, $0EAA0E66, $0CA40280, $044204A2, $08600000, $06660AAA ;0x0 (0x00012764-0x00012784, Entry count: 0x00000020)
-Pal_NeiDeath:
-	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080804, $044E0006, $0AAA020E, $0A8E0EEE, $020E020E ;0x0 (0x00012784-0x000127A4, Entry count: 0x00000020)
-Pal_NeiDeath2:
-	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080804, $044E0006, $0AAA0EEE, $0A000A00, $0E880A00 ;0x0 (0x000127A4-0x000127C4, Entry count: 0x00000020)
-Pal_PlanetMota:
-	dc.l	$00000000, $0EEE0EC8, $0EA00E60, $0E400C20, $0C000A00, $08000600, $04000200, $068A0246 ;0x0 (0x000127C4-0x000127E4, Entry count: 0x00000020)
-Pal_PlanetDezo:
-	dc.l	$00000000, $0EEE0CEA, $0AE606E2, $00E002C0, $00C000A0, $00800060, $00400020, $06CC04AA ;0x0 (0x000127E4-0x00012804, Entry count: 0x00000020)
-Pal_SpaceTravel:
-	dc.l	$00000000, $02200442, $06640886, $0AA80CCA, $0EEC0EEE, $08EE00CE, $008E006E, $00000000 ;0x0 (0x00012804-0x00012824, Entry count: 0x00000020)
-Pal_SceneLutz:
-	dc.l	$00000EEE, $0ACE08AE, $068E0C64, $0EA60E84, $0ECA000E, $000A00AC, $00EE0AC8, $046C0666 ;0x0 (0x00012824-0x00012844, Entry count: 0x00000020)
-Pal_CentTow2Port:
-	dc.l	$00000000, $0ACE08AC, $068A0EEE, $08EE00EE, $0EEA0CC8, $0AA60884, $0AAA0888, $06660444, $00000EEE, $0AAA0888, $06660A62, $08420620, $04000ECC, $0EAA0C88, $0EEE06EE, $008C000E ;0x0 (0x00012844-0x00012884, Entry count: 0x00000040)
-Pal_EndingRudo:
-	dc.l	$00000EEE, $08AE068E, $046C02EE, $02AA0AAA, $08880444, $000E0000, $008E06A0, $04800000 ;0x0 (0x00012884-0x000128A4, Entry count: 0x00000020)
-Pal_EndingAmy:
-	dc.l	$00000EEE, $0ACE08AE, $068E022E, $00080EE8, $0CC00880, $02EE02AA, $0EC00CA0, $0A800860 ;0x0 (0x000128A4-0x000128C4, Entry count: 0x00000020)
-Pal_EndingKain:
-	dc.l	$00000EEE, $0ACE08AE, $068E0E88, $0E66022E, $00080AAA, $00000000, $08C006A0, $04800260 ;0x0 (0x000128C4-0x000128E4, Entry count: 0x00000020)
-Pal_EndingShir:
-	dc.l	$00000EEE, $0ACE08AE, $068E02EE, $04A00AAA, $08880444, $000E08E0, $008E0EC0, $0A800000 ;0x0 (0x000128E4-0x00012904, Entry count: 0x00000020)
-Pal_EndingHugh:
-	dc.l	$00000EEE, $0ACE08AE, $068E0E0C, $0C080888, $06C00280, $000E0008, $08EE05CC, $04AA0288 ;0x0 (0x00012904-0x00012924, Entry count: 0x00000020)
-Pal_EndingAnna:
-	dc.l	$00000EEE, $0ACE08AE, $068E0C00, $080006EE, $02AA0AAA, $08880444, $0E660E44, $0E220A00 ;0x0 (0x00012924-0x00012944, Entry count: 0x00000020)
-Pal_EndingRolf:
-	dc.l	$00000EEE, $0ACE08AE, $068E0E66, $0C000AAA, $08880666, $02EE02AA, $000E0EEE, $00000000 ;0x0 (0x00012944-0x00012964, Entry count: 0x00000020)
-Pal_Credits:
-	dc.l	$00000000, $02220444, $06660888, $0AAA0CCC, $0EEE0000, $00000000, $00000000, $00000000, $00000400, $06000800, $0A200C42, $0E640E86, $0E640000, $00000000, $00000C42, $06200000 ;0x0 (0x00012964-0x000129A4, Entry count: 0x00000040)
+Pal_MotSaveEmpPort:	binclude "general/palettes/mota_save_employee_portrait.bin"
+Pal_MotSaveEmpPortEnd:
+
+Pal_MotDocPortrait:	binclude "general/palettes/mota_doctor_portrait.bin"
+Pal_MotDocPortraitEnd:
+
+Pal_GrandmaPortrait:	binclude "general/palettes/grandma_portrait.bin"
+Pal_GrandmaPortraitEnd:
+
+Pal_MotItemSellerPort:	binclude "general/palettes/mota_item_seller_portrait.bin"
+Pal_MotItemSellerPortEnd:
+
+Pal_MotWpnSellerPort:	binclude "general/palettes/mota_weapon_seller_portrait.bin"
+Pal_MotWpnSellerPortEnd:
+
+Pal_MotArmorSellPort:	binclude "general/palettes/mota_armor_seller_portrait.bin"
+Pal_MotArmorSellPortEnd:
+
+Pal_UstvestiaPortrait:	binclude "general/palettes/ustvestia_portrait.bin"
+Pal_UstvestiaPortraitEnd:
+
+Pal_Dezolian1Portrait:	binclude "general/palettes/dezolian1_portrait.bin"
+Pal_Dezolian1PortraitEnd:
+
+Pal_Dezolian2Portrait:	binclude "general/palettes/dezolian2_portrait.bin"
+Pal_Dezolian2PortraitEnd:
+
+Pal_Dezolian3Portrait:	binclude "general/palettes/dezolian3_portrait.bin"
+Pal_Dezolian3PortraitEnd:
+
+Pal_Dezolian4Portrait:	binclude "general/palettes/dezolian4_portrait.bin"
+Pal_Dezolian4PortraitEnd:
+
+Pal_ItemKeeperPort:	binclude "general/palettes/item_keeper_portrait.bin"
+Pal_ItemKeeperPortEnd:
+
+Pal_TeleEmpPort:	binclude "general/palettes/teleport_employee_portrait.bin"
+Pal_TeleEmpPortEnd:
+
+Pal_CentTow1Port:	binclude "general/palettes/central_tower1_portrait.bin"
+Pal_CentTow1PortEnd:
+
+Pal_GovernorPortrait:	binclude "general/palettes/governor_portrait.bin"
+Pal_GovernorPortraitEnd:
+
+Pal_RoofPortrait:	binclude "general/palettes/roof_portrait.bin"
+Pal_RoofPortraitEnd:
+
+Pal_GraphPortrait:	binclude "general/palettes/graph_portrait.bin"
+Pal_GraphPortraitEnd:
+
+Pal_Graph:	binclude "general/palettes/graph.bin"
+Pal_GraphEnd:
+
+Pal_RadarPortrait:	binclude "general/palettes/radar_portrait.bin"
+Pal_RadarPortraitEnd:
+
+Pal_NeiDeath:	binclude "general/palettes/nei_death.bin"
+Pal_NeiDeathEnd:
+
+Pal_NeiDeath2:	binclude "general/palettes/nei_death2.bin"
+Pal_NeiDeath2End:
+
+Pal_PlanetMota:	binclude "general/palettes/planet_mota.bin"
+Pal_PlanetMotaEnd:
+
+Pal_PlanetDezo:	binclude "general/palettes/planet_dezo.bin"
+Pal_PlanetDezoEnd:
+
+Pal_SpaceTravel:	binclude "general/palettes/space_travel.bin"
+Pal_SpaceTravelEnd:
+
+Pal_SceneLutz:	binclude "general/palettes/scene_lutz.bin"
+Pal_SceneLutzEnd:
+
+Pal_CentTow2Port:	binclude "general/palettes/central_tower2_portrait.bin"
+Pal_CentTow2PortEnd:
+
+Pal_EndingRudo:	binclude "general/palettes/ending_rudo.bin"
+Pal_EndingRudoEnd:
+
+Pal_EndingAmy:	binclude "general/palettes/ending_amy.bin"
+Pal_EndingAmyEnd:
+
+Pal_EndingKain:	binclude "general/palettes/ending_kain.bin"
+Pal_EndingKainEnd:
+
+Pal_EndingShir:	binclude "general/palettes/ending_shir.bin"
+Pal_EndingShirEnd:
+
+Pal_EndingHugh:	binclude "general/palettes/ending_hugh.bin"
+Pal_EndingHughEnd:
+
+Pal_EndingAnna:	binclude "general/palettes/ending_anna.bin"
+Pal_EndingAnnaEnd:
+
+Pal_EndingRolf:	binclude "general/palettes/ending_rolf.bin"
+Pal_EndingRolfEnd:
+
+Pal_Credits:	binclude "general/palettes/credits.bin"
+Pal_CreditsEnd:
 
 ; ---------------------------------------------------------------------------------
 ; filler free space - can be replaced with even
@@ -49406,7 +49286,7 @@ Map_MotaOverworld:
 	dc.l	loc_498E8
 	dc.l	loc_48AF0
 	dc.l	loc_29B64
-	dc.l	$03000000|MapTrans_MotaOverworld
+	dc.l	(PalID_MotaOverworld<<$18)|MapTrans_MotaOverworld
 	dc.b	$A, MusicID_Restoration
 
 Map_SkureB2:
@@ -49414,7 +49294,7 @@ Map_SkureB2:
 	dc.l	$41000000|loc_4A370
 	dc.l	$3F000000|loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|MapTrans_SkureB2
+	dc.l	(PalID_DezolisSkure<<$18)|MapTrans_SkureB2
 	dc.b	$83, MusicID_SilentZone
 
 Map_SkureB1:
@@ -49422,7 +49302,7 @@ Map_SkureB1:
 	dc.l	$42000000|loc_4A632
 	dc.l	$3E000000|loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|MapTrans_SkureB1
+	dc.l	(PalID_DezolisSkure<<$18)|MapTrans_SkureB1
 	dc.b	$83, MusicID_SilentZone
 
 Map_DezolisSkure:
@@ -49430,7 +49310,7 @@ Map_DezolisSkure:
 	dc.l	loc_4A944
 	dc.l	loc_5801A
 	dc.l	$18000000|loc_29C06
-	dc.l	$04000000|MapTrans_DezolisSkure
+	dc.l	(PalID_DezolisSkure<<$18)|MapTrans_DezolisSkure
 	dc.b	$80, MusicID_SilentZone
 
 Map_Paseo:
@@ -49438,7 +49318,7 @@ Map_Paseo:
 	dc.l	loc_4B5E8
 	dc.l	loc_4B4FC
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Paseo
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Paseo
 	dc.b	$00, MusicID_Pleasure
 
 Map_Arima:
@@ -49446,7 +49326,7 @@ Map_Arima:
 	dc.l	loc_4B786
 	dc.l	loc_4B720
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Arima
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Arima
 	dc.b	$00, MusicID_Pleasure
 
 Map_Oputa:
@@ -49454,7 +49334,7 @@ Map_Oputa:
 	dc.l	loc_4B9BE
 	dc.l	loc_4B84E
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Oputa
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Oputa
 	dc.b	$01, MusicID_Pleasure
 
 Map_Zema:
@@ -49462,7 +49342,7 @@ Map_Zema:
 	dc.l	loc_4BC08
 	dc.l	loc_4BB6C
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Zema
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Zema
 	dc.b	$00, MusicID_Pleasure
 
 Map_Kueri:
@@ -49470,7 +49350,7 @@ Map_Kueri:
 	dc.l	loc_4BDC0
 	dc.l	loc_4BCB0
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Kueri
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Kueri
 	dc.b	$01, MusicID_Pleasure
 
 Map_Piata:
@@ -49478,7 +49358,7 @@ Map_Piata:
 	dc.l	loc_4C060
 	dc.l	loc_4BEB8
 	dc.l	$01000000|loc_29C6C
-	dc.l	$05000000|MapTrans_Piata
+	dc.l	(PalID_MotaTown<<$18)|MapTrans_Piata
 	dc.b	$01, MusicID_Pleasure
 
 Map_Aukba:
@@ -49486,7 +49366,7 @@ Map_Aukba:
 	dc.l	loc_4C2A8
 	dc.l	loc_4C226
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|MapTrans_Aukba
+	dc.l	(PalID_DezoTown<<$18)|MapTrans_Aukba
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_Zosa:
@@ -49494,7 +49374,7 @@ Map_Zosa:
 	dc.l	loc_4C3F0
 	dc.l	loc_4C354
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|MapTrans_Zosa
+	dc.l	(PalID_DezoTown<<$18)|MapTrans_Zosa
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_Ryuon:
@@ -49502,7 +49382,7 @@ Map_Ryuon:
 	dc.l	loc_4C52A
 	dc.l	loc_4C492
 	dc.l	$01000000|loc_29C6C
-	dc.l	$4C000000|MapTrans_Ryuon
+	dc.l	(PalID_DezoTown<<$18)|MapTrans_Ryuon
 	dc.b	$02, MusicID_ExcitingTown
 
 Map_TubeNearPaseo:
@@ -49510,7 +49390,7 @@ Map_TubeNearPaseo:
 	dc.l	loc_4C5AE
 	dc.l	$2B000000|loc_4C5AE
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|MapTrans_TubeNearPaseo
+	dc.l	(PalID_Tube<<$18)|MapTrans_TubeNearPaseo
 	dc.b	$04, MusicID_Restoration
 
 Map_DarumTube:
@@ -49518,7 +49398,7 @@ Map_DarumTube:
 	dc.l	loc_4C618
 	dc.l	$2B000000|loc_4C618
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|MapTrans_DarumTube
+	dc.l	(PalID_Tube<<$18)|MapTrans_DarumTube
 	dc.b	$04, MusicID_Restoration
 
 Map_TubeLockedDoor:
@@ -49526,7 +49406,7 @@ Map_TubeLockedDoor:
 	dc.l	loc_4C650
 	dc.l	$2C000000|loc_4C650
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|MapTrans_TubeLockedDoor
+	dc.l	(PalID_Tube<<$18)|MapTrans_TubeLockedDoor
 	dc.b	$07, MusicID_Restoration
 
 Map_EsperMansionB1:
@@ -49534,7 +49414,7 @@ Map_EsperMansionB1:
 	dc.l	loc_4C6BA
 	dc.l	loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3D000000|MapTrans_EsperMansionB1
+	dc.l	(PalID_EsperMansion<<$18)|MapTrans_EsperMansionB1
 	dc.b	$85, MusicID_Violation
 
 Map_EsperMansionF1:
@@ -49542,7 +49422,7 @@ Map_EsperMansionF1:
 	dc.l	loc_4C700
 	dc.l	loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3D000000|MapTrans_EsperMansionF1
+	dc.l	(PalID_EsperMansion<<$18)|MapTrans_EsperMansionF1
 	dc.b	$8B, MusicID_Violation
 
 Map_Uzo:
@@ -49550,7 +49430,7 @@ Map_Uzo:
 	dc.l	$1E000000|loc_4C7A6
 	dc.l	$2C000000|loc_5801A
 	dc.l	$19000000|loc_29D72
-	dc.l	$06000000|MapTrans_Uzo
+	dc.l	(PalID_Uzo<<$18)|MapTrans_Uzo
 	dc.b	$84, MusicID_SecretWays
 
 Map_UnderwaterPassage:
@@ -49558,7 +49438,7 @@ Map_UnderwaterPassage:
 	dc.l	$1F000000|loc_4D544
 	dc.l	loc_58070
 	dc.l	$19000000|loc_29D72
-	dc.l	$07000000|MapTrans_UnderwaterPassage
+	dc.l	(PalID_UnderwaterPassage<<$18)|MapTrans_UnderwaterPassage
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceB2:
@@ -49566,7 +49446,7 @@ Map_CreviceB2:
 	dc.l	loc_4D92A
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|MapTrans_CreviceB2
+	dc.l	(PalID_Crevice<<$18)|MapTrans_CreviceB2
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceB1:
@@ -49574,7 +49454,7 @@ Map_CreviceB1:
 	dc.l	loc_4DA1A
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|MapTrans_CreviceB1
+	dc.l	(PalID_Crevice<<$18)|MapTrans_CreviceB1
 	dc.b	$80, MusicID_SecretWays
 
 Map_CreviceGroundF:
@@ -49582,7 +49462,7 @@ Map_CreviceGroundF:
 	dc.l	loc_4DD24
 	dc.l	$40000000|loc_5801A
 	dc.l	$18000000|loc_29D72
-	dc.l	$37000000|MapTrans_CreviceGroundF
+	dc.l	(PalID_Crevice<<$18)|MapTrans_CreviceGroundF
 	dc.b	$80, MusicID_SecretWays
 
 Map_ShureGroundF:
@@ -49590,7 +49470,7 @@ Map_ShureGroundF:
 	dc.l	$10000000|loc_4E160
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_ShureGroundF
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_ShureGroundF
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF1:
@@ -49598,7 +49478,7 @@ Map_ShureF1:
 	dc.l	$11000000|loc_4E3E2
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_ShureF1
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_ShureF1
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF2:
@@ -49606,7 +49486,7 @@ Map_ShureF2:
 	dc.l	$12000000|loc_4E66A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_ShureF2
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_ShureF2
 	dc.b	$87, MusicID_Advanced
 
 Map_ShureF3:
@@ -49614,7 +49494,7 @@ Map_ShureF3:
 	dc.l	$13000000|loc_4E92E
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_ShureF3
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_ShureF3
 	dc.b	$87, MusicID_Advanced
 
 Map_NidoGroundF:
@@ -49622,7 +49502,7 @@ Map_NidoGroundF:
 	dc.l	$14000000|loc_4EBE0
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_NidoGroundF
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_NidoGroundF
 	dc.b	$88, MusicID_Advanced
 
 Map_NidoF1:
@@ -49630,7 +49510,7 @@ Map_NidoF1:
 	dc.l	$14000000|loc_4EF46
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_NidoF1
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_NidoF1
 	dc.b	$88, MusicID_Advanced
 
 Map_NidoF2:
@@ -49638,7 +49518,7 @@ Map_NidoF2:
 	dc.l	$15000000|loc_4F2A6
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0E000000|MapTrans_NidoF2
+	dc.l	(PalID_ShureNido<<$18)|MapTrans_NidoF2
 	dc.b	$87, MusicID_Advanced
 
 Map_RoronB5:
@@ -49646,7 +49526,7 @@ Map_RoronB5:
 	dc.l	$1D000000|loc_4F5FE
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronB5
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronB5
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB4:
@@ -49654,7 +49534,7 @@ Map_RoronB4:
 	dc.l	$1D000000|loc_4F76E
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronB4
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronB4
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB3:
@@ -49662,7 +49542,7 @@ Map_RoronB3:
 	dc.l	$1C000000|loc_4F818
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronB3
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronB3
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB2:
@@ -49670,7 +49550,7 @@ Map_RoronB2:
 	dc.l	$1C000000|loc_4F9E4
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronB2
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronB2
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronB1:
@@ -49678,7 +49558,7 @@ Map_RoronB1:
 	dc.l	$1B000000|loc_4FB5A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronB1
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronB1
 	dc.b	$89, MusicID_Advanced
 
 Map_RoronGroundF:
@@ -49686,7 +49566,7 @@ Map_RoronGroundF:
 	dc.l	$1A000000|loc_4FEE6
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$10000000|MapTrans_RoronGroundF
+	dc.l	(PalID_Roron<<$18)|MapTrans_RoronGroundF
 	dc.b	$89, MusicID_Advanced
 
 Map_YellowDamGroundF:
@@ -49694,7 +49574,7 @@ Map_YellowDamGroundF:
 	dc.l	loc_4FF7E
 	dc.l	$35000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|MapTrans_YellowDamGroundF
+	dc.l	(PalID_YellowDam<<$18)|MapTrans_YellowDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF1:
@@ -49702,7 +49582,7 @@ Map_YellowDamF1:
 	dc.l	loc_50198
 	dc.l	$35000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|MapTrans_YellowDamF1
+	dc.l	(PalID_YellowDam<<$18)|MapTrans_YellowDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF2:
@@ -49710,7 +49590,7 @@ Map_YellowDamF2:
 	dc.l	loc_503E8
 	dc.l	$36000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|MapTrans_YellowDamF2
+	dc.l	(PalID_YellowDam<<$18)|MapTrans_YellowDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_YellowDamF3:
@@ -49718,7 +49598,7 @@ Map_YellowDamF3:
 	dc.l	loc_50652
 	dc.l	$37000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0B000000|MapTrans_YellowDamF3
+	dc.l	(PalID_YellowDam<<$18)|MapTrans_YellowDamF3
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamGroundF:
@@ -49726,7 +49606,7 @@ Map_RedDamGroundF:
 	dc.l	loc_508AC
 	dc.l	$33000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|MapTrans_RedDamGroundF
+	dc.l	(PalID_RedDam<<$18)|MapTrans_RedDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamF1:
@@ -49734,7 +49614,7 @@ Map_RedDamF1:
 	dc.l	loc_50A86
 	dc.l	$32000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|MapTrans_RedDamF1
+	dc.l	(PalID_RedDam<<$18)|MapTrans_RedDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_RedDamF2:
@@ -49742,7 +49622,7 @@ Map_RedDamF2:
 	dc.l	loc_50C7C
 	dc.l	$34000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0D000000|MapTrans_RedDamF2
+	dc.l	(PalID_RedDam<<$18)|MapTrans_RedDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamGroundF:
@@ -49750,7 +49630,7 @@ Map_BlueDamGroundF:
 	dc.l	loc_50E20
 	dc.l	$38000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|MapTrans_BlueDamGroundF
+	dc.l	(PalID_BlueDam<<$18)|MapTrans_BlueDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF1:
@@ -49758,7 +49638,7 @@ Map_BlueDamF1:
 	dc.l	loc_5103C
 	dc.l	$39000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|MapTrans_BlueDamF1
+	dc.l	(PalID_BlueDam<<$18)|MapTrans_BlueDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF2:
@@ -49766,7 +49646,7 @@ Map_BlueDamF2:
 	dc.l	loc_51250
 	dc.l	$39000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|MapTrans_BlueDamF2
+	dc.l	(PalID_BlueDam<<$18)|MapTrans_BlueDamF2
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF3:
@@ -49774,7 +49654,7 @@ Map_BlueDamF3:
 	dc.l	loc_51482
 	dc.l	$3A000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|MapTrans_BlueDamF3
+	dc.l	(PalID_BlueDam<<$18)|MapTrans_BlueDamF3
 	dc.b	$87, MusicID_Mystery
 
 Map_BlueDamF4:
@@ -49782,7 +49662,7 @@ Map_BlueDamF4:
 	dc.l	loc_516B8
 	dc.l	$3A000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0A000000|MapTrans_BlueDamF4
+	dc.l	(PalID_BlueDam<<$18)|MapTrans_BlueDamF4
 	dc.b	$87, MusicID_Mystery
 
 Map_GreenDamGroundF:
@@ -49790,7 +49670,7 @@ Map_GreenDamGroundF:
 	dc.l	loc_518D0
 	dc.l	$3B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0C000000|MapTrans_GreenDamGroundF
+	dc.l	(PalID_GreenDam<<$18)|MapTrans_GreenDamGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_GreenDamF1:
@@ -49798,7 +49678,7 @@ Map_GreenDamF1:
 	dc.l	loc_51DFA
 	dc.l	$3C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0C000000|MapTrans_GreenDamF1
+	dc.l	(PalID_GreenDam<<$18)|MapTrans_GreenDamF1
 	dc.b	$87, MusicID_Mystery
 
 Map_BiosystemsLabB1:
@@ -49806,7 +49686,7 @@ Map_BiosystemsLabB1:
 	dc.l	$16000000|loc_522DE
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|MapTrans_BiosystemsLabB1
+	dc.l	(PalID_BiosystemsLab<<$18)|MapTrans_BiosystemsLabB1
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabGroundF:
@@ -49814,7 +49694,7 @@ Map_BiosystemsLabGroundF:
 	dc.l	$17000000|loc_5271E
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|MapTrans_BiosystemsLabGroundF
+	dc.l	(PalID_BiosystemsLab<<$18)|MapTrans_BiosystemsLabGroundF
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabF1:
@@ -49822,7 +49702,7 @@ Map_BiosystemsLabF1:
 	dc.l	$18000000|loc_52B52
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|MapTrans_BiosystemsLabF1
+	dc.l	(PalID_BiosystemsLab<<$18)|MapTrans_BiosystemsLabF1
 	dc.b	$88, MusicID_Advanced
 
 Map_BiosystemsLabF2:
@@ -49830,7 +49710,7 @@ Map_BiosystemsLabF2:
 	dc.l	$19000000|loc_52F8E
 	dc.l	$2B000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$33000000|MapTrans_BiosystemsLabF2
+	dc.l	(PalID_BiosystemsLab<<$18)|MapTrans_BiosystemsLabF2
 	dc.b	$88, MusicID_Advanced
 
 Map_ClimatrolGroundF:
@@ -49838,7 +49718,7 @@ Map_ClimatrolGroundF:
 	dc.l	$20000000|loc_533D6
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolGroundF
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolGroundF
 	dc.b	$83, MusicID_Advanced
 
 Map_ClimatrolF1:
@@ -49846,7 +49726,7 @@ Map_ClimatrolF1:
 	dc.l	$21000000|loc_5354E
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF1
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF1
 	dc.b	$83, MusicID_Advanced
 
 Map_ClimatrolF2:
@@ -49854,7 +49734,7 @@ Map_ClimatrolF2:
 	dc.l	$21000000|loc_535C2
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF2
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF2
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF3:
@@ -49862,7 +49742,7 @@ Map_ClimatrolF3:
 	dc.l	$21000000|loc_5364A
 	dc.l	$2C000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF3
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF3
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF4:
@@ -49870,7 +49750,7 @@ Map_ClimatrolF4:
 	dc.l	$22000000|loc_536D2
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF4
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF4
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF5:
@@ -49878,7 +49758,7 @@ Map_ClimatrolF5:
 	dc.l	$23000000|loc_5392C
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF5
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF5
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF6:
@@ -49886,7 +49766,7 @@ Map_ClimatrolF6:
 	dc.l	$24000000|loc_53BAA
 	dc.l	$2D000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF6
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF6
 	dc.b	$86, MusicID_Advanced
 
 Map_ClimatrolF7:
@@ -49894,7 +49774,7 @@ Map_ClimatrolF7:
 	dc.l	$25000000|loc_53E04
 	dc.l	$2E000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$0F000000|MapTrans_ClimatrolF7
+	dc.l	(PalID_Climatrol<<$18)|MapTrans_ClimatrolF7
 	dc.b	$86, MusicID_Advanced
 
 Map_ControlTowerGroundF:
@@ -49902,7 +49782,7 @@ Map_ControlTowerGroundF:
 	dc.l	$30000000|loc_54086
 	dc.l	$30000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$34000000|MapTrans_ControlTowerGroundF
+	dc.l	(PalID_ControlTower<<$18)|MapTrans_ControlTowerGroundF
 	dc.b	$87, MusicID_Mystery
 
 Map_ControlTowerF1:
@@ -49910,7 +49790,7 @@ Map_ControlTowerF1:
 	dc.l	$31000000|loc_54300
 	dc.l	$31000000|loc_5808A
 	dc.l	$19000000|loc_29CF2
-	dc.l	$34000000|MapTrans_ControlTowerF1
+	dc.l	(PalID_ControlTower<<$18)|MapTrans_ControlTowerF1
 	dc.b	$88, MusicID_Mystery
 
 Map_TubeNearZema:
@@ -49918,7 +49798,7 @@ Map_TubeNearZema:
 	dc.l	loc_4C5AE
 	dc.l	$2C000000|loc_4C5AE
 	dc.l	$11000000|loc_29CF2
-	dc.l	$09000000|MapTrans_TubeNearZema
+	dc.l	(PalID_Tube<<$18)|MapTrans_TubeNearZema
 	dc.b	$07, MusicID_Restoration
 
 Map_Gaira:
@@ -49926,7 +49806,7 @@ Map_Gaira:
 	dc.l	loc_580EE
 	dc.l	$3D000000|loc_5455E
 	dc.l	$05000000|loc_29CF2
-	dc.l	$38000000|MapTrans_Gaira
+	dc.l	(PalID_Gaira<<$18)|MapTrans_Gaira
 	dc.b	$0D, MusicID_Mystery
 
 
@@ -49935,7 +49815,7 @@ Map_Gaira_Copy:
 	dc.l	loc_580EE
 	dc.l	$3D000000|loc_5455E
 	dc.l	$05000000|loc_29CF2
-	dc.l	$38000000|MapTrans_Gaira
+	dc.l	(PalID_Gaira<<$18)|MapTrans_Gaira
 	dc.b	$0D, MusicID_Mystery
 
 Map_NavalGroundF:
@@ -49943,7 +49823,7 @@ Map_NavalGroundF:
 	dc.l	loc_54752
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|MapTrans_Gaira
+	dc.l	(PalID_Naval<<$18)|MapTrans_Gaira
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF1:
@@ -49951,7 +49831,7 @@ Map_NavalF1:
 	dc.l	loc_548DE
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|MapTrans_NavalF1
+	dc.l	(PalID_Naval<<$18)|MapTrans_NavalF1
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF2:
@@ -49959,7 +49839,7 @@ Map_NavalF2:
 	dc.l	loc_54A72
 	dc.l	$47000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|MapTrans_NavalF2
+	dc.l	(PalID_Naval<<$18)|MapTrans_NavalF2
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF3:
@@ -49967,7 +49847,7 @@ Map_NavalF3:
 	dc.l	loc_54C04
 	dc.l	$48000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|MapTrans_NavalF3
+	dc.l	(PalID_Naval<<$18)|MapTrans_NavalF3
 	dc.b	$86, MusicID_Violation
 
 Map_NavalF4:
@@ -49975,7 +49855,7 @@ Map_NavalF4:
 	dc.l	loc_54D98
 	dc.l	$48000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$3F000000|MapTrans_NavalF4
+	dc.l	(PalID_Naval<<$18)|MapTrans_NavalF4
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeGroundF:
@@ -49983,7 +49863,7 @@ Map_MenobeGroundF:
 	dc.l	loc_54F24
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|MapTrans_MenobeGroundF
+	dc.l	(PalID_Menobe<<$18)|MapTrans_MenobeGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF1:
@@ -49991,7 +49871,7 @@ Map_MenobeF1:
 	dc.l	loc_552B2
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|MapTrans_MenobeF1
+	dc.l	(PalID_Menobe<<$18)|MapTrans_MenobeF1
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF2:
@@ -49999,7 +49879,7 @@ Map_MenobeF2:
 	dc.l	loc_5558E
 	dc.l	$49000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|MapTrans_MenobeF2
+	dc.l	(PalID_Menobe<<$18)|MapTrans_MenobeF2
 	dc.b	$86, MusicID_Violation
 
 Map_MenobeF3:
@@ -50007,7 +49887,7 @@ Map_MenobeF3:
 	dc.l	loc_5586A
 	dc.l	$4A000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$40000000|MapTrans_MenobeF3
+	dc.l	(PalID_Menobe<<$18)|MapTrans_MenobeF3
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB6:
@@ -50015,7 +49895,7 @@ Map_IkutoB6:
 	dc.l	loc_55AD4
 	dc.l	$4D000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB6
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB6
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB5:
@@ -50023,7 +49903,7 @@ Map_IkutoB5:
 	dc.l	loc_55E84
 	dc.l	$4D000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB5
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB5
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB4:
@@ -50031,7 +49911,7 @@ Map_IkutoB4:
 	dc.l	loc_56346
 	dc.l	$4C000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB4
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB4
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB3:
@@ -50039,7 +49919,7 @@ Map_IkutoB3:
 	dc.l	loc_56818
 	dc.l	$4C000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB3
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB3
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB2:
@@ -50047,7 +49927,7 @@ Map_IkutoB2:
 	dc.l	loc_56A5A
 	dc.l	$4B000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB2
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB2
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoB1:
@@ -50055,7 +49935,7 @@ Map_IkutoB1:
 	dc.l	loc_56B5C
 	dc.l	$4B000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoB1
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoB1
 	dc.b	$86, MusicID_Violation
 
 Map_IkutoGroundF:
@@ -50063,7 +49943,7 @@ Map_IkutoGroundF:
 	dc.l	loc_56BF4
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$41000000|MapTrans_IkutoGroundF
+	dc.l	(PalID_Ikuto<<$18)|MapTrans_IkutoGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronGroundF:
@@ -50071,7 +49951,7 @@ Map_GuaronGroundF:
 	dc.l	loc_56C34
 	dc.l	$45000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronGroundF
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronGroundF
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF1:
@@ -50079,7 +49959,7 @@ Map_GuaronF1:
 	dc.l	loc_56ED0
 	dc.l	$46000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF1
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF1
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF2:
@@ -50087,7 +49967,7 @@ Map_GuaronF2:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF2
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF2
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF3:
@@ -50095,7 +49975,7 @@ Map_GuaronF3:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF3
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF3
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF4:
@@ -50103,7 +49983,7 @@ Map_GuaronF4:
 	dc.l	loc_57094
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF4
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF4
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF5:
@@ -50111,7 +49991,7 @@ Map_GuaronF5:
 	dc.l	loc_5711E
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF5
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF5
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF6:
@@ -50119,7 +49999,7 @@ Map_GuaronF6:
 	dc.l	loc_5711E
 	dc.l	$4E000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF6
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF6
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF7:
@@ -50127,7 +50007,7 @@ Map_GuaronF7:
 	dc.l	loc_571A8
 	dc.l	$4F000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF7
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF7
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF8:
@@ -50135,7 +50015,7 @@ Map_GuaronF8:
 	dc.l	loc_57354
 	dc.l	$4F000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF8
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF8
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF9:
@@ -50143,7 +50023,7 @@ Map_GuaronF9:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF9
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF9
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF10:
@@ -50151,7 +50031,7 @@ Map_GuaronF10:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF10
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF10
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF11:
@@ -50159,7 +50039,7 @@ Map_GuaronF11:
 	dc.l	loc_57468
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF11
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF11
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF12:
@@ -50167,7 +50047,7 @@ Map_GuaronF12:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF12
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF12
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF13:
@@ -50175,7 +50055,7 @@ Map_GuaronF13:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF13
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF13
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF14:
@@ -50183,7 +50063,7 @@ Map_GuaronF14:
 	dc.l	loc_574D6
 	dc.l	$50000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF14
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF14
 	dc.b	$86, MusicID_Violation
 
 Map_GuaronF15:
@@ -50191,7 +50071,7 @@ Map_GuaronF15:
 	dc.l	loc_57544
 	dc.l	$51000000|loc_57FC4
 	dc.l	$19000000|loc_29DD6
-	dc.l	$42000000|MapTrans_GuaronF15
+	dc.l	(PalID_Guaron<<$18)|MapTrans_GuaronF15
 	dc.b	$86, MusicID_Violation
 
 Map_NoahGroundF:
@@ -50199,7 +50079,7 @@ Map_NoahGroundF:
 	dc.l	loc_5811C
 	dc.l	$52000000|loc_575BE
 	dc.l	$05000000|loc_29DD6
-	dc.l	$3E000000|MapTrans_NoahGroundF
+	dc.l	(PalID_Noah<<$18)|MapTrans_NoahGroundF
 	dc.b	$C, MusicID_Under
 
 Map_NoahF1:
@@ -50207,7 +50087,7 @@ Map_NoahF1:
 	dc.l	loc_5811C
 	dc.l	$53000000|loc_57A52
 	dc.l	$05000000|loc_29DD6
-	dc.l	$3E000000|MapTrans_NoahF1
+	dc.l	(PalID_Noah<<$18)|MapTrans_NoahF1
 	dc.b	$C, MusicID_Under
 
 
@@ -51633,11 +51513,11 @@ loc_29E16:
 	
 Art_Font:
 	if revision=0
-	binclude "general/art/font_ja.bin"
+	binclude "general/font/art/font_ja.bin"
 	elseif revision=3
-	binclude "general/art/font_pt.bin"
+	binclude "general/font/art/font_pt.bin"
 	else
-	binclude "general/art/font.bin"
+	binclude "general/font/art/font.bin"
 	endif
 	
 	even
@@ -51660,7 +51540,7 @@ PlaneMap_SegaLogo:	binclude "sega/mappings/sega_logo.bin"
 ; ---------------------------------------------------------------------------------
 	endif
 
-Art_MapCharacterSpriteSheets: binclude "map/sprites/art/character_sprite_sheets.bin"
+Art_MapCharacterSpriteSheets: binclude "general/objects/art/character_sprite_sheets.bin"
 	even
 
 Art_SceneLibrarian: binclude "scene/art/librarian.bin"
@@ -51779,18 +51659,18 @@ loc_39E9C:
 
 ArtNem_Mota:
 	if revision=0
-	binclude "map/mota/art/ja/tiles.bin"
+	binclude "map/art/compressed/mota_ja.bin"
 	else
-	binclude "map/mota/art/nemesis/tiles.bin"
+	binclude "map/art/nemesis/mota.bin"
 	endif
 
 	even
 
 ArtNem_Dezo:
 	if revision=0
-	binclude "map/dezo/art/ja/tiles.bin"
+	binclude "map/art/compressed/dezo_skure_ja.bin"
 	else
-	binclude "map/dezo/art/nemesis/tiles.bin"	
+	binclude "map/art/nemesis/dezo_skure.bin"	
 	endif
 
 	even
@@ -51799,17 +51679,17 @@ ArtNem_Town:
 	if revision=0
 	
 	if cross_patch=1
-	binclude "map/towns/art/ja/tiles_no_cross.bin"
+	binclude "map/art/compressed/towns_no_cross_ja.bin"
 	else
-	binclude "map/towns/art/ja/tiles.bin"
+	binclude "map/art/compressed/towns_ja.bin"
 	endif
 	
 	else
 	
 	if cross_patch=1
-	binclude "map/towns/art/nemesis/tiles_no_cross.bin"
+	binclude "map/art/nemesis/towns_no_cross.bin"
 	else
-	binclude "map/towns/art/nemesis/tiles.bin"
+	binclude "map/art/nemesis/towns.bin"
 	endif
 	
 	endif
@@ -51818,9 +51698,9 @@ ArtNem_Town:
 
 ArtNem_IslandPassage:
 	if revision=0
-	binclude "map/islands and passageways/art/ja/tiles.bin"
+	binclude "map/art/compressed/islands_and_passageways_ja.bin"
 	else
-	binclude "map/islands and passageways/art/nemesis/tiles.bin"
+	binclude "map/art/nemesis/islands_and_passageways.bin"
 	endif
 	
 	even
@@ -51857,9 +51737,9 @@ loc_412F8:
 
 ArtNem_MotaDungeon:
 	if revision=0
-	binclude "map/mota dungeons/art/ja/tiles.bin"
+	binclude "map/art/compressed/mota_dungeons_ja.bin"
 	else
-	binclude "map/mota dungeons/art/nemesis/tiles.bin"
+	binclude "map/art/nemesis/mota_dungeons.bin"
 	even
 	endif
 
@@ -51874,9 +51754,9 @@ loc_39E9C:
 
 ArtNem_DezoDungeon:
 	if revision=0
-	binclude "map/dezo dungeons/art/ja/tiles.bin"
+	binclude "map/art/compressed/dezo_dungeons_ja.bin"
 	else
-	binclude "map/dezo dungeons/art/nemesis/tiles.bin"
+	binclude "map/art/nemesis/dezo_dungeons.bin"
 	endif
 	
 	even
@@ -57720,10 +57600,10 @@ loc_5811C:
 
 	even
 
-Art_MotaMan:	binclude "map/sprites/art/mota_man.bin"
+Art_MotaMan:	binclude "general/objects/art/mota_man.bin"
 	even
 
-Art_MotaWoman:	binclude "map/sprites/art/mota_woman.bin"
+Art_MotaWoman:	binclude "general/objects/art/mota_woman.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -57830,10 +57710,10 @@ loc_58A56:
 
 ; ==================================================================
 
-Art_MotaOldMan:	binclude "map/sprites/art/mota_old_man.bin"
+Art_MotaOldMan:	binclude "general/objects/art/mota_old_man.bin"
 	even
 
-Art_MotaChild:	binclude "map/sprites/art/mota_child.bin"
+Art_MotaChild:	binclude "general/objects/art/mota_child.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -57940,10 +57820,10 @@ loc_5926C:
 
 ; =======================================================
 
-Art_Dezolian:	binclude "map/sprites/art/dezolian.bin"
+Art_Dezolian:	binclude "general/objects/art/dezolian.bin"
 	even
 
-Art_Motavian:	binclude "map/sprites/art/motavian.bin"
+Art_Motavian:	binclude "general/objects/art/motavian.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58110,7 +57990,7 @@ loc_59FB0:
 
 ; =======================================================
 
-Art_MuskCat:	binclude "map/sprites/art/musk_cat.bin"
+Art_MuskCat:	binclude "general/objects/art/musk_cat.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58197,16 +58077,16 @@ loc_5A40A:
 
 ; =======================================================
 
-Art_Darum:	binclude "map/sprites/art/darum.bin"
+Art_Darum:	binclude "general/objects/art/darum.bin"
 	even
 
-Art_Teim:	binclude "map/sprites/art/teim.bin"
+Art_Teim:	binclude "general/objects/art/teim.bin"
 	even
 
-Art_Explosion:	binclude "map/sprites/art/explosion.bin"
+Art_Explosion:	binclude "general/objects/art/explosion.bin"
 	even
 
-Art_Corpse:	binclude "map/sprites/art/corpse.bin"
+Art_Corpse:	binclude "general/objects/art/corpse.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58355,16 +58235,16 @@ loc_5B5AE:
 
 ; =================================================================
 
-Art_MapLutz:	binclude "map/sprites/art/lutz.bin"
+Art_MapLutz:	binclude "general/objects/art/lutz.bin"
 	even
 
-Art_CryogenicChamber:	binclude "map/sprites/art/cryogenic_chamber.bin"
+Art_CryogenicChamber:	binclude "general/objects/art/cryogenic_chamber.bin"
 	even
 
-Art_CryogenicChamberBed:	binclude "map/sprites/art/cryogenic_chamber_bed.bin"
+Art_CryogenicChamberBed:	binclude "general/objects/art/cryogenic_chamber_bed.bin"
 	even
 
-Art_LutzChair:	binclude "map/sprites/art/lutz_chair.bin"
+Art_LutzChair:	binclude "general/objects/art/lutz_chair.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58533,7 +58413,7 @@ loc_5C8F4:
 
 	even
 
-Art_MotherBrain:	binclude "map/sprites/art/mother_brain.bin"
+Art_MotherBrain:	binclude "general/objects/art/mother_brain.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58651,10 +58531,10 @@ loc_5D00C:
 
 	even
 
-Art_Neifirst:	binclude "map/sprites/art/neifirst.bin"
+Art_Neifirst:	binclude "general/objects/art/neifirst.bin"
 	even
 
-Art_PlasmaRing:	binclude "map/sprites/art/plasma_ring.bin"
+Art_PlasmaRing:	binclude "general/objects/art/plasma_ring.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58688,7 +58568,7 @@ loc_5D1A2:
 
 ; =================================================================
 
-Art_Door:	binclude "map/sprites/art/door.bin"
+Art_Door:	binclude "general/objects/art/door.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58737,7 +58617,7 @@ loc_5D540:
 
 	even
 
-Art_DezoTreasureChest:	binclude "map/sprites/art/dezo_treasure_chest.bin"
+Art_DezoTreasureChest:	binclude "general/objects/art/dezo_treasure_chest.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58758,7 +58638,7 @@ loc_5D70A:
 
 ; ================================================================
 
-Art_MotaTreasureChest:	binclude "map/sprites/art/mota_treasure_chest.bin"
+Art_MotaTreasureChest:	binclude "general/objects/art/mota_treasure_chest.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58824,7 +58704,7 @@ loc_5D98C:
 ; =================================================================
 
 
-Art_JetScooter:	binclude "map/sprites/art/jet_scooter.bin"
+Art_JetScooter:	binclude "general/objects/art/jet_scooter.bin"
 	even
 	
 
@@ -58920,7 +58800,7 @@ loc_5DFCA:
 	even
 
 	
-Art_Earthman:	binclude "map/sprites/art/earthman.bin"
+Art_Earthman:	binclude "general/objects/art/earthman.bin"
 	even
 
 ; =================================================================
@@ -58942,7 +58822,7 @@ loc_5E31C:
 
 ; =======================================================
 
-Art_PouringWater:	binclude "map/sprites/art/pouring_water.bin"
+Art_PouringWater:	binclude "general/objects/art/pouring_water.bin"
 	even
 
 ; -----------------------------------------------------------------
