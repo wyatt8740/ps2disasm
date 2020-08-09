@@ -62,7 +62,11 @@ object_size = $40
 next_object = object_size
 
 obj_id = 0	; word
-render_flags = 2	; bitfield; bit 0 = if set, delete object; bit 4 = if set, use absolute screen coordinates; bit 5 = if set, object has top priority for Sprite_table_input (drawn above all other objects)
+render_flags = 2	; bitfield; bit 0 = if set, delete object
+					;           bit 1 = if set, don't render sprite;
+					;           bit 4 = if set, use absolute screen coordinates;
+					;           bit 5 = if set, object has top priority for Sprite_table_input (drawn above all other objects)
+					;			bit 7 = if set, object is on-screen, otherwise off-screen
 mappings = 4	; longword
 art_tile = 8	; word
 x_pos = $A	; longword
@@ -94,7 +98,7 @@ anim_frame = $32	; word
 
 ; ---------------------------------------------------------------------------
 ; Properties and constants applicable to battle objects
-battle_status = 3	; bitfield;	bit 0 = attacking flag; bit 1 = animaction for child objects, if set, use parent animation number + 1; bit 3 = display dead message flag; bit 4 = no damage flag; bit 5 = killed flag; bit 6 = hit flag; bit 7 = is-target flag
+battle_status = 3	; bitfield;	bit 0 = attacking flag; bit 1 = animation for child objects, if set, use parent animation number + 1; bit 3 = display dead message flag; bit 4 = no damage flag; bit 5 = killed flag; bit 6 = hit flag; bit 7 = is-target flag
 saved_x_pos = $C	; word
 saved_y_pos = $10	; word
 battle_anim = $16	; word

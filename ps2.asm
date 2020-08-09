@@ -267,6 +267,8 @@ ChecksumError:
 ChecksumFailedLoop:
 	bra.s	ChecksumFailedLoop
 
+
+; -----------------------------------------------------------------
 RunObjects:
 	lea	(Object_RAM).w, a0
 
@@ -290,10 +292,10 @@ RunObject:
 	bclr	#7, render_flags(a0)
 	btst	#3, render_flags(a0)
 	beq.w	loc_3E4
-	move.l	$14(a0), d0
-	add.l	d0, $A(a0)
-	move.l	$18(a0), d0
-	add.l	d0, $E(a0)
+	move.l	x_move_steps(a0), d0
+	add.l	d0, x_pos(a0)
+	move.l	y_move_steps(a0), d0
+	add.l	d0, y_pos(a0)
 	move.w	$1C(a0), d0
 	move.w	$12(a0), d1
 	add.w	d0, d1
@@ -302,9 +304,9 @@ RunObject:
 	cmpi.w	#$4000, d1
 	bcc.w	Obj_Delete
 	move.w	d1, $12(a0)
-	move.w	$A(a0), d0
-	move.w	d0, $20(a0)
-	move.w	$E(a0), d0
+	move.w	x_pos(a0), d0
+	move.w	d0, sprite_x_pos(a0)
+	move.w	y_pos(a0), d0
 	subi.w	#$90, d0
 	muls.w	#$400, d0
 	divs.w	$12(a0), d0
@@ -315,7 +317,7 @@ RunObject:
 	bmi.w	RunObjectEnd
 	cmpi.w	#$180, d0
 	bcc.w	RunObjectEnd
-	move.w	d0, $1E(a0)
+	move.w	d0, sprite_y_pos(a0)
 	btst	#1, render_flags(a0)
 	bne.s	RunObjectEnd
 	lea	(Sprite_table_input).w, a1
@@ -346,8 +348,8 @@ Obj_Delete:
 	bra.w	FillMemBlock2	; clear 64 bytes of memory (object size)
 
 loc_3E4:
-	move.w	$A(a0), d0
-	add.w	$14(a0), d0
+	move.w	x_pos(a0), d0
+	add.w	x_move_steps(a0), d0
 	bmi.s	+
 	btst	#4, render_flags(a0)
 	bne.s	++
@@ -357,9 +359,9 @@ loc_3E4:
 	add.w	(Camera_max_X_pos).w, d0
 
 +
-	move.w	d0, $A(a0)
-	move.w	$E(a0), d0
-	add.w	$18(a0), d0
+	move.w	d0, x_pos(a0)
+	move.w	y_pos(a0), d0
+	add.w	y_move_steps(a0), d0
 	bmi.s	+
 	btst	#4, render_flags(a0)
 	bne.s	++
@@ -369,7 +371,7 @@ loc_3E4:
 	add.w	(Camera_max_Y_pos).w, d0
 
 +
-	move.w	d0, $E(a0)
+	move.w	d0, y_pos(a0)
 
 ; Fix sprite rendering when at the edge of the screen
 	if bugfixes=1
@@ -498,6 +500,8 @@ Obj_SpriteTable:
 	bset	#7, render_flags(a0)
 +
 	rts
+; -----------------------------------------------------------------
+
 
 BuildSprites:
 	move.b	#0, (Link_field_count).w
@@ -6078,17 +6082,17 @@ loc_36B0:
 
 Obj_MapCharacter:
 	tst.w	(Map_index).w
-	bne.s	loc_36D8
+	bne.s	+
 	tst.w	(Jet_Scooter_flag).w
-	bne.s	loc_36E4
-loc_36D8:
+	bne.s	++
++
 	move.w	routine(a0), d0
 	asl.b	#2, d0
 	jsr	MapCharacterRoutines(pc,d0.w)
 	rts
 
-loc_36E4:
-	move.b	#2, 2(a0)
++
+	move.b	#2, render_flags(a0)
 	rts
 
 ; --------------------------------------------------------------
@@ -11762,7 +11766,7 @@ loc_7216:
 	moveq	#0, d4
 	rts
 loc_7224:
-	btst	#7, 2(a1)
+	btst	#7, render_flags(a1)
 	beq.s	loc_7216
 	move.w	$2C(a1), d0
 	beq.s	loc_7216
