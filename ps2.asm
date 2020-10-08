@@ -169,7 +169,7 @@ EntryPoint:
 	if revision>0
 	move.b	(HW_version).l, d0	; get hardware version
 	andi.b	#$F, d0		; stored in the lower nibble
-	beq.s	SkipSecurity	; branch if hardware is older than Genesis III
+	beq.s	SkipSecurity	; branch if console is the first model
 	move.l	#'SEGA', (Security_addr).l	; satisfy the TMSS
 	endif
 SkipSecurity:
@@ -197,7 +197,7 @@ ChecksumLoop:
 	bne.w	ChecksumError   ; if they don't match, branch
 
 ChecksumGood:
-	lea	($FFFFFE00).w, a6
+	lea	(System_stack).w, a6
 	moveq	#0, d7
 
 	move.w	#$7F, d6
@@ -207,8 +207,8 @@ ChecksumGood:
 
 	if revision>0
 	move.b	(HW_version).l, d0
-	andi.b	#$C0, d0				; get video type (NTSC, PAL)
-	move.b	d0, ($FFFFFFF8).w	; and store them
+	andi.b	#$C0, d0
+	move.b	d0, (Graphics_flags).w
 	endif
 	move.l	#'init', (Checksum_four_CC).w	; Checksum routine successful
 GameInit:
@@ -507,7 +507,7 @@ BuildSprites:
 	move.b	#0, (Link_field_count).w
 	move.b	#80, (Sprite_count).w		; sprite limit = 80
 	lea	(Sprite_table_buffer).w, a1
-	move.l	a1, ($FFFFF608).w
+	move.l	a1, (Sprite_table_current_entry).w
 	lea	(Sprite_table_input).w, a6
 
 	moveq	#$3F, d7
@@ -538,12 +538,12 @@ loc_512:
 	addq.w	#8, a6
 	dbf	d7, loc_4E4
 
-	movea.l	($FFFFF608).w, a0		; load sprite table
+	movea.l	(Sprite_table_current_entry).w, a0		; load sprite table
 	move.l	#0, (a0)
 	rts
 
 loc_526:
-	movea.l	($FFFFF608).w, a2		; load sprite table address
+	movea.l	(Sprite_table_current_entry).w, a2		; load sprite table address
 	moveq	#0, d1
 	move.b	(a1)+, d1
 	subq.b	#1, d1		; get number of attributes for each mapping
@@ -574,7 +574,7 @@ FillSpriteAttributesLoop:
 	dbf	d1, FillSpriteAttributesLoop
 
 loc_56C:
-	move.l	a2, ($FFFFF608).w
+	move.l	a2, (Sprite_table_current_entry).w
 	rts
 
 loc_572:
@@ -9397,7 +9397,7 @@ VInt:
 	swap	d0
 	move.l	d0, (VDP_data_port).l
 	if revision>0
-	btst	#6,($FFFFFFF8).w
+	btst	#6,(Graphics_flags).w
 	beq.s	+		; branch if NTSC (bit 6 = 0)
 
 	move.w	#$700, d0	; wait for a while (PAL megadrive)
@@ -9703,10 +9703,10 @@ LoadPCMDrums:
 
 
 UpdateSoundQueue:
-	cmp.b	($FFFFF640).w, d0
+	cmp.b	(Current_sound).w, d0
 	beq.s	+
 	move.b	d0, (Sound_queue).w
-	move.b	d0, ($FFFFF640).w
+	move.b	d0, (Current_sound).w
 +
 	rts
 
@@ -12030,7 +12030,7 @@ MoveToOpeningScreen:
 	move.w	#$5B0, (Map_X_pos).w
 	move.w	#$1007, (Map_event_load).w
 	move.w	#$3C, ($FFFFF780).w
-	move.b	#$82, ($FFFFF640).w	; keep playing same music
+	move.b	#MusicID_Restoration, (Current_sound).w	; keep playing same music
 	rts
 
 ; ------------------------------------------------------------
@@ -12783,7 +12783,7 @@ EventLoad_NeiDeath:
 	move.w	#$26, (Interaction_type).w ; => Event_NeiDeath
 	move.w	#$8200, (Map_event_load).w
 	move.b	#MusicID_Power, (Sound_queue).w
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	rts
 
 ; 2
@@ -12815,7 +12815,7 @@ EventLoad_NeifirstDeath:
 	bne.s	+			; if not, branch
 	move.b	#MusicID_Power, (Sound_queue).w		; otherwise play Power music
 +
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	rts
 
 ; 3
@@ -12828,7 +12828,7 @@ EventLoad_ClimatrolOverflow:
 	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
-	move.b	#$82, ($FFFFF640).w
+	move.b	#MusicID_Restoration, (Current_sound).w
 	rts
 
 ; 4
@@ -12841,7 +12841,7 @@ loc_7F14:
 	move.w	#MapID_ClimatrolF7, (Map_index).w
 	move.w	#$1A0, (Map_Y_pos).w
 	move.w	#$300, (Map_X_pos).w
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	rts
 
 ; 5
@@ -12856,7 +12856,7 @@ loc_7F44:
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
 	move.b	#1, ($FFFFC735).w
-	move.b	#$82, ($FFFFF640).w
+	move.b	#MusicID_Restoration, (Current_sound).w
 	rts
 
 ; 6
@@ -12869,7 +12869,7 @@ loc_7F80:
 	move.w	#MapID_ClimatrolF7, ($FFFFF748).w
 	move.w	#$1A0, ($FFFFF74A).w
 	move.w	#$300, ($FFFFF74C).w
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	rts
 
 ; 7
@@ -12879,7 +12879,7 @@ loc_7FB0:
 	move.w	#1, ($FFFFDE70).w
 	move.w	#$2A, (Interaction_type).w
 	move.w	#0, (Map_event_load).w
-	move.b	#$84, ($FFFFF640).w
+	move.b	#MusicID_Pleasure, (Current_sound).w
 	rts
 
 ; 8
@@ -23958,7 +23958,7 @@ loc_F134:
 	move.w	#$1E, ($FFFFCC94).w
 	cmpi.w	#$100, (Enemy_formation).w
 	bne.s	loc_F186			; Branch if not Neifirst boss battle
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	rts
 loc_F16E:
 	lea	(Characters_RAM).w, a0
@@ -24037,7 +24037,7 @@ loc_F24C:
 loc_F24E:
 	cmpi.w	#$100, (Enemy_formation).w
 	bne.s	loc_F24C			; branch if not Neifirst boss battle
-	move.b	#$87, ($FFFFF640).w
+	move.b	#MusicID_Advanced, (Current_sound).w
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	bra.w	RestoreCharDataAfterBattle
 loc_F266:

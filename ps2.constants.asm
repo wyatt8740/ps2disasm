@@ -1380,6 +1380,8 @@ Joypad_ctrl =  ramaddr($FFFFF602)
 Joypad_held =  ramaddr($FFFFF602)
 Joypad_pressed =  ramaddr($FFFFF603)
 
+Sprite_table_current_entry =  ramaddr($FFFFF608)
+
 VDP_reg1_values =  ramaddr($FFFFF610)
 
 Sprite_count =  ramaddr($FFFFF618)		; number of sprite counter. Starts from 80 and when it reaches 0, you cannot create more sprites
@@ -1394,6 +1396,7 @@ RNG_seed =  ramaddr($FFFFF636)
 
 Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
 
+Current_sound =  ramaddr($FFFFF640)
 Battle_saved_sound =  ramaddr($FFFFF642)
 
 DMA_last_write =  ramaddr($FFFFF644)
@@ -1440,4 +1443,5 @@ System_stack =  ramaddr($FFFFFE00)
 
 Opening_ending_flag =  ramaddr($FFFFFFF0)
 
+Graphics_flags =  ramaddr($FFFFFFF8) 			; only bits 6 and 7 are used; bit 6 = video (NTSC or PAL); bit 7 = Hardware region
 Checksum_four_CC =  ramaddr($FFFFFFFC) 		; four bytes: string that is checked for the checksum routine.
