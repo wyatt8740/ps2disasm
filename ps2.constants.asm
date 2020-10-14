@@ -1304,7 +1304,9 @@ Battle_turn_index = ramaddr($FFFFCC90)	; word
 Plasma_ring_countup = ramaddr($FFFFCC92)	; word	; incremented each time Army Eye has a turn; when it reaches 9, one of the enemies will use Plasma Ring
 Battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of fighter; bytes 3-4 = agility
 
-Script_ID =  ramaddr($FFFFCD00)
+Script_queue =  ramaddr($FFFFCD00)		; 18 bytes total, 2 bytes per entry (can put 9 script ID's total)
+										; 	entry definition: byte 1: index of script table
+										;					  byte 2: index of text to load
 Window_active_flag =  ramaddr($FFFFCD10)
 Text_offset =	ramaddr($FFFFCD12)	; longword
 Text_plane_offset =	ramaddr($FFFFCD16)	; word
@@ -1339,9 +1341,14 @@ Character_pos_table = ramaddr($FFFFDD00)
 
 Windows_opened_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
 
-Window_index =  ramaddr($FFFFDE10)		; type of window to open
+Window_queue =  ramaddr($FFFFDE10)		; 18 bytes total, 2 bytes per entry (can put 9 windows total)
+										;	entry definition: byte 1: bitfield holding various flags for processing
+										;							bit 1 = if clear, slide open; if set, window appears fully in one frame
+										;							bit 2 = if set, redraw existing window
+										;							bit 7 = if set, destroy window; byte 2 holds the number of windows to destroy rather than the window index 
+										;					  byte 2: window index
 
-Window_index_saved =  ramaddr($FFFFDE54)
+Window_index =  ramaddr($FFFFDE54)
 Window_routine =  ramaddr($FFFFDE56)
 
 
