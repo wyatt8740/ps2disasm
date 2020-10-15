@@ -1345,7 +1345,7 @@ Window_queue =  ramaddr($FFFFDE10)		; 18 bytes total, 2 bytes per entry (can put
 										;	entry definition: byte 1: bitfield holding various flags for processing
 										;							bit 0 = if set, window is opening
 										;							bit 1 = if clear, slide open; if set, window appears fully in one frame
-										;							bit 2 = if set, redraw existing window
+										;							bit 2 = if set, draw window without tracking it in memory (static window)
 										;							bit 7 = if set, destroy window; byte 2 holds the number of windows to destroy rather than the window index 
 										;					  byte 2: window index
 
