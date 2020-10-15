@@ -1307,7 +1307,7 @@ Battle_turn_order = ramaddr($FFFFCCA0)	; 4 bytes per fighter; bytes 1-2 = ID of 
 Script_queue =  ramaddr($FFFFCD00)		; 18 bytes total, 2 bytes per entry (can put 9 script ID's total)
 										; 	entry definition: byte 1: index of script table
 										;					  byte 2: index of text to load
-Window_active_flag =  ramaddr($FFFFCD10)
+Script_flag =  ramaddr($FFFFCD10)
 Text_offset =	ramaddr($FFFFCD12)	; longword
 Text_plane_offset =	ramaddr($FFFFCD16)	; word
 Text_plane_offset_start =	ramaddr($FFFFCD18)	; word
@@ -1367,6 +1367,8 @@ Meseta_value =  ramaddr($FFFFDE6A)			; price for items, services, etc...
 EXP_points_buffer =  ramaddr($FFFFDE6A)		; used to hold the value for exp points, such as when you defeat all enemies and you want to display text containing the value
 Interaction_type =  ramaddr($FFFFDE6E)
 Interaction_subtype =  ramaddr($FFFFDE6F)
+Interaction_routine =  ramaddr($FFFFDE70)
+Interaction_routine_2 =  ramaddr($FFFFDE72)
 
 Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
 

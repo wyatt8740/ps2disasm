@@ -1075,8 +1075,8 @@ Map_LoadObjects:
 	jsr	(RemoveItemFromInventory).l		; remove TEIM from inventory
 
 ; Trigger Teim and Darum event
-	move.w	#1, ($FFFFDE70).w
-	move.w	#0, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine).w
+	move.w	#0, (Interaction_routine_2).w
 	move.w	#$302, (Interaction_type).w
 	move.w	#1, (Cutscene_flag).w
 	move.w	#2, (Cutscene_index).w
@@ -6180,7 +6180,7 @@ loc_3786:
 loc_37EC:
 	cmpi.b	#$FE, d0
 	bne.s	loc_37FE
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	move.w	#0, (Cutscene_flag).w
 	rts
 loc_37FE:
@@ -8403,7 +8403,7 @@ loc_4ECC:
 	bne.s	loc_4EF0
 	move.w	#4, $22(a0)
 	move.w	#5, $24(a0)
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_4EF0:
 	move.w	#$A, $26(a0)
@@ -8469,7 +8469,7 @@ loc_4F8E:
 	subq.w	#1, $28(a0)
 	bpl.s	loc_4FA6
 	move.w	#0, $14(a0)
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	move.w	#3, $22(a0)
 	rts
 loc_4FA6:
@@ -8518,7 +8518,7 @@ loc_501E:
 	move.w	d0, ($FFFFE88A).w
 	move.w	#0, ($FFFFE8A2).w
 	move.b	#1, 2(a0)
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 loc_504A:
 	rts
 
@@ -9397,7 +9397,7 @@ VInt:
 	swap	d0
 	move.l	d0, (VDP_data_port).l
 	if revision>0
-	btst	#6,(Graphics_flags).w
+	btst	#6, (Graphics_flags).w
 	beq.s	+		; branch if NTSC (bit 6 = 0)
 
 	move.w	#$700, d0	; wait for a while (PAL megadrive)
@@ -9439,7 +9439,7 @@ VInt_SegaTitle:
 	bsr.w	VInt_NormalUpdates
 	tst.w	(General_timer).w
 	beq.w	+		; don't decrease timer if already 0
-	subq.w	#1,(General_timer).w	; otherwise subtract 1 to timer
+	subq.w	#1, (General_timer).w	; otherwise subtract 1 to timer
 +
 	rts
 
@@ -9466,7 +9466,7 @@ loc_5B6E:
 	move.w	#$96EB, (a6)
 	move.w	#$977F, (a6)
 	move.w	#$6000, (a6)
-	move.w	#$81,(DMA_last_write).w
+	move.w	#$81, (DMA_last_write).w
 	move.w	(DMA_last_write).w, (a6)
 loc_5B96:
 	bsr.w	loc_8E00
@@ -10187,7 +10187,7 @@ loc_61D4:
 	endif
 
 PaletteFadeTo:
-	move.l	#$3F,($FFFFF626).w
+	move.l	#$3F, ($FFFFF626).w
 loc_61F4:
 	lea	(Palette_table_buffer).w, a0
 	move.w	($FFFFF626).w, d0
@@ -10411,21 +10411,21 @@ loc_63BE:
 
 
 PaletteCycle:
-	subq.w	#1,($FFFFF634).w
+	subq.w	#1, ($FFFFF634).w
 	bpl.s	PaletteCycleEnd		; return if value is in range of 0-3
-	move.w	#3,($FFFFF634).w	; if value in address is less than 0, set it to 3
+	move.w	#3, ($FFFFF634).w	; if value in address is less than 0, set it to 3
 	move.w	($FFFFF632).w, d0
 	bmi.s	PaletteCycleEnd		; return if palette cycle in address is less than 0
-	subq.w	#2,($FFFFF632).w	; otherwise subtract 2 from it
+	subq.w	#2, ($FFFFF632).w	; otherwise subtract 2 from it
 	lea	(CyclingPal_SegaLogo).l, a0
 	lea	($FFFFFB04).w, a1
 	adda.w	d0, a0
-	move.l	(a0)+,(a1)+
-	move.l	(a0)+,(a1)+
-	move.l	(a0)+,(a1)+
-	move.l	(a0)+,(a1)+
-	move.l	(a0)+,(a1)+
-	move.w	(a0)+,(a1)+
+	move.l	(a0)+, (a1)+
+	move.l	(a0)+, (a1)+
+	move.l	(a0)+, (a1)+
+	move.l	(a0)+, (a1)+
+	move.l	(a0)+, (a1)+
+	move.w	(a0)+, (a1)+
 PaletteCycleEnd:
 	rts
 
@@ -11466,8 +11466,8 @@ RunMapTransition:
 	bne.s	loc_6ED6	; if not, branch
 	tst.w	(Rolf_stats+curr_hp).w
 	bne.s	loc_6ED6	; if Rolf is alive, branch
-	move.w	#1, ($FFFFDE70).w
-	move.w	#0, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine).w
+	move.w	#0, (Interaction_routine_2).w
 	move.w	#$303, (Interaction_type).w
 	moveq	#-1, d4
 	rts
@@ -11693,7 +11693,7 @@ loc_7162:
 	subq.w	#1, (a2,d1.w)
 	bne.s	loc_7184
 	move.w	d2, (Character_index).w
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$30, (Interaction_type).w
 loc_7184:
 	dbf	d0, loc_7162
@@ -11840,8 +11840,8 @@ GameMode_Sega:
 
 	moveq	#PalID_Sega, d0
 	bsr.w	PaletteLoad1
-	move.w	#$28,($FFFFF632).w		; set palette cycle timer
-	move.w	#$12C,(General_timer).w		; set timer
+	move.w	#$28, ($FFFFF632).w		; set palette cycle timer
+	move.w	#$12C, (General_timer).w		; set timer
 	move.w	(VDP_reg1_values).w, d0		; VDP reg #1 values
 	ori.b	#$40, d0					; enable display
 	move.w	d0, (VDP_control_port).l
@@ -11919,16 +11919,16 @@ loc_73C0:
 	bsr.w	UpdateSoundQueue
 	if revision=0
 	move.l	#0, ($FFFFF61C).w	; clear y position
-	move.w	#0,(Opening_ending_flag).w
+	move.w	#0, (Opening_ending_flag).w
 	else
 	moveq	#0, d0
 	move.l	d0, ($FFFFF61C).w	; clear y position
-	move.w	d0,(Opening_ending_flag).w
-	move.w	d0,(Window_active_flag).w
+	move.w	d0, (Opening_ending_flag).w
+	move.w	d0, (Script_flag).w
 	endif
 	move.w	#$8006, (VDP_control_port).l
 	move.w	#$8B00, (VDP_control_port).l
-	move.w	#$B4,(General_timer).w		; set timer
+	move.w	#$B4, (General_timer).w		; set timer
 
 	lea	(Object_RAM).w, a6
 	moveq	#0, d7
@@ -11956,7 +11956,7 @@ loc_73C0:
 	tst.w	(General_timer).w
 	bne.s	-
 
-	move.w	#$6CC,(General_timer).w
+	move.w	#$6CC, (General_timer).w
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 
@@ -12656,13 +12656,13 @@ loc_7CAA:
 
 	tst.w	(Opening_ending_flag).w
 	bne.s	loc_7CCE
-	move.w	#ObjID_MapCharacter,(Characters_RAM).w
-	move.w	#3,($FFFFE424).w
-	move.w	(Map_X_pos).w,(Characters_RAM+x_pos).w
-	move.w	(Map_Y_pos).w,(Characters_RAM+y_pos).w
+	move.w	#ObjID_MapCharacter, (Characters_RAM).w
+	move.w	#3, ($FFFFE424).w
+	move.w	(Map_X_pos).w, (Characters_RAM+x_pos).w
+	move.w	(Map_Y_pos).w, (Characters_RAM+y_pos).w
 
 loc_7CCE:
-	move.w	#$300,($FFFFE408).w
+	move.w	#$300, ($FFFFE408).w
 	bsr.w	Map_LoadData
 	bsr.w	Map_LoadObjects
 	bsr.w	Map_EventLoad
@@ -12779,7 +12779,7 @@ EventLoad_NeiDeath:
 	moveq	#PalID_NeiDeath, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$26, (Interaction_type).w ; => Event_NeiDeath
 	move.w	#$8200, (Map_event_load).w
 	move.b	#MusicID_Power, (Sound_queue).w
@@ -12808,7 +12808,7 @@ EventLoad_NeifirstDeath:
 	moveq	#PalID_NeiDeath2, d0
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$27, (Interaction_type).w	; => Event_NeifirstDeath
 	move.w	#$8300, (Map_event_load).w
 	tst.w	($FFFFC042).w			; is Nei dead?
@@ -12822,7 +12822,7 @@ EventLoad_NeifirstDeath:
 EventLoad_ClimatrolOverflow:
 	subq.b	#1, d1
 	bne.s	loc_7F14
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$28, (Interaction_type).w	; => Event_ClimatrolOverflow
 	move.w	#$403, (Map_event_load).w
 	move.w	#MapID_MotaOverworld, (Map_index).w
@@ -12848,7 +12848,7 @@ loc_7F14:
 loc_7F44:
 	subq.b	#1, d1
 	bne.s	loc_7F80
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$29, (Interaction_type).w
 	move.w	#$12C, (General_timer).w
 	move.w	#$602, (Map_event_load).w
@@ -12876,7 +12876,7 @@ loc_7F80:
 loc_7FB0:
 	subq.b	#1, d1
 	bne.s	loc_7FCE
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$2A, (Interaction_type).w
 	move.w	#0, (Map_event_load).w
 	move.b	#MusicID_Pleasure, (Current_sound).w
@@ -12898,7 +12898,7 @@ loc_7FD4:
 EventLoad_Gaira:
 	subq.b	#1, d1
 	bne.s	loc_7FF2
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$2D, (Interaction_type).w	; => Event_Gaira
 	move.w	#0, (Map_event_load).w
 	rts
@@ -12908,7 +12908,7 @@ loc_7FF2:
 	subq.b	#1, d1
 	bne.s	loc_8010
 	move.w	#0, (Characters_RAM).w
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$36, (Interaction_type).w
 	move.w	#$8000, (Map_event_load).w
 	rts
@@ -12917,7 +12917,7 @@ loc_7FF2:
 loc_8010:
 	subq.b	#1, d1
 	bne.s	loc_8022
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$31, (Interaction_type).w
 	rts
 
@@ -12940,7 +12940,7 @@ EventLoad_MotherBrain:
 	move.w	#ObjID_EyeBeam, ($FFFFEC80).w
 	move.w	#$214, ($FFFFEC8A).w
 	move.w	#$1B1, ($FFFFEC8E).w
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$37, (Interaction_type).w	; => Event_MotherBrain
 	rts
 
@@ -12948,7 +12948,7 @@ EventLoad_MotherBrain:
 loc_8070:
 	subq.b	#1, d1
 	bne.s	EventLoad_Opening
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$38, (Interaction_type).w
 	rts
 
@@ -12956,7 +12956,7 @@ loc_8070:
 EventLoad_Opening:
 	subq.b	#1, d1
 	bne.s	loc_8094
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$3B, (Interaction_type).w	; => Event_OpeningText1
 	rts
 
@@ -13043,7 +13043,7 @@ loc_815A:
 loc_815C:
 	subq.b	#1, d1
 	bne.s	EventRun_Opening
-	tst.w	($FFFFDE70).w
+	tst.w	(Interaction_routine).w
 	bne.s	loc_817C
 	tst.w	(Window_queue).w
 	bne.s	loc_817C
@@ -13055,7 +13055,7 @@ loc_815C:
 loc_817C:
 	rts
 loc_817E:
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	#$2E, (Interaction_type).w
 	move.w	#0, (Map_event_load).w
 	rts
@@ -13064,7 +13064,7 @@ loc_817E:
 EventRun_Opening:
 	subq.b	#1, d1
 	bne.s	loc_81E6
-	tst.w	($FFFFDE70).w
+	tst.w	(Interaction_routine).w
 	bne.s	loc_81E4
 	move.w	($FFFFC648).w, d0
 	sub.w	(Camera_Y_pos_BG).w, d0
@@ -13090,7 +13090,7 @@ loc_81C4:
 	bne.w	loc_8BBA
 	tst.w	d1
 	bne.w	loc_8BBA
-	move.w	#1, ($FFFFDE70).w
+	move.w	#1, (Interaction_routine).w
 	move.w	($FFFFF780).w, (Interaction_type).w
 	addq.w	#1, ($FFFFF780).w
 loc_81E4:
@@ -15028,8 +15028,8 @@ loc_9586:
 	rts
 
 CheckRenderScript:
-	move.w	(Window_active_flag).w, d1
-	beq.w	loc_96EC		; if no window is open, branch
+	move.w	(Script_flag).w, d1
+	beq.w	loc_96EC		; branch if script is not running
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	movea.l	(Text_offset).w, a1
@@ -15453,13 +15453,13 @@ loc_99BE:
 
 
 ProcessPlayerMenu:
-	tst.w	($FFFFDE70).w
+	tst.w	(Interaction_routine).w
 	bne.s	+	; rts
 	tst.w	(Window_queue).w
 	bne.s	+	; rts
 	tst.w	(Window_index).w
 	bne.s	+	; rts
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	+	; rts
 	move.w	(Event_routine).w, d1
 	bne.s	loc_9A20
@@ -17491,7 +17491,7 @@ Scene_CheckRoutine:
 	bne.s	loc_AF02
 	tst.w	(Window_index).w
 	bne.s	loc_AF02
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	loc_AF02
 	move.w	(Event_routine).w, d1
 	bne.s	loc_AF04
@@ -19335,10 +19335,10 @@ Scene_Library:
 	andi.w	#$3C, d1
 	jmp	LibraryEventIndex-4(pc,d1.w)
 loc_C3A8:
-	cmpi.w	#1,(Event_routine_2).w
+	cmpi.w	#1, (Event_routine_2).w
 	bne.w	CloseAllWindows
 	move.w	#$1002, (Script_queue).w
-	addq.w	#1,(Event_routine_2).w
+	addq.w	#1, (Event_routine_2).w
 	rts
 
 
@@ -19355,7 +19355,7 @@ LibraryEventIndex:
 	bra.w	loc_C4CA
 
 loc_C3E6:
-	move.w	#WinID_ScriptMessageBig,(Window_queue).w
+	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	tst.w	(Character_stats+curr_hp).w
 	beq.s	loc_C406
 	moveq	#ItemID_Recorder, d2
@@ -19401,8 +19401,8 @@ loc_C442:
 	rts
 
 loc_C448:
-	move.w	#WinID_LibraryOptions,(Window_queue).w
-	addq.w	#1,(Event_routine).w
+	move.w	#WinID_LibraryOptions, (Window_queue).w
+	addq.w	#1, (Event_routine).w
 	rts
 
 loc_C454:
@@ -19412,8 +19412,8 @@ loc_C454:
 	move.w	#$1000, d0
 	move.b	(a0),d0
 	move.w	d0, (Script_queue).w
-	move.w	#$1003,($FFFFCD02).w
-	addq.w	#1,(Event_routine).w
+	move.w	#$1003, ($FFFFCD02).w
+	addq.w	#1, (Event_routine).w
 	rts
 loc_C476:
 	move.w	#WinID_YesNo2, (Window_queue).w
@@ -20758,7 +20758,7 @@ IntroScr_CheckRoutine:
 	bne.s	loc_D158
 	tst.w	(Window_index).w
 	bne.s	loc_D158
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	loc_D158
 	move.w	(Event_routine).w, d1
 	bne.s	Intro_RunRoutine
@@ -21327,11 +21327,11 @@ Map_CheckInteractions:
 	bne.s	loc_D7FA
 	tst.w	(Window_index).w
 	bne.s	loc_D7FA
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	loc_D7FA
 	tst.w	(Event_routine).w
 	bne.s	loc_D7FA
-	move.w	($FFFFDE70).w, d2
+	move.w	(Interaction_routine).w, d2
 	bne.w	loc_D862
 	tst.w	(Opening_ending_flag).w
 	bne.s	loc_D7FA
@@ -21375,8 +21375,8 @@ loc_D846:
 	move.w	type(a1), d4
 loc_D84A:
 	move.w	#WinID_ScriptMessage, (Window_queue).w
-	move.w	#1, ($FFFFDE70).w
-	move.w	#0, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine).w
+	move.w	#0, (Interaction_routine_2).w
 	move.w	d4, (Interaction_type).w
 	moveq	#0, d2
 loc_D862:
@@ -21407,7 +21407,7 @@ InteractionTypes:
 
 ; -----------------------------------------------------------------
 Interact_Event:
-	tst.w	($FFFFDE72).w
+	tst.w	(Interaction_routine_2).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0
 	move.b	(Interaction_subtype).w, d0
@@ -21505,7 +21505,7 @@ Event_Talk:
 
 loc_D9BA:
 	move.w	#$1708, (Script_queue).w		; "There seems to be nothing unusual here."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_D9C6:
@@ -21542,7 +21542,7 @@ loc_DA10:
 	lea	(loc_29E16).l, a1
 	move.l	a1, (Map_collision_data_addr).w
 	move.w	#$171E, (Script_queue).w		; "We can't get off here!"
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_DA26:
@@ -21562,7 +21562,7 @@ loc_DA4C:
 	dbf	d0, loc_DA4C
 
 	move.w	#0, ($FFFFE822).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 
@@ -21582,22 +21582,22 @@ JetScooter_CharOffPosOffsets:
 
 Event_BlownUpBuilding:
 	move.w	#$170A, (Script_queue).w		; "Those scoundrels seem to have blown open the door with dynamite and stolen the things."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_ControlTower:
 	move.w	#$1709, (Script_queue).w		; "This is the control tower which links the town and Mother Brain in one network."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_Corpse:
 	move.w	#$170B, (Script_queue).w		; "Those are bodies of the scoundrels. I wonder if the Biohazards killed them?"
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_FakeMaruera:
 	move.w	#$170F, (Script_queue).w		; "It looks like a Maruera-tree, but it isn't."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_JetScooter:
@@ -21614,7 +21614,7 @@ loc_DABA:
 loc_DAC2:
 	move.w	($FFFFE42A).w, ($FFFFE82A).w
 	move.w	#1, (Jet_Scooter_flag).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Piano:
 	tst.w	d2
@@ -21625,7 +21625,7 @@ loc_DAE0:
 	subq.w	#1, d2
 	bne.s	loc_DAF0
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_DAF0:
 	tst.w	(Yes_no_input).w
@@ -21639,41 +21639,41 @@ loc_DAF0:
 	cmpi.b	#$80, (Track_timer).w
 	bne.s	-
 loc_DB1C:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_Newspaper1:
 	move.l	#$17191712, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_Newspaper2:
 	move.l	#$17191713, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Newspaper3:
 	move.l	#$17191714, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Newspaper4:
 	move.l	#$17191715, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Newspaper5:
 	move.l	#$17191716, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Newspaper6:
 	move.l	#$17191717, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Newspaper7:
 	move.l	#$17191718, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_UnderwaterPassage:
 	move.w	#$1720, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_MarueraTree:
 	tst.w	d2
@@ -21684,7 +21684,7 @@ Event_MarueraTree:
 	rts
 loc_DBA0:
 	move.w	#$1708, (Script_queue).w		; "There seems to be nothing unusual here."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 loc_DBAC:
 	moveq	#ItemID_MruraLeaf, d0
@@ -21699,19 +21699,19 @@ Event_CorpseLetter:
 	rts
 loc_DBC8:
 	move.w	#$170B, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_DBD4:
 	subq.w	#1, d2
 	bne.s	loc_DBF2
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	cmpi.b	#1, (a0)
 	beq.s	loc_DBF2
 	moveq	#ItemID_SmallKey, d0
 	bsr.w	Interact_AddItem
 	bne.s	loc_DBF0
-	move.w	#0, ($FFFFDE72).w
+	move.w	#0, (Interaction_routine_2).w
 loc_DBF0:
 	rts
 
@@ -21731,7 +21731,7 @@ loc_DC10:
 	rts
 loc_DC12:
 	move.w	#$1708, (Script_queue).w		; "There seems to be nothing unusual here."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_GetCard:
 	tst.b	(a0)
@@ -21740,7 +21740,7 @@ Event_GetCard:
 	bra.w	Interact_AddItem
 loc_DC2A:
 	move.w	#$1708, (Script_queue).w		; "There seems to be nothing unusual here."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Teim:
 	tst.w	d2
@@ -21756,7 +21756,7 @@ Event_Teim:
 	rts
 loc_DC58:
 	move.w	#$1807, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 loc_DC64:
 	addq.b	#1, (a0)
@@ -21765,19 +21765,19 @@ loc_DC64:
 	move.w	(Character_index).w, d1
 	bsr.w	AddItemToInventory2
 	move.b	#SFXID_ItemReceived, (Sound_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_DynamiteDoor:
 	move.w	#$170D, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Door:
 	move.w	#$170E, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_CardSlot:
 	move.w	#$171B, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_Neifirst:
 	tst.w	d2
@@ -21791,17 +21791,17 @@ loc_DCBC:
 	tst.w	($FFFFC042).w
 	bne.s	loc_DCD2
 	move.w	#$180E, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 loc_DCD2:
 	move.l	#$180F1810, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_DCE0:
 	subq.w	#1, d2
 	bne.s	loc_DCF0
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_DCF0:
 	subq.w	#1, d2
@@ -21809,14 +21809,14 @@ loc_DCF0:
 	tst.w	(Yes_no_input).w
 	beq.s	loc_DD06
 	move.w	#$1822, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 loc_DD06:
 	move.w	#$1823, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_DD12:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.w	#$100, (Enemy_formation).w		; Neifirst boss battle
 	move.b	#GameModeID_Battle, (Game_mode_index).w
 	move.w	#$100, (Map_event_load).w
@@ -21844,7 +21844,7 @@ loc_DD58:
 	bne.s	+
 	move.w	#$1826, (Script_queue).w
 +
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	bra.s	loc_DDA2
 loc_DD7A:
 	tst.w	(Party_members_num).w
@@ -21890,7 +21890,7 @@ loc_DDD6:
 	move.b	#1, (a0)
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1827, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	bra.s	loc_DDA2
 loc_DDF0:
 	move.l	#0, ($FFFFC610).w
@@ -21918,7 +21918,7 @@ loc_DE24:
 	bne.s	loc_DE3A
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1825, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_DE3A:
 	move.w	#-1, (Screen_changed_flag).w
@@ -21932,7 +21932,7 @@ Event_ClimatrolExplosions:
 loc_DE48:
 	subq.w	#1, d2
 	beq.s	loc_DE52
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_DE52:
@@ -21961,7 +21961,7 @@ loc_DE8E:
 	dbf	d2, loc_DE62
 
 	move.w	#$12C, (Text_auto_timer).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 
 ; ===========================================
@@ -21998,7 +21998,7 @@ loc_DECC:
 	move.w	#$1828, (Script_queue).w
 	rts
 loc_DEE2:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.w	#MapID_Paseo, (Map_index).w
 	move.w	#$170, (Map_Y_pos).w
 	move.w	#$20, (Map_X_pos).w
@@ -22012,7 +22012,7 @@ loc_DEE2:
 	rts
 Event_UzoEntrance:
 	move.w	#$171F, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	bra.w	loc_DDA2
 Event_Gaira:
 	tst.w	d2
@@ -22025,7 +22025,7 @@ loc_DF38:
 	else
 	move.w	#$1839, (Script_queue).w
 	endif
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.w	#$708, (General_timer).w
 	move.w	#6, (Map_event_load).w
 	lea	(Character_stats).w, a0
@@ -22067,7 +22067,7 @@ loc_DFAE:
 	bne.s	loc_DFC4
 	move.b	#SFXID_Explosion, (Sound_queue).w
 	move.w	#$78, (General_timer).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 
 loc_DFC4:
@@ -22080,7 +22080,7 @@ loc_DFD0:
 	move.b	#1, (a0)
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1812, (Script_queue).w		; "ROLF hears a large explosion and feels a tremendous force moving the satellite. ROLF better check the control panel and fix the Gaila's orbit!"
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_GairaControlPanel:
@@ -22099,7 +22099,7 @@ loc_E004:
 	bne.s	loc_E01A
 	move.w	#WinID_ScriptMessage, (Window_queue).w
 	move.w	#$1721, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E01A:
 	lea	(Party_member_ID).w, a1
@@ -22114,12 +22114,12 @@ loc_E026:
 	dbf	d0, loc_E026
 	move.b	#GameModeID_Sega, (Game_mode_index).w
 loc_E03C:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 Event_ShirGone:
 	move.w	#WinID_ScriptMessage, (Window_queue).w
 	move.w	#$1722, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.w	#0, (Map_event_load).w
 	rts
 Event_EsperMansionEntrance:
@@ -22129,7 +22129,7 @@ Event_EsperMansionEntrance:
 	move.b	#1, ($FFFFC742).w
 	move.w	#$1687, (Script_queue).w		; "You must be ROLF. We've been expecting you."
 loc_E072:
-	move.w	#1, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine_2).w
 	rts
 
 Event_Esper:
@@ -22147,7 +22147,7 @@ Event_Esper:
 	move.w	#$1698, (Script_queue).w	
 	endif
 loc_E090:
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E096:
 	tst.b	($FFFFC743).w
@@ -22165,7 +22165,7 @@ Event_DarkForce:
 	tst.w	d2
 	bne.s	loc_E0CE
 	move.w	#$171A, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E0CE:
 	move.b	#1, (a0)
@@ -22192,7 +22192,7 @@ loc_E0FE:
 	else
 	move.w	#$1910, (Script_queue).w
 	endif
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E114:
 	move.w	#$102, (Enemy_formation).w		; Dark Force boss battle
@@ -22210,7 +22210,7 @@ loc_E128:
 	move.w	#1, ($FFFFF656).w
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1813, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	move.w	#0, (Map_event_load).w
 loc_E150:
 	rts
@@ -22218,7 +22218,7 @@ loc_E152:
 	subq.w	#1, d2
 	bne.s	loc_E162
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E162:
 	subq.w	#1, d2
@@ -22230,17 +22230,17 @@ loc_E162:
 	else
 	move.w	#$1816, (Script_queue).w
 	endif
-	addq.w	#4, ($FFFFDE70).w
+	addq.w	#4, (Interaction_routine).w
 	rts
 loc_E178:
 	move.w	#$1814, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E184:
 	subq.w	#1, d2
 	bne.s	loc_E194
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E194:
 	subq.w	#1, d2
@@ -22252,11 +22252,11 @@ loc_E194:
 	else
 	move.w	#$1817, (Script_queue).w
 	endif
-	addq.w	#2, ($FFFFDE70).w
+	addq.w	#2, (Interaction_routine).w
 	rts
 loc_E1AA:
 	move.w	#$1818, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E1B6:
 	subq.w	#1, d2
@@ -22267,7 +22267,7 @@ loc_E1B6:
 	move.w	#$F00, (Map_event_load).w
 	rts
 loc_E1D2:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.b	#1, ($FFFFEC02).w
 	move.w	#0, ($FFFFF656).w
 	rts
@@ -22300,7 +22300,7 @@ loc_E21C:
 	beq.s	loc_E230
 	move.w	#$181E, (Script_queue).w
 loc_E230:
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E236:
 	subq.w	#1, d2
@@ -22310,7 +22310,7 @@ loc_E236:
 	else
 	move.l	#$183B181F, (Script_queue).w
 	endif
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E248:
 	subq.w	#1, d2
@@ -22329,7 +22329,7 @@ loc_E26C:
 	move.w	#0, (Character_index).w
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1831, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E288:
 	bsr.w	CloseAllWindows
@@ -22349,7 +22349,7 @@ Event_Earthmen:
 	jsr	(UpdateSoundQueue).l
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1832, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E2C4:
 	bsr.w	CloseAllWindows
@@ -22368,13 +22368,13 @@ loc_E2E8:
 	move.w	#0, (Character_index).w
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1819, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E306:
 	subq.w	#1, d2
 	bne.s	loc_E316
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E316:
 	subq.w	#1, d2
@@ -22385,13 +22385,13 @@ loc_E316:
 	move.w	#$181B, (Script_queue).w
 loc_E32C:
 	move.l	#$181C1833, ($FFFFCD02).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E33A:
 	subq.w	#1, d2
 	bne.s	loc_E34A
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E34A:
 	subq.w	#1, d2
@@ -22400,15 +22400,15 @@ loc_E34A:
 	tst.w	(Yes_no_input).w
 	bne.s	loc_E364
 	move.w	#$1834, (Script_queue).w
-	addq.w	#2, ($FFFFDE70).w
+	addq.w	#2, (Interaction_routine).w
 loc_E364:
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E36A:
 	subq.w	#1, d2
 	bne.s	loc_E37A
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E37A:
 	subq.w	#1, d2
@@ -22422,13 +22422,13 @@ loc_E37A:
 	beq.s	loc_E392
 	move.l	#$18381834, (Script_queue).w
 loc_E392:
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E398:
 	subq.w	#1, d2
 	bne.w	loc_E458
 	move.w	#$1821, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	lea	(Party_member_ID).w, a0
 	movea.l	a0, a1
 	move.w	(Party_members_num).w, d0
@@ -22488,7 +22488,7 @@ loc_E43E:
 loc_E456:
 	rts
 loc_E458:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	move.b	#GameModeID_Ending, (Game_mode_index).w
 	rts
 
@@ -22512,12 +22512,12 @@ loc_E48C:
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	d1, (Script_queue).w
 	move.w	#$10E, (General_timer).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E4A8:
 	subq.w	#1, (General_timer).w
 	bne.s	loc_E4B2
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 loc_E4B2:
 	rts
 Event_OpeningText2:
@@ -22546,7 +22546,7 @@ loc_E4F6:
 	rts
 ; -------------------------------------------------------------
 Interact_NPC:
-	tst.w	($FFFFDE72).w
+	tst.w	(Interaction_routine_2).w
 	bne.s	loc_E53A
 	moveq	#0, d1
 	move.w	d1, (Character_index).w
@@ -22579,7 +22579,7 @@ loc_E542:
 
 loc_E554:
 	move.w	#$1708, (Script_queue).w		; "There seems to be nothing unusual here."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E560:
@@ -22592,7 +22592,7 @@ loc_E560:
 	move.w	#$1600, d0
 	move.b	(a0), d0
 	move.w	d0, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E584:
@@ -22610,7 +22610,7 @@ loc_E5A6:
 	move.w	#$1600, d0
 	move.b	(a0), d0
 	move.w	d0, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E5B8:
@@ -22619,11 +22619,11 @@ loc_E5B8:
 	bcs.s	+
 	move.w	#$1652, (Script_queue).w
 +
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E5D0:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	cmpi.w	#$88, d1
 	bcs.s	loc_E5EA
 	cmpi.b	#3, ($FFFFC743).w
@@ -22652,7 +22652,7 @@ loc_E5FE:
 	subq.w	#1, d2
 	bne.s	+
 	move.w	#WinID_YesNo2, (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 +
 	subq.w	#1, d2
@@ -22661,14 +22661,14 @@ loc_E5FE:
 	tst.w	(Yes_no_input).w
 	bne.s	loc_E688
 	move.w	#$1682, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E636:
 	subq.w	#1, d2
 	bne.s	loc_E64C
 	move.w	#WinID_MenuCharStats, (Window_queue).w
 	move.w	#$1E, ($FFFFDE5E).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E64C:
 	subq.w	#1, d2
@@ -22688,14 +22688,14 @@ loc_E64C:
 +
 	dbf	d0, -
 	move.w	#((6<<8)|WinID_MenuCharStats), (Window_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 loc_E680:
 	rts
 loc_E682:
 	bsr.w	WaitJoypad_B_C_Pressed
 	beq.s	loc_E680
 loc_E688:
-	move.w	#1, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E690:
@@ -22703,7 +22703,7 @@ loc_E690:
 	move.b	#1, ($FFFFC716).w				; events after Roron (Jet Scooter and other stuff activated)
 	move.w	#$730, (Jet_Scooter_Y_pos).w
 	move.w	#$590, (Jet_Scooter_X_pos).w
-	move.w	#1, ($FFFFDE72).w
+	move.w	#1, (Interaction_routine_2).w
 	rts
 
 ; =========================================
@@ -23025,7 +23025,7 @@ loc_E730:
 
 ; -------------------------------------------------------------
 Interact_TreasureChest:
-	tst.w	($FFFFDE72).w
+	tst.w	(Interaction_routine_2).w
 	bne.w	CloseAllWindows
 	moveq	#0, d1
 	move.b	(Interaction_subtype).w, d1
@@ -23041,14 +23041,14 @@ Interact_TreasureChest:
 
 TreasureChest_Empty:
 	move.w	#$1706, (Script_queue).w		; "There is nothing inside."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 TreasureChest_Locked:
 	tst.w	(a1)
 	beq.w	loc_E8B4
 	move.w	#$1707, (Script_queue).w		; "It's locked and won't open."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 loc_E804:
@@ -23061,7 +23061,7 @@ loc_E804:
 	move.b	#SFXID_ItemReceived, (Sound_queue).w
 	move.b	#1, (a0)
 	move.w	#$1701, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	lea	(Character_stats).w, a2
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d1
@@ -23100,7 +23100,7 @@ loc_E878:
 loc_E884:
 	dbf	d1, loc_E85C
 	move.w	#$1704, ($FFFFCD02).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	moveq	#-1, d0
 	rts
 loc_E896:
@@ -23109,14 +23109,14 @@ loc_E896:
 	move.w	(Character_index).w, d1
 	bsr.w	AddItemToInventory2
 	move.b	#SFXID_ItemReceived, (Sound_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	moveq	#0, d0
 	rts
 
 loc_E8B4:
 	move.b	#1, (a0)
 	move.w	#$1705, (Script_queue).w		; "It's full of garbage."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 
 ; ===============================================
@@ -23226,7 +23226,7 @@ TreasureChestContentArray:
 
 ; -------------------------------------------------------------
 Interact_TeimDarum:
-	tst.w	($FFFFDE72).w
+	tst.w	(Interaction_routine_2).w
 	bne.w	CloseAllWindows
 	moveq	#0, d0
 	move.b	(Interaction_subtype).w, d0
@@ -23244,7 +23244,7 @@ loc_E99C:
 TeimDarum_Idle:
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1801, (Script_queue).w		; "I've seen that face! He tried to kill Nei seven months ago! This is bad news. Let's go back for awhile."
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 ; ----------------------------------------
 loc_E9BA:
@@ -23260,7 +23260,7 @@ loc_E9C6:
 	bne.s	loc_E9DC
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1802, (Script_queue).w		; "What's Teim doing?"
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E9DC:
 	subq.w	#1, d2
@@ -23272,13 +23272,13 @@ loc_E9DC:
 	subi.w	#$10, d0
 	move.w	d0, ($FFFFE80A).w
 	move.w	#1, ($FFFFE824).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EA0A:
 	subq.w	#1, d2
 	bne.s	loc_EA1A
 	move.w	#1, ($FFFFE822).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EA1A:
 	subq.w	#1, d2
@@ -23289,7 +23289,7 @@ loc_EA20:
 	bne.s	loc_EA36
 	move.w	#$1804, (Script_queue).w
 	move.w	#1, ($FFFFE862).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EA36:
 	subq.w	#1, d2
@@ -23297,7 +23297,7 @@ loc_EA36:
 	tst.w	($FFFFE854).w
 	bne.s	loc_EA4A
 	move.w	#2, ($FFFFE862).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 loc_EA4A:
 	rts
 loc_EA4C:
@@ -23308,7 +23308,7 @@ loc_EA52:
 	subq.w	#1, d2
 	bne.s	loc_EA62
 	move.w	#$1805, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EA62:
 	subq.w	#1, d2
@@ -23334,19 +23334,19 @@ loc_EA9A:
 	bne.s	loc_EAB0
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#$1806, (Script_queue).w
-	addq.w	#1, ($FFFFDE70).w
+	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EAB0:
 	move.b	#1, ($FFFFC715).w
 	move.w	#0, (Cutscene_flag).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 ; ----------------------------------------
 loc_EAC2:
 	move.w	#WinID_ScriptMessage, (Window_queue).w
 	move.w	#0, (Character_index).w
 	move.w	#6, (Script_queue).w
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 	rts
 ; -------------------------------------------------------------
 
@@ -23357,7 +23357,7 @@ Battle_CheckRoutines:
 	bne.s	+
 	tst.w	(Window_index).w
 	bne.s	+
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	+
 	tst.w	(Fight_action_steps).w
 	bne.s	+
@@ -24433,8 +24433,8 @@ UpdateWindows:
 	bset	#0, (Window_queue).w	; set window-opening flag
 	bne.s	.return						; if it was already processed, return
 	move.w	(Window_queue).w, d0
-	andi.w	#$FF, d0
-	move.w	d0, (Window_index).w	; save index for further processing
+	andi.w	#$FF, d0		; get window index
+	move.w	d0, (Window_index).w
 	move.w	#0, (Window_routine).w
 
 .update:
@@ -24573,7 +24573,7 @@ WindowsIndexTable:
 ; ========================================
 
 Win_Null:
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	beq.s	+
 	bsr.w	ScriptControlCodes
 +
@@ -24976,7 +24976,7 @@ loc_FB7A:
 loc_FB84:
 	cmpi.b	#$C5, d0
 	bne.s	loc_FB92
-	move.w	#0, (Window_active_flag).w
+	move.w	#0, (Script_flag).w
 	rts
 loc_FB92:
 	cmpi.b	#$C6, d0
@@ -24990,7 +24990,7 @@ loc_FBA8:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	move.w	#$3C, (Text_auto_timer).w
 	move.w	#0, (Joypad_held).w
-	move.w	#0, (Window_active_flag).w
+	move.w	#0, (Script_flag).w
 	lea	(Window_queue).w, a1
 loc_FBC4:
 	tst.w	(a1)+
@@ -25003,7 +25003,7 @@ loc_FBCE:
 	subq.w	#1, (Text_auto_timer).w
 	bpl.s	loc_FBFE
 	move.w	#$3C, (Text_auto_timer).w
-	move.w	#0, (Window_active_flag).w
+	move.w	#0, (Script_flag).w
 	rts
 loc_FBE8:
 	move.b	(Joypad_pressed).w, d0
@@ -25020,7 +25020,7 @@ loc_FC00:
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.s	loc_FC16
 	move.b	#SFXID_Selection, (Sound_queue).w
-	move.w	#0, (Window_active_flag).w
+	move.w	#0, (Script_flag).w
 loc_FC16:
 	rts
 ; ----------------------------------------
@@ -26152,7 +26152,7 @@ loc_106E4:
 	bsr.w	loc_11064
 	btst	#Button_B, (Joypad_pressed).w
 	beq.s	loc_106FE
-	subq.w	#1,(Event_routine_2).w
+	subq.w	#1, (Event_routine_2).w
 	rts
 
 loc_106FE:
@@ -26172,7 +26172,7 @@ loc_10706:
 	beq.s	loc_10706
 	dbf	d1, loc_10706
 
-	move.w	d0,(Character_index).w
+	move.w	d0, (Character_index).w
 loc_10726:
 	rts
 
@@ -27142,12 +27142,12 @@ loc_11028:
 	move.w	d1, (a0)
 	andi.b	#$10, d0
 	beq.s	loc_1105E
-	tst.w	($FFFFDE70).w
+	tst.w	(Interaction_routine).w
 	bne.s	loc_1105A
 	addq.w	#1, (Event_routine_2).w
 	rts
 loc_1105A:
-	addq.w	#1, ($FFFFDE72).w
+	addq.w	#1, (Interaction_routine_2).w
 loc_1105E:
 	rts
 
@@ -27200,15 +27200,15 @@ CloseAllWindows:
 	move.w	d0, (Event_routine).w
 	move.w	d0, (Event_routine_2).w
 	move.w	d0, (Interaction_type).w
-	move.w	d0, ($FFFFDE70).w
-	move.w	d0, ($FFFFDE72).w
+	move.w	d0, (Interaction_routine).w
+	move.w	d0, (Interaction_routine_2).w
 	move.w	(Windows_opened_num).w, d0
 	ori.w	#$8000, d0
 	move.w	d0, (Window_queue).w
 	rts
 
 CheckLoadScript:
-	tst.w	(Window_active_flag).w
+	tst.w	(Script_flag).w
 	bne.s	+
 	move.w	(Script_queue).w, d0
 	bne.s	LoadScript
@@ -27360,7 +27360,7 @@ loc_1125C:
 	bra.w	LoadScript_ChkCharName
 loc_11268:
 	move.b	d0, (a2)+
-	move.w	#1, (Window_active_flag).w
+	move.w	#1, (Script_flag).w
 	rts
 
 Script_ProcessItemEnemyNames:	; 10 characters
@@ -28512,7 +28512,7 @@ LoadDynWindowsInRam:
 
 ProcessRandomBattle:
 	nop
-	tst.w	($FFFFDE70).w
+	tst.w	(Interaction_routine).w
 	bne.s	loc_116FE
 	tst.w	(Window_queue).w
 	bne.s	loc_116FE
