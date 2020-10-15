@@ -29030,223 +29030,223 @@ PtrPal_DezoTown:
 ; ===========================================================
 
 
-Pal_Sega:	binclude "general/palettes/sega.bin"
+Pal_Sega:	binclude "palettes/sega/Sega.bin"
 Pal_SegaEnd:
 
-Pal_Title:	binclude "general/palettes/title.bin"
+Pal_Title:	binclude "palettes/title/Title.bin"
 Pal_TitleEnd:
 
-Pal_GameStart:	binclude "general/palettes/game_start.bin"
+Pal_GameStart:	binclude "palettes/misc/Game start.bin"
 Pal_GameStartEnd:
 
-Pal_Party:	binclude "general/palettes/party.bin"
+Pal_Party:	binclude "palettes/characters/Map party.bin"
 Pal_PartyEnd:
 
-Pal_Battle:	binclude "general/palettes/battle.bin"
+Pal_Battle:	binclude "palettes/battle/Battle.bin"
 Pal_BattleEnd:
 
-Pal_MotaOverworld:	binclude "general/palettes/mota_overworld.bin"
+Pal_MotaOverworld:	binclude "palettes/maps/Mota overworld.bin"
 Pal_MotaOverworldEnd:
 
-Pal_DezolisSkure:	binclude "general/palettes/dezo_skure.bin"
+Pal_DezolisSkure:	binclude "palettes/maps/Dezo Skure.bin"
 Pal_DezolisSkureEnd:
 
-Pal_MotaTown:	binclude "general/palettes/mota_town.bin"
+Pal_MotaTown:	binclude "palettes/maps/Mota town.bin"
 Pal_MotaTownEnd:
 
-Pal_Uzo:	binclude "general/palettes/uzo.bin"
+Pal_Uzo:	binclude "palettes/maps/Uzo.bin"
 Pal_UzoEnd:
 
-Pal_UnderwaterPassage:	binclude "general/palettes/underwater_passage.bin"
+Pal_UnderwaterPassage:	binclude "palettes/maps/Underwater passage.bin"
 Pal_UnderwaterPassageEnd:
 
-Pal_Unknown:	binclude "general/palettes/unknown.bin"
+Pal_Unknown:	binclude "palettes/misc/Unknown.bin"
 Pal_UnknownEnd:
 
-Pal_Tube:	binclude "general/palettes/tube.bin"
+Pal_Tube:	binclude "palettes/maps/Tube.bin"
 Pal_TubeEnd:
 
-Pal_BlueDam:	binclude "general/palettes/blue_dam.bin"
+Pal_BlueDam:	binclude "palettes/maps/Blue Dam.bin"
 Pal_BlueDamEnd:
 
-Pal_YellowDam:	binclude "general/palettes/yellow_dam.bin"
+Pal_YellowDam:	binclude "palettes/maps/Yellow Dam.bin"
 Pal_YellowDamEnd:
 
-Pal_GreenDam:	binclude "general/palettes/green_dam.bin"
+Pal_GreenDam:	binclude "palettes/maps/Green Dam.bin"
 Pal_GreenDamEnd:
 
-Pal_RedDam:	binclude "general/palettes/red_dam.bin"
+Pal_RedDam:	binclude "palettes/maps/Red Dam.bin"
 Pal_RedDamEnd:
 
-Pal_ShureNido:	binclude "general/palettes/shure_nido.bin"
+Pal_ShureNido:	binclude "palettes/maps/Shure Nido.bin"
 Pal_ShureNidoEnd:
 
-Pal_Climatrol:	binclude "general/palettes/climatrol.bin"
+Pal_Climatrol:	binclude "palettes/maps/Climatrol.bin"
 Pal_ClimatrolEnd:
 
-Pal_Roron:	binclude "general/palettes/roron.bin"
+Pal_Roron:	binclude "palettes/maps/Roron.bin"
 Pal_RoronEnd:
 
-Pal_BiosystemsLab:	binclude "general/palettes/biosystems_lab.bin"
+Pal_BiosystemsLab:	binclude "palettes/maps/Biosystems Lab.bin"
 Pal_BiosystemsLabEnd:
 
-Pal_ControlTower:	binclude "general/palettes/control_tower.bin"
+Pal_ControlTower:	binclude "palettes/maps/Control Tower.bin"
 Pal_ControlTowerEnd:
 
-Pal_Crevice:	binclude "general/palettes/crevice.bin"
+Pal_Crevice:	binclude "palettes/maps/Crevice.bin"
 Pal_CreviceEnd:
 
-Pal_Gaira:	binclude "general/palettes/gaira.bin"
+Pal_Gaira:	binclude "palettes/maps/Gaira.bin"
 Pal_GairaEnd:
 
-Pal_EsperMansion:	binclude "general/palettes/esper_mansion.bin"
+Pal_EsperMansion:	binclude "palettes/maps/Esper Mansion.bin"
 Pal_EsperMansionEnd:
 
-Pal_Noah:	binclude "general/palettes/noah.bin"
+Pal_Noah:	binclude "palettes/maps/Noah.bin"
 Pal_NoahEnd:
 
-Pal_Naval:	binclude "general/palettes/naval.bin"
+Pal_Naval:	binclude "palettes/maps/Naval.bin"
 Pal_NavalEnd:
 
-Pal_Menobe:	binclude "general/palettes/menobe.bin"
+Pal_Menobe:	binclude "palettes/maps/Menobe.bin"
 Pal_MenobeEnd:
 
-Pal_Ikuto:	binclude "general/palettes/ikuto.bin"
+Pal_Ikuto:	binclude "palettes/maps/Ikuto.bin"
 Pal_IkutoEnd:
 
-Pal_Guaron:	binclude "general/palettes/guaron.bin"
+Pal_Guaron:	binclude "palettes/maps/Guaron.bin"
 Pal_GuaronEnd:
 
-Pal_DezoTown:	binclude "general/palettes/dezo_town.bin"
+Pal_DezoTown:	binclude "palettes/maps/Dezo town.bin"
 Pal_DezoTownEnd:
 
-Pal_RolfPortrait:	binclude "general/palettes/rolf_portrait.bin"
+Pal_RolfPortrait:	binclude "palettes/characters/Rolf portrait.bin"
 Pal_RolfPortraitEnd:
 
-Pal_NeiPortrait:	binclude "general/palettes/nei_portrait.bin"
+Pal_NeiPortrait:	binclude "palettes/characters/Nei portrait.bin"
 Pal_NeiPortraitEnd:
 
-Pal_RudoPortrait:	binclude "general/palettes/rudo_portrait.bin"
+Pal_RudoPortrait:	binclude "palettes/characters/Rudo portrait.bin"
 Pal_RudoPortraitEnd:
 
-Pal_AmyPortrait:	binclude "general/palettes/amy_portrait.bin"
+Pal_AmyPortrait:	binclude "palettes/characters/Amy portrait.bin"
 Pal_AmyPortraitEnd:
 
-Pal_HughPortrait:	binclude "general/palettes/hugh_portrait.bin"
+Pal_HughPortrait:	binclude "palettes/characters/Hugh portrait.bin"
 Pal_HughPortraitEnd:
 
-Pal_AnnaPortrait:	binclude "general/palettes/anna_portrait.bin"
+Pal_AnnaPortrait:	binclude "palettes/characters/Anna portrait.bin"
 Pal_AnnaPortraitEnd:
 
-Pal_KainPortrait:	binclude "general/palettes/kain_portrait.bin"
+Pal_KainPortrait:	binclude "palettes/characters/Kain portrait.bin"
 Pal_KainPortraitEnd:
 
-Pal_ShirPortrait:	binclude "general/palettes/shir_portrait.bin"
+Pal_ShirPortrait:	binclude "palettes/characters/Shir portrait.bin"
 Pal_ShirPortraitEnd:
 
-Pal_LibrarianPortrait:	binclude "general/palettes/librarian_portrait.bin"
+Pal_LibrarianPortrait:	binclude "palettes/NPC/Librarian portrait.bin"
 Pal_LibrarianPortraitEnd:
 
-Pal_MotSaveEmpPort:	binclude "general/palettes/mota_save_employee_portrait.bin"
+Pal_MotSaveEmpPort:	binclude "palettes/NPC/Mota save employee portrait.bin"
 Pal_MotSaveEmpPortEnd:
 
-Pal_MotDocPortrait:	binclude "general/palettes/mota_doctor_portrait.bin"
+Pal_MotDocPortrait:	binclude "palettes/NPC/Mota doctor portrait.bin"
 Pal_MotDocPortraitEnd:
 
-Pal_GrandmaPortrait:	binclude "general/palettes/grandma_portrait.bin"
+Pal_GrandmaPortrait:	binclude "palettes/NPC/Grandma portrait.bin"
 Pal_GrandmaPortraitEnd:
 
-Pal_MotItemSellerPort:	binclude "general/palettes/mota_item_seller_portrait.bin"
+Pal_MotItemSellerPort:	binclude "palettes/NPC/Mota item seller portrait.bin"
 Pal_MotItemSellerPortEnd:
 
-Pal_MotWpnSellerPort:	binclude "general/palettes/mota_weapon_seller_portrait.bin"
+Pal_MotWpnSellerPort:	binclude "palettes/NPC/Mota weapon seller portrait.bin"
 Pal_MotWpnSellerPortEnd:
 
-Pal_MotArmorSellPort:	binclude "general/palettes/mota_armor_seller_portrait.bin"
+Pal_MotArmorSellPort:	binclude "palettes/NPC/Mota armor seller portrait.bin"
 Pal_MotArmorSellPortEnd:
 
-Pal_UstvestiaPortrait:	binclude "general/palettes/ustvestia_portrait.bin"
+Pal_UstvestiaPortrait:	binclude "palettes/NPC/Ustvestia portrait.bin"
 Pal_UstvestiaPortraitEnd:
 
-Pal_Dezolian1Portrait:	binclude "general/palettes/dezolian1_portrait.bin"
+Pal_Dezolian1Portrait:	binclude "palettes/NPC/Dezolian 1 portrait.bin"
 Pal_Dezolian1PortraitEnd:
 
-Pal_Dezolian2Portrait:	binclude "general/palettes/dezolian2_portrait.bin"
+Pal_Dezolian2Portrait:	binclude "palettes/NPC/dezolian 2 portrait.bin"
 Pal_Dezolian2PortraitEnd:
 
-Pal_Dezolian3Portrait:	binclude "general/palettes/dezolian3_portrait.bin"
+Pal_Dezolian3Portrait:	binclude "palettes/NPC/dezolian 3 portrait.bin"
 Pal_Dezolian3PortraitEnd:
 
-Pal_Dezolian4Portrait:	binclude "general/palettes/dezolian4_portrait.bin"
+Pal_Dezolian4Portrait:	binclude "palettes/NPC/dezolian 4 portrait.bin"
 Pal_Dezolian4PortraitEnd:
 
-Pal_ItemKeeperPort:	binclude "general/palettes/item_keeper_portrait.bin"
+Pal_ItemKeeperPort:	binclude "palettes/NPC/Item keeper portrait.bin"
 Pal_ItemKeeperPortEnd:
 
-Pal_TeleEmpPort:	binclude "general/palettes/teleport_employee_portrait.bin"
+Pal_TeleEmpPort:	binclude "palettes/NPC/Teleport employee portrait.bin"
 Pal_TeleEmpPortEnd:
 
-Pal_CentTow1Port:	binclude "general/palettes/central_tower1_portrait.bin"
+Pal_CentTow1Port:	binclude "palettes/scene/Central Tower 1 portrait.bin"
 Pal_CentTow1PortEnd:
 
-Pal_GovernorPortrait:	binclude "general/palettes/governor_portrait.bin"
+Pal_GovernorPortrait:	binclude "palettes/NPC/Governor portrait.bin"
 Pal_GovernorPortraitEnd:
 
-Pal_RoofPortrait:	binclude "general/palettes/roof_portrait.bin"
+Pal_RoofPortrait:	binclude "palettes/scene/Roof portrait.bin"
 Pal_RoofPortraitEnd:
 
-Pal_GraphPortrait:	binclude "general/palettes/graph_portrait.bin"
+Pal_GraphPortrait:	binclude "palettes/scene/Graph portrait.bin"
 Pal_GraphPortraitEnd:
 
-Pal_Graph:	binclude "general/palettes/graph.bin"
+Pal_Graph:	binclude "palettes/scene/Graph.bin"
 Pal_GraphEnd:
 
-Pal_RadarPortrait:	binclude "general/palettes/radar_portrait.bin"
+Pal_RadarPortrait:	binclude "palettes/scene/Radar portrait.bin"
 Pal_RadarPortraitEnd:
 
-Pal_NeiDeath:	binclude "general/palettes/nei_death.bin"
+Pal_NeiDeath:	binclude "palettes/characters/Nei death.bin"
 Pal_NeiDeathEnd:
 
-Pal_NeiDeath2:	binclude "general/palettes/nei_death2.bin"
+Pal_NeiDeath2:	binclude "palettes/characters/Nei death 2.bin"
 Pal_NeiDeath2End:
 
-Pal_PlanetMota:	binclude "general/palettes/planet_mota.bin"
+Pal_PlanetMota:	binclude "palettes/misc/Planet Mota.bin"
 Pal_PlanetMotaEnd:
 
-Pal_PlanetDezo:	binclude "general/palettes/planet_dezo.bin"
+Pal_PlanetDezo:	binclude "palettes/misc/Planet Dezo.bin"
 Pal_PlanetDezoEnd:
 
-Pal_SpaceTravel:	binclude "general/palettes/space_travel.bin"
+Pal_SpaceTravel:	binclude "palettes/misc/Space Travel.bin"
 Pal_SpaceTravelEnd:
 
-Pal_SceneLutz:	binclude "general/palettes/scene_lutz.bin"
+Pal_SceneLutz:	binclude "palettes/NPC/Lutz portrait.bin"
 Pal_SceneLutzEnd:
 
-Pal_CentTow2Port:	binclude "general/palettes/central_tower2_portrait.bin"
+Pal_CentTow2Port:	binclude "palettes/scene/Central Tower 2 portrait.bin"
 Pal_CentTow2PortEnd:
 
-Pal_EndingRudo:	binclude "general/palettes/ending_rudo.bin"
+Pal_EndingRudo:	binclude "palettes/characters/Rudo ending.bin"
 Pal_EndingRudoEnd:
 
-Pal_EndingAmy:	binclude "general/palettes/ending_amy.bin"
+Pal_EndingAmy:	binclude "palettes/characters/Amy ending.bin"
 Pal_EndingAmyEnd:
 
-Pal_EndingKain:	binclude "general/palettes/ending_kain.bin"
+Pal_EndingKain:	binclude "palettes/characters/Kain ending.bin"
 Pal_EndingKainEnd:
 
-Pal_EndingShir:	binclude "general/palettes/ending_shir.bin"
+Pal_EndingShir:	binclude "palettes/characters/Shir ending.bin"
 Pal_EndingShirEnd:
 
-Pal_EndingHugh:	binclude "general/palettes/ending_hugh.bin"
+Pal_EndingHugh:	binclude "palettes/characters/Hugh ending.bin"
 Pal_EndingHughEnd:
 
-Pal_EndingAnna:	binclude "general/palettes/ending_anna.bin"
+Pal_EndingAnna:	binclude "palettes/characters/Anna ending.bin"
 Pal_EndingAnnaEnd:
 
-Pal_EndingRolf:	binclude "general/palettes/ending_rolf.bin"
+Pal_EndingRolf:	binclude "palettes/characters/Rolf ending.bin"
 Pal_EndingRolfEnd:
 
-Pal_Credits:	binclude "general/palettes/credits.bin"
+Pal_Credits:	binclude "palettes/ending/Credits.bin"
 Pal_CreditsEnd:
 
 ; ---------------------------------------------------------------------------------
@@ -39746,11 +39746,11 @@ loc_17DA2:
 	even
 
 
-TylerPortraitTileInd:	binclude "scene/mappings/tyler.bin"
+TylerPortraitTileInd:	binclude "plane mappings/NPC/Tyler portrait.bin"
 	even
 
 
-PlaneMap_TylerMonitor:	binclude "scene/mappings/tyler_monitor.bin"
+PlaneMap_TylerMonitor:	binclude "plane mappings/scene/Tyler monitor portrait.bin"
 	even
 
 
@@ -39853,7 +39853,7 @@ Map_PalmExplosion_4:
 
 	even
 
-PlaneMap_SceneLutz:	binclude "scene/mappings/lutz.bin"
+PlaneMap_SceneLutz:	binclude "plane mappings/NPC/Lutz portrait.bin"
 	even
 
 
@@ -49169,7 +49169,7 @@ PLC_Bowgun:
 ; ------------------------------------
 PLC_LaserShot:
 	dc.w	0
-	dc.l	Art_BattleLaserShot
+	dc.l	Art_BattleTsuAttack
 	dc.w	$9000
 ; ------------------------------------
 PLC_PulseCannon:
@@ -49181,12 +49181,12 @@ PLC_Neishot:
 	dc.w	1
 	dc.l	Art_BattleNeishotShoot
 	dc.w	$8000
-	dc.l	Art_BattleNeishotAttack
+	dc.l	Art_BattleMegidAttack
 	dc.w	$9000
 ; ------------------------------------
 PLC_AcidShot:
 	dc.w	0
-	dc.l	Art_BattleAcidShot
+	dc.l	Art_BattleFanbiAttack
 	dc.w	$9000
 ; ------------------------------------
 PLC_Foi:
@@ -49212,7 +49212,7 @@ PLC_Tsu:
 	dc.w	1
 	dc.l	Art_BattleTsuCast
 	dc.w	$8000
-	dc.l	Art_BattleLaserShot
+	dc.l	Art_BattleTsuAttack
 	dc.w	$9000
 ; ------------------------------------
 PLC_Shift:
@@ -49226,7 +49226,7 @@ PLC_Fanbi:
 	dc.w	1
 	dc.l	Art_BattleShiftCast
 	dc.w	$8000
-	dc.l	Art_BattleAcidShot
+	dc.l	Art_BattleFanbiAttack
 	dc.w	$9000
 ; ------------------------------------
 PLC_Eijia:
@@ -49271,7 +49271,7 @@ PLC_Megid:
 	dc.w	1
 	dc.l	Art_BattleMegidCast
 	dc.w	$8000
-	dc.l	Art_BattleNeishotAttack
+	dc.l	Art_BattleMegidAttack
 	dc.w	$9000
 ; ------------------------------------
 
@@ -51519,21 +51519,21 @@ loc_29E16:
 	
 Art_Font:
 	if revision=0
-	binclude "general/font/art/font_ja.bin"
+	binclude "graphics/font/Japanese.bin"
 	elseif revision=3
-	binclude "general/font/art/font_pt.bin"
+	binclude "graphics/font/Portuguese.bin"
 	else
-	binclude "general/font/art/font.bin"
+	binclude "graphics/font/English.bin"
 	endif
 	
 	even
 
 
-Art_SegaLogo:	binclude "sega/art/sega_logo.bin"
+Art_SegaLogo:	binclude "graphics/sega/Logo.bin"
 	even
 
 
-PlaneMap_SegaLogo:	binclude "sega/mappings/sega_logo.bin"
+PlaneMap_SegaLogo:	binclude "plane mappings/sega/Logo.bin"
 	even
 
 	if revision>0
@@ -51546,105 +51546,105 @@ PlaneMap_SegaLogo:	binclude "sega/mappings/sega_logo.bin"
 ; ---------------------------------------------------------------------------------
 	endif
 
-Art_MapCharacterSpriteSheets: binclude "general/objects/art/character_sprite_sheets.bin"
+Art_MapCharacterSpriteSheets: binclude "graphics/characters/Map sprite sheets.bin"
 	even
 
-Art_SceneLibrarian: binclude "scene/art/librarian.bin"
+Art_SceneLibrarian: binclude "graphics/NPC/Librarian portrait.bin"
 	even
 
-Art_SceneMotaSaveEmployee: binclude "scene/art/mota_save_employee.bin"
+Art_SceneMotaSaveEmployee: binclude "graphics/NPC/Mota save employee portrait.bin"
 	even
 
 Art_SceneMotaDoctor:
 	if cross_patch=1
-	binclude "scene/art/mota_doctor_no_cross.bin"
+	binclude "graphics/NPC/Mota doctor no cross portrait.bin"
 	else
-	binclude "scene/art/mota_doctor.bin"
+	binclude "graphics/NPC/Mota doctor portrait.bin"
 	endif
 
 	even
 
-Art_SceneCloneLabGrandma: binclude "scene/art/clone_lab_grandma.bin"
+Art_SceneCloneLabGrandma: binclude "graphics/NPC/Clone lab grandma portrait.bin"
 	even
 
-Art_SceneMotaItemSeller: binclude "scene/art/mota_item_seller.bin"
+Art_SceneMotaItemSeller: binclude "graphics/NPC/Mota item seller portrait.bin"
 	even
 
-Art_SceneMotaWeaponSeller: binclude "scene/art/mota_weapon_seller.bin"
+Art_SceneMotaWeaponSeller: binclude "graphics/NPC/Mota weapon seller portrait.bin"
 	even
 
-Art_SceneMotaArmorSeller: binclude "scene/art/mota_armor_seller.bin"
+Art_SceneMotaArmorSeller: binclude "graphics/NPC/Mota armor seller portrait.bin"
 	even
 
-Art_SceneUstvestia: binclude "scene/art/ustvestia.bin"
+Art_SceneUstvestia: binclude "graphics/NPC/Ustvestia portrait.bin"
 	even
 
-Art_SceneDezolian: binclude "scene/art/dezolian.bin"
+Art_SceneDezolian: binclude "graphics/NPC/Dezolian portrait.bin"
 	even
 
-Art_SceneCentralTowerOutside: binclude "scene/art/central_tower_outside.bin"
+Art_SceneCentralTowerOutside: binclude "graphics/scene/Central Tower outside portrait.bin"
 	even
 
-Art_SceneGovernor: binclude "scene/art/governor.bin"
+Art_SceneGovernor: binclude "graphics/NPC/Governor portrait.bin"
 	even
 
-Art_SceneItemKeeper: binclude "scene/art/item_keeper.bin"
+Art_SceneItemKeeper: binclude "graphics/NPC/Item keeper portrait.bin"
 	even
 
-Art_SceneRoof: binclude "scene/art/central_tower_roof.bin"
+Art_SceneRoof: binclude "graphics/scene/Central Tower roof portrait.bin"
 	even
 
-Art_SceneTylerSpaceship:	binclude "scene/art/tyler_spaceship_art.bin"
+Art_SceneTylerSpaceship:	binclude "graphics/scene/Tyler spaceship portrait.bin"
 	even
 
-Art_SceneRolf: binclude "scene/art/rolf.bin"
+Art_SceneRolf: binclude "graphics/characters/Rolf portrait.bin"
 	even
 
-Art_SceneNei: binclude "scene/art/nei.bin"
+Art_SceneNei: binclude "graphics/characters/Nei portrait.bin"
 	even
 
-Art_SceneRudo: binclude "scene/art/rudo.bin"
+Art_SceneRudo: binclude "graphics/characters/Rudo portrait.bin"
 	even
 
-Art_SceneAmy: binclude "scene/art/amy.bin"
+Art_SceneAmy: binclude "graphics/characters/Amy portrait.bin"
 	even
 
-Art_SceneHugh: binclude "scene/art/hugh.bin"
+Art_SceneHugh: binclude "graphics/characters/Hugh portrait.bin"
 	even
 
-Art_SceneAnna: binclude "scene/art/anna.bin"
+Art_SceneAnna: binclude "graphics/characters/Anna portrait.bin"
 	even
 
-Art_SceneKain: binclude "scene/art/kain.bin"
+Art_SceneKain: binclude "graphics/characters/Kain portrait.bin"
 	even
 
-Art_SceneShir: binclude "scene/art/shir.bin"
+Art_SceneShir: binclude "graphics/characters/Shir portrait.bin"
 	even
 
 	
 Art_SceneGraph:
 	if revision=0
-	binclude "scene/art/graph_ja.bin"
+	binclude "graphics/scene/Graph portrait Jap.bin"
 	elseif revision=3
-	binclude "scene/art/graph_pt.bin"
+	binclude "graphics/scene/Graph portrait Pt.bin"
 	else
-	binclude "scene/art/graph.bin"
+	binclude "graphics/scene/Graph portrait.bin"
 	endif
 	even
 
 	
 Art_SceneRadar:
 	if revision=3
-	binclude "scene/art/radar_pt.bin"
+	binclude "graphics/scene/Radar portrait Pt.bin"
 	else
-	binclude "scene/art/radar.bin"
+	binclude "graphics/scene/Radar portrait.bin"
 	even
 	endif
 	
-Art_SceneMotaTeleportEmployee: binclude "scene/art/mota_teleport_employee.bin"
+Art_SceneMotaTeleportEmployee: binclude "graphics/NPC/Mota teleport employee portrait.bin"
 	even
 
-Art_SceneLutz:	binclude "scene/art/lutz.bin"
+Art_SceneLutz:	binclude "graphics/NPC/Lutz portrait.bin"
 	even
 
 	if revision>0
@@ -51665,18 +51665,18 @@ loc_39E9C:
 
 ArtNem_Mota:
 	if revision=0
-	binclude "map/art/compressed/mota_ja.bin"
+	binclude "graphics/maps/Mota.bin"
 	else
-	binclude "map/art/nemesis/mota.bin"
+	binclude "graphics/maps/Mota Nemesis.bin"
 	endif
 
 	even
 
 ArtNem_Dezo:
 	if revision=0
-	binclude "map/art/compressed/dezo_skure_ja.bin"
+	binclude "graphics/maps/Dezo Skure.bin"
 	else
-	binclude "map/art/nemesis/dezo_skure.bin"	
+	binclude "graphics/maps/Dezo Skure Nemesis.bin"	
 	endif
 
 	even
@@ -51685,17 +51685,17 @@ ArtNem_Town:
 	if revision=0
 	
 	if cross_patch=1
-	binclude "map/art/compressed/towns_no_cross_ja.bin"
+	binclude "graphics/maps/Towns no cross.bin"
 	else
-	binclude "map/art/compressed/towns_ja.bin"
+	binclude "graphics/maps/Towns.bin"
 	endif
 	
 	else
 	
 	if cross_patch=1
-	binclude "map/art/nemesis/towns_no_cross.bin"
+	binclude "graphics/maps/Town no cross Nemesis.bin"
 	else
-	binclude "map/art/nemesis/towns.bin"
+	binclude "graphics/maps/Towns Nemesis.bin"
 	endif
 	
 	endif
@@ -51704,9 +51704,9 @@ ArtNem_Town:
 
 ArtNem_IslandPassage:
 	if revision=0
-	binclude "map/art/compressed/islands_and_passageways_ja.bin"
+	binclude "graphics/maps/Islands and passageways.bin"
 	else
-	binclude "map/art/nemesis/islands_and_passageways.bin"
+	binclude "graphics/maps/Islands and passageways Nemesis.bin"
 	endif
 	
 	even
@@ -51743,9 +51743,9 @@ loc_412F8:
 
 ArtNem_MotaDungeon:
 	if revision=0
-	binclude "map/art/compressed/mota_dungeons_ja.bin"
+	binclude "graphics/maps/Mota dungeons.bin"
 	else
-	binclude "map/art/nemesis/mota_dungeons.bin"
+	binclude "graphics/maps/Mota dungeons Nemesis.bin"
 	even
 	endif
 
@@ -51760,9 +51760,9 @@ loc_39E9C:
 
 ArtNem_DezoDungeon:
 	if revision=0
-	binclude "map/art/compressed/dezo_dungeons_ja.bin"
+	binclude "graphics/maps/Dezo dungeons.bin"
 	else
-	binclude "map/art/nemesis/dezo_dungeons.bin"
+	binclude "graphics/maps/Dezo dungeons Nemesis.bin"
 	endif
 	
 	even
@@ -57606,10 +57606,10 @@ loc_5811C:
 
 	even
 
-Art_MotaMan:	binclude "general/objects/art/mota_man.bin"
+Art_MotaMan:	binclude "graphics/NPC/Mota man.bin"
 	even
 
-Art_MotaWoman:	binclude "general/objects/art/mota_woman.bin"
+Art_MotaWoman:	binclude "graphics/NPC/Mota woman.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -57716,10 +57716,10 @@ loc_58A56:
 
 ; ==================================================================
 
-Art_MotaOldMan:	binclude "general/objects/art/mota_old_man.bin"
+Art_MotaOldMan:	binclude "graphics/NPC/Mota old man.bin"
 	even
 
-Art_MotaChild:	binclude "general/objects/art/mota_child.bin"
+Art_MotaChild:	binclude "graphics/NPC/Mota child.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -57826,10 +57826,10 @@ loc_5926C:
 
 ; =======================================================
 
-Art_Dezolian:	binclude "general/objects/art/dezolian.bin"
+Art_Dezolian:	binclude "graphics/NPC/Dezolian.bin"
 	even
 
-Art_Motavian:	binclude "general/objects/art/motavian.bin"
+Art_Motavian:	binclude "graphics/NPC/Motavian.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -57996,7 +57996,7 @@ loc_59FB0:
 
 ; =======================================================
 
-Art_MuskCat:	binclude "general/objects/art/musk_cat.bin"
+Art_MuskCat:	binclude "graphics/NPC/Musk Cat.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58083,16 +58083,16 @@ loc_5A40A:
 
 ; =======================================================
 
-Art_Darum:	binclude "general/objects/art/darum.bin"
+Art_Darum:	binclude "graphics/NPC/Darum.bin"
 	even
 
-Art_Teim:	binclude "general/objects/art/teim.bin"
+Art_Teim:	binclude "graphics/NPC/Teim.bin"
 	even
 
-Art_Explosion:	binclude "general/objects/art/explosion.bin"
+Art_Explosion:	binclude "graphics/objects/Explosion.bin"
 	even
 
-Art_Corpse:	binclude "general/objects/art/corpse.bin"
+Art_Corpse:	binclude "graphics/NPC/Corpse.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58241,16 +58241,16 @@ loc_5B5AE:
 
 ; =================================================================
 
-Art_MapLutz:	binclude "general/objects/art/lutz.bin"
+Art_MapLutz:	binclude "graphics/NPC/Lutz.bin"
 	even
 
-Art_CryogenicChamber:	binclude "general/objects/art/cryogenic_chamber.bin"
+Art_CryogenicChamber:	binclude "graphics/objects/Cryogenic chamber.bin"
 	even
 
-Art_CryogenicChamberBed:	binclude "general/objects/art/cryogenic_chamber_bed.bin"
+Art_CryogenicChamberBed:	binclude "graphics/objects/Cryogenic chamber bed.bin"
 	even
 
-Art_LutzChair:	binclude "general/objects/art/lutz_chair.bin"
+Art_LutzChair:	binclude "graphics/objects/Lutz chair.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58419,7 +58419,7 @@ loc_5C8F4:
 
 	even
 
-Art_MotherBrain:	binclude "general/objects/art/mother_brain.bin"
+Art_MotherBrain:	binclude "graphics/NPC/Mother Brain.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58537,10 +58537,10 @@ loc_5D00C:
 
 	even
 
-Art_Neifirst:	binclude "general/objects/art/neifirst.bin"
+Art_Neifirst:	binclude "graphics/NPC/Neifirst.bin"
 	even
 
-Art_PlasmaRing:	binclude "general/objects/art/plasma_ring.bin"
+Art_PlasmaRing:	binclude "graphics/objects/Plasma Ring.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58574,7 +58574,7 @@ loc_5D1A2:
 
 ; =================================================================
 
-Art_Door:	binclude "general/objects/art/door.bin"
+Art_Door:	binclude "graphics/objects/Door.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58623,7 +58623,7 @@ loc_5D540:
 
 	even
 
-Art_DezoTreasureChest:	binclude "general/objects/art/dezo_treasure_chest.bin"
+Art_DezoTreasureChest:	binclude "graphics/objects/Dezo treasure chest.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58644,7 +58644,7 @@ loc_5D70A:
 
 ; ================================================================
 
-Art_MotaTreasureChest:	binclude "general/objects/art/mota_treasure_chest.bin"
+Art_MotaTreasureChest:	binclude "graphics/objects/Mota treasure chest.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58710,7 +58710,7 @@ loc_5D98C:
 ; =================================================================
 
 
-Art_JetScooter:	binclude "general/objects/art/jet_scooter.bin"
+Art_JetScooter:	binclude "graphics/objects/Jet Scooter.bin"
 	even
 	
 
@@ -58806,7 +58806,7 @@ loc_5DFCA:
 	even
 
 	
-Art_Earthman:	binclude "general/objects/art/earthman.bin"
+Art_Earthman:	binclude "graphics/NPC/Earthman.bin"
 	even
 
 ; =================================================================
@@ -58828,7 +58828,7 @@ loc_5E31C:
 
 ; =======================================================
 
-Art_PouringWater:	binclude "general/objects/art/pouring_water.bin"
+Art_PouringWater:	binclude "graphics/objects/Pouring water.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -58875,7 +58875,7 @@ loc_5E56C:
 
 ; =======================================================
 
-Art_BattleSlasherThrow:	binclude "battle/art/slasher_throw.bin"
+Art_BattleSlasherThrow:	binclude "graphics/weapons/Slasher Throw.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -59069,7 +59069,7 @@ Map_WpnSlasherThrown_1B:
 
 	even
 
-Art_BattleSlasherAttack:	binclude "battle/art/slasher_attack.bin"
+Art_BattleSlasherAttack:	binclude "graphics/weapons/Slasher Attack.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -59368,7 +59368,7 @@ Map_WpnSlasherAttack_22:
 
 	even
 
-Art_BattleGraAttack:	binclude "battle/art/gra_attack.bin"
+Art_BattleGraAttack:	binclude "graphics/techniques/Gra Attack.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -59541,85 +59541,85 @@ loc_5FA32:
 
 	even
 
-Art_BattleShiftCast:	binclude "battle/art/shift_cast.bin"
+Art_BattleShiftCast:	binclude "graphics/techniques/Shift Cast.bin"
 	even
 
-Art_BattleShiftAttack:	binclude "battle/art/shift_attack.bin"
+Art_BattleShiftAttack:	binclude "graphics/techniques/Shift Attack.bin"
 	even
 
-Art_BattleDebanAttack:	binclude "battle/art/deban_attack.bin"
+Art_BattleDebanAttack:	binclude "graphics/techniques/Deban Attack.bin"
 	even
 
-Art_BattleGraCast:	binclude "battle/art/gra_cast.bin"
+Art_BattleGraCast:	binclude "graphics/techniques/Gra Cast.bin"
 	even
 
-Art_BattleTsuCast:	binclude "battle/art/tsu_cast.bin"
+Art_BattleTsuCast:	binclude "graphics/techniques/Tsu Cast.bin"
 	even
 
-Art_BattleSakCast:	binclude "battle/art/sak_cast.bin"
+Art_BattleSakCast:	binclude "graphics/techniques/Sak Cast.bin"
 	even
 
-Art_BattleKnife:	binclude "battle/art/knife.bin"
+Art_BattleKnife:	binclude "graphics/weapons/Knife.bin"
 	even
 
-Art_BattleSword:	binclude "battle/art/sword.bin"
+Art_BattleSword:	binclude "graphics/weapons/Sword.bin"
 	even
 
-Art_BattleLaserSword:	binclude "battle/art/laser_sword.bin"
+Art_BattleLaserSword:	binclude "graphics/weapons/Laser Sword.bin"
 	even
 
-Art_BattleLacoSword:	binclude "battle/art/laco_sword.bin"
+Art_BattleLacoSword:	binclude "graphics/weapons/Laco Sword.bin"
 	even
 
-Art_BattleSteelBar:	binclude "battle/art/steel_bar.bin"
+Art_BattleSteelBar:	binclude "graphics/weapons/Steel Bar.bin"
 	even
 
-Art_BattleLaserBar:	binclude "battle/art/laser_bar.bin"
+Art_BattleLaserBar:	binclude "graphics/weapons/Laser Bar.bin"
 	even
 
-Art_BattleFireStaff:	binclude "battle/art/fire_staff.bin"
+Art_BattleFireStaff:	binclude "graphics/weapons/Fire Staff.bin"
 	even
 
-Art_BattleGajCast:	binclude "battle/art/gaj_cast.bin"
+Art_BattleGajCast:	binclude "graphics/techniques/Gaj Cast.bin"
 	even
 
-Art_BattleGajAttack:	binclude "battle/art/gaj_attack.bin"
+Art_BattleGajAttack:	binclude "graphics/techniques/Gaj Attack.bin"
 	even
 
-Art_BattleBowgun:	binclude "battle/art/bowgun.bin"
+Art_BattleBowgun:	binclude "graphics/weapons/Bowgun.bin"
 	even
 
-Art_BattleLaserShot:	binclude "battle/art/laser_shot.bin"
+Art_BattleTsuAttack:	binclude "graphics/techniques/Tsu Attack.bin"
 	even
 
-Art_BattlePulseCannon:	binclude "battle/art/pulse_cannon.bin"
+Art_BattlePulseCannon:	binclude "graphics/weapons/Pulse Cannon.bin"
 	even
 
-Art_BattleNeishotShoot:	binclude "battle/art/neishot_shoot.bin"
+Art_BattleNeishotShoot:	binclude "graphics/weapons/Neishot Shoot.bin"
 	even
 
-Art_BattleZanCast:	binclude "battle/art/zan_cast.bin"
+Art_BattleZanCast:	binclude "graphics/techniques/Zan Cast.bin"
 	even
 
-Art_BattleZanAttack:	binclude "battle/art/zan_attack.bin"
+Art_BattleZanAttack:	binclude "graphics/techniques/Zan Attack.bin"
 	even
 
-Art_BattleFoi:	binclude "battle/art/foi.bin"
+Art_BattleFoi:	binclude "graphics/techniques/Foi.bin"
 	even
 
-Art_BattleMegidCast:	binclude "battle/art/megid_cast.bin"
+Art_BattleMegidCast:	binclude "graphics/techniques/Megid Cast.bin"
 	even
 
-Art_BattleNeishotAttack:	binclude "battle/art/neishot_attack.bin"
+Art_BattleMegidAttack:	binclude "graphics/techniques/Megid Attack.bin"
 	even
 
-Art_BattleGen:	binclude "battle/art/gen.bin"
+Art_BattleGen:	binclude "graphics/techniques/Gen.bin"
 	even
 
-Art_BattleEijiaAttack:	binclude "battle/art/eijia_attack.bin"
+Art_BattleEijiaAttack:	binclude "graphics/techniques/Eijia Attack.bin"
 	even
 
-Art_BattleAcidShot:	binclude "battle/art/acid_shot.bin"
+Art_BattleFanbiAttack:	binclude "graphics/techniques/Fanbi Attack.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -63739,25 +63739,25 @@ Map_FanbiAcidShot_8:
 
 	even
 
-Art_TitleBG:	binclude "title/art/background_tiles.bin"
+Art_TitleBG:	binclude "graphics/title/Background.bin"
 	even
 
-Art_TitleCopyright:	binclude "title/art/copyright.bin"
+Art_TitleCopyright:	binclude "graphics/title/Copyright.bin"
 	even
 
-Art_TitleWomen:	binclude "title/art/women.bin"
+Art_TitleWomen:	binclude "graphics/title/Women.bin"
 	even
 
-Art_TitlePSLogo:	binclude "title/art/phantasy_star_logo.bin"
+Art_TitlePSLogo:	binclude "graphics/title/Phantasy Star logo.bin"
 	even
 
-PlaneMap_TitleBG:	binclude "title/mappings/background_tiles.bin"
+PlaneMap_TitleBG:	binclude "plane mappings/title/Background.bin"
 	even
 
-PlaneMap_GameOverBackground:	binclude "title/mappings/game_over_background.bin"
+PlaneMap_GameOverBackground:	binclude "plane mappings/battle/Game Over.bin"
 	even
 
-PlaneMap_TitleFG:	binclude "title/mappings/foreground_tiles.bin"
+PlaneMap_TitleFG:	binclude "plane mappings/title/Foreground.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -64972,22 +64972,22 @@ loc_71E88:
 ; =================================================================
 
 
-Art_BattleRolf:	binclude "battle/art/rolf.bin"
+Art_BattleRolf:	binclude "graphics/characters/Rolf battle.bin"
 	even
 
-Art_BattleNei: binclude "battle/art/nei.bin"
+Art_BattleNei: binclude "graphics/characters/Nei battle.bin"
 	even
 
-Art_BattleRudo: binclude "battle/art/rudo.bin"
+Art_BattleRudo: binclude "graphics/characters/Rudo battle.bin"
 	even
 
-Art_BattleAmyShir: binclude "battle/art/amy_shir.bin"
+Art_BattleAmyShir: binclude "graphics/characters/Amy Shir battle.bin"
 	even
 
-Art_BattleAnna: binclude "battle/art/anna.bin"
+Art_BattleAnna: binclude "graphics/characters/Anna battle.bin"
 	even
 
-Art_BattleHughKain: binclude "battle/art/hugh_kain.bin"
+Art_BattleHughKain: binclude "graphics/characters/Hugh Kain battle.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -65509,10 +65509,10 @@ Mapping_BattleAnna_Attack_5:
 ; =================================================================
 
 
-Art_BattleBackground:	binclude "battle/art/background.bin"
+Art_BattleBackground:	binclude "graphics/battle/Background.bin"
 	even
 
-PlaneMap_BattleBackground:	binclude "battle/mappings/background.bin"
+PlaneMap_BattleBackground:	binclude "plane mappings/battle/Background.bin"
 	even
 
 loc_760D8:
@@ -65552,37 +65552,37 @@ loc_762D8:
 
 
 
-Art_BattleAnt:	binclude "battle/art/ant.bin"
+Art_BattleAnt:	binclude "graphics/enemies/Ant.bin"
 	even
 
-Art_BattleMosquito:	binclude "battle/art/mosquito.bin"
+Art_BattleMosquito:	binclude "graphics/enemies/Mosquito.bin"
 	even
 
-Art_BattleSpinner:	binclude "battle/art/spinner.bin"
+Art_BattleSpinner:	binclude "graphics/enemies/Spinner.bin"
 	even
 
-Art_BattleBee:	binclude "battle/art/bee.bin"
+Art_BattleBee:	binclude "graphics/enemies/Bee.bin"
 	even
 
-Art_BattlePoisoner:	binclude "battle/art/poisoner.bin"
+Art_BattlePoisoner:	binclude "graphics/enemies/Poisoner.bin"
 	even
 
-Art_BattleHitTail:	binclude "battle/art/hittail.bin"
+Art_BattleHitTail:	binclude "graphics/enemies/Hit Tail.bin"
 	even
 
-Art_BattleFroggy:	binclude "battle/art/froggy.bin"
+Art_BattleFroggy:	binclude "graphics/enemies/Froggy.bin"
 	even
 	
-Art_BattleCarrier:	binclude "battle/art/carrier.bin"
+Art_BattleCarrier:	binclude "graphics/enemies/Carrier.bin"
 	even
 
-Art_BattleWhistle:	binclude "battle/art/whistle.bin"
+Art_BattleWhistle:	binclude "graphics/enemies/Whistle.bin"
 	even
 
-Art_BattleLocust:	binclude "battle/art/locust.bin"
+Art_BattleLocust:	binclude "graphics/enemies/Locust.bin"
 	even
 
-Art_BattleAmoeba:	binclude "battle/art/amoeba.bin"
+Art_BattleAmoeba:	binclude "graphics/enemies/Amoeba.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -68064,34 +68064,34 @@ loc_83116:
 
 	even
 
-Art_BattlePolezi:	binclude "battle/art/polezi.bin"
+Art_BattlePolezi:	binclude "graphics/enemies/Polezi.bin"
 	even
 
-Art_BattleLeecher:	binclude "battle/art/leecher.bin"
+Art_BattleLeecher:	binclude "graphics/enemies/Leecher.bin"
 	even
 
-Art_BattlePulser:	binclude "battle/art/pulser.bin"
+Art_BattlePulser:	binclude "graphics/enemies/Pulser.bin"
 	even
 
-Art_BattleRotWood:	binclude "battle/art/rotwood.bin"
+Art_BattleRotWood:	binclude "graphics/enemies/Rotwood.bin"
 	even
 
-Art_BattleWolfang:	binclude "battle/art/wolfang.bin"
+Art_BattleWolfang:	binclude "graphics/enemies/Wolfang.bin"
 	even
 
-Art_BattlePugHit:	binclude "battle/art/pughit.bin"
+Art_BattlePugHit:	binclude "graphics/enemies/Pug Hit.bin"
 	even
 
-Art_BattleWireface:	binclude "battle/art/wireface.bin"
+Art_BattleWireface:	binclude "graphics/enemies/Wireface.bin"
 	even
 
-Art_BattleTerakite:	binclude "battle/art/terakite.bin"
+Art_BattleTerakite:	binclude "graphics/enemies/Terakite.bin"
 	even
 
-Art_BattleFireEye:	binclude "battle/art/fireeye.bin"
+Art_BattleFireEye:	binclude "graphics/enemies/Fire-Eye.bin"
 	even
 
-Art_BattleCatman:	binclude "battle/art/catman.bin"
+Art_BattleCatman:	binclude "graphics/enemies/Catman.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -70275,37 +70275,37 @@ loc_8FADA:
 
 ; =================================================================
 
-Art_BattleMechoman:	binclude "battle/art/mechoman.bin"
+Art_BattleMechoman:	binclude "graphics/enemies/Mechoman.bin"
 	even
 
-Art_BattleMazgamma:	binclude "battle/art/mazgamma.bin"
+Art_BattleMazgamma:	binclude "graphics/enemies/Mazgamma.bin"
 	even
 
-Art_BattleMetalman:	binclude "battle/art/metalman.bin"
+Art_BattleMetalman:	binclude "graphics/enemies/Metalman.bin"
 	even
 
-Art_BattleCooley61:	binclude "battle/art/cooley61.bin"
+Art_BattleCooley61:	binclude "graphics/enemies/Cooley61.bin"
 	even
 
-Art_BattleEyesore:	binclude "battle/art/eyesore.bin"
+Art_BattleEyesore:	binclude "graphics/enemies/Eyesore.bin"
 	even
 
-Art_BattleArmyEye:	binclude "battle/art/army_eye.bin"
+Art_BattleArmyEye:	binclude "graphics/enemies/Army Eye.bin"
 	even
 
-Art_BattleVan:	binclude "battle/art/van.bin"
+Art_BattleVan:	binclude "graphics/enemies/Van.bin"
 	even
 
-Art_BattleOrangah:	binclude "battle/art/orangah.bin"
+Art_BattleOrangah:	binclude "graphics/enemies/Orangah.bin"
 	even
 
-Art_BattleMastodon:	binclude "battle/art/mastodon.bin"
+Art_BattleMastodon:	binclude "graphics/enemies/Mastodon.bin"
 	even
 
-Art_BattleDezoOwl:	binclude "battle/art/dezo_owl.bin"
+Art_BattleDezoOwl:	binclude "graphics/enemies/Dezo Owl.bin"
 	even
 
-Art_BattleRabbit:	binclude "battle/art/rabbit.bin"
+Art_BattleRabbit:	binclude "graphics/enemies/Rabbit.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -73417,22 +73417,22 @@ loc_9C416:
 	dc.b	$20, $07, $00, $85, $10
 ; =================================================================
 
-Art_BattleWrestler:	binclude "battle/art/wrestler.bin"
+Art_BattleWrestler:	binclude "graphics/enemies/Wrestler.bin"
 	even
 
-Art_BattleLung:	binclude "battle/art/lung.bin"
+Art_BattleLung:	binclude "graphics/enemies/Lung.bin"
 	even
 
-Art_BattleDarkside:	binclude "battle/art/darkside.bin"
+Art_BattleDarkside:	binclude "graphics/enemies/Darkside.bin"
 	even
 
-Art_BattleMystcape:	binclude "battle/art/mystcape.bin"
+Art_BattleMystcape:	binclude "graphics/enemies/Mystcape.bin"
 	even
 
-Art_BattleArchDrgn:	binclude "battle/art/arch_drgn.bin"
+Art_BattleArchDrgn:	binclude "graphics/enemies/Arch Drgn.bin"
 	even
 
-Art_BattleFirefall:	binclude "battle/art/firefall.bin"
+Art_BattleFirefall:	binclude "graphics/enemies/Firefall.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -75050,7 +75050,7 @@ loc_A58A0:
 ; =================================================================
 
 
-Art_BattleWizard:	binclude "battle/art/wizard.bin"
+Art_BattleWizard:	binclude "graphics/enemies/Wizard.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -75390,7 +75390,7 @@ loc_A760A:
 	dc.b	$04, $08, $B1, $18, $30, $01, $08, $B3, $20, $40, $04, $08, $B5, $18, $00 ;0x0 (0x000A760B-0x000A762A, Entry count: 0x0000001F) [Unknown data]
 ; =================================================================
 
-Art_BattleNeifirst:	binclude "battle/art/neifirst.bin"
+Art_BattleNeifirst:	binclude "graphics/enemies/Neifirst.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -75754,7 +75754,7 @@ loc_A9706:
 ; =================================================================
 
 
-Art_BattleDarkFrce:	binclude "battle/art/dark_force.bin"
+Art_BattleDarkFrce:	binclude "graphics/enemies/Dark Force.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -76247,7 +76247,7 @@ loc_ACBC6:
 	dc.b	$04, $19, $37, $18, $00 ;0xA0
 ; =================================================================
 
-Art_BattleMotherBrain:	binclude "battle/art/mother_brain.bin"
+Art_BattleMotherBrain:	binclude "graphics/enemies/Mother Brain.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -76768,55 +76768,55 @@ loc_AF7FA:
 	dc.w	$282E, $282D, $2032, $2033, $2060, $2860, $2833, $2832 ;0x0 (0x000AF7FA-0x000AF82A, Entry count: 0x00000030)
 
 
-Art_EndingPortraits:	binclude "ending/art/portraits.bin"
+Art_EndingPortraits:	binclude "graphics/characters/Ending portraits.bin"
 	even
 
-PlaneMap_EndingRolfChunk1:	binclude "ending/mappings/rolf_1.bin"
+PlaneMap_EndingRolfChunk1:	binclude "plane mappings/characters/Rolf ending portrait chunk 1.bin"
 	even
 
-PlaneMap_EndingRolfChunk2:	binclude "ending/mappings/rolf_2.bin"
+PlaneMap_EndingRolfChunk2:	binclude "plane mappings/characters/Rolf ending portrait chunk 2.bin"
 	even
 
-PlaneMap_EndingRolfChunk3:	binclude "ending/mappings/rolf_3.bin"
+PlaneMap_EndingRolfChunk3:	binclude "plane mappings/characters/Rolf ending portrait chunk 3.bin"
 	even
 
-PlaneMap_EndingRolfChunk4:	binclude "ending/mappings/rolf_4.bin"
+PlaneMap_EndingRolfChunk4:	binclude "plane mappings/characters/Rolf ending portrait chunk 4.bin"
 	even
 
-PlaneMap_EndingRolfChunk5:	binclude "ending/mappings/rolf_5.bin"
+PlaneMap_EndingRolfChunk5:	binclude "plane mappings/characters/Rolf ending portrait chunk 5.bin"
 	even
 
-PlaneMap_EndingRolfChunk6:	binclude "ending/mappings/rolf_6.bin"
+PlaneMap_EndingRolfChunk6:	binclude "plane mappings/characters/Rolf ending portrait chunk 6.bin"
 	even
 
-PlaneMap_EndingRolfChunk7:	binclude "ending/mappings/rolf_7.bin"
+PlaneMap_EndingRolfChunk7:	binclude "plane mappings/characters/Rolf ending portrait chunk 7.bin"
 	even
 
-PlaneMap_EndingRudo:	binclude "ending/mappings/rudo.bin"
+PlaneMap_EndingRudo:	binclude "plane mappings/characters/Rudo ending portrait.bin"
 	even
 
-PlaneMap_EndingAmy:	binclude "ending/mappings/amy.bin"
+PlaneMap_EndingAmy:	binclude "plane mappings/characters/Amy ending portrait.bin"
 	even
 
-PlaneMap_EndingHugh:	binclude "ending/mappings/hugh.bin"
+PlaneMap_EndingHugh:	binclude "plane mappings/characters/Hugh ending portrait.bin"
 	even
 
-PlaneMap_EndingAnna:	binclude "ending/mappings/anna.bin"
+PlaneMap_EndingAnna:	binclude "plane mappings/characters/Anna ending portrait.bin"
 	even
 
-PlaneMap_EndingKain:	binclude "ending/mappings/kain.bin"
+PlaneMap_EndingKain:	binclude "plane mappings/characters/Kain ending portrait.bin"
 	even
 
-PlaneMap_EndingShir:	binclude "ending/mappings/shir.bin"
+PlaneMap_EndingShir:	binclude "plane mappings/characters/Shir ending portrait.bin"
 	even
 
-Art_EndingCreditsFont:	binclude "ending/art/credits_font.bin"
+Art_EndingCreditsFont:	binclude "graphics/font/Ending credits.bin"
 	even
 
-Art_EndingBackground:	binclude "ending/art/background.bin"
+Art_EndingBackground:	binclude "graphics/ending/Background.bin"
 	even
 
-PlaneMap_EndingBackground:	binclude "ending/mappings/background.bin"
+PlaneMap_EndingBackground:	binclude "plane mappings/ending/Background.bin"
 	even
 
 ; -----------------------------------------------------------------
@@ -76998,7 +76998,7 @@ Inventor_PatchDialogue:
 	org $BF800
 
 ArtUncomp_TitleCopyright:
-	binclude "title/art/uncompressed/copyright.bin"
+	binclude "graphics/title/Copyright uncompressed.bin"
 ArtUncomp_TitleCopyright_End:
 
 	align0 $200	
