@@ -12617,7 +12617,7 @@ loc_7C26:
 	bsr.w	ClearSpriteAndScroll
 	move	#$2500, sr
 
-	lea	($FFFFDE00).w, a6
+	lea	(Window_mem_block).w, a6
 	moveq	#0, d7
 	move.w	#$7E, d6
 loc_7C4A:
@@ -12627,7 +12627,7 @@ loc_7C4A:
 	move.w	#0, (Screen_changed_flag).w
 	move.w	#$8500, ($FFFFF72C).w
 	movea.l	#RAM_start&$FFFFFF, a0
-	move.l	a0, ($FFFFDE00).w
+	move.l	a0, (Win_backup_tiles_addr).w
 	jsr	(LoadDynWindowsInRam).l
 
 ; Fix: clear some additional memory to prevent inconsistencies
@@ -13175,7 +13175,7 @@ GameMode_Scene:
 loc_828E:
 	move.l	d7, (a6)+
 	dbf	d6, loc_828E
-	lea	($FFFFDE00).w, a6
+	lea	(Window_mem_block).w, a6
 	moveq	#0, d7
 	move.w	#$7F, d6
 loc_829E:
@@ -13186,7 +13186,7 @@ loc_829E:
 	move.w	#0, (Screen_changed_flag).w
 	move.w	#$8500, ($FFFFF72C).w
 	movea.l	#RAM_start&$FFFFFF, a0
-	move.l	a0, ($FFFFDE00).w
+	move.l	a0, (Win_backup_tiles_addr).w
 	moveq	#PalID_Party, d0
 	bsr.w	PaletteLoad1
 	move.l	#$54000002, (VDP_control_port).l
@@ -13442,7 +13442,7 @@ loc_85B2:
 	dbf	d6, -
 
 	bsr.w	loc_796
-	lea	($FFFFDE00).w, a6
+	lea	(Window_mem_block).w, a6
 	moveq	#0, d7
 	move.w	#$7F, d6
 loc_85D6:
@@ -13451,7 +13451,7 @@ loc_85D6:
 	move.w	#0, (Screen_changed_flag).w
 	move.w	#$8500, ($FFFFF72C).w
 	movea.l	#RAM_start&$FFFFFF, a0
-	move.l	a0, ($FFFFDE00).w
+	move.l	a0, (Win_backup_tiles_addr).w
 	moveq	#0, d0
 	move.w	d0, (Battle_main_routine_index).w
 	move.w	d0, (Fight_active_flag).w
@@ -13712,7 +13712,7 @@ loc_8950:
 
 	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
-	lea	($FFFFDE00).w, a6
+	lea	(Window_mem_block).w, a6
 	moveq	#0, d7
 	move.w	#$7F, d6
 loc_8970:
@@ -13723,7 +13723,7 @@ loc_8970:
 	move.w	#0, (Screen_changed_flag).w
 	move.w	#$8500, ($FFFFF72C).w
 	movea.l	#RAM_start&$FFFFFF, a0
-	move.l	a0, ($FFFFDE00).w
+	move.l	a0, (Win_backup_tiles_addr).w
 	jsr	(LoadDynWindowsInRam).l
 	move.b	#$8B, d0
 	bsr.w	UpdateSoundQueue
@@ -14854,12 +14854,14 @@ MapArtChunkPtrs:
 	dc.l	ArtNem_DezoDungeon, loc_484A2	; 6
 ; =============================================
 
+
+; -----------------------------------------------------------------
 DrawWindows:
 	move.w	($FFFFDE40).w, d1
 	bne.w	loc_947A
 	move.w	(Window_queue).w, d0
-	beq.w	CheckRenderScript
-	bmi.w	Win_Destroy
+	beq.w	CheckRenderScript	; when all windows are loaded, render script
+	bmi.w	Win_Destroy			; if bit 7 is set, destroy window
 
 ; Create window
 	andi.w	#$FF, d0
@@ -14868,42 +14870,42 @@ DrawWindows:
 	adda.w	d0, a1
 	move.w	(Camera_Y_pos_BG).w, d0
 	andi.w	#$F, d0
-	bne.w	loc_9478
+	bne.w	DrawWindows_Return	; wait until camera has updated 16 pixels
 	move.w	(Camera_X_pos_BG).w, d0
 	andi.w	#$F, d0
-	bne.w	loc_9478
-	lea	($FFFFDF00).w, a0
+	bne.w	DrawWindows_Return
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	lea	(Camera_Y_pos_FG).w, a5
-	move.w	(a5)+, d4
-	move.w	(a5), d5
+	move.w	(a5)+, d4	; d4 = Camera Y
+	move.w	(a5), d5	; d5 = Camera X
 	andi.w	#$F8, d4
 	andi.w	#$1F8, d5
-	lsl.w	#4, d4
+	lsl.w	#4, d4		; calculate VDP address
 	lsr.w	#2, d5
 	add.w	d5, d4
-	move.w	d4, d0
-	move.w	(a1), d1
-	andi.w	#$FF80, d1
+	move.w	d4, d0		; d0 = plane address
+	move.w	(a1), d1	; plane offset
+	andi.w	#$FF80, d1	; get row
 	add.w	d1, d0
 	move.w	(a1)+, d1
-	andi.w	#$7F, d1
+	andi.w	#$7F, d1	; get cell
 	move.w	d0, d2
 	add.w	d1, d0
 	eor.w	d0, d2
-	andi.w	#$80, d2
-	beq.s	loc_93F6
-	subi.w	#$80, d0
-loc_93F6:
-	andi.w	#$EFFF, d0
-	move.w	d0, (a0)+
-	move.l	($FFFFDE00).w, (a0)+
-	move.l	(a1)+, (a0)+
+	andi.w	#$80, d2	; find the difference between final address and row offset
+	beq.s	+			; branch if we're between 0 and $7F
+	subi.w	#$80, d0	; rollover
++
+	andi.w	#$EFFF, d0	; value between 0 and $FFF
+	move.w	d0, (a0)+	; store VDP address
+	move.l	(Win_backup_tiles_addr).w, (a0)+
+	move.l	(a1)+, (a0)+	; store plane mappings address
 	moveq	#0, d0
 	move.b	(a1)+, d0
-	move.w	d0, (a0)+
+	move.w	d0, (a0)+	; store number of columns
 	move.w	d0, ($FFFFDE46).w
 	move.w	d0, d1
 	lsr.w	#1, d0
@@ -14912,40 +14914,40 @@ loc_93F6:
 	andi.w	#1, d1
 	move.w	d1, ($FFFFDE44).w
 	btst	#1, (Window_queue).w
-	beq.s	loc_9432
-	move.w	($FFFFDE46).w, ($FFFFDE44).w
+	beq.s	+			; branch if we use a clipping effect
+	move.w	($FFFFDE46).w, ($FFFFDE44).w	; otherwise pop open
 	move.w	#1, ($FFFFDE40).w
-loc_9432:
++
 	move.b	(a1)+, d0
-	move.w	d0, (a0)+
+	move.w	d0, (a0)+	; store number of rows
 	move.w	d0, ($FFFFDE48).w
 	move.w	(Window_queue).w, d0
 	andi.w	#$FF, d0
-	move.w	d0, (a0)
+	move.w	d0, (a0)	; store window index
 	btst	#2, (Window_queue).w
-	bne.s	loc_9470
-	lea	($FFFFDF00).w, a0
+	bne.s	+		; branch if it's a static window (don't save it in RAM)
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	move.w	(a0)+, d0
+	move.w	(a0)+, d0	; VDP address
 	andi.w	#$2FFF, d0
 	addq.w	#8, a0
-	move.w	(a0)+, d1
-	move.w	(a0)+, d2
-	movea.l	($FFFFDE00).w, a1
-	bsr.w	loc_99A8
-	move.l	a1, ($FFFFDE00).w
-loc_9470:
+	move.w	(a0)+, d1	; get columns
+	move.w	(a0)+, d2	; get rows
+	movea.l	(Win_backup_tiles_addr).w, a1
+	bsr.w	Win_BackupTiles	; save the tiles that will be covered by the window
+	move.l	a1, (Win_backup_tiles_addr).w
++
 	btst	#1, (Window_queue).w
 	beq.s	loc_947A
-loc_9478:
+DrawWindows_Return:
 	rts
 
 loc_947A:
 	move.w	(Window_queue).w, d0
-	bmi.w	loc_954C
-	lea	($FFFFDF00).w, a0
+	bmi.w	loc_954C	; branch if set to destroy
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
@@ -14967,7 +14969,7 @@ loc_947A:
 	andi.w	#$F, (Windows_opened_num).w
 	bne.s	loc_94CC
 	movea.l	#RAM_start&$FFFFFF, a0
-	move.l	a0, ($FFFFDE00).w
+	move.l	a0, (Win_backup_tiles_addr).w
 loc_94CC:
 	move.l	(Window_queue+2).w, d0
 	move.l	d0, (Window_queue).w
@@ -15010,13 +15012,13 @@ loc_9530:
 loc_954A:
 	rts
 loc_954C:
-	lea	($FFFFDF00).w, a0
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
 	move.w	(a0)+, d0
 	movea.l	(a0)+, a1
-	move.l	a1, ($FFFFDE00).w
+	move.l	a1, (Win_backup_tiles_addr).w
 	addq.w	#4, a0
 	move.w	(a0)+, d3
 	move.w	(a0)+, d2
@@ -15120,17 +15122,17 @@ loc_9666:
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
 	beq.s	loc_96AE
-	movea.l	($FFFFDE00).w, a1
-	bsr.w	loc_99A8
+	movea.l	(Win_backup_tiles_addr).w, a1
+	bsr.w	Win_BackupTiles
 	move.w	(Text_plane_offset_start).w, d0
 	andi.w	#$CFFF, d0
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
-	movea.l	($FFFFDE00).w, a1
+	movea.l	(Win_backup_tiles_addr).w, a1
 	bsr.w	loc_997E
 	move.w	#$17, d1
 loc_96A0:
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$8526, (a3)
 	dbf	d1, loc_96A0
 	rts
@@ -15152,7 +15154,7 @@ loc_96CC:
 	move.w	d1, d4
 	move.w	d0, d5
 loc_96D0:
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$8526, (a3)
 	dbf	d4, loc_96D0
 	move.w	d5, d0
@@ -15201,7 +15203,7 @@ loc_9746:
 	moveq	#2, d1
 	moveq	#0, d4
 loc_9750:
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	tst.b	d1
 	bne.s	loc_975C
 	move.b	#1, d4
@@ -15249,18 +15251,18 @@ loc_978C:
 loc_97C6:
 	move.l	d0, -(sp)
 	move.w	d1, d4
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$B8, d5
 	move.w	d5, (a3)
 	dbf	d4, loc_97E2
 	bra.s	loc_97F0
 loc_97DA:
 	move.b	(a1)+, d5
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	d5, (a3)
 loc_97E2:
 	dbf	d4, loc_97DA
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$BA, d5
 	move.w	d5, (a3)
 loc_97F0:
@@ -15270,20 +15272,20 @@ loc_97F0:
 loc_97F6:
 	move.l	d0, -(sp)
 	move.w	d1, d4
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$BB, d5
 	move.w	d5, (a3)
 	dbf	d4, loc_9816
 	bra.s	loc_9824
 
 loc_980A:
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	($FFFFF72C).w, d6
 	move.b	(a1)+, d6
 	move.w	d6, (a3)
 loc_9816:
 	dbf	d4, loc_980A
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$BC, d5
 	move.w	d5, (a3)
 
@@ -15293,32 +15295,39 @@ loc_9824:
 	add.w	d7, d0
 	dbf	d2, loc_97F6
 	move.w	d1, d4
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$BD, d5
 	move.w	d5, (a3)
 	dbf	d4, loc_9848
 	rts
 loc_9840:
 	move.b	(a1)+, d5
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	d5, (a3)
 loc_9848:
 	dbf	d4, loc_9840
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.b	#$BF, d5
 	move.w	d5, (a3)
 	rts
 
-loc_9858:
+
+; -----------------------------------------------------------------
+; d0 = VDP address
+; a2 = VDP control port
+; -----------------------------------------------------------------
+Win_VDPAddressToControlPort:
 	andi.w	#$EFFF, d0
 	move.w	d0, (a2)
-	move.w	#3, (a2)
+	move.w	#3, (a2)	; Plane address
 	move.b	d0, d6
 	andi.b	#$80, d6
 	addq.b	#2, d0
 	andi.b	#$7F, d0
 	or.b	d6, d0
 	rts
+; -----------------------------------------------------------------
+
 
 loc_9872:
 	lea	(VDP_control_port).l, a2
@@ -15338,9 +15347,9 @@ loc_9872:
 	move.w	d2, d4
 loc_98A8:
 	move.w	d0, d5
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1), (a3)
 	move.w	d5, d0
 	adda.w	d3, a1
@@ -15365,27 +15374,27 @@ loc_98C2:
 	move.w	d2, d4
 	move.w	#$8500, d5
 	move.l	d0, -(sp)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85BA, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
 loc_98FC:
 	move.l	d0, -(sp)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85BC, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
 	dbf	d4, loc_98FC
 
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85BF, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1), (a3)
 	move.l	(sp)+, d0
 	movea.l	a4, a1
@@ -15398,27 +15407,27 @@ loc_98FC:
 	adda.w	d1, a1
 	move.w	d2, d4
 	move.l	d0, -(sp)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85B8, (a3)
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
 loc_9954:
 	move.l	d0, -(sp)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85BB, (a3)
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
 	dbf	d4, loc_9954
 
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1), (a3)
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$85BD, (a3)
 	rts
 loc_997E:
@@ -15429,7 +15438,7 @@ loc_9990:
 	move.w	d1, d4
 	move.w	d0, d5
 loc_9994:
-	bsr.w	loc_9858
+	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	dbf	d4, loc_9994
 
@@ -15437,24 +15446,33 @@ loc_9994:
 	add.l	d7, d0
 	dbf	d2, loc_9990
 	rts
+; -----------------------------------------------------------------
 
-loc_99A8:
+
+; -----------------------------------------------------------------
+; d0 = VDP address
+; d1 = columns
+; d2 = rows
+; a1 = backup tiles address
+; -----------------------------------------------------------------
+Win_BackupTiles:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	move.l	#$80, d7
-loc_99BA:
+-
 	move.w	d1, d4
 	move.w	d0, d5
-loc_99BE:
-	bsr.w	loc_9858
-	move.w	(a3), (a1)+
-	dbf	d4, loc_99BE
+-
+	bsr.w	Win_VDPAddressToControlPort
+	move.w	(a3), (a1)+	; read tile from VDP
+	dbf	d4, -
 
 	move.w	d5, d0
-	add.l	d7, d0
-	dbf	d2, loc_99BA
+	add.l	d7, d0	; next row
+	dbf	d2, --
 
 	rts
+; -----------------------------------------------------------------
 
 
 ProcessPlayerMenu:
@@ -24435,8 +24453,8 @@ UpdateWindows:
 	tst.w	(Window_queue).w
 	beq.s	.update		; continue processing an already opened window
 	bmi.s	.return	; return if window is being destroyed
-	bset	#0, (Window_queue).w	; set window-opening flag
-	bne.s	.return						; if it was already processed, return
+	bset	#0, (Window_queue).w		; set initialized flag
+	bne.s	.return						; if already initialized, return
 	move.w	(Window_queue).w, d0
 	andi.w	#$FF, d0		; get window index
 	move.w	d0, (Window_index).w
@@ -24449,7 +24467,7 @@ UpdateWindows:
 	andi.w	#$3FC, d0
 	jsr	WindowsIndexTable(pc,d0.w)
 	cmpi.w	#2, (Window_routine).w
-	beq.s	.return	; rts		; stop windows routine at 2 (3 routines per window)
+	beq.s	.return
 	addq.w	#1, (Window_routine).w	; process next windows routine
 .return:
 	rts
@@ -24458,7 +24476,7 @@ UpdateWindows:
 ; table of all the windows in the game
 ; ========================================
 WindowsIndexTable:
-	bra.w	Win_Null				; 0
+	bra.w	Win_RunScript				; 0
 	bra.w	Win_PlayerMenu			; 1
 	bra.w	Win_MenuItemChar		; 2
 	bra.w	Win_MenuItemList		; 3
@@ -24577,7 +24595,7 @@ WindowsIndexTable:
 	bra.w	Win_UstvestiaSoundtracks ; $74
 ; ========================================
 
-Win_Null:
+Win_RunScript:
 	tst.w	(Script_flag).w
 	beq.s	+
 	bsr.w	ScriptControlCodes
@@ -24938,7 +24956,7 @@ Win_ScriptMessage:
 loc_FB00:
 	subq.w	#1, d1
 	bne.s	loc_FB4E
-	lea	($FFFFDF00).w, a0
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
@@ -24962,11 +24980,14 @@ loc_FB4E:
 	move.w	#0, (Window_index).w
 	rts
 
+
+; -----------------------------------------------------------------
 ScriptControlCodes:
 	movea.l	(Text_offset).w, a0
-	move.b	(a0)+, d0
+	move.b	(a0)+, d0	; get text byte
 	cmpi.b	#$C3, d0
 	bne.s	loc_FB7A
+; $C3 = halts text rendering until a button is pressed
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.w	loc_FBFE
@@ -24976,16 +24997,19 @@ ScriptControlCodes:
 loc_FB7A:
 	cmpi.b	#$C4, d0
 	bne.s	loc_FB84
-	bsr.s	loc_FC00
+; $C4 = terminate script
+	bsr.s	Script_Terminate
 	rts
 loc_FB84:
 	cmpi.b	#$C5, d0
 	bne.s	loc_FB92
+; $C5 = terminate script without user input
 	move.w	#0, (Script_flag).w
 	rts
 loc_FB92:
 	cmpi.b	#$C6, d0
 	bne.s	loc_FBCE
+; $C6 = either wait for user input or a timer to terminate the script
 	subq.w	#1, (Text_auto_timer).w
 	bmi.s	loc_FBA8
 	move.b	(Joypad_pressed).w, d0
@@ -25005,6 +25029,7 @@ loc_FBC4:
 loc_FBCE:
 	cmpi.b	#$C7, d0
 	bne.s	loc_FBE8
+; $C7 = wait until timer expires to terminate the script
 	subq.w	#1, (Text_auto_timer).w
 	bpl.s	loc_FBFE
 	move.w	#$3C, (Text_auto_timer).w
@@ -25016,11 +25041,12 @@ loc_FBE8:
 	beq.s	loc_FBFE
 	tst.w	(Opening_ending_flag).w
 	bne.s	loc_FBFE
+; if a button is pressed, text will be rendered all at once
 	move.w	#1, (Text_render_type).w
 loc_FBFE:
 	rts
 
-loc_FC00:
+Script_Terminate:
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask|Button_A_Mask, d0
 	beq.s	loc_FC16
@@ -25028,6 +25054,9 @@ loc_FC00:
 	move.w	#0, (Script_flag).w
 loc_FC16:
 	rts
+; -----------------------------------------------------------------
+
+
 ; ----------------------------------------
 ; loc_FC18
 Win_YesNo:
@@ -25711,7 +25740,7 @@ Win_ScriptMessageBig:
 loc_1028C:
 	subq.w	#1, d1
 	bne.s	loc_102DA
-	lea	($FFFFDF00).w, a0
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
@@ -26637,7 +26666,7 @@ Win_BattleMessage:
 loc_10B56:
 	subq.w	#1, d1
 	bne.s	loc_10BA4
-	lea	($FFFFDF00).w, a0
+	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#4, d0
@@ -32529,606 +32558,604 @@ Tech_UnknownB:
 ; =======================================================================
 ; 8 bytes for every window
 ;
-; byte 1 = y position
-; byte 2 = x position (must be even!)
-; bytes 3-6 = pointer for art
+; bytes 1-2 = VDP plane offset
+; bytes 3-6 = pointer to plane mappings
 ; byte 7 = columns; this byte must be set to
 ;          the number of the desired columns + 1
 ; byte 8 = rows; this byte must be set to
 ;          the number of the desired rows - 1
-; see the Player Menu as an example (the first one)
 ; =======================================================================
 WindowArtLayoutPtrs:
 
 PtrWin_PlayerMenu:
-	dc.b	$40, $82				; Y and X position
-	dc.l	PlaneMap_WinPlayerMenu	; pointer to art	(see the example in this address)
-	dc.b	$08, $0A				; 7 columns and 11 rows when drawing the window
+	dc.w	$4082
+	dc.l	PlaneMap_WinPlayerMenu
+	dc.b	$08, $0A
 
 PtrWin_MenuItemChar:
-	dc.b	$44, $88
+	dc.w	$4488
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList-DynamicWindowsStart
 	dc.b	$07, $0A
 
 PtrWin_MenuItemList:
-	dc.b	$40, $9A
+	dc.w	$409A
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_MenuItemList2:
-	dc.b	$41, $1C
+	dc.w	$411C
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ItemAction:
-	dc.b	$40, $BC
+	dc.w	$40BC
 	dc.l	PlaneMap_WinItemAction
 	dc.b	$06, $06
 
 PtrWin_ChosenItemChar:
-	dc.b	$44, $BE
+	dc.w	$44BE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList-DynamicWindowsStart
 	dc.b	$07, $0A
 
 PtrWin_MenuCharStats:
-	dc.b	$4A, $0C
+	dc.w	$4A0C
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuCharStats-DynamicWindowsStart
 	dc.b	$1C, $06
 
 PtrWin_ScriptMessage:
-	dc.b	$4A, $8E
+	dc.w	$4A8E
 	dc.l	PlaneMap_WinScriptMessage
 	dc.b	$19, $05
 
 PtrWin_YesNo:
-	dc.b	$45, $BC
+	dc.w	$45BC
 	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_StateOrder:
-	dc.b	$46, $04
+	dc.w	$4604
 	dc.l	PlaneMap_WinStateOrder
 	dc.b	$08, $04
 
 PtrWin_FirstCharStats:
-	dc.b	$47, $1E
+	dc.w	$471E
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_SecondCharStats:
-	dc.b	$47, $36
+	dc.w	$4736
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_ThirdCharStats:
-	dc.b	$4A, $1E
+	dc.w	$4A1E
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_FourthCharStats:
-	dc.b	$4A, $36
+	dc.w	$4A36
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinIndividualCharStats-DynamicWindowsStart
 	dc.b	$0B, $05
 
 PtrWin_MenuMeseta:
-	dc.b	$49, $04
+	dc.w	$4904
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMeseta-DynamicWindowsStart
 	dc.b	$0C, $02
 
 PtrWin_CharOrderDestination:
-	dc.b	$42, $20
+	dc.w	$4220
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharOrderDestination-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_CharList2:
-	dc.b	$43, $B8
+	dc.w	$43B8
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_MapTechList:
-	dc.b	$40, $98
+	dc.w	$4098
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMapTechList-DynamicWindowsStart
 	dc.b	$08, $11
 
 PtrWin_MapTechList2:
-	dc.b	$41, $1A
+	dc.w	$411A
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMapTechList-DynamicWindowsStart
 	dc.b	$08, $11
 
 PtrWin_StrngHPTP:
-	dc.b	$40, $B6
+	dc.w	$40B6
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngHPTP-DynamicWindowsStart
 	dc.b	$0B, $04
 
 PtrWin_StrngStats:
-	dc.b	$46, $34
+	dc.w	$4634
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngStats-DynamicWindowsStart
 	dc.b	$0C, $0E
 
 PtrWin_StrngEquip:
-	dc.b	$47, $8C
+	dc.w	$478C
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngEquip-DynamicWindowsStart
 	dc.b	$10, $0B
 
 PtrWin_StrngLVEXP:
-	dc.b	$40, $96
+	dc.w	$4096
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngLVEXP-DynamicWindowsStart
 	dc.b	$0B, $07
 
 PtrWin_EquipStats:
-	dc.b	$49, $AE
+	dc.w	$49AE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEquipStats-DynamicWindowsStart
 	dc.b	$0C, $07
 
 PtrWin_EqpEquipList:
-	dc.b	$47, $8C
+	dc.w	$478C
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngEquip-DynamicWindowsStart
 	dc.b	$10, $0B
 
 PtrWin_ItemList2:
-	dc.b	$40, $AE
+	dc.w	$40AE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ItemList3:
-	dc.b	$41, $30
+	dc.w	$4130
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMenuItemList-DynamicWindowsStart
 	dc.b	$0E, $11
 
 PtrWin_ScriptMessageBig:
-	dc.b	$48, $8E
+	dc.w	$488E
 	dc.l	PlaneMap_WinScriptMessageBig
 	dc.b	$19, $09
 
 PtrWin_FullTechList:
-	dc.b	$44, $18
+	dc.w	$4418
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinFullTechList-DynamicWindowsStart
 	dc.b	$0C, $11
 
 PtrWin_FullTechList2:
-	dc.b	$44, $34
+	dc.w	$4434
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinFullTechList-DynamicWindowsStart
 	dc.b	$0C, $11
 
 PtrWin_YesNo2:
-	dc.b	$49, $3E
+	dc.w	$493E
 	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_YesNo3:
-	dc.b	$46, $20
+	dc.w	$4620
 	dc.l	PlaneMap_WinYesNo
 	dc.b	$06, $04
 
 PtrWin_ScriptMessage2:
-	dc.b	$4A, $04
+	dc.w	$4A04
 	dc.l	PlaneMap_WinScriptMessage
 	dc.b	$19, $05
 
 PtrWin_BuySell:
-	dc.b	$4A, $B8
+	dc.w	$4AB8
 	dc.l	PlaneMap_WinBuySell
 	dc.b	$07, $04
 
 PtrWin_StoreMeseta:
-	dc.b	$41, $B4
+	dc.w	$41B4
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinMeseta-DynamicWindowsStart
 	dc.b	$0C, $02
 
 PtrWin_NameInput:
-	dc.b	$40, $9C
+	dc.w	$409C
 	dc.l	PlaneMap_WinNameInput
 	dc.b	$14, $10
 
 PtrWin_SaveSlots:
-	dc.b	$48, $B8
+	dc.w	$48B8
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinSaveSlots-DynamicWindowsStart
 	dc.b	$0A, $09
 
 PtrWin_LibraryOptions:
-	dc.b	$41, $AE
+	dc.w	$41AE
 	dc.l	PlaneMap_WinLibraryOptions
 	dc.b	$0D, $0B
 
 PtrWin_HealCure:
-	dc.b	$42, $9A
+	dc.w	$429A
 	dc.l	PlaneMap_WinHealCure
 	dc.b	$0A, $05
 
 PtrWin_StoreInventory:
-	dc.b	$43, $1A
+	dc.w	$431A
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStoreInventory-DynamicWindowsStart
 	dc.b	$13, $0D
 
 PtrWin_RolfHouseOptions:
-	dc.b	$41, $18
+	dc.w	$4118
 	dc.l	PlaneMap_WinRolfHouseOptions
 	dc.b	$0E, $06
 
 PtrWin_ProfileCharList:
-	dc.b	$42, $92
+	dc.w	$4292
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinProfileCharList-DynamicWindowsStart
 	dc.b	$07, $11
 
 PtrWin_RolfProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinRolfProfile
 	dc.b	$17, $0B
 
 PtrWin_NeiProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinNeiProfile
 	dc.b	$17, $0B
 
 PtrWin_RudoProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinRudoProfile
 	dc.b	$17, $0B
 
 PtrWin_AmyProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinAmyProfile
 	dc.b	$17, $0B
 
 PtrWin_HughProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinHughProfile
 	dc.b	$17, $0B
 
 PtrWin_AnnaProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinAnnaProfile
 	dc.b	$17, $0B
 
 PtrWin_KainProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinKainProfile
 	dc.b	$17, $0B
 
 PtrWin_ShirProfile:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	PlaneMap_WinShirProfile
 	dc.b	$17, $0B
 
 PtrWin_RegroupCharList:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinRegroupCharList-DynamicWindowsStart
 	dc.b	$07, $0D
 
 PtrWin_RegroupSelectedChar:
-	dc.b	$43, $16
+	dc.w	$4316
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinRegroupSelectedChar-DynamicWindowsStart
 	dc.b	$05, $09
 
 PtrWin_CentTowerOptions:
-	dc.b	$43, $32
+	dc.w	$4332
 	dc.l	PlaneMap_WinCentTowerOptions
 	dc.b	$0B, $07
 
 PtrWin_CentTowerOptions2:
-	dc.b	$43, $32
+	dc.w	$4332
 	dc.l	PlaneMap_WinCentTowerOptions2
 	dc.b	$0B, $09
 
 PtrWin_GameSelect:
-	dc.b	$41, $8E
+	dc.w	$418E
 	dc.l	PlaneMap_WinGameSelect
 	dc.b	$12, $07
 
 PtrWin_RoomOptions:
-	dc.b	$47, $82
+	dc.w	$4782
 	dc.l	PlaneMap_WinRoomOptions
 	dc.b	$11, $05
 
 PtrWin_RightLeft:
-	dc.b	$44, $9C
+	dc.w	$449C
 	dc.l	PlaneMap_WinRightLeft
 	dc.b	$07, $05
 
 PtrWin_StrngCharList:
-	dc.b	$45, $86
+	dc.w	$4586
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_PortraitStart:
 
 PtrWin_RolfPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinRolfPortrait
 	dc.b	$0B, $0B
 
 PtrWin_NeiPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinNeiPortrait
 	dc.b	$0B, $0B
 
 PtrWin_RudoPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinRudoPortrait
 	dc.b	$0B, $0B
 
 PtrWin_AmyPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinAmyPortrait
 	dc.b	$0B, $0B
 
 PtrWin_HughPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinHughPortrait
 	dc.b	$0B, $0B
 
 PtrWin_AnnaPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinAnnaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_KainPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinKainPortrait
 	dc.b	$0B, $0B
 
 PtrWin_ShirPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinShirPortrait
 	dc.b	$0B, $0B
 
 PtrWin_LibrarianPortrait:
-	dc.b	$41, $14
+	dc.w	$4114
 	dc.l	PlaneMap_WinLibrarianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaSaveEmplPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaSaveEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaDoctorPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaDoctorPortrait
 	dc.b	$0B, $0B
 
 PtrWin_GrandmaPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinGrandmaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaItemSellerPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaItemSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaWpnSellerPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaWpnSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaArmorSellerPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaArmorSellerPortrait
 	dc.b	$0B, $0B
 
 PtrWin_UstvestiaPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinUstvestiaPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian1Portrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian2Portrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian3Portrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_Dezolian4Portrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinDezolianPortrait
 	dc.b	$0B, $0B
 
 PtrWin_ItemKeeperPortrait:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinItemKeeperPortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait:
-	dc.b	$41, $14
+	dc.w	$4114
 	dc.l	PlaneMap_WinCentTowerOutsidePortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortraitCopy:
-	dc.b	$41, $14
+	dc.w	$4114
 	dc.l	PlaneMap_WinCentTowerOutsidePortraitCopy
 	dc.b	$0B, $0B
 
 PtrWin_GovernorPortrait:
-	dc.b	$41, $14
+	dc.w	$4114
 	dc.l	PlaneMap_WinGovernorPortrait
 	dc.b	$0B, $0B
 
 PtrWin_SpaceshipPortrait:
-	dc.b	$41, $14
+	dc.w	$4114
 	dc.l	PlaneMap_WinSpaceshipPortrait
 	dc.b	$0B, $0B
 
 PtrWin_MotaTeleportEmplPortrait:
-	dc.b	$41, $12
+	dc.w	$4112
 	dc.l	PlaneMap_WinMotaTeleportEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_LibraryGraphPortrait:
-	dc.b	$41, $2E
+	dc.w	$412E
 	dc.l	PlaneMap_WinLibraryGraphPortrait
 	dc.b	$0B, $0B
 
 PtrWin_RadarPortrait:
-	dc.b	$41, $1C
+	dc.w	$411C
 	dc.l	PlaneMap_WinRadarPortrait
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait3:
-	dc.b	$41, $AE
+	dc.w	$41AE
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$0B, $0B
 
 PtrWin_CentTowerOutsidePortrait3_2:
-	dc.b	$41, $AE
+	dc.w	$41AE
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$0B, $0B
 
 PtrWin_MotaTeleportEmplPortrait2:
-	dc.b	$41, $02
+	dc.w	$4102
 	dc.l	PlaneMap_WinMotaTeleportEmplPortrait
 	dc.b	$0B, $0B
 
 PtrWin_HouseLVEXP:
-	dc.b	$42, $36
+	dc.w	$4236
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinStrngLVEXP-DynamicWindowsStart
 	dc.b	$0B, $07
 
 PtrWin_StoreCharList:
-	dc.b	$43, $B8
+	dc.w	$43B8
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinCharList2-DynamicWindowsStart
 	dc.b	$07, $09
 
 PtrWin_BattleCharStats:
 
 PtrWin_BattleFirstCharStats:
-	dc.b	$4A, $92
+	dc.w	$4A92
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleSecondCharStats:
-	dc.b	$4A, $AE
+	dc.w	$4AAE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleThirdCharStats:
-	dc.b	$4A, $82
+	dc.w	$4A82
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleFourthCharStats:
-	dc.b	$4A, $BE
+	dc.w	$4ABE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharStats-DynamicWindowsStart
 	dc.b	$07, $05
 
 PtrWin_BattleOptions:
-	dc.b	$4A, $A2
+	dc.w	$4AA2
 	dc.l	PlaneMap_WinBattleOptions
 	dc.b	$05, $05
 
 PtrWin_BattleOptions2:
-	dc.b	$4A, $A2
+	dc.w	$4AA2
 	dc.l	PlaneMap_WinBattleOptions2
 	dc.b	$05, $05
 
 PtrWin_BattleCharName:
-	dc.b	$48, $A2
+	dc.w	$48A2
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleCharName-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_BattleCommands:
-	dc.b	$48, $08
+	dc.w	$4808
 	dc.l	PlaneMap_WinBattleCommands
 	dc.b	$0C, $04
 
 PtrWin_EnemyGroups:
-	dc.b	$47, $AE
+	dc.w	$47AE
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyGroups-DynamicWindowsStart
 	dc.b	$0D, $05
 
 PtrWin_BattleMessage:
 	if revision=0
-	dc.b	$48, $94
+	dc.w	$4894
 	dc.l	PlaneMap_WinBattleMessage
 	dc.b	$13, $03
 	else
-	dc.b	$48, $92
+	dc.w	$4892
 	dc.l	PlaneMap_WinBattleMessage
 	dc.b	$15, $03
 	endif
 
 PtrWin_BattleTechList:
-	dc.b	$47, $90
+	dc.w	$4790
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleTechList-DynamicWindowsStart
 	dc.b	$08, $09
 
 PtrWin_BattleItemList:
-	dc.b	$47, $84
+	dc.w	$4784
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleItemList-DynamicWindowsStart
 	dc.b	$0E, $09
 
 PtrWin_BattleItemUsed:
-	dc.b	$48, $9C
+	dc.w	$489C
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleItemUsed-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_BattleTechUsed:
-	dc.b	$48, $A2
+	dc.w	$48A2
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinBattleTechUsed-DynamicWindowsStart
 	dc.b	$06, $03
 
 PtrWin_FirstEnemyName:
-	dc.b	$60, $82
+	dc.w	$6082
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyNames-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_SecondEnemyName:
-	dc.b	$60, $AA
+	dc.w	$60AA
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyNames-DynamicWindowsStart
 	dc.b	$0B, $03
 
 PtrWin_FirstEnemyInfo:
-	dc.b	$60, $9A
+	dc.w	$609A
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyInfo-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_SecondEnemyInfo:
-	dc.b	$60, $C2
+	dc.w	$60C2
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinEnemyInfo-DynamicWindowsStart
 	dc.b	$05, $03
 
 PtrWin_BattleEmptySpotStart:
 
 PtrWin_BattleFirstEmptySpot:
-	dc.b	$4A, $92
+	dc.w	$4A92
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleSecondEmptySpot:
-	dc.b	$4A, $AE
+	dc.w	$4AAE
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleThirdEmptySpot:
-	dc.b	$4A, $82
+	dc.w	$4A82
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_BattleFourthEmptySpot:
-	dc.b	$4A, $BE
+	dc.w	$4ABE
 	dc.l	PlaneMap_WinBattleEmptySpots
 	dc.b	$07, $05
 
 PtrWin_RolfPortrait2:
-	dc.b	$42, $36
+	dc.w	$4236
 	dc.l	PlaneMap_WinRolfPortrait
 	dc.b	$0B, $0B
 
 PtrWin_TeleportPlaceNames:
-	dc.b	$43, $A4
+	dc.w	$43A4
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinTeleportPlaceNames-DynamicWindowsStart
 	dc.b	$08, $0B
 
 PtrWin_UstvestiaSoundtracks:
-	dc.b	$45, $1A
+	dc.w	$451A
 	dc.l	(Window_art_buffer&$FFFFFF)+PlaneMap_WinUstvestiaSoundtracks-DynamicWindowsStart
 	dc.b	$0D, $03
 ; =======================================================================

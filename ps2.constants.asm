@@ -1339,18 +1339,22 @@ Special_SFX_tracks = $FFD1E0
 
 Character_pos_table = ramaddr($FFFFDD00)
 
-Windows_opened_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
+Window_mem_block = ramaddr($FFFFDE00)
 
+Win_backup_tiles_addr = ramaddr($FFFFDE00)
+Windows_opened_num =  ramaddr($FFFFDE04)		; number of objects that were populated in the object ram
 Window_queue =  ramaddr($FFFFDE10)		; 16 bytes total, 2 bytes per entry
 										;	entry definition: byte 1: bitfield holding various flags for processing
-										;							bit 0 = if set, window is opening
-										;							bit 1 = if clear, slide open; if set, window appears fully in one frame
+										;							bit 0 = initialization flag
+										;							bit 1 = if clear, open window with a clipping effect; if set, window appears fully in one frame
 										;							bit 2 = if set, draw window without tracking it in memory (static window)
 										;							bit 7 = if set, destroy window; byte 2 holds the number of windows to destroy rather than the window index 
 										;					  byte 2: window index
 
 Window_index =  ramaddr($FFFFDE54)
-Window_routine =  ramaddr($FFFFDE56)
+Window_routine =  ramaddr($FFFFDE56)	; 0 = generally used for initialization before being opened
+										; 1 = load additional stuff such as the red cursor for navigating
+										; 2 = main logic
 
 
 Event_routine =  ramaddr($FFFFDE58)			; index for offset tables
@@ -1371,6 +1375,8 @@ Interaction_routine =  ramaddr($FFFFDE70)
 Interaction_routine_2 =  ramaddr($FFFFDE72)
 
 Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
+
+Window_draw_cache = ramaddr($FFFFDF00)
 
 Object_RAM =  ramaddr($FFFFE000)
 Push_start_button_text =  ramaddr($FFFFE000)	; blinking text in Title Screen
