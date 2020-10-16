@@ -12630,9 +12630,14 @@ loc_7C4A:
 	move.l	a0, ($FFFFDE00).w
 	jsr	(LoadDynWindowsInRam).l
 
-; Fix
+; Fix: clear some additional memory to prevent inconsistencies
 	if bugfixes=1
-	clr.w	(Encounter_step_flag).w
+	moveq	#0, d7
+	move.w	d7, (Encounter_step_flag).w	; clear this to prevent getting into a random battle as soon as you enter a new map
+	move.l	d7, (Script_queue).w
+	move.l	d7, (Script_queue+4).w
+	move.l	d7, (Script_queue+8).w
+	move.l	d7, (Script_queue+$C).w
 	endif
 	move.w	#0, (Encounter_step_counter).w
 	move.w	#0, (Fight_active_flag).w
