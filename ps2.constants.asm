@@ -1351,6 +1351,10 @@ Window_queue =  ramaddr($FFFFDE10)		; 16 bytes total, 2 bytes per entry
 										;							bit 7 = if set, destroy window; byte 2 holds the number of windows to destroy rather than the window index 
 										;					  byte 2: window index
 
+Window_column_frames_left =  ramaddr($FFFFDE40)
+Window_column_frames_num =  ramaddr($FFFFDE44)	; number of columns to draw per frame
+Window_total_columns =  ramaddr($FFFFDE46)
+Window_total_rows =  ramaddr($FFFFDE48)
 Window_index =  ramaddr($FFFFDE54)
 Window_routine =  ramaddr($FFFFDE56)	; 0 = generally used for initialization before being opened
 										; 1 = load additional stuff such as the red cursor for navigating

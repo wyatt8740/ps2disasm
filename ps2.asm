@@ -14857,11 +14857,11 @@ MapArtChunkPtrs:
 
 ; -----------------------------------------------------------------
 DrawWindows:
-	move.w	($FFFFDE40).w, d1
-	bne.w	loc_947A
+	move.w	(Window_column_frames_left).w, d1
+	bne.w	DrawWindows_Cont
 	move.w	(Window_queue).w, d0
-	beq.w	CheckRenderScript	; when all windows are loaded, render script
-	bmi.w	Win_Destroy			; if bit 7 is set, destroy window
+	beq.w	Win_CheckRenderScript	; when all windows are loaded, render script
+	bmi.w	DestroyWindows			; if bit 7 is set, destroy window
 
 ; Create window
 	andi.w	#$FF, d0
@@ -14906,21 +14906,21 @@ DrawWindows:
 	moveq	#0, d0
 	move.b	(a1)+, d0
 	move.w	d0, (a0)+	; store number of columns
-	move.w	d0, ($FFFFDE46).w
+	move.w	d0, (Window_total_columns).w
 	move.w	d0, d1
 	lsr.w	#1, d0
 	addq.w	#1, d0
-	move.w	d0, ($FFFFDE40).w
+	move.w	d0, (Window_column_frames_left).w
 	andi.w	#1, d1
-	move.w	d1, ($FFFFDE44).w
+	move.w	d1, (Window_column_frames_num).w
 	btst	#1, (Window_queue).w
 	beq.s	+			; branch if we use a clipping effect
-	move.w	($FFFFDE46).w, ($FFFFDE44).w	; otherwise pop open
-	move.w	#1, ($FFFFDE40).w
+	move.w	(Window_total_columns).w, (Window_column_frames_num).w	; otherwise pop open
+	move.w	#1, (Window_column_frames_left).w
 +
 	move.b	(a1)+, d0
 	move.w	d0, (a0)+	; store number of rows
-	move.w	d0, ($FFFFDE48).w
+	move.w	d0, (Window_total_rows).w
 	move.w	(Window_queue).w, d0
 	andi.w	#$FF, d0
 	move.w	d0, (a0)	; store window index
@@ -14940,28 +14940,28 @@ DrawWindows:
 	move.l	a1, (Win_backup_tiles_addr).w
 +
 	btst	#1, (Window_queue).w
-	beq.s	loc_947A
+	beq.s	DrawWindows_Cont
 DrawWindows_Return:
 	rts
 
-loc_947A:
+DrawWindows_Cont:
 	move.w	(Window_queue).w, d0
-	bmi.w	loc_954C	; branch if set to destroy
+	bmi.w	DestroyWindows_Cont	; branch if set to destroy
 	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	move.w	(a0)+, d0
-	addq.w	#4, a0
-	movea.l	(a0)+, a1
-	subq.w	#1, d1
+	move.w	(a0)+, d0	; d0 = VDP address
+	addq.w	#4, a0		; skip backup tiles address
+	movea.l	(a0)+, a1	; a1 = plane mappings address
+	subq.w	#1, d1	; plane mappings don't have side border in their data, so subtract 1
 	adda.w	d1, a1
-	move.w	(a0)+, d3
-	move.w	(a0)+, d2
-	move.w	($FFFFDE44).w, d1
+	move.w	(a0)+, d3	; get columns
+	move.w	(a0)+, d2	; get rows
+	move.w	(Window_column_frames_num).w, d1
 	bsr.w	loc_978C
-	addq.w	#2, ($FFFFDE44).w
-	subq.w	#1, ($FFFFDE40).w
+	addq.w	#2, (Window_column_frames_num).w
+	subq.w	#1, (Window_column_frames_left).w
 	bne.s	loc_94EC
 	btst	#2, (Window_queue).w
 	bne.s	loc_94CC
@@ -14981,7 +14981,7 @@ loc_94CC:
 	move.l	d0, (Window_queue+$C).w
 loc_94EC:
 	rts
-Win_Destroy:
+DestroyWindows:
 	tst.w	(Windows_opened_num).w
 	beq.s	loc_94CC
 	subq.w	#1, (Windows_opened_num).w
@@ -14994,12 +14994,12 @@ Win_Destroy:
 	move.w	d0, d1
 	lsr.w	#1, d0
 	addq.w	#1, d0
-	move.w	d0, ($FFFFDE40).w
-	move.w	#0, ($FFFFDE44).w
+	move.w	d0, (Window_column_frames_left).w
+	move.w	#0, (Window_column_frames_num).w
 	btst	#1, (Window_queue).w
 	beq.s	loc_9530
-	move.w	($FFFFDE46).w, ($FFFFDE44).w
-	move.w	#1, ($FFFFDE40).w
+	move.w	(Window_total_columns).w, (Window_column_frames_num).w
+	move.w	#1, (Window_column_frames_left).w
 loc_9530:
 	btst	#2, (Window_queue).w
 	bne.s	loc_954A
@@ -15011,7 +15011,7 @@ loc_9530:
 	bra.w	FillMemBlock2
 loc_954A:
 	rts
-loc_954C:
+DestroyWindows_Cont:
 	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
@@ -15022,10 +15022,10 @@ loc_954C:
 	addq.w	#4, a0
 	move.w	(a0)+, d3
 	move.w	(a0)+, d2
-	move.w	($FFFFDE44).w, d1
+	move.w	(Window_column_frames_num).w, d1
 	bsr.w	loc_9872
-	addq.w	#2, ($FFFFDE44).w
-	subq.w	#1, ($FFFFDE40).w
+	addq.w	#2, (Window_column_frames_num).w
+	subq.w	#1, (Window_column_frames_left).w
 	bne.s	loc_9586
 	move.w	(Window_queue).w, d0
 	subq.b	#1, d0
@@ -15034,20 +15034,20 @@ loc_954C:
 loc_9586:
 	rts
 
-CheckRenderScript:
+Win_CheckRenderScript:
 	move.w	(Script_flag).w, d1
 	beq.w	loc_96EC		; branch if script is not running
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	movea.l	(Text_offset).w, a1
 -
-	bsr.s	RenderScript
+	bsr.s	Win_RenderScript
 	move.l	a1, (Text_offset).w
 	tst.w	(Text_render_type).w
 	bne.s	-
 	rts
 
-RenderScript:
+Win_RenderScript:
 	moveq	#0, d1
 	move.b	(a1), d1
 	cmpi.b	#$C1, d1
@@ -15084,11 +15084,11 @@ loc_95F4:
 	rts
 loc_9608:
 	cmpi.b	#$C3, d1
-	bcs.s	DrawScriptToVDP
+	bcs.s	Win_TextToVDP
 	move.w	#0, (Text_render_type).w
 	rts
 
-DrawScriptToVDP:
+Win_TextToVDP:
 	add.w	d1, d1
 	lea	(VDPCharacterMaps).l, a4
 	adda.w	d1, a4
@@ -15230,6 +15230,15 @@ loc_9782:
 	move.w	#$8526, (a3)
 	dbf	d1, loc_9750
 	rts
+
+
+; -----------------------------------------------------------------
+; d0 = VDP address
+; d1 = column frames number
+; d2 = rows
+; d3 = columns
+; a1 = plane mappings
+; -----------------------------------------------------------------
 loc_978C:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
@@ -15310,6 +15319,7 @@ loc_9848:
 	move.b	#$BF, d5
 	move.w	d5, (a3)
 	rts
+; -----------------------------------------------------------------
 
 
 ; -----------------------------------------------------------------
@@ -15335,7 +15345,7 @@ loc_9872:
 	move.l	#$80, d7
 	movea.l	a1, a4
 	add.w	d3, d3
-	cmpi.w	#1, ($FFFFDE40).w
+	cmpi.w	#1, (Window_column_frames_left).w
 	bne.w	loc_98C2
 	andi.w	#$FFFE, d1
 	move.b	d0, d6
@@ -32560,10 +32570,8 @@ Tech_UnknownB:
 ;
 ; bytes 1-2 = VDP plane offset
 ; bytes 3-6 = pointer to plane mappings
-; byte 7 = columns; this byte must be set to
-;          the number of the desired columns + 1
-; byte 8 = rows; this byte must be set to
-;          the number of the desired rows - 1
+; byte 7 = columns
+; byte 8 = rows
 ; =======================================================================
 WindowArtLayoutPtrs:
 
