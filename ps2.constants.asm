@@ -1346,7 +1346,7 @@ Windows_opened_num =  ramaddr($FFFFDE04)		; number of objects that were populate
 Window_queue =  ramaddr($FFFFDE10)		; 16 bytes total, 2 bytes per entry
 										;	entry definition: byte 1: bitfield holding various flags for processing
 										;							bit 0 = initialization flag
-										;							bit 1 = if clear, open window with a clipping effect; if set, window appears fully in one frame
+										;							bit 1 = if clear, open window in multiple frames; if set, window appears fully in one frame
 										;							bit 2 = if set, draw window without tracking it in memory (static window)
 										;							bit 7 = if set, destroy window; byte 2 holds the number of windows to destroy rather than the window index 
 										;					  byte 2: window index
@@ -1432,6 +1432,7 @@ Camera_max_X_pos =  ramaddr($FFFFF722)
 Camera_Y_step_counter =  ramaddr($FFFFF724)
 Camera_X_step_counter =  ramaddr($FFFFF726)
 
+Window_art_tile_start =  ramaddr($FFFFF72C)
 Map_collision_data_addr =  ramaddr($FFFFF72E)
 Collision_map_layout_addr =  ramaddr($FFFFF732)	; either $9000 or $A800; determines which map layout we want to check collision detection from
 Screen_changed_flag =  ramaddr($FFFFF734)

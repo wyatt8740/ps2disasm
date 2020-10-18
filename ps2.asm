@@ -9471,12 +9471,12 @@ loc_5B6E:
 loc_5B96:
 	bsr.w	loc_8E00
 	jsr	(loc_118F4).l
-	bsr.w	DrawWindows
+	bsr.w	RenderWindows
 	rts
 
 VInt_Scene:
 	bsr.w	VInt_NormalUpdates
-	bsr.w	DrawWindows
+	bsr.w	RenderWindows
 	rts
 
 VInt_Battle:
@@ -9502,7 +9502,7 @@ VInt_Battle:
 	move.w	#$83, (DMA_last_write).w
 	move.w	(DMA_last_write).w, (a6)
 +
-	bsr.w	DrawWindows
+	bsr.w	RenderWindows
 	bsr.w	FlushDecompressionQueue
 	rts
 
@@ -12342,7 +12342,7 @@ loc_797C:
 	bsr.w	WaitForVInt
 	move.b	#$C, (V_int_routine).w
 	bsr.w	WaitForVInt
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	subq.w	#1, (General_timer).w
 	bne.s	loc_797C
 loc_799A:
@@ -12625,7 +12625,7 @@ loc_7C4A:
 	dbf	d6, loc_7C4A
 
 	move.w	#0, (Screen_changed_flag).w
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, (Win_backup_tiles_addr).w
 	jsr	(LoadDynWindowsInRam).l
@@ -12725,7 +12725,7 @@ GameMode_MapLoop:
 	bsr.w	ProcessPlayerMenu
 +
 	bsr.w	Map_CheckInteractions
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	bsr.w	RunDecompressionQueue
 	jsr	(RenderCharSprites).l
 	bsr.w	Map_EventRun
@@ -13184,7 +13184,7 @@ loc_829E:
 
 	move.w	#1, (Event_routine).w
 	move.w	#0, (Screen_changed_flag).w
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, (Win_backup_tiles_addr).w
 	moveq	#PalID_Party, d0
@@ -13277,7 +13277,7 @@ GameMode_SceneLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	Scene_CheckRoutine
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	bsr.w	loc_66F6
 	tst.w	(Screen_changed_flag).w
 	bne.s	loc_8406
@@ -13449,7 +13449,7 @@ loc_85D6:
 	move.l	d7, (a6)+
 	dbf	d6, loc_85D6
 	move.w	#0, (Screen_changed_flag).w
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, (Win_backup_tiles_addr).w
 	moveq	#0, d0
@@ -13504,8 +13504,8 @@ loc_85D6:
 +
 	bsr.w	UpdateSoundQueue
 loc_86A2:
-	bsr.w	UpdateWindows
-	bsr.w	DrawWindows
+	bsr.w	RunWindows
+	bsr.w	RenderWindows
 	tst.w	(Window_queue).w
 	bne.s	loc_86A2
 	move.w	(VDP_reg1_values).w, d0
@@ -13560,7 +13560,7 @@ GameMode_BattleLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	Battle_CheckRoutines
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	bsr.w	RunDecompressionQueue
 	bsr.w	loc_67B8
 	move.b	(Joypad_pressed).w, d0
@@ -13634,7 +13634,7 @@ GameOverScreenLoop:
 	bsr.w	CheckGamePause
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	subq.w	#1, (General_timer).w
 	beq.s	loc_88B2
 	move.b	(Joypad_pressed).w, d0
@@ -13721,7 +13721,7 @@ loc_8970:
 
 	move.w	#1, (Event_routine).w
 	move.w	#0, (Screen_changed_flag).w
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, (Win_backup_tiles_addr).w
 	jsr	(LoadDynWindowsInRam).l
@@ -13740,7 +13740,7 @@ GameMode_IntroLoop:
 	jsr	(RunObjects).l
 	jsr	(BuildSprites).l
 	bsr.w	IntroScr_CheckRoutine
-	bsr.w	UpdateWindows
+	bsr.w	RunWindows
 	tst.w	(Screen_changed_flag).w
 	bmi.s	loc_89E6
 	bne.s	loc_89E4
@@ -14856,9 +14856,9 @@ MapArtChunkPtrs:
 
 
 ; -----------------------------------------------------------------
-DrawWindows:
+RenderWindows:
 	move.w	(Window_column_frames_left).w, d1
-	bne.w	DrawWindows_Cont
+	bne.w	RenderWindows_Cont
 	move.w	(Window_queue).w, d0
 	beq.w	Win_CheckRenderScript	; when all windows are loaded, render script
 	bmi.w	DestroyWindows			; if bit 7 is set, destroy window
@@ -14870,10 +14870,10 @@ DrawWindows:
 	adda.w	d0, a1
 	move.w	(Camera_Y_pos_BG).w, d0
 	andi.w	#$F, d0
-	bne.w	DrawWindows_Return	; wait until camera has updated 16 pixels
+	bne.w	RenderWindows_Return	; wait until camera has updated 16 pixels
 	move.w	(Camera_X_pos_BG).w, d0
 	andi.w	#$F, d0
-	bne.w	DrawWindows_Return
+	bne.w	RenderWindows_Return
 	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
@@ -14914,7 +14914,7 @@ DrawWindows:
 	andi.w	#1, d1
 	move.w	d1, (Window_column_frames_num).w
 	btst	#1, (Window_queue).w
-	beq.s	+			; branch if we use a clipping effect
+	beq.s	+			; branch if window opens in multiple frames
 	move.w	(Window_total_columns).w, (Window_column_frames_num).w	; otherwise pop open
 	move.w	#1, (Window_column_frames_left).w
 +
@@ -14940,11 +14940,11 @@ DrawWindows:
 	move.l	a1, (Win_backup_tiles_addr).w
 +
 	btst	#1, (Window_queue).w
-	beq.s	DrawWindows_Cont
-DrawWindows_Return:
+	beq.s	RenderWindows_Cont
+RenderWindows_Return:
 	rts
 
-DrawWindows_Cont:
+RenderWindows_Cont:
 	move.w	(Window_queue).w, d0
 	bmi.w	DestroyWindows_Cont	; branch if set to destroy
 	lea	(Window_draw_cache).w, a0
@@ -14954,23 +14954,23 @@ DrawWindows_Cont:
 	move.w	(a0)+, d0	; d0 = VDP address
 	addq.w	#4, a0		; skip backup tiles address
 	movea.l	(a0)+, a1	; a1 = plane mappings address
-	subq.w	#1, d1	; plane mappings don't have side border in their data, so subtract 1
+	subq.w	#1, d1
 	adda.w	d1, a1
 	move.w	(a0)+, d3	; get columns
 	move.w	(a0)+, d2	; get rows
 	move.w	(Window_column_frames_num).w, d1
-	bsr.w	loc_978C
+	bsr.w	Win_Draw
 	addq.w	#2, (Window_column_frames_num).w
 	subq.w	#1, (Window_column_frames_left).w
-	bne.s	loc_94EC
+	bne.s	+
 	btst	#2, (Window_queue).w
-	bne.s	loc_94CC
+	bne.s	ShiftUpWindowQueue
 	addq.w	#1, (Windows_opened_num).w
 	andi.w	#$F, (Windows_opened_num).w
-	bne.s	loc_94CC
+	bne.s	ShiftUpWindowQueue
 	movea.l	#RAM_start&$FFFFFF, a0
 	move.l	a0, (Win_backup_tiles_addr).w
-loc_94CC:
+ShiftUpWindowQueue:
 	move.l	(Window_queue+2).w, d0
 	move.l	d0, (Window_queue).w
 	move.l	(Window_queue+6).w, d0
@@ -14979,11 +14979,12 @@ loc_94CC:
 	move.l	d0, (Window_queue+8).w
 	move.l	(Window_queue+$E).w, d0
 	move.l	d0, (Window_queue+$C).w
-loc_94EC:
++
 	rts
+
 DestroyWindows:
 	tst.w	(Windows_opened_num).w
-	beq.s	loc_94CC
+	beq.s	ShiftUpWindowQueue
 	subq.w	#1, (Windows_opened_num).w
 	andi.w	#$F, (Windows_opened_num).w
 	lea	($FFFFDF0A).w, a0
@@ -15029,7 +15030,7 @@ DestroyWindows_Cont:
 	bne.s	loc_9586
 	move.w	(Window_queue).w, d0
 	subq.b	#1, d0
-	beq.w	loc_94CC
+	beq.w	ShiftUpWindowQueue
 	move.w	d0, (Window_queue).w
 loc_9586:
 	rts
@@ -15239,84 +15240,85 @@ loc_9782:
 ; d3 = columns
 ; a1 = plane mappings
 ; -----------------------------------------------------------------
-loc_978C:
+Win_Draw:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	move.l	#$80, d7
+	move.l	#$80, d7	; row increment
 	move.w	d3, d5
-	sub.w	d1, d5
+	sub.w	d1, d5	; offset from center
 	andi.w	#$FFFE, d5
 	move.b	d0, d6
 	andi.b	#$80, d6
-	add.b	d5, d0
+	add.b	d5, d0	; add offset to VDP address
 	andi.b	#$7F, d0
 	or.b	d6, d0
-	subq.w	#2, d2
-	sub.w	d1, d3
-	move.w	#$8500, d5
+	subq.w	#2, d2	; don't account for top and bottom border
+	sub.w	d1, d3	; offset from center
+	move.w	#$8500, d5	; d5 = starting plane tile
 	btst	#$D, d0
-	beq.s	loc_97C6
-	move.w	#$500, d5
-loc_97C6:
+	beq.s	+	; if we're writing to plane A, branch (priority bit set)
+	move.w	#$500, d5	; if we're writing to plane B, clear priority bit
++
 	move.l	d0, -(sp)
 	move.w	d1, d4
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$B8, d5
+	move.b	#$B8, d5	; top left corner
 	move.w	d5, (a3)
-	dbf	d4, loc_97E2
-	bra.s	loc_97F0
-loc_97DA:
+	dbf	d4, Win_DrawTopNextTile
+	bra.s	Win_DrawMiddle
+
+Win_DrawTopBorderLoop:
 	move.b	(a1)+, d5
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	d5, (a3)
-loc_97E2:
-	dbf	d4, loc_97DA
+Win_DrawTopNextTile:
+	dbf	d4, Win_DrawTopBorderLoop
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$BA, d5
+	move.b	#$BA, d5	; top right corner
 	move.w	d5, (a3)
-loc_97F0:
+Win_DrawMiddle:
 	move.l	(sp)+, d0
-	adda.w	d3, a1
-	add.w	d7, d0
-loc_97F6:
+	adda.w	d3, a1	; next plane mappings row
+	add.w	d7, d0	; next VDP row
+Win_DrawMiddleLoop:
 	move.l	d0, -(sp)
 	move.w	d1, d4
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$BB, d5
+	move.b	#$BB, d5	; left border
 	move.w	d5, (a3)
-	dbf	d4, loc_9816
-	bra.s	loc_9824
+	dbf	d4, Win_DrawMiddleNextTile
+	bra.s	Win_DrawMiddleNextRow
 
-loc_980A:
+Win_DrawMiddleTileLoop:
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	($FFFFF72C).w, d6
+	move.w	(Window_art_tile_start).w, d6
 	move.b	(a1)+, d6
 	move.w	d6, (a3)
-loc_9816:
-	dbf	d4, loc_980A
+Win_DrawMiddleNextTile:
+	dbf	d4, Win_DrawMiddleTileLoop
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$BC, d5
+	move.b	#$BC, d5	; right border
 	move.w	d5, (a3)
 
-loc_9824:
+Win_DrawMiddleNextRow:
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
-	dbf	d2, loc_97F6
+	dbf	d2, Win_DrawMiddleLoop
 	move.w	d1, d4
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$BD, d5
+	move.b	#$BD, d5	; bottom left corner
 	move.w	d5, (a3)
-	dbf	d4, loc_9848
+	dbf	d4, Win_DrawBottomNextTile
 	rts
-loc_9840:
+Win_DrawBottomBorderLoop:
 	move.b	(a1)+, d5
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	d5, (a3)
-loc_9848:
-	dbf	d4, loc_9840
+Win_DrawBottomNextTile:
+	dbf	d4, Win_DrawBottomBorderLoop
 	bsr.w	Win_VDPAddressToControlPort
-	move.b	#$BF, d5
+	move.b	#$BF, d5	; bottom right corner
 	move.w	d5, (a3)
 	rts
 ; -----------------------------------------------------------------
@@ -15325,6 +15327,10 @@ loc_9848:
 ; -----------------------------------------------------------------
 ; d0 = VDP address
 ; a2 = VDP control port
+;
+; Returns
+;
+; d0 = VDP address + 2
 ; -----------------------------------------------------------------
 Win_VDPAddressToControlPort:
 	andi.w	#$EFFF, d0
@@ -24459,7 +24465,7 @@ CharStartCommandsArray:
 
 	even
 
-UpdateWindows:
+RunWindows:
 	tst.w	(Window_queue).w
 	beq.s	.update		; continue processing an already opened window
 	bmi.s	.return	; return if window is being destroyed
@@ -26415,10 +26421,10 @@ loc_108DC:
 Win_RolfPortrait:
 	tst.b	d1
 	bne.s	loc_10900
-	move.w	#$A400, ($FFFFF72C).w
+	move.w	#$A400, (Window_art_tile_start).w
 	rts
 loc_10900:
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	move.w	#0, (Window_index).w
 	rts
 ; ----------------------------------------
@@ -26426,10 +26432,10 @@ loc_10900:
 Win_Portraits:
 	tst.b	d1
 	bne.s	loc_1091A
-	move.w	#$C400, ($FFFFF72C).w
+	move.w	#$C400, (Window_art_tile_start).w
 	rts
 loc_1091A:
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	move.w	#0, (Window_index).w
 	rts
 ; ---------------------------------------
@@ -26671,7 +26677,7 @@ loc_10B38:
 Win_BattleMessage:
 	tst.b	d1
 	bne.s	loc_10B56
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	rts
 loc_10B56:
 	subq.w	#1, d1
@@ -26958,7 +26964,7 @@ Win_SecondEnemyName:
 loc_10E68:
 	tst.b	d1
 	bne.s	loc_10E80
-	move.w	#$500, ($FFFFF72C).w
+	move.w	#$500, (Window_art_tile_start).w
 	lea	(Window_art_buffer+PlaneMap_WinEnemyNames-DynamicWindowsStart+$A).w, a1
 	moveq	#0, d3
 	bsr.s	loc_10E8E
@@ -26966,7 +26972,7 @@ loc_10E68:
 	bsr.s	loc_10E8E
 	rts
 loc_10E80:
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	move.w	#0, (Window_index).w
 	rts
 loc_10E8E:
@@ -26997,11 +27003,11 @@ Win_SecondEnemyInfo:
 loc_10EC2:
 	tst.b	d1
 	beq.s	loc_10ED4
-	move.w	#$8500, ($FFFFF72C).w
+	move.w	#$8500, (Window_art_tile_start).w
 	move.w	#0, (Window_index).w
 	rts
 loc_10ED4:
-	move.w	#$500, ($FFFFF72C).w
+	move.w	#$500, (Window_art_tile_start).w
 	lea	(Window_art_buffer+PlaneMap_WinEnemyInfo-DynamicWindowsStart+4).w, a1
 	lea	(loc_114FE).l, a3
 	tst.w	d0
