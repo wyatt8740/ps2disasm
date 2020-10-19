@@ -12722,7 +12722,7 @@ GameMode_MapLoop:
 	bne.s	+
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
-	bsr.w	ProcessPlayerMenu
+	bsr.w	OpenMenuWindow
 +
 	bsr.w	Map_CheckInteractions
 	bsr.w	RunWindows
@@ -14982,49 +14982,55 @@ ShiftUpWindowQueue:
 +
 	rts
 
+
+; -----------------------------------------------------------------
 DestroyWindows:
 	tst.w	(Windows_opened_num).w
 	beq.s	ShiftUpWindowQueue
 	subq.w	#1, (Windows_opened_num).w
 	andi.w	#$F, (Windows_opened_num).w
-	lea	($FFFFDF0A).w, a0
+	lea	(Window_draw_cache+$A).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	move.w	(a0)+, d0
+	move.w	(a0)+, d0	; columns
 	move.w	d0, d1
 	lsr.w	#1, d0
 	addq.w	#1, d0
 	move.w	d0, (Window_column_frames_left).w
 	move.w	#0, (Window_column_frames_num).w
 	btst	#1, (Window_queue).w
-	beq.s	loc_9530
+	beq.s	+
 	move.w	(Window_total_columns).w, (Window_column_frames_num).w
 	move.w	#1, (Window_column_frames_left).w
-loc_9530:
++
 	btst	#2, (Window_queue).w
-	bne.s	loc_954A
+	bne.s	+
 	lea	(Object_RAM).w, a1
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#6, d0
 	adda.w	d0, a1
 	moveq	#0, d1
-	bra.w	FillMemBlock2
-loc_954A:
+	bra.w	FillMemBlock2	; clear red cursor object
++
 	rts
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
 DestroyWindows_Cont:
 	lea	(Window_draw_cache).w, a0
 	move.w	(Windows_opened_num).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	move.w	(a0)+, d0
-	movea.l	(a0)+, a1
-	move.l	a1, (Win_backup_tiles_addr).w
-	addq.w	#4, a0
-	move.w	(a0)+, d3
-	move.w	(a0)+, d2
+	move.w	(a0)+, d0	; VDP address
+	movea.l	(a0)+, a1	; backup tiles address
+	move.l	a1, (Win_backup_tiles_addr).w	; restore previous address
+	addq.w	#4, a0	; skip plane mappings address
+	move.w	(a0)+, d3	; columns
+	move.w	(a0)+, d2	; rows
 	move.w	(Window_column_frames_num).w, d1
-	bsr.w	loc_9872
+	bsr.w	Win_Erase
 	addq.w	#2, (Window_column_frames_num).w
 	subq.w	#1, (Window_column_frames_left).w
 	bne.s	loc_9586
@@ -15034,7 +15040,10 @@ DestroyWindows_Cont:
 	move.w	d0, (Window_queue).w
 loc_9586:
 	rts
+; -----------------------------------------------------------------
 
+
+; -----------------------------------------------------------------
 Win_CheckRenderScript:
 	move.w	(Script_flag).w, d1
 	beq.w	loc_96EC		; branch if script is not running
@@ -15231,6 +15240,7 @@ loc_9782:
 	move.w	#$8526, (a3)
 	dbf	d1, loc_9750
 	rts
+; -----------------------------------------------------------------
 
 
 ; -----------------------------------------------------------------
@@ -15245,7 +15255,7 @@ Win_Draw:
 	lea	(VDP_data_port).l, a3
 	move.l	#$80, d7	; row increment
 	move.w	d3, d5
-	sub.w	d1, d5	; offset from center
+	sub.w	d1, d5
 	andi.w	#$FFFE, d5
 	move.b	d0, d6
 	andi.b	#$80, d6
@@ -15345,14 +15355,23 @@ Win_VDPAddressToControlPort:
 ; -----------------------------------------------------------------
 
 
-loc_9872:
+; -----------------------------------------------------------------
+; d0 = VDP address
+; d1 = column frames number
+; d2 = rows
+; d3 = columns
+; a1 = backup tiles
+; -----------------------------------------------------------------
+Win_Erase:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	move.l	#$80, d7
+	move.l	#$80, d7	; row increment
 	movea.l	a1, a4
-	add.w	d3, d3
+	add.w	d3, d3	; multiply by 2 (2 bytes per plane pattern)
 	cmpi.w	#1, (Window_column_frames_left).w
-	bne.w	loc_98C2
+	bne.w	Win_EraseShrinkWindow
+
+; for the last frame, window disappears completely
 	andi.w	#$FFFE, d1
 	move.b	d0, d6
 	andi.b	#$80, d6
@@ -15361,7 +15380,7 @@ loc_9872:
 	or.b	d6, d0
 	adda.w	d1, a1
 	move.w	d2, d4
-loc_98A8:
+Win_EraseLastLoop:
 	move.w	d0, d5
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
@@ -15370,11 +15389,11 @@ loc_98A8:
 	move.w	d5, d0
 	adda.w	d3, a1
 	add.w	d7, d0
-	dbf	d4, loc_98A8
+	dbf	d4, Win_EraseLastLoop
 
 	rts
 
-loc_98C2:
+Win_EraseShrinkWindow:
 	move.l	d0, -(sp)
 	move.w	d3, d5
 	sub.w	d1, d5
@@ -15386,32 +15405,34 @@ loc_98C2:
 	add.b	d5, d0
 	andi.b	#$7F, d0
 	or.b	d6, d0
-	subq.w	#2, d2
+	subq.w	#2, d2	; don't account for top and bottom border
 	move.w	d2, d4
 	move.w	#$8500, d5
 	move.l	d0, -(sp)
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85BA, (a3)
+	move.w	#$85BA, (a3)	; draw top right corner
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	(a1)+, (a3)
+	move.w	(a1)+, (a3)		; then draw tile
 	move.l	(sp)+, d0
 	adda.w	d3, a1
 	add.w	d7, d0
-loc_98FC:
+Win_EraseRightLoop:
 	move.l	d0, -(sp)
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85BC, (a3)
+	move.w	#$85BC, (a3)	; draw right border
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	move.l	(sp)+, d0
-	adda.w	d3, a1
+	adda.w	d3, a1	; next row
 	add.w	d7, d0
-	dbf	d4, loc_98FC
+	dbf	d4, Win_EraseRightLoop
 
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85BF, (a3)
+	move.w	#$85BF, (a3)	; draw bottom right corner
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1), (a3)
+
+; now draw left side
 	move.l	(sp)+, d0
 	movea.l	a4, a1
 	andi.w	#$FFFE, d1
@@ -15421,31 +15442,35 @@ loc_98FC:
 	andi.b	#$7F, d0
 	or.b	d6, d0
 	adda.w	d1, a1
-	move.w	d2, d4
+	move.w	d2, d4	; rows
 	move.l	d0, -(sp)
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85B8, (a3)
+	move.w	#$85B8, (a3)	; draw top left corner
 	move.l	(sp)+, d0
-	adda.w	d3, a1
+	adda.w	d3, a1	; next row
 	add.w	d7, d0
-loc_9954:
+Win_EraseLeftLoop:
 	move.l	d0, -(sp)
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85BB, (a3)
+	move.w	#$85BB, (a3)	; draw left border
 	move.l	(sp)+, d0
-	adda.w	d3, a1
+	adda.w	d3, a1	; next row
 	add.w	d7, d0
-	dbf	d4, loc_9954
+	dbf	d4, Win_EraseLeftLoop
 
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1), (a3)
 	bsr.w	Win_VDPAddressToControlPort
-	move.w	#$85BD, (a3)
+	move.w	#$85BD, (a3)	; draw bottom left corner
 	rts
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
 loc_997E:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
@@ -15491,7 +15516,7 @@ Win_BackupTiles:
 ; -----------------------------------------------------------------
 
 
-ProcessPlayerMenu:
+OpenMenuWindow:
 	tst.w	(Interaction_routine).w
 	bne.s	+	; rts
 	tst.w	(Window_queue).w
