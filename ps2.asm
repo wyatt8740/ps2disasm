@@ -15033,12 +15033,12 @@ DestroyWindows_Cont:
 	bsr.w	Win_Erase
 	addq.w	#2, (Window_column_frames_num).w
 	subq.w	#1, (Window_column_frames_left).w
-	bne.s	loc_9586
+	bne.s	+
 	move.w	(Window_queue).w, d0
 	subq.b	#1, d0
 	beq.w	ShiftUpWindowQueue
 	move.w	d0, (Window_queue).w
-loc_9586:
++
 	rts
 ; -----------------------------------------------------------------
 
@@ -15046,7 +15046,7 @@ loc_9586:
 ; -----------------------------------------------------------------
 Win_CheckRenderScript:
 	move.w	(Script_flag).w, d1
-	beq.w	loc_96EC		; branch if script is not running
+	beq.w	Win_RefreshStatsNum		; branch if script is not running
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	movea.l	(Text_offset).w, a1
@@ -15061,20 +15061,20 @@ Win_RenderScript:
 	moveq	#0, d1
 	move.b	(a1), d1
 	cmpi.b	#$C1, d1
-	bne.s	loc_95F4
+	bne.s	Win_ScriptChkC2
 	subq.w	#1, (Text_line_scroll_speed).w
-	bpl.s	loc_95F2
+	bpl.s	+++
 	move.w	#3, (Text_line_scroll_speed).w
 	move.w	(Text_curr_line).w, d0
 	cmp.w	(Text_max_line_num).w, d0
-	beq.s	loc_95D4
+	beq.s	+		; branch if we no longer have room to print text
 	addq.w	#1, (Text_curr_line).w
-	bra.s	loc_95DC
-loc_95D4:
+	bra.s	++
++
 	movea.l	a1, a4
-	bsr.w	loc_9666
+	bsr.w	Win_ShiftUpText
 	movea.l	a4, a1
-loc_95DC:
++
 	move.w	(Text_plane_offset_start).w, d0
 	move.w	(Text_curr_line).w, d1
 	lsl.w	#7, d1
@@ -15082,22 +15082,26 @@ loc_95DC:
 	andi.w	#$CFFF, d0
 	move.w	d0, (Text_plane_offset).w
 	addq.w	#1, a1
-loc_95F2:
++
 	rts
 
-loc_95F4:
+Win_ScriptChkC2:
 	cmpi.b	#$C2, d1
-	bne.s	loc_9608
-	bsr.w	loc_96AE
+	bne.s	Win_ScriptChkC3
+	bsr.w	Win_Clear
 	move.w	(Text_plane_offset_start).w, (Text_plane_offset).w
 	addq.w	#1, a1
 	rts
-loc_9608:
+
+Win_ScriptChkC3:
 	cmpi.b	#$C3, d1
 	bcs.s	Win_TextToVDP
 	move.w	#0, (Text_render_type).w
 	rts
+; -----------------------------------------------------------------
 
+
+; -----------------------------------------------------------------
 Win_TextToVDP:
 	add.w	d1, d1
 	lea	(VDPCharacterMaps).l, a4
@@ -15105,11 +15109,11 @@ Win_TextToVDP:
 	move.w	(Text_plane_offset).w, d0
 	andi.w	#$CFFF, d0
 	move.w	d0, (a2)
-	move.w	#3, (a2)
+	move.w	#3, (a2)	; plane address
 	move.w	#$8500, d2
 	move.b	(a4)+, d2
 	move.w	d2, (a3)
-	addi.w	#$80, d0
+	addi.w	#$80, d0	; skip line
 	andi.w	#$EFFF, d0
 	move.w	d0, (a2)
 	move.w	#3, (a2)
@@ -15125,120 +15129,133 @@ Win_TextToVDP:
 	move.w	d0, (Text_plane_offset).w
 	addq.w	#1, a1
 	rts
-loc_9666:
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
+Win_ShiftUpText:
 	move.w	(Text_plane_offset_start).w, d0
 	addi.w	#$80, d0
 	andi.w	#$FFF, d0
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
-	beq.s	loc_96AE
+	beq.s	Win_Clear
 	movea.l	(Win_backup_tiles_addr).w, a1
-	bsr.w	Win_BackupTiles
+	bsr.w	Win_BackupTiles	; back up text
 	move.w	(Text_plane_offset_start).w, d0
 	andi.w	#$CFFF, d0
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
 	movea.l	(Win_backup_tiles_addr).w, a1
-	bsr.w	loc_997E
+	bsr.w	Win_TilesToVDP
 	move.w	#$17, d1
-loc_96A0:
+-
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$8526, (a3)
-	dbf	d1, loc_96A0
+	dbf	d1, -
 	rts
-loc_96AE:
+; -----------------------------------------------------------------
+
+
+; -----------------------------------------------------------------
+Win_Clear:
 	move.w	(Text_plane_offset_start).w, d0
 	andi.w	#$CFFF, d0
 	move.w	#$17, d1
 	move.w	(Text_max_line_num).w, d2
-	bne.s	loc_96C4
+	bne.s	+
+; for the window in battle
 	if revision=0
 	move.w	#$11, d1
 	else
 	move.w	#$13, d1
 	endif
-loc_96C4:
-	addq.w	#1, d2
++
+	addq.w	#1, d2	; include last empty line
 	move.l	#$80, d7
-loc_96CC:
+-
 	move.w	d1, d4
 	move.w	d0, d5
-loc_96D0:
+-
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	#$8526, (a3)
-	dbf	d4, loc_96D0
+	dbf	d4, -
 	move.w	d5, d0
 	add.l	d7, d0
-	dbf	d2, loc_96CC
+	dbf	d2, --
 	move.w	#0, (Text_curr_line).w
 	rts
+; -----------------------------------------------------------------
 
-loc_96EC:
-	tst.w	($FFFFDEA8).w
-	bne.s	loc_96F4
+
+; -----------------------------------------------------------------
+; Refresh the Agility, Attack and Defense parameters
+Win_RefreshStatsNum:
+	tst.w	(Refresh_stats_flag).w
+	bne.s	+
 	rts
 
-loc_96F4:
-	move.w	#0, ($FFFFDEA8).w
++
+	move.w	#0, (Refresh_stats_flag).w
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
-	lea	($FFFFDE74).w, a0
+	lea	(Win_agility_num).w, a0
 	move.w	#$112, d1
-	bsr.s	loc_9722
-	lea	($FFFFDE78).w, a0
+	bsr.s	+
+	lea	(Win_attack_num).w, a0
 	move.w	#$212, d1
-	bsr.s	loc_9722
-	lea	($FFFFDE7C).w, a0
+	bsr.s	+
+	lea	(Win_defense_num).w, a0
 	move.w	#$312, d1
-loc_9722:
++
 	move.w	(a0)+, d5
 	cmp.w	(a0), d5
-	beq.s	loc_9730
-	bcs.s	loc_972E
+	beq.s	++
+	bcs.s	+
 	addq.w	#1, (a0)
-	bra.s	loc_9730
-loc_972E:
+	bra.s	++
++
 	subq.w	#1, (a0)
-loc_9730:
++
 	move.w	(a0), d5
-	move.w	($FFFFDF40).w, d0
+	move.w	(Window_draw_cache+$40).w, d0	; get VDP offset
 	move.w	d0, d2
 	add.w	d1, d0
 	eor.w	d0, d2
 	andi.w	#$80, d2
-	beq.s	loc_9746
+	beq.s	+
 	subi.w	#$80, d0
-loc_9746:
++
 	lea	(DecimalDigitData+$14).l, a1
 	moveq	#2, d1
 	moveq	#0, d4
-loc_9750:
+-
 	bsr.w	Win_VDPAddressToControlPort
 	tst.b	d1
-	bne.s	loc_975C
+	bne.s	+
 	move.b	#1, d4
-loc_975C:
++
 	move.w	#$8597, d2
 	move.l	(a1)+, d3
-loc_9762:
+-
 	sub.w	d3, d5
-	bcs.s	loc_976A
+	bcs.s	+
 	addq.b	#1, d2
-	bra.s	loc_9762
-loc_976A:
+	bra.s	-
++
 	add.w	d3, d5
 	tst.b	d4
-	bne.s	loc_977A
+	bne.s	+
 	cmpi.w	#$8597, d2
-	beq.s	loc_9782
+	beq.s	++
 	move.b	#1, d4
-loc_977A:
++
 	move.w	d2, (a3)
-	dbf	d1, loc_9750
+	dbf	d1, --
 	rts
-loc_9782:
++
 	move.w	#$8526, (a3)
-	dbf	d1, loc_9750
+	dbf	d1, --
 	rts
 ; -----------------------------------------------------------------
 
@@ -15471,21 +15488,26 @@ Win_EraseLeftLoop:
 
 
 ; -----------------------------------------------------------------
-loc_997E:
+; d0 = VDP address
+; d1 = columns
+; d2 = rows
+; a1 = tile address
+; -----------------------------------------------------------------
+Win_TilesToVDP:
 	lea	(VDP_control_port).l, a2
 	lea	(VDP_data_port).l, a3
 	move.l	#$80, d7
-loc_9990:
+-
 	move.w	d1, d4
 	move.w	d0, d5
-loc_9994:
+-
 	bsr.w	Win_VDPAddressToControlPort
 	move.w	(a1)+, (a3)
-	dbf	d4, loc_9994
+	dbf	d4, -
 
 	move.w	d5, d0
 	add.l	d7, d0
-	dbf	d2, loc_9990
+	dbf	d2, --
 	rts
 ; -----------------------------------------------------------------
 
@@ -17163,17 +17185,17 @@ loc_AAE6:
 	move.w	d0, d1
 	swap	d0
 	move.w	d1, d0
-	move.l	d0, ($FFFFDE74).w
+	move.l	d0, (Win_agility_num).w
 	move.w	$1C(a2), d0
 	move.w	d0, d1
 	swap	d0
 	move.w	d1, d0
-	move.l	d0, ($FFFFDE78).w
+	move.l	d0, (Win_attack_num).w
 	move.w	$1E(a2), d0
 	move.w	d0, d1
 	swap	d0
 	move.w	d1, d0
-	move.l	d0, ($FFFFDE7C).w
+	move.l	d0, (Win_defense_num).w
 	move.l	#((WinID_StrngLVEXP<<$10)|WinID_EqpEquipList), (Window_queue).w
 	move.l	#((WinID_EquipStats<<$10)|WinID_ItemList2), (Window_queue+4).w
 	addq.w	#1, (Event_routine).w
@@ -17332,9 +17354,9 @@ loc_ACFE:
 loc_AD00:
 	move.w	(Character_index).w, d3
 	bsr.w	loc_AD4C
-	move.w	$14(a1), ($FFFFDE74).w
-	move.w	$1C(a1), ($FFFFDE78).w
-	move.w	$1E(a1), ($FFFFDE7C).w
+	move.w	$14(a1), (Win_agility_num).w
+	move.w	$1C(a1), (Win_attack_num).w
+	move.w	$1E(a1), (Win_defense_num).w
 	bsr.w	JmpTo_CloseCurrentWindow
 	move.w	#((6<<8)|WinID_EqpEquipList), (Window_queue+2).w
 	move.w	#((6<<8)|WinID_ItemList2), (Window_queue+4).w
@@ -25657,7 +25679,7 @@ loc_10154:
 	lea	(Character_stats+items).w, a2
 	bra.w	loc_F922
 loc_1015C:
-	move.w	#1, ($FFFFDEA8).w
+	move.w	#1, (Refresh_stats_flag).w
 	subq.w	#1, d1
 	bne.s	loc_10192
 	lea	(Character_stats+item_num).w, a2
@@ -25689,7 +25711,7 @@ loc_10192:
 	andi.b	#$10, d0
 	beq.s	loc_101B2
 	endif
-	move.w	#0, ($FFFFDEA8).w
+	move.w	#0, (Refresh_stats_flag).w
 	rts
 loc_101B2:
 	cmpi.b	#8, ($FFFFDE51).w
@@ -25720,7 +25742,7 @@ Win_ItemList3:
 	lea	(loc_11422).l, a3
 	bra.w	loc_F922
 loc_101F8:
-	move.w	#1, ($FFFFDEA8).w
+	move.w	#1, (Refresh_stats_flag).w
 	subq.w	#1, d1
 	bne.s	loc_10222
 	lea	(Character_stats+item_num).w, a2
@@ -25747,7 +25769,7 @@ loc_10222:
 	andi.b	#$10, d0
 	beq.s	loc_10242
 	endif
-	move.w	#0, ($FFFFDEA8).w
+	move.w	#0, (Refresh_stats_flag).w
 	rts
 loc_10242:
 	tst.w	($FFFFDE84).w
@@ -26375,7 +26397,7 @@ Win_RightLeft:
 	bne.s	loc_10838
 	rts
 loc_10838:
-	move.w	#1, ($FFFFDEA8).w
+	move.w	#1, (Refresh_stats_flag).w
 	subq.w	#1, d1
 	bne.s	loc_10852
 	move.w	#1, d0

@@ -1377,8 +1377,13 @@ Interaction_type =  ramaddr($FFFFDE6E)
 Interaction_subtype =  ramaddr($FFFFDE6F)
 Interaction_routine =  ramaddr($FFFFDE70)
 Interaction_routine_2 =  ramaddr($FFFFDE72)
+Win_agility_num =  ramaddr($FFFFDE74)
+Win_attack_num =  ramaddr($FFFFDE78)
+Win_defense_num =  ramaddr($FFFFDE7C)
 
 Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
+
+Refresh_stats_flag =  ramaddr($FFFFDEA8)
 
 Window_draw_cache = ramaddr($FFFFDF00)
 
