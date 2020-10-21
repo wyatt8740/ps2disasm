@@ -1360,10 +1360,9 @@ Window_routine =  ramaddr($FFFFDE56)	; 0 = generally used for initialization bef
 										; 1 = load additional stuff such as the red cursor for navigating
 										; 2 = main logic
 
-
-Event_routine =  ramaddr($FFFFDE58)			; index for offset tables
-Event_routine_2 =  ramaddr($FFFFDE5A)		; index for offset tables in child tables
-Event_routine_3 =  ramaddr($FFFFDE5C)
+Window_routine_2 =  ramaddr($FFFFDE58)
+Window_routine_3 =  ramaddr($FFFFDE5A)
+Window_routine_4 =  ramaddr($FFFFDE5C)
 
 Character_index =  ramaddr($FFFFDE60)		; id for the characters; 0 = Rolf; 1 = Nei; 2 = Rudo; 3 = Amy; 4 = Hugh; 5 = Anna; 6 = Kain; 7 = Shir
 Character_index_2 =  ramaddr($FFFFDE62)		; same as above. Seems to be used when character gets something from another character (e.g. healing technique)
@@ -1420,6 +1419,9 @@ Link_field_count =  ramaddr($FFFFF62C)		; counter for link field Sprite attribut
 RNG_seed =  ramaddr($FFFFF636)
 
 Paused_flag =  ramaddr($FFFFF63A)		; flag: 0 = not paused; 1 = paused
+
+Palette_cycle_frame =  ramaddr($FFFFF63C)
+Palette_cycle_frame_timer =  ramaddr($FFFFF63E)
 
 Current_sound =  ramaddr($FFFFF640)
 Battle_saved_sound =  ramaddr($FFFFF642)
