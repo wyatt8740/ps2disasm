@@ -999,7 +999,7 @@ Map_LoadObjects:
 	lea	(Town_flags).w, a2
 	move.w	(Map_index).w, d0
 	bne.s	+
-	tst.b	($FFFFC716).w
+	tst.b	(Event_flag_Jet_Scooter).w
 	beq.s	+
 	tst.b	(Map_event_load).w
 	bne.s	+
@@ -1059,7 +1059,7 @@ Map_LoadObjects:
 	bne.s	+
 	addq.w	#1, (a1)
 +
-	cmpi.b	#2, ($FFFFC716).w
+	cmpi.b	#2, (Event_flag_Jet_Scooter).w
 	bne.s	+
 	tst.w	d1
 	bmi.s	+
@@ -1103,7 +1103,7 @@ Map_LoadObjects:
 +
 	cmpi.w	#$63, d0
 	bne.s	+
-	tst.b	($FFFFC745).w
+	tst.b	(Event_flag_Dark_Force).w
 	bne.s	+
 	_move.w	#ObjID_DezoTreasureChest, 0(a3)
 	move.w	#$35, type(a3)
@@ -7420,7 +7420,7 @@ loc_42A6:
 	cmpi.w	#$187, d0
 	bne.s	loc_42F6
 loc_42E8:
-	cmpi.b	#2, ($FFFFC716).w
+	cmpi.b	#2, (Event_flag_Jet_Scooter).w
 	bne.s	loc_42F6
 	move.b	#1, 2(a0)
 loc_42F6:
@@ -7930,7 +7930,7 @@ ObjJetSctr_Init:
 	move.w	#5, $2C(a0)
 	move.w	#6, ($FFFFE82E).w
 	move.w	#0, $28(a0)
-	tst.b	($FFFFC716).w
+	tst.b	(Event_flag_Jet_Scooter).w
 	bne.s	loc_4946
 	move.b	#1, 2(a0)
 loc_4946:
@@ -8097,7 +8097,7 @@ loc_4B40:
 	move.w	4(a0), $2A(a0)
 	move.w	#$D0, $28(a0)
 	move.w	#2, $26(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#2, d0
 	bne.s	loc_4B76
 	move.w	#1, $22(a0)
@@ -8144,7 +8144,7 @@ loc_4BC8:
 	move.w	4(a0), $2A(a0)
 	move.w	#$160, $28(a0)
 	move.w	#2, $26(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#2, d0
 	bne.s	loc_4BFE
 	move.w	#1, $22(a0)
@@ -8190,7 +8190,7 @@ loc_4C50:
 	move.w	4(a0), $2A(a0)
 	move.w	#$1F8, $28(a0)
 	move.w	#3, $26(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#2, d0
 	bne.s	loc_4C86
 	move.w	#1, $22(a0)
@@ -8232,7 +8232,7 @@ loc_4CD0:
 	move.l	#loc_5C866, 4(a0)
 	move.w	4(a0), $2A(a0)
 	move.w	#$A, $2C(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#3, d0
 	bne.s	loc_4CFA
 	move.w	#$B, $2C(a0)
@@ -8258,7 +8258,7 @@ loc_4D18:
 	move.w	4(a0), $2A(a0)
 	move.w	#$240, $28(a0)
 	move.w	#1, $26(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#2, d0
 	bne.s	loc_4D48
 	move.w	#1, $22(a0)
@@ -8356,9 +8356,9 @@ loc_4E2A:
 	move.w	$24(a0), $2A(a0)
 	move.w	#8, $2C(a0)
 	move.w	#$27, $28(a0)
-	tst.b	($FFFFC715).w
+	tst.b	(Event_flag_Darum_Teim).w
 	beq.s	loc_4E5C
-	move.b	#1, 2(a0)
+	move.b	#1, 2(a0)	; if the Darum/Teim event already took place, delete object
 loc_4E5C:
 	rts
 ; --------------------------------------------------------------
@@ -8448,7 +8448,7 @@ loc_4F36:
 	move.w	#4, $2C(a0)
 	cmpi.w	#MapID_DarumTube, (Map_index).w
 	beq.s	loc_4F66
-	tst.b	($FFFFC727).w
+	tst.b	(Event_flag_Teim).w
 	beq.s	loc_4F64
 loc_4F5E:
 	move.b	#1, 2(a0)
@@ -8715,7 +8715,7 @@ loc_5280:
 	move.w	4(a0), $2A(a0)
 	move.w	#3, $24(a0)
 	move.w	#4, $2C(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#3, d0
 	bne.s	loc_52B8
 	cmpi.w	#MapID_EsperMansionB1, (Map_index).w
@@ -8769,7 +8769,7 @@ loc_532C:
 	move.w	4(a0), $2A(a0)
 	move.w	#4, $2C(a0)
 	move.w	#1, $22(a0)
-	tst.b	($FFFFC742).w
+	tst.b	(Event_flag_Esper_Mansion).w
 	beq.s	loc_5386
 	move.w	#4, $22(a0)
 	move.w	$A(a0), d0
@@ -8782,7 +8782,7 @@ loc_532C:
 loc_5386:
 	rts
 loc_5388:
-	tst.b	($FFFFC742).w
+	tst.b	(Event_flag_Esper_Mansion).w
 	beq.s	loc_5394
 	move.w	#2, $22(a0)
 loc_5394:
@@ -8864,7 +8864,7 @@ ObjNeifirst_Init:
 	move.w	#1, $22(a0)
 	tst.w	(Characters_RAM).w
 	beq.s	+
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	ObjNeifirst_Main
 +
 	move.b	#1, 2(a0)
@@ -8892,7 +8892,7 @@ loc_54B4:
 	move.w	4(a0), $2A(a0)
 	move.w	#$C, $2C(a0)
 	move.w	#1, $22(a0)
-	move.b	($FFFFC743).w, d0
+	move.b	(Event_flag_Lutz).w, d0
 	cmpi.b	#3, d0
 	bne.s	loc_54F6
 	move.b	#0, 2(a0)
@@ -9172,7 +9172,7 @@ loc_5822:
 	move.w	#4, $2C(a0)
 	move.w	#0, $32(a0)
 	move.w	#0, $2A(a0)
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	loc_585A
 	move.b	#0, 2(a0)
 	move.w	#1, $22(a0)
@@ -9187,7 +9187,7 @@ loc_585C:
 	move.b	(a1), d0
 	add.w	$2A(a0), d0
 	move.w	d0, $24(a0)
-	tst.b	($FFFFC735).w
+	tst.b	(Event_flag_Neifirst).w
 	beq.s	loc_5888
 	move.w	#2, $22(a0)
 loc_5888:
@@ -10492,7 +10492,7 @@ loc_649A:
 loc_64A4:
 	rts
 loc_64A6:
-	tst.b	($FFFFC73E).w
+	tst.b	(Event_flag_Gaira_alarm).w
 	beq.s	loc_64E8
 	move.w	d1, d0
 	andi.w	#$F, d0
@@ -11480,7 +11480,7 @@ RunMapTransition:
 loc_6ED6:
 	cmpi.b	#$3E, (a1)
 	bne.s	loc_6EE6
-	tst.b	($FFFFC712).w
+	tst.b	(Event_flag_control_tower).w
 	bne.s	loc_6F1C
 	moveq	#-1, d4
 	rts
@@ -11651,7 +11651,7 @@ loc_7082:
 loc_70D6:
 	cmpi.w	#$218, (Characters_RAM+y_pos).w
 	bhi.s	loc_7102
-	tst.b	($FFFFC747).w
+	tst.b	(Event_flag_Mother_Brain).w
 	bne.s	loc_7102
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
@@ -12229,7 +12229,7 @@ loc_785C:
 	
 ; Fix: clear event flags before going back to Sega screen
 	if bugfixes=1
-	lea	($FFFFC700).w, a0
+	lea	(Flag_mem_block).w, a0
 	moveq	#0, d0
 	moveq	#0, d7
 	move.w	#$3F, d7
@@ -12740,7 +12740,7 @@ GameMode_MapLoop:
 	beq.s	loc_7DCE
 	cmpi.w	#MapID_NoahGroundF, (Map_index).w
 	bcc.s	loc_7DCA
-	tst.b	($FFFFC73E).w
+	tst.b	(Event_flag_Gaira_alarm).w
 	beq.s	loc_7DCE
 	addq.w	#1, ($FFFFF61E).w
 	addq.w	#1, ($FFFFF622).w
@@ -12819,7 +12819,7 @@ EventLoad_NeifirstDeath:
 	bsr.w	PaletteLoad1
 	move.w	#0, (Characters_RAM).w
 	move.w	#1, (Interaction_routine).w
-	move.w	#$27, (Interaction_type).w	; => Event_NeifirstDeath
+	move.w	#$27, (Interaction_type).w	; => Event_Climatrol
 	move.w	#$8300, (Map_event_load).w
 	tst.w	($FFFFC042).w			; is Nei dead?
 	bne.s	+			; if not, branch
@@ -12865,7 +12865,7 @@ loc_7F44:
 	move.w	#MapID_MotaOverworld, (Map_index).w
 	move.w	#$4A0, (Map_Y_pos).w
 	move.w	#$490, (Map_X_pos).w
-	move.b	#1, ($FFFFC735).w
+	move.b	#1, (Event_flag_Neifirst).w
 	move.b	#MusicID_Restoration, (Current_sound).w
 	rts
 
@@ -13115,7 +13115,7 @@ loc_81E6:
 	tst.w	(Windows_opened_num).w
 	bne.w	loc_8224
 	move.w	#$101, d0
-	lea	($FFFFC72C).w, a1
+	lea	(Event_flag_Cards).w, a1
 	cmp.w	(a1)+, d0
 	bne.s	loc_821E
 	cmp.w	(a1)+, d0
@@ -14744,7 +14744,7 @@ loc_923C:
 loc_9258:
 	move.w	(Map_index).w, d0
 	bne.s	loc_92CC
-	tst.b	($FFFFC735).w
+	tst.b	(Event_flag_Neifirst).w
 	beq.s	loc_92CA
 	lea	(Map_layout_BG).w, a1
 	move.w	#$17FF, d1
@@ -14762,22 +14762,22 @@ loc_9278:
 	move.b	d0, ($FFFF9EC8).w
 	move.b	d0, ($FFFF9C17).w
 	lea	(Map_layout_BG).w, a1
-	tst.b	($FFFFC72F).w
+	tst.b	(Event_flag_Blue_Dam_open).w
 	beq.s	loc_92A0
 	lea	(loc_17C94).l, a2
 	bsr.s	loc_9302
 loc_92A0:
-	tst.b	($FFFFC733).w
+	tst.b	(Event_flag_Red_Dam_open).w
 	beq.s	loc_92AE
 	lea	(loc_17CDA).l, a2
 	bsr.s	loc_9302
 loc_92AE:
-	tst.b	($FFFFC731).w
+	tst.b	(Event_flag_Yellow_Dam_open).w
 	beq.s	loc_92BC
 	lea	(loc_17D4A).l, a2
 	bsr.s	loc_9302
 loc_92BC:
-	tst.b	($FFFFC72D).w
+	tst.b	(Event_flag_Green_Dam_open).w
 	beq.s	loc_92CA
 	lea	(loc_17DA2).l, a2
 	bsr.s	loc_9302
@@ -14801,7 +14801,7 @@ loc_92EC:
 loc_92EE:
 	cmpi.w	#$64, d0
 	bne.s	loc_9300
-	tst.b	($FFFFC747).w
+	tst.b	(Event_flag_Mother_Brain).w
 	beq.s	loc_9300
 	move.b	#$28, ($FFFFA9B0).w
 loc_9300:
@@ -17081,7 +17081,7 @@ TechEffect_Musik:
 	cmpi.b	#7, d1
 	bne.s	loc_AA3E
 	move.w	#$109, (Script_queue).w
-	move.b	#1, ($FFFFC734).w
+	move.b	#1, (Event_flag_Musik_door).w
 	move.b	#SFXID_Musik, (Sound_queue).w
 	move.b	#0, (Track_timer).w
 -
@@ -17812,7 +17812,7 @@ loc_B1A0:
 	move.l	#0, (Party_member_ID).w
 	move.l	#0, ($FFFFC60C).w
 	move.w	#0, (Party_members_num).w
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	bne.s	+
 	move.w	#1, (Party_members_num).w
 	move.w	#1, ($FFFFC60A).w
@@ -19156,7 +19156,7 @@ loc_C066:
 	rts
 
 loc_C086:
-	cmpi.w	#1, ($FFFFC736).w
+	cmpi.w	#1, (Event_flag_Nei_dead).w
 	beq.s	loc_C09A
 	move.w	#$D01, (Script_queue).w
 	addq.w	#1, (Window_routine_2).w
@@ -19169,7 +19169,7 @@ loc_C09A:
 	rts
 loc_C0AC:
 	move.w	#WinID_CentTowerOptions, (Window_queue).w
-	tst.b	($FFFFC73F).w
+	tst.b	(Event_flag_spaceship).w
 	beq.s	+
 	move.w	#WinID_CentTowerOptions2, (Window_queue).w
 +
@@ -19190,7 +19190,7 @@ loc_C0C4:
 	addq.w	#1, (Window_routine_3).w
 	rts
 loc_C0EA:
-	tst.b	($FFFFC73F).w
+	tst.b	(Event_flag_spaceship).w
 	bne.s	loc_C0F6
 	addq.w	#1, (Window_routine_3).w
 	rts
@@ -19462,25 +19462,25 @@ loc_C406:
 	if revision=0
 	move.w	#$100F, ($FFFFCD04).w
 	move.w	#$1010, ($FFFFCD02).w
-	tst.b	($FFFFC722).w
+	tst.b	(Event_flag_Recorder).w
 	beq.s	loc_C442
 	move.w	#$1011, ($FFFFCD02).w
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	loc_C442
 	move.w	#$1012, ($FFFFCD02).w
-	tst.b	($FFFFC73F).w
+	tst.b	(Event_flag_spaceship).w
 	beq.s	loc_C442
 	move.w	#$1013, ($FFFFCD02).w
 	else
 	move.w	#$1015, ($FFFFCD04).w
 	move.w	#$1016, ($FFFFCD02).w
-	tst.b	($FFFFC722).w
+	tst.b	(Event_flag_Recorder).w
 	beq.s	loc_C442
 	move.w	#$1017, ($FFFFCD02).w
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	loc_C442
 	move.w	#$1018, ($FFFFCD02).w
-	tst.b	($FFFFC73F).w
+	tst.b	(Event_flag_spaceship).w
 	beq.s	loc_C442
 	move.w	#$1019, ($FFFFCD02).w	
 	endif
@@ -20005,7 +20005,7 @@ ContTowGoverEventIndex:
 
 loc_C98E:
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
-	tst.b	($FFFFC736).w
+	tst.b	(Event_flag_Nei_dead).w
 	beq.s	loc_C9BE
 	if revision=0
 	move.w	#$110B, (Script_queue).w
@@ -20033,7 +20033,7 @@ loc_C9BE:
 	rts
 loc_C9D8:
 	move.w	#0, (Character_index).w
-	cmpi.w	#1, ($FFFFC736).w
+	cmpi.w	#1, (Event_flag_Nei_dead).w
 	beq.s	loc_C9F4
 	if revision=0
 	move.w	#$1101, (Script_queue).w
@@ -20077,8 +20077,8 @@ loc_CA42:
 	addq.w	#1, (Window_routine_2).w
 	rts
 loc_CA58:
-	move.b	#1, ($FFFFC736).w
-	move.b	#1, ($FFFFC712).w
+	move.b	#1, (Event_flag_Nei_dead).w
+	move.b	#1, (Event_flag_control_tower).w	; open control tower in Piata
 loc_CA64:
 	move.w	#0, (Cutscene_flag).w
 	bra.w	CloseAllWindows
@@ -20530,7 +20530,7 @@ EspMansionEventIndex:
 loc_CF0A:
 	move.w	#WinID_ScriptMessageBig, (Window_queue).w
 	move.w	#0, (Character_index).w
-	cmpi.b	#2, ($FFFFC743).w
+	cmpi.b	#2, (Event_flag_Lutz).w
 	bne.s	loc_CF38
 	if revision=0
 	move.w	#$1909, (Script_queue).w
@@ -20542,7 +20542,7 @@ loc_CF0A:
 	move.b	#0, (Treasure_chest_flags+Chest_Prism).w
 	rts
 loc_CF38:
-	tst.b	($FFFFC744).w
+	tst.b	(Event_flag_Nei_weapons).w
 	bne.s	loc_CF7A
 	move.w	#$168F, (Script_queue).w
 	lea	(NeiEquipmentArray).l, a3
@@ -20558,7 +20558,7 @@ loc_CF58:
 
 	cmpi.b	#NeiEquipmentArrayEnd-NeiEquipmentArray, d5
 	bne.s	loc_CF74			; if we don't have all the Nei items, branch
-	move.b	#1, ($FFFFC744).w
+	move.b	#1, (Event_flag_Nei_weapons).w
 ; Fix: RAM overflow (music freeze)
 	if revision>0
 	if bugfixes=1
@@ -20618,7 +20618,7 @@ loc_CFC0:
 	addq.w	#1, (Window_routine_3).w
 	rts
 loc_CFD8:
-	move.b	#3, ($FFFFC743).w
+	move.b	#3, (Event_flag_Lutz).w
 	move.w	#MapID_EsperMansionF1, (Map_index).w
 	move.w	#$100, (Map_Y_pos).w
 	move.w	#$100, (Map_X_pos).w
@@ -21549,14 +21549,14 @@ EventJumpTable:
 	bra.w	Event_Door	; $24
 	bra.w	Event_Neifirst	; $25
 	bra.w	Event_NeiDeath	; $26
-	bra.w	Event_NeifirstDeath	; $27
+	bra.w	Event_Climatrol	; $27
 	bra.w	Event_ClimatrolOverflow	; $28
 	bra.w	Event_ClimatrolExplosions	; $29
 	bra.w	Event_ReturnFromClimatrol	; $2A
 	bra.w	Event_UzoEntrance	; $2B
 	bra.w	Event_Gaira	; $2C
 	bra.w	Event_Gaira	; $2D
-	bra.w	Event_GairaExplosion	; $2E
+	bra.w	Event_GairaAlarm	; $2E
 	bra.w	Event_GairaControlPanel	; $2F
 	bra.w	Event_CharacterDead	; $30
 	bra.w	Event_ShirGone	; $31
@@ -21692,7 +21692,7 @@ Event_JetScooter:
 	tst.w	d2
 	bne.s	loc_DAC2
 	cmpi.b	#1, (a0)
-	bne.s	loc_DABA
+	bne.s	loc_DABA	; branch if we already interacted with the Jet Scooter the first time
 	addq.b	#1, (a0)
 	move.l	#$1686171C, (Script_queue).w
 	rts
@@ -21967,7 +21967,7 @@ loc_DDBC:
 loc_DDCE:
 	rts
 
-Event_NeifirstDeath:
+Event_Climatrol:
 	tst.w	d2
 	bne.s	loc_DDD6
 	rts
@@ -22145,7 +22145,7 @@ loc_DF78:
 	addq.w	#8, a0
 	dbf	d0, loc_DF78
 	bra.w	SetCharEquipment
-Event_GairaExplosion:
+Event_GairaAlarm:
 	tst.w	d2
 	bne.s	loc_DFAE
 	rts
@@ -22214,7 +22214,7 @@ Event_EsperMansionEntrance:
 	move.w	#$1688, (Script_queue).w
 	tst.w	(Character_stats+curr_hp).w
 	beq.s	loc_E072
-	move.b	#1, ($FFFFC742).w
+	move.b	#1, (Event_flag_Esper_Mansion).w
 	move.w	#$1687, (Script_queue).w		; "You must be ROLF. We've been expecting you."
 loc_E072:
 	move.w	#1, (Interaction_routine_2).w
@@ -22225,12 +22225,12 @@ Event_Esper:
 	bne.s	loc_E096
 	if revision=0
 	move.w	#$1695, (Script_queue).w
-	tst.b	($FFFFC743).w
+	tst.b	(Event_flag_Lutz).w
 	beq.s	loc_E090
 	move.w	#$1696, (Script_queue).w
 	else
 	move.w	#$1697, (Script_queue).w
-	tst.b	($FFFFC743).w
+	tst.b	(Event_flag_Lutz).w
 	beq.s	loc_E090
 	move.w	#$1698, (Script_queue).w	
 	endif
@@ -22238,11 +22238,11 @@ loc_E090:
 	addq.w	#1, (Interaction_routine).w
 	rts
 loc_E096:
-	tst.b	($FFFFC743).w
+	tst.b	(Event_flag_Lutz).w
 	beq.s	loc_E0A2
 	move.w	#$D00, (Map_event_load).w
 loc_E0A2:
-	addq.b	#1, ($FFFFC743).w
+	addq.b	#1, (Event_flag_Lutz).w
 	bra.w	CloseAllWindows
 Event_Lutz:
 	move.w	#SceneID_EsperMansion, (Scene_index).w
@@ -22672,7 +22672,7 @@ loc_E554:
 
 loc_E560:
 	lea	(loc_E6B0-1).l, a0
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	bne.s	+		; branch if we are past Climatrol events
 	lea	(loc_E70C-1).l, a0
 +
@@ -22714,7 +22714,7 @@ loc_E5D0:
 	addq.w	#1, (Interaction_routine_2).w
 	cmpi.w	#$88, d1
 	bcs.s	loc_E5EA
-	cmpi.b	#3, ($FFFFC743).w
+	cmpi.b	#3, (Event_flag_Lutz).w
 	bne.s	loc_E5EA
 	if revision=0
 	move.w	#$169F, (Script_queue).w
@@ -22787,8 +22787,8 @@ loc_E688:
 	rts
 
 loc_E690:
-	move.w	#$1685, (Script_queue).w	;
-	move.b	#1, ($FFFFC716).w				; events after Roron (Jet Scooter and other stuff activated)
+	move.w	#$1685, (Script_queue).w
+	move.b	#1, (Event_flag_Jet_Scooter).w		; Jet Scooter flag
 	move.w	#$730, (Jet_Scooter_Y_pos).w
 	move.w	#$590, (Jet_Scooter_X_pos).w
 	move.w	#1, (Interaction_routine_2).w
@@ -23425,7 +23425,7 @@ loc_EA9A:
 	addq.w	#1, (Interaction_routine).w
 	rts
 loc_EAB0:
-	move.b	#1, ($FFFFC715).w
+	move.b	#1, (Event_flag_Darum_Teim).w	; set Darum/Teim event
 	move.w	#0, (Cutscene_flag).w
 	addq.w	#1, (Interaction_routine_2).w
 	rts
@@ -28664,7 +28664,7 @@ loc_11716:
 	move.w	(Map_index).w, d1
 	bne.s	loc_11778
 	lea	(loc_23C3A).l, a1
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	+
 	adda.w	#loc_23CFA-loc_23C3A, a1
 +
@@ -28716,7 +28716,7 @@ loc_11778:
 	bra.s	loc_117C6
 loc_117B0:
 	move.w	(Formations_index_1).w, d2
-	tst.b	($FFFFC737).w
+	tst.b	(Event_flag_Climatrol).w
 	beq.s	+
 	move.w	(Formations_index_2).w, d2
 +

@@ -1263,11 +1263,36 @@ Planet_index =  ramaddr($FFFFC658)			; 0 = Motavia; 1 = Dezolis
 
 Character_names =  ramaddr($FFFFC660)
 
-
+Flag_mem_block = ramaddr($FFFFC700)
 Town_flags =  ramaddr($FFFFC700)
 Event_flags =  ramaddr($FFFFC710)
 Map_event_load =  ramaddr($FFFFC710)
 Map_event_run =  ramaddr($FFFFC711)
+Event_flag_control_tower = ramaddr($FFFFC712)
+Event_flag_Darum_Teim = ramaddr($FFFFC715)
+Event_flag_Jet_Scooter = ramaddr($FFFFC716)
+Event_flag_Recorder = ramaddr($FFFFC722)
+Event_flag_Teim = ramaddr($FFFFC727)
+Event_flag_Cards = ramaddr($FFFFC72C)
+Event_flag_Green_Dam_entrance = ramaddr($FFFFC72C)
+Event_flag_Green_Dam_open = ramaddr($FFFFC72D)
+Event_flag_Blue_Dam_entrance = ramaddr($FFFFC72E)
+Event_flag_Blue_Dam_open = ramaddr($FFFFC72F)
+Event_flag_Yellow_Dam_entrance = ramaddr($FFFFC730)
+Event_flag_Yellow_Dam_open = ramaddr($FFFFC731)
+Event_flag_Red_Dam_entrance = ramaddr($FFFFC732)
+Event_flag_Red_Dam_open = ramaddr($FFFFC733)
+Event_flag_Musik_door = ramaddr($FFFFC734)
+Event_flag_Neifirst = ramaddr($FFFFC735)
+Event_flag_Nei_dead = ramaddr($FFFFC736)
+Event_flag_Climatrol = ramaddr($FFFFC737)
+Event_flag_Gaira_alarm = ramaddr($FFFFC73E)
+Event_flag_spaceship = ramaddr($FFFFC73F)
+Event_flag_Esper_Mansion = ramaddr($FFFFC742)
+Event_flag_Lutz = ramaddr($FFFFC743)
+Event_flag_Nei_weapons = ramaddr($FFFFC744)
+Event_flag_Dark_Force = ramaddr($FFFFC745)
+Event_flag_Mother_Brain = ramaddr($FFFFC747)
 Treasure_chest_flags =  ramaddr($FFFFC780)	; space where open/close flags for treasure chests are
 
 Battle_character_stats =  ramaddr($FFFFC900)	; save all characters data so that you can retrieve it after the end of a battle
