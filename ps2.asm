@@ -22548,7 +22548,7 @@ loc_E3D6:
 	dbf	d0, loc_E3D6
 
 	move.w	#7, (Party_members_num).w
-	bsr.w	loc_1183A
+	bsr.w	RenderCharSprites2
 	lea	(VDP_control_port).l, a6
 	move.w	#$9380, (a6)
 	move.w	#$9403, (a6)
@@ -28623,6 +28623,7 @@ LoadDynWindowsInRam:
 	rts
 
 
+; -----------------------------------------------------------------
 ProcessRandomBattle:
 	nop
 	tst.w	(Interaction_routine).w
@@ -28744,9 +28745,12 @@ loc_117C6:
 	move.b	#GameModeID_Battle, (Game_mode_index).w
 +
 	rts
+; -----------------------------------------------------------------
 
+
+; -----------------------------------------------------------------
 RenderCharSprites:
-	lea	($FFFFD600).w, a4
+	lea	(Character_sprites_buffer).w, a4
 	lea	(Party_member_ID).w, a2
 	lea	(Characters_RAM).w, a0
 	move.w	(Party_members_num).w, d3
@@ -28758,56 +28762,57 @@ RenderCharSprites:
 	moveq	#0, d3
 +
 	move.w	#$40, d1
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bra.s	loc_11868
+	bra.s	RenderCharSprite_Single
 
-loc_1183A:
-	lea	($FFFFD600).w, a4
+; draws all characters right before the ending sequence
+RenderCharSprites2:
+	lea	(Character_sprites_buffer).w, a4
 	lea	(Party_member_ID).w, a2
 	lea	(Characters_RAM).w, a0
 	move.w	(Party_members_num).w, d3
 	addq.w	#1, d3
 	move.w	#$40, d1
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-	bsr.s	loc_11868
+	bsr.s	RenderCharSprite_Single
 	adda.w	d1, a0
-loc_11868:
+RenderCharSprite_Single:
 	subq.w	#1, d3
 	bpl.s	+
-	move.b	#2, 2(a0)	; sprite not visible
+	move.b	#2, render_flags(a0)	; sprite not visible
 	rts
 +
-	move.b	#0, 2(a0)
+	move.b	#0, render_flags(a0)
 	lea	(Character_stats+curr_hp).w, a1
 	move.w	(a2)+, d0
 	move.w	d0, d2
 	lsl.w	#6, d2
 	adda.w	d2, a1
 	tst.w	(a1)
-	beq.s	loc_11868
+	beq.s	RenderCharSprite_Single	; if HP is 0, skip this character; however the memory address in the object RAM is the same
 	tst.w	(a0)
-	beq.s	loc_118C6
-	lea	(loc_118C8).l, a1
+	beq.s	+
+	lea	(CharacterSpritesheetsRAMPtrs).l, a1
 	lsl.w	#2, d0
 	adda.w	d0, a1
-	move.b	(a1), 8(a0)
+	move.b	(a1), art_tile(a0)
 	movea.l	(a1), a1
-	lea	(loc_118E8).l, a3
-	adda.w	$24(a0), a3
+	lea	(CharSpritesMappingOffsets).l, a3
+	adda.w	mapping_frame(a0), a3
 	move.b	(a3), d0
 	ext.w	d0
 	lsl.w	#5, d0
@@ -28821,20 +28826,26 @@ loc_11868:
 
 	dbf	d0, -
 
-loc_118C6:
++
 	rts
+; -----------------------------------------------------------------
 
-loc_118C8:
-	dc.l	$03FF3000
-	dc.l	$23FF3900
-	dc.l	$03FF5400
-	dc.l	$03FF4200
-	dc.l	$23FF5D00
-	dc.l	$03FF4B00
-	dc.l	$03FF5D00
-	dc.l	$23FF4200
 
-loc_118E8:
+; =================================================================
+CharacterSpritesheetsRAMPtrs:
+	dc.l	($03<<$18)|Rolf_sprite_sheet
+	dc.l	($23<<$18)|Nei_sprite_sheet
+	dc.l	($03<<$18)|Rudo_sprite_sheet
+	dc.l	($03<<$18)|Amy_Shir_sprite_sheet
+	dc.l	($23<<$18)|Hugh_Kain_sprite_sheet
+	dc.l	($03<<$18)|Anna_sprite_sheet
+	dc.l	($03<<$18)|Hugh_Kain_sprite_sheet
+	dc.l	($23<<$18)|Amy_Shir_sprite_sheet
+; =================================================================
+
+
+; =================================================================
+CharSpritesMappingOffsets:
 	dc.b	$18
 	dc.b	$20
 	dc.b	$28
@@ -28847,6 +28858,8 @@ loc_118E8:
 	dc.b	$30
 	dc.b	$38
 	dc.b	$40
+; =================================================================
+
 
 	even
 

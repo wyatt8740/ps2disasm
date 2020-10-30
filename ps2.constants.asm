@@ -1224,6 +1224,13 @@ ramaddr function x,-(-x)&$FFFFFFFF
 
 RAM_start =  ramaddr($FFFF0000)
 
+Rolf_sprite_sheet = $FF3000
+Nei_sprite_sheet = $FF3900
+Amy_Shir_sprite_sheet = $FF4200
+Anna_sprite_sheet = $FF4B00
+Rudo_sprite_sheet = $FF5400
+Hugh_Kain_sprite_sheet = $FF5D00
+
 Chunk_table = ramaddr($FFFF6800)
 
 Window_art_buffer =  ramaddr($FFFF8000)	; used to store art tiles for windows; mainly for dynamic windows
@@ -1361,6 +1368,8 @@ Music_or_SFX = $FFD01B
 Music_tracks = $FFD030
 SFX_tracks = $FFD150
 Special_SFX_tracks = $FFD1E0
+
+Character_sprites_buffer = ramaddr($FFFFD600)
 
 Character_pos_table = ramaddr($FFFFDD00)
 
