@@ -1069,7 +1069,7 @@ Map_LoadObjects:
 	cmpi.w	#$E, d0
 	bne.s	+
 	moveq	#ItemID_Teim, d2
-	jsr	(CheckItemExistInventory).l		; search if one of the party member has TEIM
+	jsr	(FindInventoryItem).l		; search if one of the party member has TEIM
 	bne.s	+	; if TEIM was not found, branch
 
 	jsr	(RemoveItemFromInventory).l		; remove TEIM from inventory
@@ -4279,12 +4279,12 @@ loc_24FE:
 	lea	(Character_stats+items).w, a2		; get first item in the inventory
 	lsl.w	#6, d0
 	adda.w	d0, a2
-	move.w	#0, ($FFFFDE84).w
+	move.w	#0, (Inventory_offset).w
 	moveq	#$F, d0
 -
 	cmp.b	(a2)+, d2
 	beq.s	+			; return if we found the item used
-	addq.w	#1, ($FFFFDE84).w
+	addq.w	#1, (Inventory_offset).w
 	dbf	d0, -
 +
 	rts
@@ -14788,7 +14788,7 @@ loc_92CC:
 	cmpi.w	#3, d0
 	bne.s	loc_92EE
 	moveq	#ItemID_Prism, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_92EC					; no Prism? Then, don't load Dezolis dungeons art
 	moveq	#$63, d1
 	move.b	d1, ($FFFF9096).w
@@ -17231,7 +17231,7 @@ loc_ABB2:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	move.b	-(a0), d1
 	andi.w	#7, d1
 	addq.w	#1, (Window_routine_2).w
@@ -17291,7 +17291,7 @@ loc_AC42:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	bset	#7, (a2)
 	move.w	#$202, (Script_queue).w
 	move.w	($FFFFDE6C).w, d1
@@ -17362,7 +17362,7 @@ loc_AD00:
 	bsr.w	Win_CloseCurrent
 	move.w	#((6<<8)|WinID_EqpEquipList), (Window_queue+2).w
 	move.w	#((6<<8)|WinID_ItemList2), (Window_queue+4).w
-	cmpi.w	#8, ($FFFFDE84).w
+	cmpi.w	#8, (Inventory_offset).w
 	bcs.s	loc_AD38
 	move.w	#((6<<8)|WinID_ItemList3), (Window_queue+4).w
 loc_AD38:
@@ -17499,7 +17499,7 @@ loc_AE2E:
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	bclr	#7, (a2)
 	beq.s	loc_AE82
 	move.w	(Character_index).w, d3
@@ -17545,7 +17545,7 @@ RemoveItemFromInventory2:
 	adda.w	d1, a2
 	subq.b	#1, (a2)					; decrease number
 	addq.w	#1, a2
-	move.w	($FFFFDE84).w, d1			; index of item used in inventory
+	move.w	(Inventory_offset).w, d1			; index of item used in inventory
 	adda.w	d1, a2						; pointer of this item
 	movea.l	a2, a1
 	addq.w	#1, a2
@@ -19024,7 +19024,7 @@ loc_BEF6:
 	rts
 
 loc_BF02:
-	move.w	($FFFFDE84).w, d0
+	move.w	(Inventory_offset).w, d0
 	lsr.w	#3, d0
 	andi.w	#1, d0
 	addi.w	#$8002, d0
@@ -19149,7 +19149,7 @@ loc_C066:
 	tst.w	(Character_stats+curr_hp).w
 	beq.s	loc_C086
 	moveq	#ItemID_Recorder, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_C086
 	move.w	#$D04, (Script_queue).w
 	addq.w	#5, (Window_routine_2).w
@@ -19332,7 +19332,7 @@ loc_C27A:
 	addq.w	#1, (Window_routine_3).w
 	rts
 loc_C286:
-	move.w	($FFFFDE84).w, d0
+	move.w	(Inventory_offset).w, d0
 	lsr.w	#3, d0
 	andi.w	#1, d0
 	addi.w	#$8002, d0
@@ -19344,7 +19344,7 @@ loc_C2A4:
 	tst.b	($FFFFC627).w
 	bne.s	loc_C2BC
 	move.w	#$E0A, (Script_queue).w
-	move.w	#$FFFF, ($FFFFDE84).w
+	move.w	#$FFFF, (Inventory_offset).w
 	addq.w	#5, (Window_routine_2).w
 	rts
 loc_C2BC:
@@ -19403,14 +19403,14 @@ loc_C362:
 	addq.w	#1, (Window_routine_3).w
 	rts
 loc_C36E:
-	move.w	($FFFFDE84).w, d0
+	move.w	(Inventory_offset).w, d0
 	bmi.s	loc_C382
 	lsr.w	#3, d0
 	andi.w	#1, d0
 	addi.w	#$8002, d0
 	move.w	d0, (Window_queue).w
 loc_C382:
-	move.w	#0, ($FFFFDE84).w
+	move.w	#0, (Inventory_offset).w
 	move.w	#WinID_RoomOptions, (Window_index).w
 	subi.w	#$D, (Window_routine_2).w
 	rts
@@ -19447,7 +19447,7 @@ loc_C3E6:
 	tst.w	(Character_stats+curr_hp).w
 	beq.s	loc_C406
 	moveq	#ItemID_Recorder, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_C406
 	if revision=0
 	move.w	#$100C, (Script_queue).w
@@ -19941,7 +19941,7 @@ loc_C8CA:
 	endif
 loc_C8E2:
 	moveq	#ItemID_MruraLeaf, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	beq.s	loc_C8F6						; if you have the Maruera Leaf, branch
 	move.w	#$B02, (Script_queue).w
 	addq.w	#1, (Window_routine_2).w
@@ -20021,7 +20021,7 @@ loc_C98E:
 
 loc_C9BE:
 	moveq	#ItemID_Recorder, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_C9D8
 	move.w	#0, (Character_index).w
 	if revision=0
@@ -20550,7 +20550,7 @@ loc_CF38:
 	moveq	#0, d5
 loc_CF4E:
 	move.b	(a3)+, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_CF58				 ; no Nei item, so loop to see if we have the others
 	addq.w	#1, d5
 loc_CF58:
@@ -20580,7 +20580,7 @@ loc_CF7A:
 	move.w	#$1913, (Script_queue).w
 	endif
 	moveq	#ItemID_NeiSword, d2
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_CF74
 	if revision=0
 	move.w	#$190D, (Script_queue).w
@@ -20671,31 +20671,40 @@ CheckSubtractMoney:
 	rts
 
 
-CheckItemExistInventory:
+; -----------------------------------------------------------------
+; d2 = item to locate
+;
+; Returns:
+;
+; d0 = if -1, item was not found
+; -----------------------------------------------------------------
+FindInventoryItem:
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d1
-loc_D036:
+-
 	move.w	(a1)+, d0
 	move.w	d0, (Character_index).w
 	lea	(Character_stats+items).w, a2
 	lsl.w	#6, d0
 	adda.w	d0, a2
-	move.w	#0, ($FFFFDE84).w
+	move.w	#0, (Inventory_offset).w
 	moveq	#$F, d0
-loc_D04C:
+-
 	move.b	(a2)+, d3
 	andi.b	#$7F, d3
 	cmp.b	d3, d2
-	beq.s	loc_D064
-	addq.w	#1, ($FFFFDE84).w
-	dbf	d0, loc_D04C
+	beq.s	+
+	addq.w	#1, (Inventory_offset).w
+	dbf	d0, -
 
-	dbf	d1, loc_D036
+	dbf	d1, --
 
 	moveq	#-1, d0		; item was not found in inventory for any character
 
-loc_D064:
++
 	rts
+; -----------------------------------------------------------------
+
 
 ProcessStealItem:
 	if dezo_steal_fix=1
@@ -21838,7 +21847,7 @@ Event_Teim:
 	bne.s	loc_DC58
 	moveq	#ItemID_Letter, d2
 	move.b	d2, (Item_index).w
-	bsr.w	CheckItemExistInventory
+	bsr.w	FindInventoryItem
 	bne.s	loc_DC58
 	move.w	#$1808, (Script_queue).w
 	rts
@@ -23177,12 +23186,12 @@ loc_E85C:
 	adda.w	d0, a2
 	tst.w	-$26(a2)
 	beq.s	loc_E884			; branch if character's dead
-	move.w	#0, ($FFFFDE84).w
+	move.w	#0, (Inventory_offset).w
 	moveq	#$F, d0
 loc_E878:
 	tst.b	(a2)+
 	beq.s	loc_E896
-	addq.w	#1, ($FFFFDE84).w
+	addq.w	#1, (Inventory_offset).w
 	dbf	d0, loc_E878
 
 loc_E884:
@@ -24782,7 +24791,7 @@ loc_F8D8:
 	bra.w	LoadCursorInWindows
 
 loc_F8E0:
-	lea	($FFFFDE84).w, a0
+	lea	(Inventory_offset).w, a0
 	bsr.w	Win_GetInputCloseCurrent
 	andi.b	#$20, d0
 	beq.s	loc_F920		; branch if C was not pressed
@@ -24794,13 +24803,13 @@ loc_F8E0:
 	rts
 
 loc_F902:
-	subq.w	#1, ($FFFFDE84).w
+	subq.w	#1, (Inventory_offset).w
 loc_F906:
 	lea	(Character_stats+items).w, a2
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	move.b	(a2), d0
 	andi.b	#$7F, d0
 	move.b	d0, (Item_index).w
@@ -24874,7 +24883,7 @@ loc_F996:
 	move.w	#$100, d1
 	bra.w	LoadCursorInWindows
 loc_F9BA:
-	lea	($FFFFDE84).w, a0
+	lea	(Inventory_offset).w, a0
 	move.w	#$8002, d1
 	bsr.w	Win_GetInput
 	andi.b	#$30, d0
@@ -24889,7 +24898,7 @@ loc_F9BA:
 	endif
 	rts
 loc_F9D4:
-	tst.w	($FFFFDE84).w
+	tst.w	(Inventory_offset).w
 	bne.s	loc_F9F2
 	move.w	#$8001, (Window_queue).w
 	lea	($FFFFDEEE).w, a1
@@ -24899,12 +24908,12 @@ loc_F9D4:
 	move.w	(a1), (Window_index).w
 	rts
 loc_F9F2:
-	addq.w	#7, ($FFFFDE84).w
+	addq.w	#7, (Inventory_offset).w
 	lea	(Character_stats+items).w, a2
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	move.b	(a2), d0
 	andi.b	#$7F, d0
 	move.b	d0, (Item_index).w
@@ -25700,7 +25709,7 @@ loc_1018A:
 	move.w	#$148, d1
 	bra.w	LoadCursorInWindows
 loc_10192:
-	lea	($FFFFDE84).w, a0
+	lea	(Inventory_offset).w, a0
 	move.w	#$8004, d1
 	bsr.w	Win_GetInput
 	andi.b	#$30, d0
@@ -25723,13 +25732,13 @@ loc_101B2:
 	move.w	#WinID_ItemList3, (Window_queue).w
 	rts
 loc_101C6:
-	subq.w	#1, ($FFFFDE84).w
+	subq.w	#1, (Inventory_offset).w
 loc_101CA:
 	lea	(Character_stats+items).w, a2
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	move.b	(a2), d0
 	andi.b	#$7F, d0
 	move.b	d0, (Item_index).w
@@ -25758,7 +25767,7 @@ loc_101F8:
 	move.w	#$150, d1
 	bra.w	LoadCursorInWindows
 loc_10222:
-	lea	($FFFFDE84).w, a0
+	lea	(Inventory_offset).w, a0
 	move.w	#$8005, d1
 	bsr.w	Win_GetInput
 	andi.b	#$30, d0
@@ -25774,7 +25783,7 @@ loc_10222:
 	move.w	#0, (Refresh_stats_flag).w
 	rts
 loc_10242:
-	tst.w	($FFFFDE84).w
+	tst.w	(Inventory_offset).w
 	bne.s	loc_10260
 	move.w	#$8001, (Window_queue).w
 	lea	($FFFFDEEE).w, a1
@@ -25784,12 +25793,12 @@ loc_10242:
 	move.w	(a1), (Window_index).w
 	rts
 loc_10260:
-	addq.w	#7, ($FFFFDE84).w
+	addq.w	#7, (Inventory_offset).w
 	lea	(Character_stats+items).w, a2
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	move.b	(a2), d0
 	andi.b	#$7F, d0
 	move.b	d0, (Item_index).w
@@ -26909,7 +26918,7 @@ loc_10D4C:
 	move.w	#$A0, d1
 	bra.w	LoadCursorInWindows
 loc_10D54:
-	lea	($FFFFDE84).w, a0
+	lea	(Inventory_offset).w, a0
 	move.b	(Joypad_pressed).w, d0
 	andi.b	#Button_B_Mask|Button_C_Mask, d0
 	beq.w	loc_10DEE
@@ -26946,13 +26955,13 @@ loc_10D9E:
 loc_10DCA:
 	rts
 loc_10DCC:
-	subq.w	#1, ($FFFFDE84).w
+	subq.w	#1, (Inventory_offset).w
 loc_10DD0:
 	lea	(Character_stats+items).w, a2
 	move.w	(Character_index).w, d1
 	lsl.w	#6, d1
 	adda.w	d1, a2
-	adda.w	($FFFFDE84).w, a2
+	adda.w	(Inventory_offset).w, a2
 	adda.w	($FFFFDEEE).w, a2
 	move.b	(a2), d0
 	andi.b	#$7F, d0
@@ -77108,7 +77117,7 @@ LoadTitleCopyrightUncomp:
 Inventor_PatchDialogue:
 	move.w	#WinID_ScriptMessage2, (Window_queue&$FFFFFF).l
 	moveq	#ItemID_MruraGum, d2
-	jsr	(CheckItemExistInventory).l
+	jsr	(FindInventoryItem).l
 	beq.s	+
 	addq.w	#1, (Window_routine_2&$FFFFFF).l
 	move.w	#$B01, (Script_queue&$FFFFFF).l
