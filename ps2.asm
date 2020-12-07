@@ -26,6 +26,8 @@ zeroOffsetOptimization = 0
 bugfixes = 0			; if 1, include bug fixes
 dezo_steal_fix = 0		; if 1, Shir will no longer steal on Dezo
 walk_speed = 0			; 0 = normal; 1 = double; 2 = quadruple
+exp_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
+meseta_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
 cross_patch = 0			; Set this to 1 to replace the green cross sign with an H and remove the red cross sign, just like
@@ -19914,6 +19916,19 @@ GumInvHouseEventIndex:
 	bra.w	loc_C936
 
 loc_C8CA:
+; Fix: unused text for the Kueri inventor
+	if bugfixes=1
+	move.w	#WinID_ScriptMessage2, (Window_queue).w
+	move.w	#$B08, (Script_queue).w
+	cmpi.b	#2, (Event_flags+$10).w
+	beq.s	+
+	move.w	#$B01, (Script_queue).w
+	addq.w	#1, (Window_routine_2).w
+	rts
++
+	addq.w	#1, (Window_routine_3).w
+	rts
+	else
 	if revision=3
 	; Brazilian version fixes the missing dialogue for the Kueri inventory
 	; by checking if you have the Gum in your inventory, however it doesn't
@@ -19924,17 +19939,6 @@ loc_C8CA:
 	move.w	#WinID_ScriptMessage2, (Window_queue).w
 	endif
 	move.w	#$B08, (Script_queue).w
-; Fix: unused text for the Kueri inventor
-	if bugfixes=1
-	cmpi.b	#2, (Event_flags+$10).w
-	beq.s	+
-	move.w	#$B01, (Script_queue).w
-	addq.w	#1, (Window_routine_2).w
-	rts
-+
-	addq.w	#1, (Window_routine_3).w
-	rts
-	else
 	move.w	#$B01, (Script_queue).w
 	addq.w	#1, (Window_routine_2).w
 	rts
@@ -24188,6 +24192,12 @@ loc_F2A4:
 	addq.l	#1, d0		; round up
 	endif
 	
+	if exp_gain=1
+	add.l	d0, d0
+	elseif exp_gain=2
+	add.l	d0, d0
+	add.l	d0, d0
+	endif
 	move.l	d0, (EXP_points_buffer).w	; save the exp points got from enemies
 	lea	(Party_member_ID).w, a1
 	move.w	(Party_members_num).w, d1
@@ -24216,6 +24226,13 @@ loc_F308:
 	bsr.w	AddToCurrentMoney
 	else
 	add.l	d0, (Current_money).w			; add it to your money
+	endif
+	
+	if meseta_gain=1
+	add.l	d0, d0
+	elseif meseta_gain=2
+	add.l	d0, d0
+	add.l	d0, d0
 	endif
 	move.l	d0, (Meseta_value).w		; move it so that it's displayed later in the victory message
 	move.w	#0, ($FFFFC602).w
@@ -77101,6 +77118,25 @@ PCMDrums:
 	!org (PCMDrums+PCMDrumsEnd-PCMDrumsStart)		; PC must be set to the correct value, so it's the whole code up until the PCMDrums label + the whole z80 code
 
 	if revision=3
+	
+	if bugfixes=1
+
+LoadTitleCopyrightUncomp:
+	lea	(ArtUncomp_TitleCopyright).l, a0
+	lea	(VDP_data_port).l, a1
+	move.l	#0, d0
+	move.w	#(ArtUncomp_TitleCopyright_End-ArtUncomp_TitleCopyright)/2, d0
+-
+	move.w	(a0)+, (a1)
+	dbf	d0, -
+	jmp	(loc_73C0).w
+	
+ArtUncomp_TitleCopyright:
+	binclude "graphics/title/Copyright uncompressed.bin"
+ArtUncomp_TitleCopyright_End:
+
+	else
+
 	align $100
 LoadTitleCopyrightUncomp:
 	lea	(ArtUncomp_TitleCopyright).l, a0
@@ -77132,8 +77168,10 @@ ArtUncomp_TitleCopyright:
 	binclude "graphics/title/Copyright uncompressed.bin"
 ArtUncomp_TitleCopyright_End:
 
-	align0 $200	
-	
+	align0 $200
+
+	endif
+
 	endif
 
 	while (*) < $C0000
