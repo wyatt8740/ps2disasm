@@ -13885,9 +13885,7 @@ CharNamesEnd:
 
 	else
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	' ', 0
+	include	"tables/characters/charset1.asm"
 
 CharNames:
 	dc.b	"ROLF"
@@ -27189,19 +27187,7 @@ TeleportPlaceNamesArray:
 
 	else
 	
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 ; ========================================
 ; Array of names of places you can
@@ -27786,20 +27772,7 @@ loc_11506:
 
 	elseif revision=3
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 loc_11412:
 	dc.b	"    "
@@ -27871,19 +27844,7 @@ loc_11456:
 ; $A4 = Delete character
 ; $C4 = Close window
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 InputCharacterMap:
 	dc.b	"A B C D E F G H I"
@@ -27896,20 +27857,7 @@ InputCharacterMap:
 	charset
 
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 loc_114DA:
 	dc.w	$1213, $1415
@@ -27936,20 +27884,7 @@ loc_11506:
 	
 	else
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 loc_11412:
 	dc.b	"    WHO?"
@@ -28019,19 +27954,7 @@ loc_11456:
 ; $A4 = Delete character
 ; $C4 = Close window
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 InputCharacterMap:
 	dc.b	"A B C D E F G H I"
@@ -28044,20 +27967,7 @@ InputCharacterMap:
 	charset
 
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 loc_114DA:
 	dc.w	$1213, $1415
@@ -30481,19 +30391,7 @@ Item_Unknown2:
 
 	elseif revision=3
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 
 Item_None:
@@ -31343,19 +31241,7 @@ Item_Unknown2:
 	
 	else
 	
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 
 Item_None:
@@ -34174,20 +34060,7 @@ DynamicWindowsEnd:
 
 	elseif revision=3
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 
 
@@ -35509,20 +35382,7 @@ DynamicWindowsEnd:
 	
 	else
 
-	charset 'A', "\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62\63\64"
-	charset 'a', "\65\66\67\68\69\70\71\72\73\74\75\76\77\78\79\80\81\82\83\84\85\86\87\88\89\90"
-	charset '0', "\118\119\120\121\122\123\124\125\126\127"
-	charset ' ', $26
-	charset ',', $5B
-	charset '.', $5C
-	charset ';', $5D
-	charset '"', $5E
-	charset '?', $5F
-	charset '!', $60
-	charset 39, $61  ; apostrophe
-	charset '-', $62
-	charset '/', $64
-	charset ':', $80
+	include	"tables/characters/charset2.asm"
 
 
 
@@ -39452,19 +39312,8 @@ EnemyNames:
 	dc.b	$73, $91, $A5, $9D, $7E, $57, $82, $C4, $00, $00
 	
 	elseif revision=3
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	
+	include	"tables/characters/charset1.asm"
 
 
 	dc.b	$C4, "         "
@@ -39599,19 +39448,7 @@ EnemyNames:
 	
 	else
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 
 	dc.b	$C4, "         "
@@ -40037,9 +39874,7 @@ SoundtrackCharArray:
 	
 	elseif revision=3
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	' ', 0
+	include	"tables/characters/charset1.asm"
 	
 	dc.b	"Phantasy    "
 	dc.b	"Restration  "
@@ -40068,9 +39903,7 @@ SoundtrackCharArray:
 	
 	else
 
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	' ', 0
+	include	"tables/characters/charset1.asm"
 	
 	dc.b	"Phantasy    "
 	dc.b	"Restration  "
@@ -40095,6 +39928,8 @@ SoundtrackCharArray:
 	dc.b	"Exclaim     "
 	dc.b	"Never Dream "
 	
+	charset
+
 	endif
 ; ========================================================================================
 
@@ -40257,19 +40092,7 @@ Script_Miscellaneous:	include "script/ja/misc.asm"
 	
 	elseif revision=3
 	
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 Script_ItemAction:	include "script/pt/item.asm"
 Script_TechAction:	include "script/pt/tech.asm"
@@ -40309,19 +40132,7 @@ Script_Miscellaneous:	include "script/pt/misc.asm"
 
 	else
 	
-	charset	'A', "\11\12\13\14\15\16\17\18\19\20\21\22\23\24\25\26\27\28\29\30\31\32\33\34\35\36"
-	charset	'a', "\37\38\39\40\41\42\43\44\45\46\47\48\49\50\51\52\53\54\55\56\57\58\59\60\61\62"
-	charset	'0', "\1\2\3\4\5\6\7\8\9\10"
-	charset	' ', 0
-	charset	',', $3F
-	charset	'.', $40
-	charset	';', $41
-	charset	'"', $42
-	charset	'?', $43
-	charset	'!', $44
-	charset	39, $45	; apostrophe
-	charset	'-', $46
-	charset	':', $77
+	include	"tables/characters/charset1.asm"
 
 Script_ItemAction:	include "script/en/item.asm"
 	even
