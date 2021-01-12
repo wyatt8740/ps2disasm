@@ -1448,9 +1448,19 @@ Sprite_count =  ramaddr($FFFFF618)		; number of sprite counter. Starts from 80 a
 
 General_timer =  ramaddr($FFFFF61A)
 
+V_scroll_amount =  ramaddr($FFFFF61C)
+V_scroll_amount_FG =  ramaddr($FFFFF61C)
+V_scroll_amount_BG =  ramaddr($FFFFF61E)
+H_scroll_amount =  ramaddr($FFFFF620)
+H_scroll_amount_FG =  ramaddr($FFFFF620)
+H_scroll_amount_BG =  ramaddr($FFFFF622)
+
 V_int_routine =  ramaddr($FFFFF62A)
 
 Link_field_count =  ramaddr($FFFFF62C)		; counter for link field Sprite attribute
+
+General_timer_2 =  ramaddr($FFFFF632)
+General_timer_3 =  ramaddr($FFFFF634)
 
 RNG_seed =  ramaddr($FFFFF636)
 
@@ -1488,6 +1498,8 @@ Cutscene_joypad =  ramaddr($FFFFF756)
 
 Scene_index =  ramaddr($FFFFF760)
 Portrait_index =  ramaddr($FFFFF762)
+
+Credits_render_timer =  ramaddr($FFFFF770)
 
 Decom_queue_chunk_num =  ramaddr($FFFFF790)
 Decom_queue_next_flag =  ramaddr($FFFFF792)

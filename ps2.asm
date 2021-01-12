@@ -3523,7 +3523,7 @@ Character_CheckAttack:
 	bne.s	loc_1C9A			; if the random number is 0, the Nei Sword will cure Dark Force's status anomalies
 	move.w	#$122A, (Battle_script_ID).w
 	move.w	#1, ($FFFFCC98).w
-	move.w	#0, ($FFFFF632).w
+	move.w	#0, (General_timer_2).w
 
 	lea	(Character_stats).w, a1
 	moveq	#7, d1
@@ -9391,9 +9391,9 @@ VInt:
 	ori.b	#$40, d0				; enable display
 	move.w	d0, (VDP_control_port).l			; move new values in VDP control port
 	move.l	#$40000010, (VDP_control_port).l	; write to VSRAM
-	move.l	($FFFFF61C).w, (VDP_data_port).l	; move screen y position to the data port
+	move.l	(V_scroll_amount).w, (VDP_data_port).l	; move screen y position to the data port
 	move.l	#$7C000002, (VDP_control_port).l	; write to H scroll address
-	move.l	($FFFFF620).w, d0	; get screen x position
+	move.l	(H_scroll_amount).w, d0	; get screen x position
 	neg.w	d0
 	swap	d0
 	neg.w	d0
@@ -9608,8 +9608,8 @@ VDPSetupGame:
 	move.w	d0, (a1)
 	dbf	d7, -
 
-	move.l	#0, ($FFFFF61C).w	; screen y pos = 0
-	move.l	#0, ($FFFFF620).w	; screen x pos = 0
+	move.l	#0, (V_scroll_amount).w
+	move.l	#0, (H_scroll_amount).w
 
 	lea	(VDP_control_port).l, a6
 
@@ -9668,8 +9668,8 @@ ClearSpriteAndScroll:
 	bne.s	-
 
 	move.w	#$8F02, (a6)	; auto increment = 2
-	move.l	#0, ($FFFFF61C).w	; clear screen y position
-	move.l	#0, ($FFFFF620).w	; clear screen x position
+	move.l	#0, (V_scroll_amount).w
+	move.l	#0, (H_scroll_amount).w
 	lea	(Sprite_table_buffer).w, a6		; load Sprite table buffer
 
 	moveq	#0, d7
@@ -10418,12 +10418,12 @@ loc_63BE:
 
 
 Sega_PaletteCycle:
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	PaletteCycleEnd		; return if value is in range of 0-3
-	move.w	#3, ($FFFFF634).w	; if value in address is less than 0, set it to 3
-	move.w	($FFFFF632).w, d0
+	move.w	#3, (General_timer_3).w	; if value in address is less than 0, set it to 3
+	move.w	(General_timer_2).w, d0
 	bmi.s	PaletteCycleEnd		; return if palette cycle in address is less than 0
-	subq.w	#2, ($FFFFF632).w	; otherwise subtract 2 from it
+	subq.w	#2, (General_timer_2).w	; otherwise subtract 2 from it
 	lea	(CyclingPal_SegaLogo).l, a0
 	lea	($FFFFFB04).w, a1
 	adda.w	d0, a0
@@ -10461,12 +10461,12 @@ loc_6430:
 	move.w	($FFFFF710).w, d0
 	cmpi.w	#5, d0
 	bne.w	loc_650E
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_64A4
-	move.w	#7, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
+	move.w	#7, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
 	move.w	d0, d1
-	addq.w	#1, ($FFFFF632).w
+	addq.w	#1, (General_timer_2).w
 	andi.w	#7, d0
 	lsl.w	#2, d0
 	lea	(loc_65D8).l, a0
@@ -10529,11 +10529,11 @@ loc_650E:
 	bne.s	loc_6548
 	cmpi.w	#MapID_Aukba, (Map_index).w
 	bcc.s	loc_6546
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_6546
-	move.w	#7, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	addq.w	#1, ($FFFFF632).w
+	move.w	#7, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	addq.w	#1, (General_timer_2).w
 	move.l	#$EA00E80, d1
 	andi.w	#1, d0
 	beq.s	loc_6542
@@ -10547,11 +10547,11 @@ loc_6548:
 	bne.s	loc_6586
 	cmpi.w	#MapID_Uzo, (Map_index).w
 	bne.s	loc_6586
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_6584
-	move.w	#$F, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	addq.w	#1, ($FFFFF632).w
+	move.w	#$F, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	addq.w	#1, (General_timer_2).w
 	andi.w	#3, d0
 	mulu.w	#6, d0
 	lea	(loc_6638).l, a0
@@ -10565,11 +10565,11 @@ loc_6586:
 	bne.w	loc_65D6
 	cmpi.w	#MapID_NoahGroundF, (Map_index).w
 	bcs.w	loc_65D4
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_65D4
-	move.w	#7, ($FFFFF634).w
-	move.w	($FFFFF632).w, d1
-	addq.w	#1, ($FFFFF632).w
+	move.w	#7, (General_timer_3).w
+	move.w	(General_timer_2).w, d1
+	addq.w	#1, (General_timer_2).w
 	bsr.w	loc_64E8
 	move.w	#$442, d2
 	tst.w	($FFFFF656).w
@@ -10714,11 +10714,11 @@ loc_66F6:
 	bne.w	loc_6754
 	cmpi.w	#4, (Window_routine_2).w
 	bcc.s	loc_6752
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_6752
-	move.w	#7, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	addq.w	#1, ($FFFFF632).w
+	move.w	#7, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	addq.w	#1, (General_timer_2).w
 	move.w	d0, d1
 	andi.w	#$F, d0
 	bne.s	loc_672C
@@ -10741,11 +10741,11 @@ loc_6754:
 	bne.s	loc_678E
 	cmpi.w	#$A, (Window_routine_2).w
 	bcs.s	loc_678E
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_678E
-	move.w	#3, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	addq.w	#1, ($FFFFF632).w
+	move.w	#3, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	addq.w	#1, (General_timer_2).w
 	andi.w	#3, d0
 	lsl.w	#3, d0
 	lea	(loc_6798).l, a0
@@ -10779,11 +10779,11 @@ loc_67B8:
 +
 	subq.w	#1, d0
 	bne.s	loc_67FE
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.s	loc_67FC
-	move.w	#1, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	addq.w	#1, ($FFFFF632).w
+	move.w	#1, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	addq.w	#1, (General_timer_2).w
 	move.w	d0, d1
 	andi.w	#7, d0
 	cmpi.w	#6, d0
@@ -10799,9 +10799,9 @@ loc_67FC:
 loc_67FE:
 	subq.w	#1, d0
 	bne.w	loc_694A
-	subq.w	#1, ($FFFFF634).w
+	subq.w	#1, (General_timer_3).w
 	bpl.w	loc_6948
-	move.w	#3, ($FFFFF634).w
+	move.w	#3, (General_timer_3).w
 	cmpi.w	#$E, (Palette_table_buffer).w
 	beq.s	loc_6864
 	move.w	($FFFFF650).w, d1
@@ -11005,27 +11005,29 @@ loc_6A8C:
 ; ================================================================
 
 
-loc_6AE0:
-	subq.w	#1, ($FFFFF634).w
-	bpl.s	loc_6B0E
-	move.w	#7, ($FFFFF634).w
-	move.w	($FFFFF632).w, d0
-	bmi.s	loc_6B0E
-	bne.s	loc_6AFA
+; ----------------------------------------------------------------
+Ending_DoAnimations:
+	subq.w	#1, (General_timer_3).w
+	bpl.s	++
+	move.w	#7, (General_timer_3).w
+	move.w	(General_timer_2).w, d0
+	bmi.s	++
+	bne.s	+
 	move.w	#ObjID_EndingSpaceship, (Object_RAM).w
-loc_6AFA:
-	subq.w	#8, ($FFFFF632).w
-	lea	(loc_6B10).l, a0
-	lea	($FFFFFB72).w, a2
++
+	subq.w	#8, (General_timer_2).w
+	lea	(EndingCyclingPalettes).l, a0
+	lea	(Palette_line_4+$12).w, a2
 	adda.w	d0, a0
 	move.l	(a0)+, (a2)+
 	move.l	(a0)+, (a2)+
-loc_6B0E:
++
 	rts
+; ----------------------------------------------------------------
 
 
 ; ================================================================
-loc_6B10:
+EndingCyclingPalettes:
 	dc.l	$0EEC0CCA, $0AA80866
 	dc.l	$0CCA0AA8, $08860644
 	dc.l	$0AA80886, $06640442
@@ -11847,7 +11849,7 @@ GameMode_Sega:
 
 	moveq	#PalID_Sega, d0
 	bsr.w	PaletteLoad1
-	move.w	#$28, ($FFFFF632).w		; set palette cycle timer
+	move.w	#$28, (General_timer_2).w		; set palette cycle timer
 	move.w	#$12C, (General_timer).w		; set timer
 	move.w	(VDP_reg1_values).w, d0		; VDP reg #1 values
 	ori.b	#$40, d0					; enable display
@@ -11925,11 +11927,11 @@ loc_73C0:
 	move.b	#$81, d0		; Phantasy music
 	bsr.w	UpdateSoundQueue
 	if revision=0
-	move.l	#0, ($FFFFF61C).w	; clear y position
+	move.l	#0, (V_scroll_amount).w
 	move.w	#0, (Opening_ending_flag).w
 	else
 	moveq	#0, d0
-	move.l	d0, ($FFFFF61C).w	; clear y position
+	move.l	d0, (V_scroll_amount).w
 	move.w	d0, (Opening_ending_flag).w
 	move.w	d0, (Script_flag).w
 	endif
@@ -12040,7 +12042,7 @@ MoveToOpeningScreen:
 	move.b	#MusicID_Restoration, (Current_sound).w	; keep playing same music
 	rts
 
-; ------------------------------------------------------------
+; -----------------------------------------------------------------
 GameMode_Ending:
 	move.w	#$93, d0
 	bsr.w	UpdateSoundQueue
@@ -12106,7 +12108,7 @@ loc_7660:
 	move.w	d0, (VDP_control_port).l
 	move	#$2500, sr
 	bsr.w	loc_62CC
-	move.w	#$120, ($FFFFF620).w
+	move.w	#$120, (H_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#0, d0
@@ -12116,7 +12118,7 @@ loc_7660:
 	moveq	#PalID_EndingRudo, d0
 	move.l	#$200000, d2
 	bsr.w	loc_7932
-	move.w	#$120, ($FFFFF61C).w
+	move.w	#$120, (V_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#8, d0
@@ -12126,8 +12128,8 @@ loc_7660:
 	moveq	#PalID_EndingAmy, d0
 	moveq	#$20, d2
 	bsr.w	loc_7932
-	move.w	#$120, ($FFFFF620).w
-	move.w	#$120, ($FFFFF61C).w
+	move.w	#$120, (H_scroll_amount_FG).w
+	move.w	#$120, (V_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#$10, d0
@@ -12137,7 +12139,7 @@ loc_7660:
 	moveq	#PalID_EndingKain, d0
 	move.l	#$200020, d2
 	bsr.w	loc_7932
-	move.w	#$120, ($FFFFF620).w
+	move.w	#$120, (H_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#$18, d0
@@ -12147,7 +12149,7 @@ loc_7660:
 	moveq	#PalID_EndingShir, d0
 	move.l	#$200000, d2
 	bsr.w	loc_7932
-	move.w	#$120, ($FFFFF61C).w
+	move.w	#$120, (V_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#$20, d0
@@ -12157,8 +12159,8 @@ loc_7660:
 	moveq	#PalID_EndingHugh, d0
 	move.l	#$FFE0, d2
 	bsr.w	loc_7932
-	move.w	#$120, ($FFFFF620).w
-	move.w	#$120, ($FFFFF61C).w
+	move.w	#$120, (H_scroll_amount_FG).w
+	move.w	#$120, (V_scroll_amount_FG).w
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
 	moveq	#$28, d0
@@ -12198,11 +12200,12 @@ loc_77B2:
 	bsr.w	loc_7932
 	move.b	#$97, d0		; play Ending music
 	bsr.w	UpdateSoundQueue
-	move.w	#$40, ($FFFFF632).w
-	move.w	#$E10, ($FFFFF634).w
+	move.w	#$40, (General_timer_2).w
+	move.w	#$E10, (General_timer_3).w
 	lea	(EndingCredits_Script).l, a3
-	move.w	#0, ($FFFFF770).w
-loc_7824:
+	move.w	#0, (Credits_render_timer).w
+
+Ending_CreditsLoop:
 	moveq	#2, d0
 -
 	move.b	#$14, (V_int_routine).w
@@ -12211,17 +12214,17 @@ loc_7824:
 
 	bsr.w	RunObjects
 	bsr.w	BuildSprites
-	bsr.w	loc_6AE0
-	move.w	($FFFFF61C).w, d0
+	bsr.w	Ending_DoAnimations
+	move.w	(V_scroll_amount_FG).w, d0
 	addq.w	#1, d0
 	andi.w	#$1FF, d0
-	move.w	d0, ($FFFFF61C).w
+	move.w	d0, (V_scroll_amount_FG).w
 	andi.w	#7, d0
 	bne.s	+
-	bsr.s	loc_787E
+	bsr.s	EndingCredits_RenderText
 +
 	cmpi.b	#$C5, (a3)
-	bne.s	loc_7824
+	bne.s	Ending_CreditsLoop
 
 loc_785C:
 	move.b	#$14, (V_int_routine).w
@@ -12243,66 +12246,75 @@ loc_785C:
 	move.w	#$9001, (VDP_control_port).l
 	move.b	#GameModeID_Sega, (Game_mode_index).w	; Sega screen
 	rts
+; -----------------------------------------------------------------
 
-loc_787E:
-	move.w	($FFFFF61C).w, d0
-	addi.w	#$100, d0
+
+; -----------------------------------------------------------------
+; a3 = script address
+; -----------------------------------------------------------------
+EndingCredits_RenderText:
+	move.w	(V_scroll_amount_FG).w, d0
+	addi.w	#$100, d0	; bottom of the plane
 	lsl.w	#4, d0
-	andi.w	#$1F80, d0
+	andi.w	#$1F80, d0	; get plane offset
 	addi.w	#$4000, d0
 	swap	d0
 	move.w	#3, d0
 	move.l	d0, (VDP_control_port).l
 	lea	(VDP_data_port).l, a2
-	moveq	#$27, d1
-	subq.w	#1, ($FFFFF770).w
-	bpl.s	loc_790A
-	addq.w	#3, ($FFFFF770).w
-loc_78AE:
+	moveq	#40-1, d1	; line width
+	subq.w	#1, (Credits_render_timer).w
+	bpl.s	.renderspaces
+	addq.w	#3, (Credits_render_timer).w
+
+.scriptloop:
 	moveq	#0, d0
 	move.b	(a3)+, d0
-	cmpi.b	#$20, d0
-	beq.s	loc_78F6
+	cmpi.b	#' ', d0
+	beq.s	.isspace
 	cmpi.b	#$C1, d0
-	beq.s	loc_790A
+	beq.s	.renderspaces
 	cmpi.b	#$C3, d0
-	beq.s	loc_78FE
+	beq.s	.waitless
 	cmpi.b	#$C4, d0
-	beq.s	loc_7904
+	beq.s	.waitlonger
 	cmpi.b	#$C5, d0
-	beq.s	loc_7904
+	beq.s	.waitlonger
 	cmpi.b	#$14, d0
-	bcc.s	loc_78E2
--
+	bcc.s	.ischaracter
+
+.spaceloop:
 	move.w	#0, (a2)
 	subq.w	#1, d1
-	dbf	d0, -
+	dbf	d0, .spaceloop
 
-	bra.s	loc_78AE
+	bra.s	.scriptloop
 
-loc_78E2:
+.ischaracter:
 	bclr	#5, d0
-	beq.s	loc_78EC
-	addi.w	#$2000, d0
-loc_78EC:
+	beq.s	.f1	; branch if character is uppercase...In this particular instance, while the script follows the standard ascii table,
+													; lowercase means render in a different color
+	addi.w	#$2000, d0	; second palette line
+.f1:
 	addi.w	#$4BF, d0
 	move.w	d0, (a2)
-	dbf	d1, loc_78AE
+	dbf	d1, .scriptloop
 
-loc_78F6:
+.isspace:
 	move.w	#0, (a2)
-	dbf	d1, loc_78AE
+	dbf	d1, .scriptloop
 
-loc_78FE:
-	subq.w	#1, ($FFFFF770).w
-	bra.s	loc_790A
-loc_7904:
-	move.w	#$1C, ($FFFFF770).w
-loc_790A:
+.waitless:
+	subq.w	#1, (Credits_render_timer).w
+	bra.s	.renderspaces
+.waitlonger:
+	move.w	#$1C, (Credits_render_timer).w
+.renderspaces:
 	move.w	#0, (a2)
-	dbf	d1, loc_790A
+	dbf	d1, .renderspaces
 
 	rts
+; -----------------------------------------------------------------
 
 
 ; -----------------------------------------------------------------
@@ -12330,14 +12342,14 @@ loc_7932:
 loc_794A:
 	move.b	#$14, (V_int_routine).w
 	bsr.w	WaitForVInt
-	add.w	d2, ($FFFFF61C).w
-	andi.w	#$1FF, ($FFFFF61C).w
+	add.w	d2, (V_scroll_amount_FG).w
+	andi.w	#$1FF, (V_scroll_amount_FG).w
 	bne.s	loc_7964
 	move.w	#0, d2
 loc_7964:
 	swap	d2
-	add.w	d2, ($FFFFF620).w
-	andi.w	#$1FF, ($FFFFF620).w
+	add.w	d2, (H_scroll_amount_FG).w
+	andi.w	#$1FF, (H_scroll_amount_FG).w
 	bne.s	loc_7976
 	move.w	#0, d2
 loc_7976:
@@ -12442,163 +12454,145 @@ EndingPortraitsPlaneMappings:
 ; =================================================================
 
 ; =================================================================
+; Script data for the ending credits
+;
+; Values:
+;
+; 0-$13: number of spaces to render; generally used before the string
+; $C1: line break
+; $C3: line break; same as $C1, but won't take as long before printing the next line
+; $C4: line break; same as $C1, but will take much longer before printing the next line
+; $C5: script end
+; other values: the script follows the standard ascii character set. Currently only the space ($20),
+;               the uppercase characters ($41-$5A) and the lowercase characters ($61-$7A) are used;
+;               lowercase characters are still rendered in uppercase, but in a different color
+;				uppercase color = white
+;               lowercase color = blue
+; =================================================================
 EndingCredits_Script:
 	dc.b	$11
-	dc.b	$53, $54, $41, $46, $46		; STAFF
+	dc.b	"STAFF"
 	dc.b	$C4
 
 	dc.b	$09
-	dc.b	$77, $72, $69, $74, $74, $65, $6E			; WRITTEN
-	dc.b	$20
-	dc.b	$61, $6E, $64								; AND
-	dc.b	$20
-	dc.b	$64, $69, $72, $65, $63, $74, $65, $64		; DIRECTED
+	dc.b	"written and directed"
 	dc.b	$C3
 	dc.b	$12
-	dc.b	$62, $79									; BY
+	dc.b	"by"
 	dc.b	$C1
 	dc.b	$0F
-	dc.b	$43, $48, $49, $45, $4D, $53, $48, $49		; CHIEMSHI
+	dc.b	"CHIEMSHI"
 	dc.b	$C4
 
 	dc.b	$0A
-	dc.b	$61, $73, $73, $69, $73, $74, $61, $6E, $74	; ASSISTANT
-	dc.b	$20
-	dc.b	$64, $69, $72, $65, $63, $74, $65, $72		; DIRECTER
+	dc.b	"assistant directer"
 	dc.b	$C1
 	dc.b	$10
-	dc.b	$50, $53, $59, $43, $48, $45				; PSYCHE
+	dc.b	"PSYCHE"
 	dc.b	$C4
 
 	dc.b	$0D
-	dc.b	$61, $72, $74										; ART
-	dc.b	$20
-	dc.b	$64, $69, $72, $65, $63, $74, $65, $72				; DIRECTER
+	dc.b	"art directer"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$43, $48, $41, $4F, $54, $49, $43, $4B, $41, $5A	; CHAOTICKAZ
+	dc.b	"CHAOTICKAZ"
 	dc.b	$C4
 
 	dc.b	$0B
-	dc.b	$63, $68, $61, $72, $61, $63, $74, $65, $72			; CHARACTER
-	dc.b	$20
-	dc.b	$64, $65, $73, $69, $67, $6E						; DESIGN
+	dc.b	"character design"
 	dc.b	$C1
 	dc.b	$0F
-	dc.b	$59, $4F, $53, $48, $49, $42, $4F, $4E				; YOSHIBON
+	dc.b	"YOSHIBON"
 	dc.b	$C4
 
 	dc.b	$0B
-	dc.b	$6D, $65, $63, $68, $61, $6E, $69, $63, $61, $6C	; MECHANICAL
-	dc.b	$20
-	dc.b	$64, $65, $73, $69, $67, $6E						; DESIGN
+	dc.b	"mechanical design"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$4A, $55, $44, $59, $54, $4F, $54, $4F, $59, $41	; JUDYTOTOYA
+	dc.b	"JUDYTOTOYA"
 	dc.b	$C4
 
 	dc.b	$0F
-	dc.b	$64, $65, $73, $69, $67, $6E, $65, $72, $73					; DESIGNERS
+	dc.b	"designers"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$50, $48, $4F, $45, $4E, $49, $58							; PHOENIX
-	dc.b	$20
-	dc.b	$52, $49, $45												; RIE
+	dc.b	"PHOENIX RIE"
 	dc.b	$C1
 	dc.b	$11
-	dc.b	$43, $48, $4F, $4B, $4F										; CHOKO
+	dc.b	"CHOKO"
 	dc.b	$C1
 	dc.b	$0F
-	dc.b	$42, $49, $47, $49, $53, $4C, $41, $4E, $44					; BIGISLAND
+	dc.b	"BIGISLAND"
 	dc.b	$C1
 	dc.b	$0F
-	dc.b	$49, $43, $48, $49, $45, $4D, $4F, $4E						; ICHIEMON
+	dc.b	"ICHIEMON"
 	dc.b	$C1
 	dc.b	$0F
-	dc.b	$57, $41, $4B, $41, $53, $41, $4D, $41						; WAKASAMA
+	dc.b	"WAKASAMA"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$53, $54, $52, $45, $53, $54, $45, $4C, $45, $53, $53		; STRESTELESS
+	dc.b	"STRESTELESS"
 	dc.b	$C1
 	dc.b	$10
-	dc.b	$59, $4F, $4E, $45, $53, $41, $4E							; YONESAN
+	dc.b	"YONESAN"
 	dc.b	$C1
 	dc.b	$12
-	dc.b	$47, $45, $4E, $C4											; GEN
+	dc.b	"GEN"
+	dc.b	$C4
 
 	dc.b	$0B
-	dc.b	$6D, $75, $73, $69, $63, $61, $6C		; MUSICAL
-	dc.b	$20
-	dc.b	$63, $6F, $6D, $70, $6F, $73, $65, $72	; COMPOSER
+	dc.b	"musical composer"
 	dc.b	$C1
 	dc.b	$12
-	dc.b	$42, $4F								; BO
+	dc.b	"BO"
 	dc.b	$C4
 
 	dc.b	$0D
-	dc.b	$73, $6F, $75, $6E, $64				; SOUND
-	dc.b	$20
-	dc.b	$65, $66, $66, $65, $63, $74, $73	; EFFECTS
+	dc.b	"sound effects"
 	dc.b	$C1
 	dc.b	$12
-	dc.b	$4E, $41, $56						; NAV
+	dc.b	"NAV"
 	dc.b	$C1
 	dc.b	$10
-	dc.b	$54, $41, $52, $4E, $59, $41		; TARNYA
+	dc.b	"TARNYA"
 	dc.b	$C4
 
 	dc.b	$09
-	dc.b	$61, $73, $73, $69, $73, $74, $61, $6E, $74			; ASSISTANT
-	dc.b	$20
-	dc.b	$70, $72, $6F, $67, $72, $61, $6D, $6D, $65, $72	; PROGRAMMER
+	dc.b	"assistant programmer"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$54, $41, $50, $4B, $41, $52, $41					; TAPKARA
-	dc.b	$20
-	dc.b	$53, $41, $54										; SAT
+	dc.b	"TAPKARA SAT"
 	dc.b	$C4
 
 	dc.b	$09
-	dc.b	$73, $6F, $66, $74, $77, $61, $72, $65				; SOFTWARW
-	dc.b	$20
-	dc.b	$70, $72, $6F, $67, $72, $61, $6D, $6D, $65, $72	; PROGRAMMER
+	dc.b	"software programmer"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$43, $4F, $4D										; COM
-	dc.b	$20
-	dc.b	$42, $4C, $55, $45									; BLUE
+	dc.b	"COM BLUE"
 	dc.b	$C4
 
 	dc.b	$08
-	dc.b	$70, $72, $6F, $64, $75, $63, $65, $64				; PRODUCED
-	dc.b	$20
-	dc.b	$61, $6E, $64										; AND
-	dc.b	$20
-	dc.b	$70, $72, $6F, $67, $72, $61, $6D, $6D, $65, $64	; PROGRAMMED
+	dc.b	"produced and programmed"
 	dc.b	$C3
 	dc.b	$12
-	dc.b	$62, $79											; BY
+	dc.b	"by"
 	dc.b	$C1
 	dc.b	$0E
-	dc.b	$4D, $55, $55, $55, $55								; MUUUU
-	dc.b	$20
-	dc.b	$59, $55, $4A, $49									; YUJI
+	dc.b	"MUUUU YUJI"
 	dc.b	$C4
 
 	dc.b	$0F
-	dc.b	$50, $52, $45, $53, $45, $4E, $54, $45, $44		; PRESENTED
+	dc.b	"PRESENTED"
 	dc.b	$C3
 	dc.b	$12
-	dc.b	$42, $59										; BY
+	dc.b	"BY"
 	dc.b	$C3
 	dc.b	$11
-	dc.b	$53, $45, $47, $41								; SEGA
+	dc.b	"SEGA"
 	dc.b	$C4
 
 	dc.b	$0F
-	dc.b	$54, $48, $45						; THE
-	dc.b	$20, $20
-	dc.b	$45, $4E, $44						; END
+	dc.b	"THE  END"
 	dc.b	$C3
 	dc.b	$C1, $C1, $C1, $C1, $C1, $C1, $C1
 	dc.b	$C5
@@ -12744,11 +12738,11 @@ GameMode_MapLoop:
 	bcc.s	loc_7DCA
 	tst.b	(Event_flag_Gaira_alarm).w
 	beq.s	loc_7DCE
-	addq.w	#1, ($FFFFF61E).w
-	addq.w	#1, ($FFFFF622).w
+	addq.w	#1, (V_scroll_amount_BG).w
+	addq.w	#1, (H_scroll_amount_BG).w
 	bra.s	loc_7DCE
 loc_7DCA:
-	subq.w	#1, ($FFFFF61E).w
+	subq.w	#1, (V_scroll_amount_BG).w
 loc_7DCE:
 	tst.w	(Screen_changed_flag).w
 	bne.w	loc_7E00
@@ -12998,11 +12992,11 @@ Map_EventRun:
 	move.w	(Camera_Y_pos_BG).w, d2
 	andi.w	#$FF, d2
 	bsr.w	loc_8226
-	move.l	d0, ($FFFFF61C).w
+	move.l	d0, (V_scroll_amount).w
 	move.w	(Camera_X_pos_BG).w, d2
 	andi.w	#$1FF, d2
 	bsr.w	loc_8226
-	move.l	d0, ($FFFFF620).w
+	move.l	d0, (H_scroll_amount).w
 	bra.w	loc_8240
 
 ; 3
@@ -13014,13 +13008,13 @@ loc_80D4:
 	bsr.w	UpdateRNGSeed
 	andi.l	#$10001, d0
 	add.l	d2, d0
-	move.l	d0, ($FFFFF61C).w
+	move.l	d0, (V_scroll_amount).w
 	move.w	(Camera_X_pos_BG).w, d2
 	andi.l	#$1FF, d2
 	bsr.w	UpdateRNGSeed
 	andi.l	#$10001, d0
 	add.l	d2, d0
-	move.l	d0, ($FFFFF620).w
+	move.l	d0, (H_scroll_amount).w
 	rts
 
 ; 4
@@ -13261,8 +13255,8 @@ loc_8396:
 	bsr.w	LoadPortraits
 loc_839A:
 	moveq	#0, d0
-	move.l	d0, ($FFFFF61C).w
-	move.l	d0, ($FFFFF620).w
+	move.l	d0, (V_scroll_amount).w
+	move.l	d0, (H_scroll_amount).w
 	move.l	d0, (Camera_Y_pos_FG).w
 	move.l	d0, (Camera_Y_pos_BG).w
 
@@ -14097,17 +14091,17 @@ loc_8BEE:
 	bne.s	loc_8C0E
 	move.w	(Camera_Y_pos_BG).w, d0
 	andi.w	#$FF, d0
-	move.w	d0, ($FFFFF61E).w
+	move.w	d0, (V_scroll_amount_BG).w
 	move.w	(Camera_X_pos_BG).w, d0
 	andi.w	#$1FF, d0
-	move.w	d0, ($FFFFF622).w
+	move.w	d0, (H_scroll_amount_BG).w
 loc_8C0E:
 	move.w	(Camera_Y_pos_FG).w, d0
 	andi.w	#$FF, d0
-	move.w	d0, ($FFFFF61C).w
+	move.w	d0, (V_scroll_amount_FG).w
 	move.w	(Camera_X_pos_FG).w, d0
 	andi.w	#$1FF, d0
-	move.w	d0, ($FFFFF620).w
+	move.w	d0, (H_scroll_amount_FG).w
 	rts
 
 loc_8C28:
@@ -14204,7 +14198,7 @@ loc_8CE8:
 	tst.w	(a1)
 	beq.s	loc_8CF2
 	move.w	d2, d1
-	move.w	d2, ($FFFFF61C).w
+	move.w	d2, (V_scroll_amount_FG).w
 loc_8CF2:
 	tst.w	(a1)
 	bpl.s	loc_8D00
@@ -14315,7 +14309,7 @@ loc_8DD4:
 	tst.w	(a1)
 	beq.s	loc_8DDE
 	move.w	d2, d1
-	move.w	d2, ($FFFFF620).w
+	move.w	d2, (H_scroll_amount_FG).w
 loc_8DDE:
 	tst.w	(a1)
 	bpl.s	loc_8DEC
