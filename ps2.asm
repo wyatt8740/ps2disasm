@@ -24213,12 +24213,6 @@ loc_F302:
 loc_F308:
 	move.w	#$1213, (Script_queue).w
 	move.l	(Enemy_total_meseta).w, d0	; get enemy's total meseta
-	; fix: add money with cap check
-	if bugfixes=1
-	bsr.w	AddToCurrentMoney
-	else
-	add.l	d0, (Current_money).w			; add it to your money
-	endif
 	
 	if meseta_gain=1
 	add.l	d0, d0
@@ -24226,6 +24220,14 @@ loc_F308:
 	add.l	d0, d0
 	add.l	d0, d0
 	endif
+	
+	; fix: add money with cap check
+	if bugfixes=1
+	bsr.w	AddToCurrentMoney
+	else
+	add.l	d0, (Current_money).w			; add it to your money
+	endif
+	
 	move.l	d0, (Meseta_value).w		; move it so that it's displayed later in the victory message
 	move.w	#0, ($FFFFC602).w
 	addq.w	#1, (Window_routine_2).w
