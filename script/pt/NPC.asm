@@ -1268,7 +1268,12 @@ loc_2018A:
 	dc.b	"ele. Com o tempo, foram"
 	dc.b	$C3
 	dc.b	"esquecendo Alis."
+	if bugfixes=1
+	dc.b	$C4
+	else
 	dc.b	$C1
+	endif
+
 loc_20208:
 	dc.b	"Eu creio que ha uma"
 	dc.b	$C3
