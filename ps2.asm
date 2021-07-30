@@ -10218,7 +10218,7 @@ loc_61F4:
 
 PaletteFadeIn:
 	lea	(Palette_table_buffer).w, a0	; load palette
-	lea	($FFFFFB80).w, a1	; load target palette
+	lea	(Target_palette).w, a1	; load target palette
 	move.w	($FFFFF626).w, d0	; fade start
 	adda.w	d0, a0
 	adda.w	d0, a1
@@ -10333,7 +10333,7 @@ loc_62F0:
 
 loc_6302:
 	lea	(Palette_table_buffer).w, a0
-	lea	($FFFFFB80).w, a1
+	lea	(Target_palette).w, a1
 	move.w	($FFFFF626).w, d0
 	adda.w	d0, a0
 	adda.w	d0, a1
@@ -10370,7 +10370,10 @@ loc_6346:
 loc_634A:
 	addq.w	#2, a0
 	rts
-loc_634E:
+
+
+; ---------------------------------------------------------------
+Palette_FadeToWhite:
 	move.l	#$3F, ($FFFFF626).w
 	move.w	#$14, d4
 loc_635A:
@@ -10415,6 +10418,7 @@ loc_63AC:
 loc_63BE:
 	addq.w	#2, a0
 	rts
+; ---------------------------------------------------------------
 
 
 Sega_PaletteCycle:
@@ -11680,7 +11684,7 @@ loc_711C:
 	move.b	#$10, (V_int_routine).w
 	bsr.w	WaitForVInt
 	lea	(Palette_table_buffer).w, a1
-	lea	($FFFFFB80).w, a2
+	lea	(Target_palette).w, a2
 	moveq	#$1F, d0
 loc_7140:
 	move.l	(a2)+, (a1)+
@@ -12046,7 +12050,7 @@ MoveToOpeningScreen:
 GameMode_Ending:
 	move.w	#$93, d0
 	bsr.w	UpdateSoundQueue
-	bsr.w	loc_634E
+	bsr.w	Palette_FadeToWhite
 	move	#$2700, sr
 	move.w	(VDP_reg1_values).w, d0
 	andi.b	#$BF, d0
@@ -12092,7 +12096,7 @@ loc_764C:
 
 	moveq	#PalID_Title, d0
 	bsr.w	PaletteLoad1
-	lea	($FFFFFBE0).w, a0
+	lea	(Target_palette_line_4).w, a0
 	moveq	#0, d0
 	moveq	#7, d1
 loc_7660:
@@ -12187,7 +12191,7 @@ loc_77B2:
 	bsr.w	loc_79D2
 	move.b	#$E0, d0
 	bsr.w	UpdateSoundQueue
-	bsr.w	loc_634E
+	bsr.w	Palette_FadeToWhite
 	moveq	#PalID_Credits, d0
 	bsr.w	PaletteLoad1
 	move.w	#$A44, ($FFFFFBA2).w
@@ -12608,7 +12612,7 @@ GameMode_Map:
 	bra.s	loc_7C26
 
 loc_7C22:
-	bsr.w	loc_634E
+	bsr.w	Palette_FadeToWhite
 
 loc_7C26:
 	move	#$2700, sr
@@ -13372,10 +13376,10 @@ SceneMusicPtrs:
 
 ; ------------------------------------------------------------
 GameMode_Battle:
-	bsr.w	loc_634E
-	move	#$2700, sr
+	bsr.w	Palette_FadeToWhite
+	move	#$2700, sr	; disable interrupts
 	move.w	(VDP_reg1_values).w, d0
-	andi.b	#$BF, d0
+	andi.b	#$BF, d0	; disable display
 	move.w	d0, (VDP_control_port).l
 	bsr.w	ClearSpriteAndScroll
 
@@ -13383,23 +13387,23 @@ GameMode_Battle:
 	move.w	#$8F01, (a6)
 	move.w	#$93FF, (a6)
 	move.w	#$943F, (a6)
-	move.w	#$9780, (a6)
+	move.w	#$9780, (a6)	; DMA, VRAM fill
 	move.w	#$4000, (a6)
 	move.w	#$80, (a6)
 	move.w	#0, (VDP_data_port).l
 
-loc_850C:
+-
 	move.w	(a6), d7
 	andi.w	#2, d7
-	bne.s	loc_850C
+	bne.s	-	; loop until DMA is done
 
 	move.w	#$8F02, (a6)
 	move.w	(Characters_RAM+y_pos).w, d0
 	andi.w	#$FFF0, d0
-	move.w	d0, (Map_Y_pos).w
+	move.w	d0, (Map_Y_pos).w	; Save Y position
 	move.w	(Characters_RAM+x_pos).w, d0
 	andi.w	#$FFF0, d0
-	move.w	d0, (Map_X_pos).w
+	move.w	d0, (Map_X_pos).w	; Save X position
 	move.l	#$60000002, (VDP_control_port).l
 	lea	(Art_Font).l, a0
 	bsr.w	DecompressToVDP
@@ -13415,7 +13419,7 @@ loc_850C:
 	bsr.w	PaletteLoad1
 	cmpi.w	#$103, (Enemy_formation).w
 	bne.s	loc_8594		; branch if we are not in Mother Brain boss battle
-	move.w	#0, ($FFFFFB80).w
+	move.w	#0, (Target_palette).w
 	lea	(loc_AE8A0).l, a1
 	move.l	#$60000003, d0
 	moveq	#$27, d1
@@ -23477,21 +23481,21 @@ BattleModeRoutines:
 BattleMode_Standby:
 	lsl.w	#2, d1
 	andi.w	#$1C, d1
-	jmp	loc_EB32-4(pc,d1.w)
-; ----------------------------------------------
-loc_EB32:
-	bra.w	loc_EB46
-	bra.w	loc_EB52
-	bra.w	loc_EB78
-	bra.w	loc_EBBC
-	bra.w	loc_EC5C
-; ----------------------------------------------
-loc_EB46:
+	jmp	BattleStandbyRoutines-4(pc,d1.w)
+; ------------------------------------------------------------
+BattleStandbyRoutines:
+	bra.w	BattleStandby_LoadOptions
+	bra.w	BattleStandby_WaitInputFGHTSTGY
+	bra.w	BattleStandby_WaitInputORDRRUN
+	bra.w	BattleStandby_PickCharacter
+	bra.w	BattleStandby_PickCommand
+; ------------------------------------------------------------
+BattleStandby_LoadOptions:
 	move.w	#((6<<8)|WinID_BattleOptions), (Window_queue).w
 	addq.w	#1, (Window_routine_2).w
 	rts
-loc_EB52:
-	move.w	($FFFFDEDA).w, d0
+BattleStandby_WaitInputFGHTSTGY:
+	move.w	(Battle_option_index).w, d0
 	bne.s	+
 	move.w	#0, (Window_routine_2).w
 	move.b	#1, (Battle_main_routine_index).w		; next battle main routine
@@ -23503,8 +23507,8 @@ loc_EB52:
 	move.w	#((6<<8)|WinID_BattleOptions2), (Window_queue).w
 	addq.w	#1, (Window_routine_2).w
 	rts
-loc_EB78:
-	move.w	($FFFFDEDC).w, d0
+BattleStandby_WaitInputORDRRUN:
+	move.w	(Battle_option_index_2).w, d0
 	beq.s	+
 	move.w	#0, (Window_routine_2).w
 	move.b	#2, (Battle_main_routine_index).w		; routine to process the RUN option
@@ -23523,7 +23527,7 @@ loc_EB78:
 	move.w	#$148, $E(a0)
 	addq.w	#1, (Window_routine_2).w
 	rts
-loc_EBBC:
+BattleStandby_PickCharacter:
 	tst.w	(Window_routine_3).w
 	bne.s	loc_EBEA
 	move.b	(Joypad_pressed).w, d0
@@ -23588,15 +23592,15 @@ Battle_CharacterIdIndex:
 
 	even
 
-loc_EC5C:
+BattleStandby_PickCommand:
 	tst.w	(Window_routine_3).w
 	bne.s	loc_EC74
 	moveq	#0, d1
 	moveq	#0, d2
-	move.w	($FFFFDEE2).w, d0
+	move.w	(Battle_command_index).w, d0
 	lsl.w	#2, d0
 	andi.w	#$C, d0
-	jmp	Battle_CommandActionIndex(pc,d0.w)
+	jmp	BattleCommandActionRoutines(pc,d0.w)
 
 loc_EC74:
 	move.w	#$8001, (Window_queue).w
@@ -23606,7 +23610,7 @@ loc_EC74:
 	rts
 
 ; -----------------------------------------
-Battle_CommandActionIndex:
+BattleCommandActionRoutines:
 	bra.w	CommandAction_Attack
 	bra.w	CommandAction_Technique
 	bra.w	CommandAction_Item
@@ -23886,7 +23890,7 @@ CommandAction_Defense:
 	move.w	(Character_index).w, d0
 	lsl.w	#4, d0
 	adda.w	d0, a0
-	move.w	($FFFFDEE2).w, (a0)+
+	move.w	(Battle_command_index).w, (a0)+
 	move.w	d1, (a0)+
 	move.w	d2, (a0)
 	lea	(Window_queue).w, a0
@@ -23908,17 +23912,17 @@ BattleMode_Fighting:
 
 ; -----------------------------------------
 BattleFightingRoutines:
-	bra.w	loc_F004
-	bra.w	loc_F0C0
-	bra.w	loc_F188
-	bra.w	loc_F1D0
-	bra.w	loc_F1F6
-	bra.w	loc_F270
-	bra.w	loc_F308
-	bra.w	loc_F328
-	bra.w	loc_F428
+	bra.w	BattleFighting_ProcessTurnOrder
+	bra.w	BattleFighting_CheckFightersAlive
+	bra.w	BattleFighting_FighterAct
+	bra.w	BattleFighting_TurnEnd
+	bra.w	BattleFighting_GameOver
+	bra.w	BattleFighting_Victory
+	bra.w	BattleFighting_ProcessMeseta
+	bra.w	BattleFighting_ProcessExp
+	bra.w	BattleFighting_Done
 ; -----------------------------------------
-loc_F004:
+BattleFighting_ProcessTurnOrder:
 	lea	(Battle_turn_order).w, a0
 	moveq	#$F, d3
 -
@@ -23997,7 +24001,7 @@ loc_F09C:
 	rts
 
 
-loc_F0C0:
+BattleFighting_CheckFightersAlive:
 	lea	($FFFFEC00).w, a0
 	moveq	#$F, d1
 -
@@ -24067,7 +24071,7 @@ loc_F174:
 loc_F186:
 	rts
 
-loc_F188:
+BattleFighting_FighterAct:
 	lea	(Battle_turn_order).w, a0
 	move.w	(Battle_turn_index).w, d0
 	lsl.w	#2, d0
@@ -24092,7 +24096,7 @@ loc_F19E:
 	subq.w	#1, (Window_routine_2).w
 loc_F1CE:
 	rts
-loc_F1D0:
+BattleFighting_TurnEnd:
 	tst.w	(Fight_interrupted_flag).w	; did we choose to interrupt the fight (pressed a button while fighting)?
 	beq.s	+							; if not, branch
 	move.w	#0, (Fight_active_flag).w
@@ -24103,7 +24107,7 @@ loc_F1D0:
 +
 	subq.w	#3, (Window_routine_2).w		; reprocess fight logic with same commands
 	rts
-loc_F1F6:
+BattleFighting_GameOver:
 	tst.w	(Window_routine_3).w
 	bne.s	loc_F266
 	move.w	#0, (Character_index).w
@@ -24138,7 +24142,7 @@ loc_F24E:
 loc_F266:
 	move.b	#GameModeID_Sega, (Game_mode_index).w
 	bra.w	RestoreCharDataAfterBattle
-loc_F270:
+BattleFighting_Victory:
 	tst.w	($FFFFCC94).w
 	beq.s	loc_F27E
 	subq.w	#1, ($FFFFCC94).w
@@ -24210,7 +24214,7 @@ loc_F2A4:
 loc_F302:
 	addq.w	#1, (Window_routine_2).w
 	rts
-loc_F308:
+BattleFighting_ProcessMeseta:
 	move.w	#$1213, (Script_queue).w
 	move.l	(Enemy_total_meseta).w, d0	; get enemy's total meseta
 	
@@ -24233,7 +24237,7 @@ loc_F308:
 	addq.w	#1, (Window_routine_2).w
 	bra.w	RestoreCharDataAfterBattle
 
-loc_F328:
+BattleFighting_ProcessExp:
 	move.w	($FFFFC602).w, d3
 	bsr.w	loc_ADBE
 	lea	(Script_queue).w, a3
@@ -24330,7 +24334,7 @@ loc_F41E:
 	bsr.w	loc_AD4C
 	rts
 
-loc_F428:
+BattleFighting_Done:
 	move.b	#GameModeID_Map, (Game_mode_index).w
 	rts
 
@@ -26620,7 +26624,7 @@ loc_10A06:
 	andi.b	#Button_C_Mask, d0
 	beq.s	loc_10A26
 	move.b	#SFXID_Selection, (Sound_queue).w
-	lea	($FFFFDEDA).w, a0
+	lea	(Battle_option_index).w, a0
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
 	move.b	($FFFFDE50).w, d1
@@ -26649,7 +26653,7 @@ loc_10A2E:
 	move.w	#$130, $E(a0)
 	rts
 loc_10A5C:
-	lea	($FFFFDEDC).w, a0
+	lea	(Battle_option_index_2).w, a0
 	move.w	#0, d2
 loc_10A64:
 	move.b	(Joypad_pressed).w, d0
@@ -26699,7 +26703,7 @@ loc_10AB2:
 	move.w	#$118, $E(a0)
 	rts
 loc_10AE2:
-	lea	($FFFFDEE2).w, a0
+	lea	(Battle_command_index).w, a0
 	move.w	#$8402, d2
 	bra.w	loc_10A64
 ; --------------------------
@@ -26716,7 +26720,7 @@ Win_EnemyGroups:
 loc_10B06:
 	lea	($FFFFDEE4).w, a0
 	move.w	#$8003, d2
-	tst.w	($FFFFDEE2).w
+	tst.w	(Battle_command_index).w
 	beq.s	loc_10B16
 	addq.w	#1, d2
 loc_10B16:

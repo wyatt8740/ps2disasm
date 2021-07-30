@@ -1420,6 +1420,10 @@ Yes_no_input =  ramaddr($FFFFDE90)			; 0 = yes; 1 = no
 
 Refresh_stats_flag =  ramaddr($FFFFDEA8)
 
+Battle_option_index =  ramaddr($FFFFDEDA)
+Battle_option_index_2 =  ramaddr($FFFFDEDC)
+Battle_command_index =  ramaddr($FFFFDEE2)
+
 Window_draw_cache = ramaddr($FFFFDF00)
 
 Object_RAM =  ramaddr($FFFFE000)
@@ -1514,6 +1518,10 @@ Palette_table_buffer =  ramaddr($FFFFFB00)
 Palette_line_2 =  ramaddr($FFFFFB20)
 Palette_line_3 =  ramaddr($FFFFFB40)
 Palette_line_4 =  ramaddr($FFFFFB60)
+Target_palette = ramaddr($FFFFFB80) ; $80 bytes ; used by palette fading routines
+Target_palette_line_2 = ramaddr($FFFFFBA0) ; $20 bytes
+Target_palette_line_3 = ramaddr($FFFFFBC0) ; $20 bytes
+Target_palette_line_4 = ramaddr($FFFFFBE0) ; $20 bytes
 
 System_stack =  ramaddr($FFFFFE00)
 
