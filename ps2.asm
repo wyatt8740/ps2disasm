@@ -1251,1308 +1251,1308 @@ ObjectData_NoSprites:
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Paseo:
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$01
 	dc.w	$0178, $00D8
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$02
 	dc.w	$03A8, $00C8
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$03
 	dc.w	$00D8, $0038
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$04
 	dc.w	$0338, $0138
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$05
 	dc.w	$00B8, $01D8
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$06
 	dc.w	$0298, $0148
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$07
 	dc.w	$0118, $0048
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$08
 	dc.w	$03B8, $0038
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$09
 	dc.w	$0108, $0178
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$0A
 	dc.w	$02F8, $01B8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$0B
 	dc.w	$0248, $00F8
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$0C
 	dc.w	$0318, $01D8
 
-	dc.b	(ObjID_MotaChild2-$14)<<2+1
+	dc.b	((ObjID_MotaChild2-$14)<<2)|1
 	dc.b	$0D
 	dc.w	$02F8, $00D8
 
-	dc.b	(ObjID_MotaChild2-$14)<<2+1
+	dc.b	((ObjID_MotaChild2-$14)<<2)|1
 	dc.b	$0E
 	dc.w	$00D8, $00F8
 
-	dc.b	(ObjID_MotaChild2-$14)<<2+1
+	dc.b	((ObjID_MotaChild2-$14)<<2)|1
 	dc.b	$0F
 	dc.w	$03D8, $00F8
 
-	dc.b	(ObjID_MotaChild-$14)<<2+1
+	dc.b	((ObjID_MotaChild-$14)<<2)|1
 	dc.b	$10
 	dc.w	$0158, $00B8
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$01D0, $0050
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0230, $0050
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$01D0, $0190
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0230, $0190
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Arima:
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$11
 	dc.w	$0038, $0078
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$12
 	dc.w	$0158, $00D8
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$13
 	dc.w	$00D8, $0138
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$14
 	dc.w	$0178, $0158
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$15
 	dc.w	$01B8, $0048
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$16
 	dc.w	$0108, $00C8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$17
 	dc.w	$0148, $0128
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$18
 	dc.w	$0088, $01B8
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$19
 	dc.w	$0068, $01D8
 
-	dc.b	(ObjID_MotaChild-$14)<<2+1
+	dc.b	((ObjID_MotaChild-$14)<<2)|1
 	dc.b	$1A
 	dc.w	$00B8, $0098
 
-	dc.b	(ObjID_MotaChild2-$14)<<2+1
+	dc.b	((ObjID_MotaChild2-$14)<<2)|1
 	dc.b	$1B
 	dc.w	$0078, $0158
 
-	dc.b	(ObjID_MotaChild-$14)<<2+1
+	dc.b	((ObjID_MotaChild-$14)<<2)|1
 	dc.b	$1C
 	dc.w	$0118, $0178
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$0098, $0070
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$0118, $0070
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$01B8, $0090
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$0098, $0130
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$00B8, $01B0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$01
 	dc.w	$0198, $01B0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0130, $0110
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Oputa:
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$1D
 	dc.w	$02B8, $0298
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$1E
 	dc.w	$0238, $0098
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$1F
 	dc.w	$0398, $01B8
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$20
 	dc.w	$02D8, $0208
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$21
 	dc.w	$0248, $0258
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$22
 	dc.w	$0358, $0278
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$23
 	dc.w	$01A8, $00D8
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$24
 	dc.w	$02C8, $00D8
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$25
 	dc.w	$0338, $0278
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$26
 	dc.w	$0158, $0058
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$27
 	dc.w	$01E8, $00B8
 
-	dc.b	(ObjID_MotaChild-$14)<<2+1
+	dc.b	((ObjID_MotaChild-$14)<<2)|1
 	dc.b	$28
 	dc.w	$0258, $0088
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$29
 	dc.w	$0318, $01D8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$2A
 	dc.w	$0118, $0078
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$2B
 	dc.w	$02F8, $00B8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$2C
 	dc.w	$02E8, $0198
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0290, $01B0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0370, $01B0
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Zema:
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$2D
 	dc.w	$0068, $0078
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$2E
 	dc.w	$02F8, $0088
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$2F
 	dc.w	$0128, $00D8
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$30
 	dc.w	$0318, $0028
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$31
 	dc.w	$0378, $0068
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$32
 	dc.w	$0368, $00B8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$33
 	dc.w	$0098, $0028
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$34
 	dc.w	$00A8, $00D8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$35
 	dc.w	$0108, $0098
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$36
 	dc.w	$0188, $0038
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$37
 	dc.w	$01E8, $00B8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$38
 	dc.w	$0268, $0048
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$39
 	dc.w	$0288, $0098
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$3A
 	dc.w	$02E8, $00D8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$3B
 	dc.w	$0388, $00A8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$3C
 	dc.w	$03A8, $00C8
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$01F0, $0090
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Kueri:
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$3D
 	dc.w	$00F8, $0098
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$3E
 	dc.w	$0118, $0118
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$3F
 	dc.w	$0188, $01D8
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$40
 	dc.w	$0028, $0238
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$41
 	dc.w	$00C8, $0068
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$42
 	dc.w	$0168, $00B8
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$43
 	dc.w	$00A8, $0138
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$44
 	dc.w	$0078, $0278
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$45
 	dc.w	$0138, $01D8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$46
 	dc.w	$0198, $0248
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$47
 	dc.w	$0068, $0078
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$48
 	dc.w	$0198, $00E8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$49
 	dc.w	$00E8, $0108
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$4A
 	dc.w	$0078, $01A8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$4B
 	dc.w	$0188, $01A8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$4C
 	dc.w	$0128, $0258
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$00D0, $0110
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0130, $0110
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Piata:
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0050, $0170
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0090, $0170
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$00D0, $0170
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$4D
 	dc.w	$0378, $0078
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$4E
 	dc.w	$0318, $00B8
 
-	dc.b	(ObjID_MotaMan3-$14)<<2+1
+	dc.b	((ObjID_MotaMan3-$14)<<2)|1
 	dc.b	$4F
 	dc.w	$02F8, $0078
 
-	dc.b	(ObjID_MotaMan-$14)<<2+1
+	dc.b	((ObjID_MotaMan-$14)<<2)|1
 	dc.b	$50
 	dc.w	$0378, $0138
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$51
 	dc.w	$0358, $0068
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$52
 	dc.w	$0348, $00C8
 
-	dc.b	(ObjID_MotaWoman2-$14)<<2+1
+	dc.b	((ObjID_MotaWoman2-$14)<<2)|1
 	dc.b	$53
 	dc.w	$0268, $0168
 
-	dc.b	(ObjID_MotaWoman-$14)<<2+1
+	dc.b	((ObjID_MotaWoman-$14)<<2)|1
 	dc.b	$54
 	dc.w	$0378, $0278
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$55
 	dc.w	$0318, $0038
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$56
 	dc.w	$00D8, $0128
 
-	dc.b	(ObjID_MotaOldMan2-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan2-$14)<<2)|1
 	dc.b	$57
 	dc.w	$0158, $01D8
 
-	dc.b	(ObjID_MotaOldMan-$14)<<2+1
+	dc.b	((ObjID_MotaOldMan-$14)<<2)|1
 	dc.b	$58
 	dc.w	$0328, $02B8
 
-	dc.b	(ObjID_MotaChild-$14)<<2+1
+	dc.b	((ObjID_MotaChild-$14)<<2)|1
 	dc.b	$59
 	dc.w	$0398, $00D8
 
-	dc.b	(ObjID_MotaChild2-$14)<<2+1
+	dc.b	((ObjID_MotaChild2-$14)<<2)|1
 	dc.b	$5A
 	dc.w	$02D8, $0178
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$5B
 	dc.w	$0198, $0198
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$5C
 	dc.w	$0348, $0238
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0050, $0170
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$00D0, $0170
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0350, $0050
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$02
 	dc.w	$0350, $00B0
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Aukba:
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$67
 	dc.w	$00B8, $0078
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$68
 	dc.w	$0158, $0088
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$69
 	dc.w	$0188, $0098
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6A
 	dc.w	$0118, $00B8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6B
 	dc.w	$00B8, $00D8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6C
 	dc.w	$0168, $0118
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6D
 	dc.w	$0108, $0138
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6E
 	dc.w	$00B8, $0158
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$65
 	dc.w	$0158, $0158
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$66
 	dc.w	$00F8, $0188
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Zosa:
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$5D
 	dc.w	$0138, $00B8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$5E
 	dc.w	$0048, $00D8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$5F
 	dc.w	$0198, $0118
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$60
 	dc.w	$00A8, $0138
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$61
 	dc.w	$0098, $0178
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$62
 	dc.w	$0048, $0198
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$63
 	dc.w	$0088, $01B8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$64
 	dc.w	$0108, $01B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Ryuon:
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$6F
 	dc.w	$00B8, $0078
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$70
 	dc.w	$0118, $0098
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$71
 	dc.w	$0188, $0098
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$72
 	dc.w	$01B8, $0038
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$73
 	dc.w	$01C8, $0078
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$74
 	dc.w	$0248, $0038
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$75
 	dc.w	$0288, $0078
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$76
 	dc.w	$0308, $0078
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$77
 	dc.w	$0328, $0098
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$78
 	dc.w	$0398, $0058
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$79
 	dc.w	$03A8, $00B8
 
-	dc.b	(ObjID_Dezolian-$14)<<2+1
+	dc.b	((ObjID_Dezolian-$14)<<2)|1
 	dc.b	$7A
 	dc.w	$03B8, $0078
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_SkureB2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$01
 	dc.w	$0498, $0298
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$02
 	dc.w	$0278, $01B8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$03
 	dc.w	$01B8, $0438
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$04
 	dc.w	$02B8, $01B8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$05
 	dc.w	$0118, $0278
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$06
 	dc.w	$0318, $0298
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$07
 	dc.w	$0298, $0178
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$0C
 	dc.w	$02B8, $0178
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$0D
 	dc.w	$0278, $0178
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$0E
 	dc.w	$0298, $01B8
 
-	dc.b	(ObjID_MuskCat-$14)<<2+1
+	dc.b	((ObjID_MuskCat-$14)<<2)|1
 	dc.b	$7B
 	dc.w	$0298, $0198
 
-	dc.b	(ObjID_MuskCat-$14)<<2+1
+	dc.b	((ObjID_MuskCat-$14)<<2)|1
 	dc.b	$7C
 	dc.w	$0318, $02A8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_SkureB1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$08
 	dc.w	$04F8, $01B8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$09
 	dc.w	$0358, $0158
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$0A
 	dc.w	$0298, $0158
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$0B
 	dc.w	$0178, $0458
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$0C
 	dc.w	$03B8, $0338
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$08
 	dc.w	$02F8, $02D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$09
 	dc.w	$0198, $0318
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$0A
 	dc.w	$0198, $0458
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|0
 	dc.b	$0B
 	dc.w	$0418, $0498
 
-	dc.b	(ObjID_MuskCat-$14)<<2+1
+	dc.b	((ObjID_MuskCat-$14)<<2)|1
 	dc.b	$7D
 	dc.w	$0178, $0478
 
-	dc.b	(ObjID_MuskCat-$14)<<2+1
+	dc.b	((ObjID_MuskCat-$14)<<2)|1
 	dc.b	$7E
 	dc.w	$0198, $0478
 
-	dc.b	(ObjID_MuskCat-$14)<<2+1
+	dc.b	((ObjID_MuskCat-$14)<<2)|1
 	dc.b	$7F
 	dc.w	$0418, $04A8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MotaPassageDarum:
-	dc.b	(ObjID_Teim-$14)<<2+3
+	dc.b	((ObjID_Teim-$14)<<2)|3
 	dc.b	$01
 	dc.w	0, 0
 
-	dc.b	(ObjID_Darum-$14)<<2+3
+	dc.b	((ObjID_Darum-$14)<<2)|3
 	dc.b	$01
 	dc.w	$00C8, $0098
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ShureGroundF:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$10
 	dc.w	$0138, $00D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$11
 	dc.w	$0498, $00F8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$12
 	dc.w	$0118, $0218
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$13
 	dc.w	$04B8, $0218
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$14
 	dc.w	$0418, $0218
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ShureF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$15
 	dc.w	$0138, $01F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ShureF2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$16
 	dc.w	$01B8, $00F8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$17
 	dc.w	$0438, $02C8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ShureF3:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$18
 	dc.w	$0290, $0158
 
-	dc.b	(ObjID_Corpse-$14)<<2
+	dc.b	((ObjID_Corpse-$14)<<2)|0
 	dc.b	$11
 	dc.w	$0158, $0238
 
-	dc.b	(ObjID_Corpse-$14)<<2
+	dc.b	((ObjID_Corpse-$14)<<2)|0
 	dc.b	$03
 	dc.w	$0398, $0218
 
-	dc.b	(ObjID_Corpse-$14)<<2
+	dc.b	((ObjID_Corpse-$14)<<2)|0
 	dc.b	$03
 	dc.w	$0528, $0258
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_NidoF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$19
 	dc.w	$02F8, $02B8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1A
 	dc.w	$0498, $0118
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1B
 	dc.w	$0278, $0238
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_NidoF2:
-	dc.b	(ObjID_Teim-$14)<<2
+	dc.b	((ObjID_Teim-$14)<<2)|0
 	dc.b	$17
 	dc.w	$02F8, $01F8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1C
 	dc.w	$03D8, $0078
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1D
 	dc.w	$0218, $0298
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RoronB5:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1E
 	dc.w	$00F8, $0398
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$86
 	dc.w	$00B8, $0398
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$87
 	dc.w	$0138, $03A8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RoronB4:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$1F
 	dc.w	$0158, $0198
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$85
 	dc.w	$00B8, $0198
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RoronB3:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$21
 	dc.w	$0268, $00C0
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$83
 	dc.w	$0258, $0138
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$84
 	dc.w	$0398, $0168
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RoronB2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$20
 	dc.w	$0228, $01B8
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$80
 	dc.w	$0288, $0078
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$81
 	dc.w	$04D8, $0098
 
-	dc.b	(ObjID_Motavian-$14)<<2+1
+	dc.b	((ObjID_Motavian-$14)<<2)|1
 	dc.b	$82
 	dc.w	$02A8, $0158
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RoronB1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$22
 	dc.w	$0098, $0318
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$23
 	dc.w	$02B8, $0078
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_YellowDamF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$24
 	dc.w	$0598, $0258
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_YellowDamF2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$25
 	dc.w	$01F8, $00D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$26
 	dc.w	$0298, $0218
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$27
 	dc.w	$0358, $0218
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$21
 	dc.w	$0330, $0180
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_YellowDamF3:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$28
 	dc.w	$02D8, $00D8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RedDamGroundF:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$29
 	dc.w	$0518, $00F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RedDamF2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2A
 	dc.w	$01D8, $0178
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2B
 	dc.w	$0408, $0138
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$23
 	dc.w	$02D0, $0140
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BlueDamF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2C
 	dc.w	$0398, $01F8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2D
 	dc.w	$00B8, $0178
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BlueDamF2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2E
 	dc.w	$02F8, $0218
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$2F
 	dc.w	$0118, $0398
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$30
 	dc.w	$00F8, $02B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BlueDamF3:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$31
 	dc.w	$0318, $01D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$32
 	dc.w	$00F8, $02F8
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$1F
 	dc.w	$0150, $0200
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BlueDamF4:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$33
 	dc.w	$0218, $01B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GreenDamGroundF:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$1C
 	dc.w	$05F8, $019F
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$34
 	dc.w	$0998, $00B8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$35
 	dc.w	$0B58, $0298
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$36
 	dc.w	$0118, $01B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GreenDamF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$37
 	dc.w	$0A38, $0138
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$38
 	dc.w	$04A8, $0178
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$1D
 	dc.w	$0710, $01C0
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BiosystemsLabB1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$39
 	dc.w	$0108, $00D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3A
 	dc.w	$00F8, $03D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3B
 	dc.w	$0518, $0418
 
-	dc.b	(ObjID_InvisibleBlock-$14)<<2
+	dc.b	((ObjID_InvisibleBlock-$14)<<2)|0
 	dc.b	$12
 	dc.w	$0500, $0140
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BiosystemsLabF1:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3C
 	dc.w	$02F8, $0118
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3D
 	dc.w	$0558, $0238
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3E
 	dc.w	$0188, $02D8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BiosystemsLabF2:
-	dc.b	(ObjID_BreakableDoor-$14)<<2
+	dc.b	((ObjID_BreakableDoor-$14)<<2)|0
 	dc.b	$1A
 	dc.w	$02F8, $02FF
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$3F
 	dc.w	$02F8, $0418
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ClimatrolF2:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$40, $00, $F8, $01, $98
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ClimatrolF3:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$41
 	dc.w	$0138, $0198
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ClimatrolF5:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$42
 	dc.w	$04F8, $0178
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$43
 	dc.w	$0118, $01B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ClimatrolF6:
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$44
 	dc.w	$04D8, $01D8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$45
 	dc.w	$0418, $01F8
 
-	dc.b	(ObjID_MotaTreasureChest-$14)<<2+2
+	dc.b	((ObjID_MotaTreasureChest-$14)<<2)|2
 	dc.b	$46
 	dc.w	$0038, $0258
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_NavalF1:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$47
 	dc.w	$0238, $00B8
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$48
 	dc.w	$0238, $0238
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$49
 	dc.w	$0118, $0178
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4A
 	dc.w	$00F8, $0178
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4B
 	dc.w	$0338, $01B8
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4C
 	dc.w	$0358, $0198
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4D
 	dc.w	$0378, $0178
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MenobeGroundF:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4E
 	dc.w	$0378, $0258
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MenobeF1:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$4F
 	dc.w	$00D8, $02F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MenobeF2:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$50
 	dc.w	$0298, $02F8
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$51
 	dc.w	$0398, $02F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_IkutoB5:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$52
 	dc.w	$0538, $04D8
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$53
 	dc.w	$0258, $00F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_IkutoB4:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$54
 	dc.w	$0538, $0378
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$55
 	dc.w	$01B8, $0558
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_IkutoB3:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$56
 	dc.w	$00D8, $0298
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_IkutoB2:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$57
 	dc.w	$02D8, $00D8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GuaronGroundF:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$58
 	dc.w	$0488, $0078
 
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$59
 	dc.w	$0038, $02B8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GuaronF1:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$5A
 	dc.w	$04F8, $0138
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GuaronF7:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$5B
 	dc.w	$00F8, $0158
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GuaronF8:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$5C
 	dc.w	$01F8, $0118
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_GuaronF15:
-	dc.b	(ObjID_DezoTreasureChest-$14)<<2+2
+	dc.b	((ObjID_DezoTreasureChest-$14)<<2)|2
 	dc.b	$5D
 	dc.w	$00F8, $00F8
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_NoahF1:
-	dc.b	(ObjID_Earthman-$14)<<2
+	dc.b	((ObjID_Earthman-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0210, $0070
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ControlTowerF1:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$24
 	dc.w	$02F8, $00FF
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$07
 	dc.w	$0308, $01A0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$13
 	dc.w	$0290, $0060
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$14
 	dc.w	$02D0, $0060
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$15
 	dc.w	$0310, $0060
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$16
 	dc.w	$0350, $0060
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_MotaPassageDoor:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$1B
 	dc.w	$0098, $00FF
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_NidoGroundF:
-	dc.b	(ObjID_BreakableDoor-$14)<<2
+	dc.b	((ObjID_BreakableDoor-$14)<<2)|0
 	dc.b	$18
 	dc.w	$0358, $02DF
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_YellowDamGroundF:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$20
 	dc.w	$0118, $01BF
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_RedDamF1:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$22
 	dc.w	$02F8, $011F
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BlueDamGroundF:
-	dc.b	(ObjID_Door-$14)<<2
+	dc.b	((ObjID_Door-$14)<<2)|0
 	dc.b	$1E
 	dc.w	$0358, $01BF
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_BiosystemsLabGroundF:
-	dc.b	(ObjID_BreakableDoor-$14)<<2
+	dc.b	((ObjID_BreakableDoor-$14)<<2)|0
 	dc.b	$19
 	dc.w	$02F8, $049F
 
@@ -2561,143 +2561,143 @@ ObjectData_BiosystemsLabGroundF:
 ObjectData_MotaWorldMap:
 ; Fix
 	if bugfixes=0
-	dc.b	(ObjID_JetScooter-$14)<<2
+	dc.b	((ObjID_JetScooter-$14)<<2)|0
 	dc.b	$06
 	dc.w	$0588, $0738
 	endif
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$0F
 	dc.w	$09F0, $00C0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$0F
 	dc.w	$09F0, $00D0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$2B
 	dc.w	$0AD0, $0608
 
-	dc.b	(ObjID_PouringWater-$14)<<2
+	dc.b	((ObjID_PouringWater-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0490, $0490
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_ClimatrolF7:
-	dc.b	(ObjID_Neifirst-$14)<<2
+	dc.b	((ObjID_Neifirst-$14)<<2)|0
 	dc.b	$25
 	dc.w	$0308, $0198
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Uzo:
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$10
 	dc.w	$08D0, $0110
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$01F0, $0190
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$0350, $0110
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$0570, $0090
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$06F0, $00B0
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$09B0, $0130
 
-	dc.b	(ObjID_InvisibleBlock2-$14)<<2
+	dc.b	((ObjID_InvisibleBlock2-$14)<<2)|0
 	dc.b	$04
 	dc.w	$0A70, $0150
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_EspMansionB1:
-	dc.b	(ObjID_CryogenicChamberPart1-$14)<<2
+	dc.b	((ObjID_CryogenicChamberPart1-$14)<<2)|0
 	dc.b	$00
 	dc.w	$00F8, $0087
 
-	dc.b	(ObjID_CryogenicChamberPart2-$14)<<2
+	dc.b	((ObjID_CryogenicChamberPart2-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0108, $0087
 
-	dc.b	(ObjID_CryogenicChamberPart3-$14)<<2
+	dc.b	((ObjID_CryogenicChamberPart3-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0100, $007D
 
-	dc.b	(ObjID_CryogenicChamberPart4-$14)<<2
+	dc.b	((ObjID_CryogenicChamberPart4-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0100, $007C
 
-	dc.b	(ObjID_CryogenicChamberPart5-$14)<<2+1
+	dc.b	((ObjID_CryogenicChamberPart5-$14)<<2)|1
 	dc.b	$00
 	dc.w	$00F8, $007A
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8F
 	dc.w	$00C8, $0098
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8F
 	dc.w	$0138, $0098
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_EspMansion:
-	dc.b	(ObjID_MovingEsper-$14)<<2+1
+	dc.b	((ObjID_MovingEsper-$14)<<2)|1
 	dc.b	$88
 	dc.w	$00F0, $01B8
 
-	dc.b	(ObjID_MovingEsper-$14)<<2+1
+	dc.b	((ObjID_MovingEsper-$14)<<2)|1
 	dc.b	$88
 	dc.w	$0110, $01B8
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$89
 	dc.w	$00B8, $0138
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8A
 	dc.w	$00E8, $0138
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8B
 	dc.w	$0118, $0138
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8C
 	dc.w	$0148, $0138
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8D
 	dc.w	$00D8, $0158
 
-	dc.b	(ObjID_Esper-$14)<<2+1
+	dc.b	((ObjID_Esper-$14)<<2)|1
 	dc.b	$8E
 	dc.w	$0128, $0158
 
-	dc.b	(ObjID_Lutz-$14)<<2
+	dc.b	((ObjID_Lutz-$14)<<2)|0
 	dc.b	$34
 	dc.w	$0110, $00FF
 
-	dc.b	(ObjID_LutzChair-$14)<<2
+	dc.b	((ObjID_LutzChair-$14)<<2)|0
 	dc.b	$00
 	dc.w	$0110, $00FF
 
 	dc.w	0
 ; ------------------------------------------------------------
 ObjectData_Gaira:
-	dc.b	(ObjID_InvisibleBlock-$14)<<2
+	dc.b	((ObjID_InvisibleBlock-$14)<<2)|0
 	dc.b	$2F
 	dc.w	$0360, $01A0
 
