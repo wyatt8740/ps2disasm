@@ -1238,15 +1238,10 @@ MapObjectData:
 ;        Object data which gets loaded as you enter a new map
 ;
 ;
-; Byte 1 = Number which, after some calculation, represents the object and the index that
-;			affects its behaviour. I put the calculation so that it's obvious which object
-;			gets loaded. The number at the end of the calculation (e.g. +1) is the index of the
-;			InteractionTypes table.
+; Byte 1 = Holds 2 values: the InteractionTypes index in the low 2 bits (values from 0 to 3)
+;           and the object index in bits 2-7 minus 20 (or $14)
 ;
-; Byte 2 = Index of the table depending of the type of object. So for example if the object is
-;			the Treasure Chest, then the index of the 1st byte at the end of the calculation is +2 so
-;			it will branch to location Interact_TreasureChest; then this 2nd byte is used to pick the
-;			item contained in the treasure chest
+; Byte 2 = Index of the table depending of the type of object from byte 1
 ;
 ; Bytes 3-4 = X position
 ; Bytes 5-6 = Y position
