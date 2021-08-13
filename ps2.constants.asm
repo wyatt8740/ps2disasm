@@ -119,6 +119,11 @@ child_enemy_group_start = $36+object_size	; word
 parent_battle_status = -(object_size-battle_status)
 ; ---------------------------------------------------------------------------
 
+; ---------------------------------------------------------------------------
+; Properties and constants applicable to the red cursor on windows
+red_cursor_entries = $32
+red_cursor_current_entry = $32
+red_cursor_total_entries = $33
 
 ; function to determine the id in a table
 ; ptr = address of pointer in the table
@@ -1389,6 +1394,9 @@ Window_column_frames_left =  ramaddr($FFFFDE40)
 Window_column_frames_num =  ramaddr($FFFFDE44)	; number of columns to draw per frame
 Window_total_columns =  ramaddr($FFFFDE46)
 Window_total_rows =  ramaddr($FFFFDE48)
+Window_options =  ramaddr($FFFFDE50)
+Window_current_option =  ramaddr($FFFFDE50)
+Window_total_options =  ramaddr($FFFFDE51)
 Window_index =  ramaddr($FFFFDE54)
 Window_routine =  ramaddr($FFFFDE56)	; 0 = generally used for initialization before being opened
 										; 1 = load additional stuff such as the red cursor for navigating

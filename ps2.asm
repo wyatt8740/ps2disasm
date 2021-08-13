@@ -2707,9 +2707,11 @@ ObjectData_Gaira:
 ; --------------------------------------------------------------
 ; Object - Blinking red cursor for selection
 ; --------------------------------------------------------------
+red_cursor_orig_y_pos = $2A
+
 
 Obj_RedCursor:
-	move.w	$22(a0), d0
+	move.w	routine(a0), d0
 	asl.b	#2, d0
 	jsr	RedCursorRoutines(pc,d0.w)
 	rts
@@ -2719,100 +2721,101 @@ RedCursorRoutines:
 	bra.w	RedCursor_Main
 ; --------------------------------------------------------------
 RedCursor_Init:
-	move.w	$E(a0), $2A(a0)
+	move.w	y_pos(a0), red_cursor_orig_y_pos(a0)	; save original position
 	moveq	#0, d1
-	move.b	$32(a0), d1
+	move.b	red_cursor_current_entry(a0), d1	; get number of entries
 	lsl.b	#4, d1
-	add.w	$2A(a0), d1
-	move.w	d1, $E(a0)
-	move.b	#$30, 2(a0)		; start by displaying cursor
-	move.w	#$85B6, 8(a0)
-	move.l	#Map_Cursors, 4(a0)
-	move.w	#1, $22(a0)
+	add.w	red_cursor_orig_y_pos(a0), d1
+	move.w	d1, y_pos(a0)
+	move.b	#$30, render_flags(a0)		; render sprite; absolute screen coordinates; top priority for rendering
+	move.w	#$85B6, art_tile(a0)
+	move.l	#Map_Cursors, mappings(a0)
+	move.w	#1, routine(a0)	; => RedCursor_Main
 	; the Japanese version doesn't have the following value in memory cleared which can cause issues
 	; when you hold down a directional button when a new cursor is created. An example is a
 	; glitch that happens when you order your party, that is if you hold UP while selecting characters,
 	; it will corrupt graphics and may cause the game to crash. Just remove the following 'if' condition
 	; to fix it for the Japanese version.
 	if revision>0
-	move.w	#0, ($FFFFDE50).w
+	move.w	#0, (Window_options).w
 	endif
 ; --------------------------------------------------------------
 RedCursor_Main:
 	tst.w	(Window_queue).w
-	bne.s	Obj01_ShowCursor
+	bne.s	.f1
 	move.w	(Window_index).w, d0
-	beq.s	Obj01_ShowCursor
+	beq.s	.f1
 	tst.w	(Fight_active_flag).w
-	bne.s	Obj01_ShowCursor
+	bne.s	.f1
 	move.w	(Windows_opened_num).w, d0
 	subq.w	#1, d0
 	lsl.w	#6, d0
 	addi.w	#$E000, d0
 	cmpa.w	d0, a0
-	beq.s	+
+	beq.s	.f2
 
-Obj01_ShowCursor:
-	move.b	#$30, 2(a0)			; always display cursor
+.f1:
+	move.b	#$30, render_flags(a0)			; render sprite; absolute screen coordinates; top priority for rendering
 	rts
 
-+
-	subq.w	#1, $26(a0)			; subtract 1 from timer
-	bpl.s	+
-	move.w	#7, $26(a0)			; blinking timer (alternate between displaying and hiding cursor)
-	bchg	#1, 2(a0)			; either display or hide cursor
-+
+.f2
+	subq.w	#1, anim_frame_timer(a0)			; subtract 1 from timer
+	bpl.s	.f3
+	move.w	#7, anim_frame_timer(a0)			; blinking timer (alternate between displaying and hiding cursor)
+	bchg	#1, render_flags(a0)			; either display or hide cursor
+.f3
 	moveq	#$10, d2
-loc_1576:
+
+Cursor_CheckInput:
 	moveq	#0, d1
-	move.b	$32(a0), d1
+	move.b	red_cursor_current_entry(a0), d1
 	move.b	(Joypad_pressed).w, d0
 	lsr.b	#1, d0
-	bcc.s	loc_158E		; branch if up was not pressed
+	bcc.s	.f1		; branch if up was not pressed
 
 ; Up Pressed
-loc_1584:
+.b1:
 	subq.b	#1, d1
-	bpl.s	loc_159C
-	move.b	$33(a0), d1
-	bra.s	loc_159C
+	bpl.s	.f2
+	move.b	red_cursor_total_entries(a0), d1
+	bra.s	.f2
 
-loc_158E:
+.f1:
 	lsr.b	#1, d0
-	bcc.s	loc_15BA		; branch if down was not pressed
+	bcc.s	.f3		; branch if down was not pressed
 
 ; Down Pressed
-loc_1592:
+.b2:
 	addq.b	#1, d1
-	cmp.b	$33(a0), d1
-	bls.s	loc_159C
+	cmp.b	red_cursor_total_entries(a0), d1
+	bls.s	.f2
 	moveq	#0, d1
 
-loc_159C:
-	move.b	d1, $32(a0)
+.f2:
+	move.b	d1, red_cursor_current_entry(a0)
 	mulu.w	d2, d1
-	add.w	$2A(a0), d1
-	move.w	d1, $E(a0)
+	add.w	red_cursor_orig_y_pos(a0), d1
+	move.w	d1, y_pos(a0)
 
-loc_15AA:
-	move.w	#$1F, $28(a0)
-	move.w	$32(a0), d0
-	move.w	d0, ($FFFFDE50).w
+.b3:
+	move.w	#$1F, anim_timer_start(a0)
+	move.w	red_cursor_entries(a0), d0
+	move.w	d0, (Window_options).w
 	rts
 
-loc_15BA:
+.f3:
 	move.b	(Joypad_held).w, d0
 	lsr.b	#1, d0
-	bcc.s	loc_15CA		; branch if up is not being held down
-	subq.w	#1, $28(a0)
-	bmi.s	loc_1584
+	bcc.s	.f4		; branch if up is not being held down
+	subq.w	#1, anim_timer_start(a0)
+	bmi.s	.b1
 	rts
 
-loc_15CA:
+.f4:
 	lsr.b	#1, d0
-	bcc.s	loc_15AA		; branch if down is not being held down
-	subq.w	#1, $28(a0)
-	bmi.s	loc_1592
+	bcc.s	.b3		; branch if down is not being held down
+	subq.w	#1, anim_timer_start(a0)
+	bmi.s	.b2
 	rts
 
 
@@ -2966,7 +2969,7 @@ InputWindowCursor_Main:
 
 .update:
 	move.b	d1, input_win_curr_pos(a0)
-	move.w	d1, ($FFFFDE50).w
+	move.w	d1, (Window_options).w
 	move.w	d1, d0
 	divu.w	#input_win_char_row, d1
 	if revision=0
@@ -3110,7 +3113,7 @@ BattleCursor_Init:
 	move.w	#1, $22(a0)
 ; Fix: reset option index
 	if bugfixes=1
-	move.w	#0, ($FFFFDE50).w
+	move.w	#0, (Window_options).w
 	endif
 ; ---------------------------------------------------
 BattleCursor_Main:
@@ -3131,7 +3134,7 @@ loc_186A:
 	bchg	#1, 2(a0)
 loc_187C:
 	moveq	#$10, d2
-	bra.w	loc_1576
+	bra.w	Cursor_CheckInput
 
 ; -------------------------------------------------------------------
 ; Object - Triangular cursor for character selection in battle
@@ -3218,7 +3221,7 @@ loc_192C:
 loc_1930:
 	move.w	#$1F, $28(a0)		; timer for joypad held state
 	move.w	$32(a0), d0
-	move.w	d0, ($FFFFDE50).w		; save index in RAM
+	move.w	d0, (Window_options).w		; save index in RAM
 	rts
 
 loc_1940:
@@ -23546,7 +23549,7 @@ loc_EBEA:
 loc_EBF8:
 	lea	($FFFFDED8).w, a0
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	lea	(Battle_CharacterIdIndex).l, a0
 	cmpi.w	#2, (Party_members_num).w
@@ -23742,7 +23745,7 @@ loc_EE00:
 	bra.s	loc_EE4C
 loc_EE20:
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	lea	(Battle_CharacterIdIndex).l, a0
 	cmpi.w	#2, (Party_members_num).w
 	bcc.s	loc_EE36
@@ -23850,7 +23853,7 @@ loc_EF32:
 	bra.s	loc_EF84
 loc_EF52:
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	lea	(Battle_CharacterIdIndex).l, a0
 	cmpi.w	#2, (Party_members_num).w
 	bcc.s	loc_EF68
@@ -25180,7 +25183,7 @@ loc_FC58:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	andi.b	#Button_B_Mask, d0
 	beq.s	loc_FC88
@@ -25206,7 +25209,7 @@ loc_FCA4:
 	tst.w	(Window_index).w
 	bne.s	loc_FCCA
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (Yes_no_input).w
 	move.w	#$8001, (Window_queue).w
 	andi.b	#Button_B_Mask, d0
@@ -25950,7 +25953,7 @@ loc_103AE:
 	adda.w	#$40, a0
 	move.w	#ObjID_NameDestinationTile, (a0)
 	move.w	#0, $22(a0)
-	move.w	#0, ($FFFFDE50).w
+	move.w	#0, (Window_options).w
 	move.w	#0, (Chosen_letter_position).w
 	move.l	#0, ($FFFFC63C).w
 	rts
@@ -25967,7 +25970,7 @@ loc_103FA:
 	add.w	d0, d0
 	addi.w	#$412C, d0
 	lea	(InputCharacterMap).l, a1
-	adda.w	($FFFFDE50).w, a1
+	adda.w	(Window_options).w, a1
 	moveq	#0, d1
 	move.b	(a1), d1
 	andi.b	#Button_B_Mask, d2
@@ -26193,7 +26196,7 @@ loc_10632:
 	btst	#4, d0
 	bne.s	loc_1064E
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, ($FFFFDEC4).w
 loc_1064C:
 	rts
@@ -26622,7 +26625,7 @@ loc_10A06:
 	lea	(Battle_option_index).w, a0
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 loc_10A26:
 	rts
@@ -26657,7 +26660,7 @@ loc_10A64:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	andi.b	#$10, d0
 	beq.s	loc_10A8E
@@ -26825,7 +26828,7 @@ loc_10C22:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	andi.b	#$10, d0
 	beq.s	loc_10C5E
@@ -26935,7 +26938,7 @@ loc_10D54:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	andi.b	#$10, d0
 	beq.s	loc_10D90
@@ -27244,7 +27247,7 @@ loc_11028:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	moveq	#0, d1
 	move.w	d1, (Window_index).w
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 	andi.b	#$10, d0
 	beq.s	loc_1105E
@@ -27268,7 +27271,7 @@ Win_GetInput:
 	move.b	#SFXID_Selection, (Sound_queue).w
 	move.w	#0, (Window_index).w
 	moveq	#0, d1
-	move.b	($FFFFDE50).w, d1
+	move.b	(Window_current_option).w, d1
 	move.w	d1, (a0)
 -
 	rts
@@ -27566,6 +27569,10 @@ loc_112FC:
 
 
 ; -----------------------------------------------------------------
+; d0 = number of entries
+; d1 = X position
+; d2 = Y position
+; -----------------------------------------------------------------
 LoadCursorInWindows:
 	lea	(Object_RAM).w, a0
 	move.w	(Windows_opened_num).w, d3
@@ -27573,10 +27580,10 @@ LoadCursorInWindows:
 	lsl.w	#6, d3
 	adda.w	d3, a0
 	move.w	#ObjID_RedCursor, (a0)
-	move.w	#0, $22(a0)
-	move.w	d0, $32(a0)
-	move.w	d1, $A(a0)
-	move.w	d2, $E(a0)
+	move.w	#0, routine(a0)
+	move.w	d0, red_cursor_entries(a0)
+	move.w	d1, x_pos(a0)
+	move.w	d2, y_pos(a0)
 	rts
 ; -----------------------------------------------------------------
 
