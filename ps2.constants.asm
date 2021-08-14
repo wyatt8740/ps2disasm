@@ -1261,7 +1261,8 @@ Party_member_ID =  ramaddr($FFFFC608)		; ID's for the current party members; so 
 
 Current_money =  ramaddr($FFFFC620)			; amount of money that you own at the moment
 
-Chosen_letter_position =  ramaddr($FFFFC63A)	; position of the cursor when you choose letters for characters' names
+Window_name_input_cursor_pos =  ramaddr($FFFFC63A)	; position of the cursor when you choose letters for characters' names
+Window_name_input_string =  ramaddr($FFFFC63C)
 
 Map_index =  ramaddr($FFFFC640)			; index of the map you are in
 Map_Y_pos =  ramaddr($FFFFC642)

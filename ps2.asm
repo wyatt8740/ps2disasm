@@ -3034,10 +3034,10 @@ InputWindowCursor_Main:
 
 
 ; --------------------------------------------------------------------------
-; Object - blinking question mark when choosing name for characters
+; Object - blinking question mark when choosing the name for characters
 ; --------------------------------------------------------------------------
 Obj_NameDestinationTile:
-	move.w	$22(a0), d0
+	move.w	routine(a0), d0
 	asl.b	#2, d0
 	jsr	NameDestinationTileRoutines(pc,d0.w)
 	rts
@@ -3047,18 +3047,18 @@ NameDestinationTileRoutines:
 	bra.w	NameDestinationTile_Main
 ; --------------------------------------------------------------------------
 NameDestinationTile_Init:
-	move.w	#$130, $A(a0)
-	move.w	#$98, $E(a0)
-	move.b	#$30, 2(a0)
+	move.w	#$130, x_pos(a0)
+	move.w	#$98, y_pos(a0)
+	move.b	#$30, render_flags(a0)
 	if revision=0
-	move.w	#$8553, 8(a0)
+	move.w	#$8553, art_tile(a0)
 	else
-	move.w	#$855F, 8(a0)
+	move.w	#$855F, art_tile(a0)
 	endif
-	move.l	#Map_Cursors, 4(a0)
-	move.w	#7, $26(a0)
-	move.w	#4, $24(a0)
-	move.w	#1, $22(a0)
+	move.l	#Map_Cursors, mappings(a0)
+	move.w	#7, anim_frame_timer(a0)
+	move.w	#4, mapping_frame(a0)
+	move.w	#1, routine(a0)	; => NameDestinationTile_Main
 ; --------------------------------------------------------------------------
 NameDestinationTile_Main:
 	tst.w	(Window_queue).w
@@ -3071,19 +3071,19 @@ NameDestinationTile_Main:
 	cmpa.w	d0, a0
 	beq.s	++
 +
-	move.b	#1, 2(a0)
+	move.b	#1, render_flags(a0)
 	rts
 
 +
-	subq.w	#1, $26(a0)
+	subq.w	#1, anim_frame_timer(a0)
 	bpl.s	+
-	move.w	#7, $26(a0)
-	bchg	#1, 2(a0)
+	move.w	#7, anim_frame_timer(a0)
+	bchg	#1, render_flags(a0)
 +
-	move.w	(Chosen_letter_position).w, d0
+	move.w	(Window_name_input_cursor_pos).w, d0
 	lsl.w	#3, d0
 	addi.w	#$130, d0
-	move.w	d0, $A(a0)
+	move.w	d0, x_pos(a0)
 	rts
 
 
@@ -17943,7 +17943,7 @@ loc_B35C:
 	addq.w	#1, (Window_routine_2).w
 	rts
 loc_B36C:
-	lea	($FFFFC63C).w, a0
+	lea	(Window_name_input_string).w, a0
 	moveq	#3, d1
 loc_B372:
 	tst.b	(a0)
@@ -17959,7 +17959,7 @@ loc_B384:
 	move.w	(Character_index).w, d0
 	lsl.w	#2, d0
 	adda.w	d0, a2
-	move.l	($FFFFC63C).w, (a2)
+	move.l	(Window_name_input_string).w, (a2)
 loc_B394:
 	bra.w	SetCharNames
 ; ------------------------------------------
@@ -18185,7 +18185,7 @@ loc_B5A4:
 	move.w	(Map_Y_pos).w, ($FFFFC648).w
 	move.w	(Map_X_pos).w, ($FFFFC64A).w
 	move.w	(Character_stats+level).w, ($FFFFC684).w
-	lea	($FFFFC63C).w, a0
+	lea	(Window_name_input_string).w, a0
 	moveq	#3, d1
 loc_B5CE:
 	tst.b	(a0)
@@ -18200,7 +18200,7 @@ loc_B5D8:
 	lsl.w	#8, d0
 	lsl.w	#3, d0
 	adda.w	d0, a0
-	lea	($FFFFC63C).w, a1
+	lea	(Window_name_input_string).w, a1
 	move.b	(a0), (a1)+
 	addq.w	#2, a0
 	move.b	(a0), (a1)+
@@ -18209,7 +18209,7 @@ loc_B5D8:
 	addq.w	#2, a0
 	move.b	(a0), (a1)+
 loc_B600:
-	move.l	($FFFFC63C).w, ($FFFFC680).w
+	move.l	(Window_name_input_string).w, ($FFFFC680).w
 	move.w	#$FFFF, ($FFFFC69C).w
 	move.w	($FFFFDEBC).w, d5
 	bsr.w	SaveData
@@ -25938,34 +25938,42 @@ Win_StoreMeseta:
 ; loc_103A8
 Win_NameInput:
 	tst.b	d1
-	bne.s	loc_103AE
+	bne.s	Win_NameInputRoutine2
 	rts
-loc_103AE:
+; -------------------------------------------
+
+
+; -------------------------------------------
+Win_NameInputRoutine2:
 	subq.w	#1, d1
-	bne.s	loc_103EE
+	bne.s	Win_NameInputRoutine3
 	lea	(Object_RAM).w, a0
 	move.w	(Windows_opened_num).w, d3
 	subq.w	#1, d3
 	lsl.w	#6, d3
 	adda.w	d3, a0
 	move.w	#ObjID_InputWindowCursor, (a0)
-	move.w	#0, $22(a0)
+	move.w	#0, routine(a0)
 	adda.w	#$40, a0
 	move.w	#ObjID_NameDestinationTile, (a0)
-	move.w	#0, $22(a0)
+	move.w	#0, routine(a0)
 	move.w	#0, (Window_options).w
-	move.w	#0, (Chosen_letter_position).w
-	move.l	#0, ($FFFFC63C).w
+	move.w	#0, (Window_name_input_cursor_pos).w
+	move.l	#0, (Window_name_input_string).w
 	rts
-loc_103EE:
+; -------------------------------------------
+
+
+; -------------------------------------------
+Win_NameInputRoutine3:
 	move.b	(Joypad_pressed).w, d2
 	andi.b	#Button_B_Mask|Button_C_Mask, d2
 	bne.s	loc_103FA
 	rts
 loc_103FA:
 	move.b	#SFXID_Selection, (Sound_queue).w
-	lea	($FFFFC63C).w, a0
-	move.w	(Chosen_letter_position).w, d0
+	lea	(Window_name_input_string).w, a0
+	move.w	(Window_name_input_cursor_pos).w, d0
 	adda.w	d0, a0
 	add.w	d0, d0
 	addi.w	#$412C, d0
@@ -26006,14 +26014,14 @@ loc_10432:
 	tst.b	d1
 	beq.s	loc_10488
 loc_1047A:
-	cmpi.w	#3, (Chosen_letter_position).w
+	cmpi.w	#3, (Window_name_input_cursor_pos).w
 	beq.s	loc_10492
-	addq.w	#1, (Chosen_letter_position).w
+	addq.w	#1, (Window_name_input_cursor_pos).w
 	rts
 loc_10488:
-	tst.w	(Chosen_letter_position).w
+	tst.w	(Window_name_input_cursor_pos).w
 	beq.s	loc_10492
-	subq.w	#1, (Chosen_letter_position).w
+	subq.w	#1, (Window_name_input_cursor_pos).w
 loc_10492:
 	rts
 loc_10494:
