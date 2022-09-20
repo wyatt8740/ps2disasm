@@ -30,6 +30,7 @@ exp_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
 meseta_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
+soundrev = 0			; 0 = use sound engine and samples appropriate for revision; 1 = use Japanese audio regardless of revision; 2 = use Japanese audio, but with a quieter snare drum sample; 3 = use US/EU audio regardless of revision
 cross_patch = 0			; Set this to 1 to replace the green cross sign with an H and remove the red cross sign, just like
 						; the Virtual Console version
 
@@ -62,7 +63,7 @@ VectorTable:
 	dc.l	ErrorTrap, ErrorTrap, ErrorTrap, ErrorTrap
 
 Header:
-	if revision=0
+	if revision = 0
 	dc.b	"SEGA MEGA DRIVE " ; Console name
 	dc.b 	"(C)SEGA 1988.DEC" ; Copyright/Date
 	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
@@ -29102,7 +29103,7 @@ PtrPal_DezoTown:
 ; ===========================================================
 
 
-Pal_Sega:	binclude "palettes/sega/Sega.bin"
+Pal_Sega:	binclude "palettes/Sega/Sega.bin"
 Pal_SegaEnd:
 
 Pal_Title:	binclude "palettes/title/Title.bin"
@@ -29288,7 +29289,7 @@ Pal_PlanetMotaEnd:
 Pal_PlanetDezo:	binclude "palettes/misc/Planet Dezo.bin"
 Pal_PlanetDezoEnd:
 
-Pal_SpaceTravel:	binclude "palettes/misc/Space Travel.bin"
+Pal_SpaceTravel:	binclude "palettes/misc/Space travel.bin"
 Pal_SpaceTravelEnd:
 
 Pal_SceneLutz:	binclude "palettes/NPC/Lutz portrait.bin"
@@ -76501,11 +76502,25 @@ SoundDriverBase:
 ; function to make a little-endian 16-bit pointer for the z80
 z80ptr	function addr, ((addr-SoundDriverBase)<<8)&$FF00|(addr-SoundDriverBase)>>8
 
+	; if revision=0
+	; if non-zero, 'soundrev' overrides 'revision'. Otherwise, additional
+	; options are allowed.
+	switch soundrev
+	case 0
 	if revision=0
 	include "sound/ps2.sound_driver_jap.asm"
 	else
 	include "sound/ps2.sound_driver.asm"
-	endif
+	endif                              ; if revision=0
+	case 1,2
+	; if soundrev=1, use Japanese relesae sound engine
+	; if soundrev=2, use Japanese sound engine with modified quieter PCM drums.
+	include "sound/ps2.sound_driver_jap_quiet.asm"
+	elsecase
+	; if soundrev is anything else (3, for instance), use US release sound
+	; engine.
+	include "sound/ps2.sound_driver.asm"
+	endcase
 
 
 ; loc_BDC2A:
