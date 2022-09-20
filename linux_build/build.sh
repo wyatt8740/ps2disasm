@@ -1,5 +1,8 @@
-#!/bin/sh
-
+#!/bin/bash
+# dear original author:
+# don't lie and say this runs in sh; it doesn't. it's a bash script.
+# --wyatt
+#set -x
 version="0.2.1b"
 
 this="${0##*/}"
@@ -175,14 +178,14 @@ setup_helper() {
 # Be careful. fix_bin_header is this function and fixheader is the binary.
 fix_bin_header() {
     # Choose if we want to fix the header.
-    if [ -x "${fixheader:=${helperdir}/fixheader}" ]
-    then
-        "$fixheader" "$1" && msg "Fixed the header..." || warn "Header fixing failed!"
-    else
-         setup_helper fixheader{,.cpp} "https://raw.githubusercontent.com/sonicretro/s2disasm/ab771f939679b27398d3bd45c3c390508b0d0a33/build_source/fixheader.cpp" \
-             && fix_bin_header "$1" \
-             || { rm -r "$workdir"; errexit 1 "Unable to set up the fixheader helper. You might need to do it by yourself. Aborting..."; }
-    fi
+ #   if [ -x "${fixheader:=${helperdir}/fixheader}" ] || [ type fixheader ]
+  #  then
+        "fixheader" "$1" && msg "Fixed the header..." || warn "Header fixing failed!"
+#    else
+  #       setup_helper fixheader{,.cpp} "https://raw.githubusercontent.com/sonicretro/s2disasm/ab771f939679b27398d3bd45c3c390508b0d0a33/build_source/fixheader.cpp" \
+ #            && fix_bin_header "$1" \
+#             || { rm -r "$workdir"; errexit 1 "Unable to set up the fixheader helper. You might need to do it by yourself. Aborting..."; }
+#    fi
 }
 
 setup_p2bin() {
@@ -213,23 +216,30 @@ create_bdelta() {
 
 # IPS is a common format too. romhacking.net users might want to use this.
 create_ips() {
-    if check_dep python3
-    then
-        [ "$ips_py" ] || ips_py="$(find_one 'ips.py')"
-        status="$?"
-        if [ "$status" -eq 0 ]
-        then
-            python3 "$ips_py" create "$1" "$2" "$3" > /dev/null &&  msg "ips created to '$3'..." || warn "ips failed"
-        elif [ "$status" -eq 127 ]
-        then
-            ask_download "${helperdir}/ips.py" https://raw.githubusercontent.com/fbeaudet/ips.py/1fcf07a03111bac8ede9493f414765d8e4e32cfe/ips.py && \
-            ips_py="${helperdir}/ips.py" && python3 "$ips_py" create "$1" "$2" "$3" > /dev/null &&  msg "ips created to '$3'..." || warn "ips failed."
-        else
-             warn "ips Creation failed. There seems to be many possible sources for ips.py..."
-        fi
-    else
-        warn "python3 missing. Skipping ips patch creation."
-    fi
+  # ips.pl by koitsu
+  type ips
+  if [ $? -eq 0 ]; then
+    ips -c "$3" "$1" "$2"
+  else
+    warn "skipping ips creation, ips missing (the perl script by koitsu)"
+  fi
+    # if check_dep python3
+    # then
+    #     [ "$ips_py" ] || ips_py="$(find_one 'ips.py')"
+    #     status="$?"
+    #     if [ "$status" -eq 0 ]
+    #     then
+    #         python3 "$ips_py" create "$1" "$2" "$3" > /dev/null &&  msg "ips created to '$3'..." || warn "ips failed"
+    #     elif [ "$status" -eq 127 ]
+    #     then
+    #         ask_download "${helperdir}/ips.py" https://raw.githubusercontent.com/fbeaudet/ips.py/1fcf07a03111bac8ede9493f414765d8e4e32cfe/ips.py && \
+    #         ips_py="${helperdir}/ips.py" && python3 "$ips_py" create "$1" "$2" "$3" > /dev/null &&  msg "ips created to '$3'..." || warn "ips failed."
+    #     else
+    #          warn "ips Creation failed. There seems to be many possible sources for ips.py..."
+    #     fi
+    # else
+    #     warn "python3 missing. Skipping ips patch creation."
+    # fi
 }
 
 ### Go trough CLI switches.
@@ -266,7 +276,7 @@ do
             bdiff="$2"
             shift
         ;;
-        --ips-py|--ipspy)
+        --ips-pl|--ipspl)
             [ "$2" ] && check_dep "$2" die
             ips_py="$2"
             shift

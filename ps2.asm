@@ -63,7 +63,7 @@ VectorTable:
 	dc.l	ErrorTrap, ErrorTrap, ErrorTrap, ErrorTrap
 
 Header:
-	if revision = 0
+	if revision=0
 	dc.b	"SEGA MEGA DRIVE " ; Console name
 	dc.b 	"(C)SEGA 1988.DEC" ; Copyright/Date
 	dc.b 	"PHANTASY STAR 2                                 " ; Domestic name
