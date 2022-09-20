@@ -30,7 +30,7 @@ exp_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
 meseta_gain = 0			; 0 = normal; 1 = double; 2 = quadruple
 checksum_remove = 0		; if 1, remove the checksum calculation routine resulting in a faster boot time
 revision = 2			; 0 = Japanese; 1 = first US release; 2 = second US release; 3 = Portuguese
-soundrev = 0			; 0 = use sound engine and samples appropriate for revision; 1 = use Japanese audio regardless of revision; 2 = use Japanese audio, but with a quieter snare drum sample; 3 = use US/EU audio regardless of revision
+soundrev = 0			; 0 = use sound engine and samples appropriate for revision; 1 = force Japanese audio; 2 = force JP with quieter snare drum sample; 3 = force US/EU/BR audio
 cross_patch = 0			; Set this to 1 to replace the green cross sign with an H and remove the red cross sign, just like
 						; the Virtual Console version
 
