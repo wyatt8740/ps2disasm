@@ -170,6 +170,140 @@ zloc_118:
 
 ;;; ridiculously loud snare drum sample
 zloc_299:
+	switch soundrev
+    case 2
+   	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
+	db	 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 81h, 81h, 82h, 82h
+	db	 7Eh, 7Ch, 8Ah, 6Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 0B6h, 0B6h, 0B6h
+	db	 0B6h, 0B6h, 0B6h, 0B6h, 62h, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 0B6h, 0B6h
+	db	 99h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h
+	db	 0B6h, 0B6h, 0B6h, 0B6h, 0B2h, 0B6h, 4Bh, 4Bh, 4Bh, 8Ah, 5Ah, 4Bh, 5Fh, 4Bh, 4Bh, 4Bh
+	db	 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Dh
+	db	 4Bh, 66h, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 64h, 0B6h, 0B6h, 0B6h, 4Bh, 4Bh
+	db	 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 4Bh, 84h, 59h, 91h, 0B6h, 9Fh, 7Fh, 0B6h, 0B6h, 0B6h, 9Ah
+	db	 4Bh, 4Bh, 52h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h
+	db	 0B6h, 58h, 4Bh, 0A9h, 0B6h, 0B6h, 0B6h, 0B6h, 0A4h, 0B6h, 0B6h, 0B6h, 0B6h, 4Bh, 4Bh, 4Bh
+	db	 4Bh, 5Bh, 0A6h, 4Bh, 4Bh, 0A1h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 97h, 4Bh, 72h
+	db	 97h, 4Dh, 8Ah, 4Bh, 69h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 72h, 62h, 4Bh, 4Bh, 4Bh
+	db	 4Bh, 4Bh, 4Bh, 4Ch, 92h, 9Ch, 0B6h, 0A5h, 0B5h, 0B6h, 0B6h, 0B6h, 0B6h, 69h, 62h, 83h
+	db	 74h, 9Fh, 8Ch, 99h, 7Fh, 0A7h, 0B6h, 0B6h, 0B6h, 0B6h, 0AEh, 0B6h, 0B6h, 0B6h, 0B6h, 4Bh
+	db	 4Bh, 7Fh, 0B6h, 82h, 51h, 7Ch, 66h, 7Ch, 9Ah, 6Dh, 4Bh, 4Bh, 4Bh, 7Ch, 7Eh, 4Bh
+	db	 4Bh, 4Bh, 4Bh, 60h, 70h, 4Bh, 52h, 6Ah, 0B6h, 9Eh, 0A3h, 8Ah, 4Bh, 4Bh, 0A5h, 0A4h
+	db	 60h, 4Bh, 4Bh, 4Bh, 75h, 61h, 4Bh, 58h, 4Dh, 7Bh, 4Bh, 0B6h, 4Bh, 4Bh, 8Bh, 4Bh
+	db	 8Dh, 79h, 4Bh, 4Bh, 89h, 4Bh, 4Bh, 75h, 57h, 50h, 60h, 0B4h, 4Bh, 0A1h, 97h, 0ACh
+	db	 0B5h, 5Ch, 50h, 98h, 52h, 0ACh, 64h, 4Bh, 58h, 80h, 0B6h, 0B6h, 8Dh, 96h, 79h, 0A5h
+	db	 81h, 4Bh, 6Eh, 4Bh, 67h, 97h, 4Bh, 6Fh, 6Bh, 4Bh, 5Ah, 5Bh, 77h, 0ACh, 0B1h, 0B6h
+	db	 57h, 0A5h, 0A8h, 4Bh, 61h, 59h, 0B6h, 97h, 96h, 86h, 0AAh, 8Ah, 97h, 77h, 0B6h, 6Eh
+	db	 79h, 0B4h, 0A9h, 81h, 5Eh, 8Bh, 4Bh, 87h, 0B2h, 65h, 4Bh, 66h, 4Bh, 63h, 0B6h, 4Bh
+	db	 69h, 4Bh, 6Ah, 77h, 0AFh, 4Eh, 9Bh, 9Ch, 0A1h, 6Dh, 0B6h, 0B6h, 0B6h, 0B6h, 0B6h, 0A6h
+	db	 75h, 0B6h, 6Ah, 76h, 84h, 8Eh, 0AEh, 0B6h, 0B6h, 6Dh, 9Ah, 5Ah, 0A9h, 67h, 89h, 64h
+	db	 8Fh, 0B6h, 87h, 4Ch, 7Bh, 4Bh, 91h, 0B6h, 86h, 4Bh, 6Fh, 0B6h, 0B6h, 95h, 6Fh, 4Fh
+	db	 61h, 73h, 0B6h, 7Eh, 73h, 52h, 0AEh, 5Ah, 0B6h, 9Eh, 8Ch, 8Bh, 99h, 91h, 0B6h, 9Ch
+	db	 89h, 8Ch, 59h, 5Eh, 87h, 4Bh, 9Eh, 4Bh, 4Bh, 4Bh, 7Eh, 75h, 0B6h, 69h, 84h, 55h
+	db	 96h, 0A2h, 0A1h, 4Bh, 94h, 0A8h, 89h, 0B4h, 7Eh, 4Bh, 74h, 87h, 86h, 60h, 4Bh, 4Bh
+	db	 6Ch, 58h, 0AEh, 79h, 91h, 80h, 73h, 0B6h, 0B6h, 0B6h, 0AEh, 7Dh, 0B3h, 0A1h, 0A5h, 75h
+	db	 4Bh, 6Dh, 4Bh, 7Eh, 78h, 91h, 7Fh, 4Bh, 78h, 4Bh, 6Fh, 7Fh, 4Bh, 4Bh, 53h, 0B6h
+	db	 82h, 4Dh, 57h, 8Ch, 0B6h, 0B6h, 0B6h, 58h, 91h, 96h, 0A0h, 8Fh, 9Ah, 87h, 6Dh, 57h
+	db	 51h, 77h, 4Eh, 5Dh, 4Bh, 6Ch, 82h, 6Ah, 80h, 0A1h, 5Bh, 0AEh, 0B6h, 0B1h, 9Dh, 4Dh
+	db	 92h, 98h, 7Ah, 82h, 5Dh, 4Bh, 4Bh, 4Bh, 97h, 7Ah, 0B6h, 6Fh, 0ABh, 9Ch, 67h, 99h
+	db	 8Ch, 73h, 4Bh, 53h, 0B6h, 4Bh, 82h, 55h, 4Bh, 9Ch, 0B6h, 4Bh, 63h, 0AFh, 0B2h, 86h
+	db	 87h, 62h, 5Dh, 9Fh, 4Bh, 4Bh, 7Eh, 0B6h, 74h, 81h, 0A6h, 93h, 7Ch, 75h, 76h, 98h
+	db	 83h, 71h, 68h, 99h, 9Fh, 4Bh, 9Dh, 94h, 72h, 4Bh, 0B6h, 9Eh, 66h, 65h, 98h, 74h
+	db	 78h, 82h, 7Bh, 0A8h, 0A5h, 60h, 0B6h, 9Ah, 65h, 98h, 99h, 82h, 62h, 66h, 70h, 97h
+	db	 83h, 0B6h, 0A0h, 99h, 0A5h, 87h, 0ACh, 7Fh, 72h, 57h, 4Bh, 60h, 76h, 7Ch, 5Eh, 7Dh
+	db	 9Fh, 94h, 91h, 0B6h, 64h, 0A6h, 71h, 0B1h, 8Eh, 60h, 83h, 67h, 68h, 51h, 84h, 69h
+	db	 82h, 81h, 0A1h, 6Fh, 8Ah, 50h, 7Ah, 86h, 76h, 0A1h, 7Eh, 7Bh, 64h, 0B6h, 0B6h, 0B6h
+	db	 7Eh, 95h, 60h, 80h, 7Fh, 5Ah, 91h, 4Bh, 4Bh, 6Dh, 89h, 77h, 61h, 7Ah, 7Bh, 99h
+	db	 9Eh, 75h, 74h, 99h, 75h, 67h, 0B6h, 89h, 83h, 80h, 6Dh, 88h, 97h, 0A2h, 84h, 0A2h
+	db	 0B6h, 68h, 6Fh, 9Ch, 6Ah, 6Ch, 72h, 5Fh, 6Ah, 61h, 99h, 81h, 97h, 64h, 93h, 5Ah
+	db	 84h, 6Dh, 8Ah, 7Ch, 73h, 7Bh, 88h, 53h, 7Ah, 82h, 6Dh, 9Bh, 7Ch, 84h, 0A3h, 86h
+	db	 67h, 6Dh, 87h, 86h, 8Fh, 7Ch, 68h, 0A0h, 0B5h, 9Ch, 0A3h, 9Eh, 8Ah, 82h, 84h, 8Ch
+	db	 4Fh, 7Ah, 7Ah, 6Dh, 4Bh, 68h, 87h, 59h, 0A7h, 88h, 6Eh, 82h, 7Fh, 90h, 93h, 90h
+	db	 8Ah, 7Bh, 58h, 91h, 6Bh, 75h, 99h, 8Fh, 7Dh, 0AAh, 6Fh, 94h, 82h, 7Bh, 97h, 79h
+	db	 88h, 64h, 78h, 87h, 76h, 72h, 98h, 6Bh, 91h, 9Bh, 70h, 63h, 6Fh, 9Eh, 5Fh, 9Ch
+	db	 67h, 7Fh, 9Fh, 69h, 8Ah, 0A1h, 85h, 8Ah, 84h, 88h, 85h, 7Dh, 74h, 6Fh, 62h, 7Bh
+	db	 7Fh, 7Ah, 79h, 8Dh, 8Dh, 0ACh, 92h, 84h, 8Ah, 9Fh, 6Fh, 0B6h, 0A9h, 89h, 7Ch, 7Ch
+	db	 6Eh, 87h, 63h, 5Eh, 6Ah, 6Ch, 84h, 72h, 55h, 7Fh, 83h, 85h, 90h, 8Ah, 87h, 83h
+	db	 97h, 0A4h, 71h, 84h, 9Ch, 8Fh, 8Ah, 9Fh, 8Dh, 52h, 8Ah, 7Ah, 62h, 73h, 0A3h, 56h
+	db	 6Fh, 96h, 7Dh, 8Ch, 89h, 6Fh, 7Ch, 8Eh, 78h, 6Ah, 91h, 6Ah, 84h, 90h, 91h, 8Bh
+	db	 83h, 89h, 6Ah, 70h, 8Dh, 6Eh, 70h, 7Ch, 4Bh, 71h, 6Fh, 7Ah, 84h, 8Fh, 82h, 9Eh
+	db	 93h, 90h, 9Ch, 8Ah, 9Dh, 64h, 68h, 82h, 85h, 82h, 7Ah, 8Fh, 8Dh, 80h, 68h, 7Ch
+	db	 8Ah, 62h, 77h, 6Ah, 76h, 6Ah, 81h, 74h, 5Ah, 6Fh, 88h, 0A2h, 87h, 91h, 8Fh, 0A6h
+	db	 9Dh, 8Ah, 89h, 77h, 7Ch, 5Ch, 8Bh, 8Bh, 87h, 7Ch, 89h, 4Bh, 7Ch, 64h, 55h, 6Fh
+	db	 8Ch, 78h, 67h, 99h, 7Dh, 0A1h, 0A1h, 0A0h, 5Eh, 91h, 8Ch, 8Ah, 9Dh, 80h, 7Ah, 91h
+	db	 86h, 75h, 8Ah, 82h, 5Bh, 62h, 70h, 73h, 7Bh, 84h, 50h, 72h, 7Fh, 6Fh, 6Eh, 76h
+	db	 76h, 91h, 80h, 91h, 0A9h, 0A6h, 87h, 88h, 8Bh, 8Eh, 7Ch, 7Fh, 81h, 80h, 62h, 82h
+	db	 5Ch, 65h, 72h, 74h, 66h, 76h, 82h, 7Eh, 8Ah, 8Bh, 8Bh, 9Eh, 99h, 72h, 88h, 9Ch
+	db	 9Fh, 96h, 8Eh, 71h, 7Fh, 85h, 6Ah, 64h, 5Dh, 7Ah, 77h, 6Ch, 6Fh, 67h, 80h, 80h
+	db	 6Dh, 90h, 92h, 98h, 0AAh, 91h, 98h, 0A1h, 99h, 97h, 7Dh, 83h, 76h, 74h, 6Eh, 55h
+	db	 6Eh, 5Ch, 60h, 6Eh, 81h, 7Fh, 83h, 82h, 94h, 8Ah, 7Fh, 7Dh, 8Ah, 81h, 7Fh, 83h
+	db	 98h, 7Dh, 7Dh, 85h, 9Eh, 97h, 87h, 7Ch, 76h, 73h, 83h, 76h, 68h, 7Dh, 60h, 70h
+	db	 85h, 73h, 79h, 92h, 7Ch, 91h, 8Bh, 86h, 75h, 8Ah, 91h, 66h, 89h, 91h, 8Dh, 76h
+	db	 71h, 83h, 8Fh, 89h, 92h, 86h, 7Ah, 83h, 67h, 78h, 7Bh, 6Fh, 59h, 7Eh, 83h, 77h
+	db	 7Ah, 84h, 7Bh, 8Bh, 9Bh, 91h, 8Bh, 88h, 78h, 74h, 97h, 8Eh, 76h, 6Bh, 76h, 7Dh
+	db	 89h, 7Ch, 71h, 7Ch, 7Dh, 80h, 80h, 88h, 7Eh, 82h, 70h, 8Bh, 91h, 82h, 7Ah, 73h
+	db	 81h, 90h, 80h, 84h, 87h, 95h, 7Bh, 7Fh, 81h, 6Fh, 7Fh, 7Ah, 71h, 7Ch, 89h, 86h
+	db	 8Dh, 7Ch, 8Dh, 84h, 77h, 8Ch, 8Bh, 6Dh, 83h, 7Ch, 7Bh, 84h, 7Ah, 71h, 7Dh, 84h
+	db	 79h, 82h, 8Ah, 82h, 78h, 86h, 79h, 75h, 8Dh, 70h, 82h, 96h, 82h, 82h, 85h, 93h
+	db	 7Fh, 83h, 8Fh, 89h, 7Bh, 74h, 84h, 7Ah, 8Bh, 80h, 6Fh, 71h, 7Ah, 7Bh, 86h, 85h
+	db	 7Ch, 81h, 7Fh, 90h, 81h, 7Ch, 79h, 82h, 83h, 7Fh, 85h, 78h, 86h, 7Ah, 85h, 8Ch
+	db	 86h, 6Eh, 80h, 7Fh, 88h, 7Ch, 82h, 84h, 6Dh, 8Ah, 82h, 7Eh, 84h, 80h, 8Bh, 81h
+	db	 81h, 88h, 7Fh, 7Ch, 70h, 6Dh, 8Bh, 76h, 80h, 83h, 72h, 81h, 7Dh, 91h, 79h, 7Bh
+	db	 82h, 84h, 7Eh, 91h, 7Fh, 7Dh, 82h, 8Ch, 7Fh, 78h, 8Ah, 6Fh, 84h, 7Fh, 75h, 7Bh
+	db	 80h, 86h, 92h, 8Fh, 80h, 84h, 89h, 80h, 89h, 78h, 7Ch, 87h, 80h, 6Fh, 85h, 74h
+	db	 6Eh, 7Bh, 74h, 74h, 71h, 74h, 78h, 72h, 94h, 86h, 87h, 96h, 88h, 8Ah, 94h, 85h
+	db	 82h, 91h, 83h, 74h, 81h, 82h, 7Eh, 74h, 74h, 72h, 81h, 7Dh, 80h, 80h, 82h, 84h
+	db	 7Dh, 85h, 83h, 85h, 87h, 8Bh, 85h, 85h, 8Eh, 7Fh, 7Ah, 7Ch, 73h, 83h, 7Bh, 87h
+	db	 83h, 82h, 7Dh, 74h, 7Fh, 82h, 77h, 7Fh, 87h, 83h, 80h, 84h, 7Ch, 7Eh, 8Bh, 8Ch
+	db	 85h, 7Dh, 98h, 8Ah, 87h, 7Ah, 82h, 72h, 7Bh, 71h, 6Fh, 6Eh, 78h, 80h, 82h, 80h
+	db	 7Fh, 83h, 87h, 88h, 86h, 81h, 75h, 80h, 77h, 80h, 84h, 7Ch, 89h, 8Ah, 88h, 86h
+	db	 87h, 8Eh, 91h, 8Ah, 7Ah, 74h, 7Eh, 84h, 7Ah, 7Ch, 85h, 85h, 81h, 7Fh, 79h, 76h
+	db	 81h, 85h, 7Eh, 84h, 81h, 87h, 7Ch, 8Ch, 7Fh, 72h, 82h, 7Eh, 82h, 83h, 81h, 72h
+	db	 82h, 7Ch, 74h, 83h, 82h, 87h, 7Fh, 88h, 7Fh, 89h, 83h, 85h, 89h, 80h, 79h, 82h
+	db	 7Dh, 8Ah, 83h, 77h, 7Ch, 83h, 83h, 88h, 85h, 83h, 82h, 7Fh, 81h, 7Fh, 7Eh, 75h
+	db	 78h, 88h, 7Bh, 7Fh, 7Ah, 75h, 7Ch, 7Ch, 7Dh, 83h, 87h, 8Bh, 7Bh, 81h, 82h, 7Ch
+	db	 79h, 7Ah, 84h, 86h, 82h, 85h, 83h, 83h, 86h, 84h, 89h, 82h, 7Fh, 84h, 82h, 7Fh
+	db	 7Bh, 84h, 73h, 82h, 88h, 7Ch, 7Fh, 7Eh, 7Ah, 82h, 86h, 7Ch, 77h, 7Ch, 7Ah, 7Ah
+	db	 83h, 7Ah, 7Fh, 82h, 80h, 7Ch, 87h, 8Ah, 84h, 86h, 8Ah, 84h, 7Bh, 84h, 7Bh, 7Ah
+	db	 7Eh, 7Dh, 7Fh, 8Ah, 88h, 7Ch, 7Fh, 76h, 87h, 7Ch, 80h, 7Dh, 7Ah, 87h, 85h, 7Ah
+	db	 7Bh, 7Dh, 7Eh, 84h, 82h, 76h, 7Ah, 85h, 83h, 83h, 7Fh, 7Dh, 7Ch, 7Fh, 89h, 7Dh
+	db	 7Fh, 7Ch, 82h, 7Ch, 83h, 80h, 85h, 83h, 82h, 80h, 8Fh, 86h, 7Fh, 82h, 7Ch, 7Eh
+	db	 81h, 77h, 83h, 7Bh, 7Ah, 78h, 81h, 7Dh, 8Bh, 82h, 83h, 7Bh, 81h, 84h, 87h, 7Ch
+	db	 7Fh, 85h, 83h, 82h, 80h, 7Dh, 7Eh, 80h, 83h, 81h, 7Ch, 7Ch, 80h, 7Eh, 83h, 84h
+	db	 81h, 84h, 80h, 80h, 84h, 89h, 85h, 81h, 86h, 81h, 82h, 81h, 7Ah, 80h, 7Ah, 7Fh
+	db	 82h, 82h, 81h, 7Dh, 7Dh, 7Bh, 7Dh, 7Bh, 7Dh, 75h, 77h, 89h, 87h, 7Eh, 7Ah, 83h
+	db	 89h, 8Ah, 8Ch, 7Dh, 82h, 82h, 84h, 85h, 84h, 7Eh, 7Bh, 7Dh, 7Dh, 82h, 79h, 80h
+	db	 7Ch, 7Fh, 82h, 80h, 83h, 84h, 82h, 85h, 83h, 87h, 85h, 7Bh, 84h, 82h, 82h, 80h
+	db	 7Fh, 7Bh, 79h, 7Fh, 82h, 80h, 84h, 83h, 84h, 82h, 81h, 81h, 82h, 82h, 79h, 79h
+	db	 87h, 7Ah, 80h, 7Dh, 7Bh, 82h, 87h, 7Fh, 7Ah, 85h, 8Ah, 7Fh, 81h, 81h, 7Ah, 84h
+	db	 7Fh, 79h, 7Fh, 87h, 7Fh, 80h, 84h, 80h, 82h, 80h, 7Fh, 83h, 80h, 83h, 7Fh, 80h
+	db	 85h, 7Bh, 82h, 82h, 81h, 7Ah, 82h, 84h, 7Ch, 7Bh, 84h, 7Fh, 80h, 81h, 7Eh, 82h
+	db	 82h, 7Eh, 83h, 84h, 7Eh, 81h, 85h, 84h, 7Dh, 7Dh, 83h, 82h, 81h, 84h, 81h, 82h
+	db	 82h, 7Eh, 82h, 81h, 80h, 81h, 76h, 7Ah, 7Fh, 80h, 7Ah, 81h, 81h, 87h, 82h, 89h
+	db	 7Fh, 84h, 80h, 82h, 80h, 7Ch, 80h, 7Ch, 7Fh, 7Eh, 80h, 7Eh, 7Fh, 7Fh, 84h, 7Fh
+	db	 83h, 7Dh, 7Fh, 82h, 7Fh, 85h, 80h, 81h, 7Dh, 83h, 8Ah, 84h, 83h, 82h, 7Dh, 81h
+	db	 7Fh, 7Bh, 81h, 7Ah, 7Ah, 80h, 82h, 81h, 7Ah, 82h, 82h, 7Fh, 82h, 83h, 7Fh, 82h
+	db	 82h, 7Eh, 84h, 84h, 7Dh, 80h, 81h, 7Fh, 83h, 84h, 81h, 82h, 88h, 7Dh, 7Fh, 86h
+	db	 80h, 7Eh, 80h, 7Ch, 7Eh, 7Dh, 83h, 82h, 82h, 7Fh, 83h, 7Ch, 7Fh, 81h, 82h, 80h
+	db	 7Fh, 80h, 82h, 7Bh, 7Fh, 83h, 80h, 83h, 82h, 81h, 81h, 80h, 7Eh, 7Eh, 82h, 82h
+	db	 81h, 81h, 7Dh, 81h, 84h, 82h, 85h, 85h, 83h, 84h, 82h, 83h, 7Dh, 81h, 81h, 7Dh
+	db	 79h, 7Bh, 80h, 79h, 84h, 82h, 7Fh, 80h, 7Dh, 82h, 82h, 84h, 82h, 83h, 7Eh, 85h
+	db	 80h, 7Fh, 82h, 81h, 81h, 83h, 7Fh, 83h, 80h, 7Fh, 80h, 80h, 82h, 7Dh, 7Fh, 84h
+	db	 7Eh, 7Fh, 81h, 7Fh, 80h, 85h, 7Eh, 7Eh, 7Fh, 83h, 7Eh, 82h, 80h, 7Dh, 84h, 7Fh
+	db	 80h, 84h, 82h, 81h, 80h, 81h, 81h, 7Eh, 80h, 7Fh, 7Fh, 7Fh, 7Eh, 80h, 80h, 82h
+	db	 82h, 84h, 82h, 81h, 81h, 83h, 7Eh, 86h, 86h, 83h, 7Fh, 83h, 7Fh, 80h, 7Eh, 7Eh
+	db	 7Eh, 7Fh, 80h, 7Eh, 7Ch, 7Fh, 81h, 81h, 81h, 82h, 82h, 82h, 84h, 82h, 81h, 82h
+	db	 84h, 83h, 80h, 83h, 82h, 7Dh, 7Fh, 80h, 7Ch, 7Eh, 83h, 7Fh, 80h, 82h, 81h, 80h
+	db	 83h, 80h, 7Dh, 7Eh, 80h, 7Dh, 81h, 80h, 80h, 81h, 82h, 82h, 81h, 84h, 80h, 7Eh
+	db	 84h, 80h, 7Fh, 80h, 7Bh, 7Fh, 82h, 7Eh, 80h, 82h, 81h, 83h, 82h, 83h, 82h, 82h
+	db	 84h
+
+	elsecase
+;;; Use original PCM (loud)
 	db	80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h
 	db	80h, 80h, 80h, 80h, 7Fh, 7Fh, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 80h, 7Fh, 7Fh
 	db	80h, 80h, 80h, 80h, 80h, 7Fh, 80h, 80h, 7Fh, 7Fh, 80h, 80h, 7Fh, 7Fh, 80h, 7Fh
@@ -177,7 +311,7 @@ zloc_299:
 	db	80h, 7Fh, 80h, 80h, 7Fh, 7Fh, 80h, 80h, 7Fh, 7Fh, 80h, 80h, 80h, 80h, 80h, 80h
 	db	80h, 80h, 7Fh, 7Fh, 80h, 80h, 80h, 80h, 80h, 7Fh, 80h, 80h, 81h, 81h, 85h, 84h
 	db	7Ah, 76h, 97h, 4Eh, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 0FFh, 0FFh, 0FFh
-	
+
 ; 307
 	db	0FFh, 0FFh, 0FFh, 0FFh, 39h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 0FFh, 0FFh
 	db	0BBh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh, 0FFh
@@ -308,6 +442,7 @@ zloc_299:
 	db	87h, 7Fh, 79h, 7Bh, 80h, 79h, 81h, 7Fh, 80h, 82h, 83h, 83h, 81h, 89h, 80h, 7Bh
 	db	8Ah, 80h, 7Ch, 80h, 73h, 7Eh, 84h, 7Bh, 7Fh, 85h, 81h, 86h, 83h, 86h, 84h, 85h
 	db	88h
+	endcase
 	
 zloc_A98:
 	db	7Fh, 80h, 81h, 82h, 83h, 84h, 85h, 86h, 85h, 85h, 86h, 86h, 86h, 87h, 88h

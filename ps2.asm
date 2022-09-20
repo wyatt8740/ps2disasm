@@ -76515,7 +76515,9 @@ z80ptr	function addr, ((addr-SoundDriverBase)<<8)&$FF00|(addr-SoundDriverBase)>>
 	case 1,2
 	; if soundrev=1, use Japanese relesae sound engine
 	; if soundrev=2, use Japanese sound engine with modified quieter PCM drums.
-	include "sound/ps2.sound_driver_jap_quiet.asm"
+	; Edit: actually, i was able to merge 'jap.asm' and 'jap_quiet.asm' into one file.
+	; Keeping this here solely as documentation.
+	include "sound/ps2.sound_driver_jap.asm"
 	elsecase
 	; if soundrev is anything else (3, for instance), use US release sound
 	; engine.
@@ -76527,11 +76529,18 @@ z80ptr	function addr, ((addr-SoundDriverBase)<<8)&$FF00|(addr-SoundDriverBase)>>
 PCMDrums:
 	!org 0		; we need to start from an address less than $10000 for Z80 otherwise the assembler throws an Address Overflow error; so we conveniently start from 0
 	save		; save 68000 CPU settings
+	switch soundrev
+	case 0
 	if revision=0
 	include "sound/ps2.pcm_drums_jap.asm"
 	else
 	include "sound/ps2.pcm_drums.asm"
 	endif
+	case 1,2
+	include "sound/ps2.pcm_drums_jap.asm"
+	elsecase
+	include "sound/ps2.pcm_drums.asm"
+	endcase
 	restore		; restore 68000 CPU settings
 	padding off	; padding is not restored, so we need to set the flag again
 	!org (PCMDrums+PCMDrumsEnd-PCMDrumsStart)		; PC must be set to the correct value, so it's the whole code up until the PCMDrums label + the whole z80 code
